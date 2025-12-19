@@ -13,7 +13,7 @@ interface Marker {
   lat: number;
   lng: number;
   title: string;
-  type?: 'hospital' | 'prospect' | 'pharmacy' | 'default';
+  type: 'hospital' | 'prospect' | 'pharmacy' | 'default';
   info?: {
     address?: string;
     score?: number;
