@@ -39,30 +39,63 @@ export default function MyPage() {
 
   const fetchUserData = async () => {
     try {
-      // 실제 구현에서는 API 호출
-      // Mock 데이터
-      setProfile({
-        id: 1,
-        email: 'doctor@example.com',
-        name: '김의사',
-        phone: '010-1234-5678',
-        role: 'DOCTOR',
-        company: '메디매치 병원',
-        createdAt: '2024-06-01T00:00:00',
+      const token = localStorage.getItem('token');
+      if (!token) {
+        router.push('/login');
+        return;
+      }
+
+      // 사용자 프로필 조회
+      const profileResponse = await fetch('/api/v1/users/me', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       });
 
-      setSubscription({
-        plan: 'monthly',
-        status: 'ACTIVE',
-        expires_at: '2025-02-15T00:00:00',
-        is_auto_renew: true,
+      if (!profileResponse.ok) {
+        if (profileResponse.status === 401) {
+          localStorage.removeItem('token');
+          router.push('/login');
+          return;
+        }
+        throw new Error('Failed to fetch profile');
+      }
+
+      const profileData = await profileResponse.json();
+      setProfile({
+        id: profileData.id,
+        email: profileData.email,
+        name: profileData.name,
+        phone: profileData.phone || '',
+        role: profileData.role,
+        company: profileData.company || null,
+        createdAt: profileData.created_at,
       });
 
       setEditForm({
-        name: '김의사',
-        phone: '010-1234-5678',
-        company: '메디매치 병원',
+        name: profileData.name || '',
+        phone: profileData.phone || '',
+        company: profileData.company || '',
       });
+
+      // 구독 정보 조회
+      const subscriptionResponse = await fetch('/api/v1/subscriptions/me', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (subscriptionResponse.ok) {
+        const subscriptionData = await subscriptionResponse.json();
+        setSubscription({
+          plan: subscriptionData.plan,
+          status: subscriptionData.status,
+          expires_at: subscriptionData.expires_at,
+          is_auto_renew: subscriptionData.is_auto_renew,
+        });
+      } else {
+        setSubscription(null);
+      }
     } catch (err) {
       console.error('Failed to fetch user data:', err);
     } finally {
@@ -72,21 +105,45 @@ export default function MyPage() {
 
   const handleSaveProfile = async () => {
     try {
-      // API 호출하여 프로필 저장
-      console.log('Saving profile:', editForm);
+      const token = localStorage.getItem('token');
+      if (!token) {
+        router.push('/login');
+        return;
+      }
+
+      const response = await fetch('/api/v1/users/me', {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          name: editForm.name,
+          phone: editForm.phone,
+          company: editForm.company,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update profile');
+      }
+
+      const updatedData = await response.json();
+
       setProfile((prev) =>
         prev
           ? {
               ...prev,
-              name: editForm.name,
-              phone: editForm.phone,
-              company: editForm.company,
+              name: updatedData.name || editForm.name,
+              phone: updatedData.phone || editForm.phone,
+              company: updatedData.company || editForm.company,
             }
           : null
       );
       setIsEditing(false);
     } catch (err) {
       console.error('Failed to save profile:', err);
+      alert('프로필 저장에 실패했습니다. 다시 시도해주세요.');
     }
   };
 

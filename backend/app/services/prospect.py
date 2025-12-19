@@ -3,6 +3,8 @@ from uuid import UUID
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, desc, func, and_, or_
 from datetime import datetime
+import httpx
+import json
 
 from ..models.prospect import ProspectLocation, UserAlert, ProspectType, ProspectStatus
 from ..schemas.prospect import (
@@ -331,7 +333,7 @@ class ProspectService:
         commercial: Dict,
         demographics: Dict
     ) -> Dict[str, Any]:
-        """AI 분석 생성 (실제로는 OpenAI/Gemini API 호출)"""
+        """AI 분석 생성 (템플릿 기반, AI 호출은 비동기 메서드에서 처리)"""
 
         # 경쟁 분석
         same_area_hospitals = len(hospitals)
@@ -384,6 +386,86 @@ class ProspectService:
             "demographic_summary": demographic_summary,
             "recommended_actions": recommended_actions
         }
+
+    async def generate_ai_sales_report(
+        self,
+        prospect: ProspectLocation,
+        hospitals: List[Dict],
+        commercial: Dict,
+        demographics: Dict
+    ) -> Dict[str, Any]:
+        """OpenAI를 사용한 AI 영업 리포트 생성"""
+        if not settings.OPENAI_API_KEY:
+            logger.warning("OpenAI API key not configured, using template analysis")
+            return self._generate_analysis(prospect, hospitals, commercial, demographics)
+
+        prompt = f"""
+당신은 의료 영업 전문 컨설턴트입니다. 다음 데이터를 기반으로 영업사원을 위한 프로스펙트 분석 리포트를 작성해주세요.
+
+[프로스펙트 정보]
+- 주소: {prospect.address}
+- 유형: {prospect.type.value if prospect.type else '신규 건물'}
+- 적합도 점수: {prospect.clinic_fit_score or 70}점
+- 추천 진료과: {', '.join(prospect.recommended_dept or ['미정'])}
+- 층별 정보: {prospect.floor_info or '미정'}
+- 예상 면적: {prospect.floor_area or 0}㎡
+
+[시장 데이터]
+- 반경 1km 내 병원 수: {len(hospitals)}개
+- 유동인구: {commercial.get('floating_population', 50000):,}명/일
+- 반경 1km 인구: {demographics.get('population_1km', 45000):,}명
+- 40대 이상 비율: {demographics.get('age_40_plus_ratio', 0.4) * 100:.1f}%
+
+다음 JSON 형식으로 영업 전략 리포트를 작성해주세요:
+{{
+    "executive_summary": "경영진 요약 (2-3문장)",
+    "opportunity_score": 0-100 사이 점수,
+    "target_doctors": ["타겟 의사 유형 2-3개"],
+    "key_selling_points": ["핵심 영업 포인트 3-4개"],
+    "potential_objections": ["예상 반론과 대응책 2-3개"],
+    "recommended_approach": "권장 영업 접근 방식",
+    "urgency_factor": "긴급도 (HIGH/MEDIUM/LOW)와 이유"
+}}
+"""
+
+        try:
+            async with httpx.AsyncClient(timeout=30.0) as client:
+                response = await client.post(
+                    "https://api.openai.com/v1/chat/completions",
+                    headers={
+                        "Authorization": f"Bearer {settings.OPENAI_API_KEY}",
+                        "Content-Type": "application/json",
+                    },
+                    json={
+                        "model": "gpt-4o-mini",
+                        "messages": [
+                            {"role": "system", "content": "당신은 의료 영업 전문 컨설턴트입니다. JSON 형식으로만 응답하세요."},
+                            {"role": "user", "content": prompt}
+                        ],
+                        "temperature": 0.7,
+                        "max_tokens": 1500,
+                        "response_format": {"type": "json_object"}
+                    }
+                )
+
+                if response.status_code == 200:
+                    data = response.json()
+                    content = data["choices"][0]["message"]["content"]
+                    ai_result = json.loads(content)
+
+                    # 기존 분석과 AI 결과 병합
+                    base_analysis = self._generate_analysis(prospect, hospitals, commercial, demographics)
+                    base_analysis["ai_report"] = ai_result
+                    base_analysis["opportunity_score"] = ai_result.get("opportunity_score", base_analysis["opportunity_score"])
+
+                    return base_analysis
+                else:
+                    logger.error(f"OpenAI API error: {response.status_code}")
+                    return self._generate_analysis(prospect, hospitals, commercial, demographics)
+
+        except Exception as e:
+            logger.error(f"OpenAI API call failed: {e}")
+            return self._generate_analysis(prospect, hospitals, commercial, demographics)
 
 
 prospect_service = ProspectService()

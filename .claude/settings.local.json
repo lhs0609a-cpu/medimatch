@@ -3,7 +3,24 @@
     "allow": [
       "Bash(gh auth status:*)",
       "Bash(git init:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(winget install:*)",
+      "Bash(\"C:\\\\Program Files\\\\GitHub CLI\\\\gh.exe\" --version)",
+      "Bash(\"C:\\\\Program Files \\(x86\\)\\\\GitHub CLI\\\\gh.exe\" --version)",
+      "Bash(gh --version:*)",
+      "Bash(git remote add:*)",
+      "Bash(git branch:*)",
+      "Bash(git push:*)",
+      "Bash(npx vercel:*)",
+      "Bash(npm install:*)",
+      "Bash(npm run build:*)",
+      "Bash(npx next build)",
+      "Bash(npx next build:*)",
+      "Bash(node_modules/.bin/next build)",
+      "Bash(dir:*)",
+      "Bash(cd:*)",
+      "Bash(cat:*)"
     ]
   }
 }

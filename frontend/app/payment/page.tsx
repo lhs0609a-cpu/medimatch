@@ -29,6 +29,8 @@ export default function PaymentPage() {
   const [selectedProduct, setSelectedProduct] = useState<string | null>(productId);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [retryCount, setRetryCount] = useState(0);
+  const MAX_RETRIES = 3;
 
   useEffect(() => {
     fetchProducts();
@@ -62,6 +64,16 @@ export default function PaymentPage() {
     setError(null);
 
     try {
+      await processPaymentWithRetry(selectedProduct);
+    } catch (err: any) {
+      setError(err.message || '결제 처리 중 오류가 발생했습니다.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const processPaymentWithRetry = async (productId: string, attempt: number = 0): Promise<void> => {
+    try {
       // 결제 요청 생성
       const response = await fetch('/api/v1/payments/create', {
         method: 'POST',
@@ -70,14 +82,25 @@ export default function PaymentPage() {
           Authorization: `Bearer ${localStorage.getItem('token')}`,
         },
         body: JSON.stringify({
-          product_id: selectedProduct,
+          product_id: productId,
           success_url: `${window.location.origin}/payment/success`,
           fail_url: `${window.location.origin}/payment/fail`,
         }),
       });
 
       if (!response.ok) {
-        throw new Error('결제 요청 생성에 실패했습니다.');
+        const errorData = await response.json().catch(() => ({}));
+
+        // 재시도 가능한 에러인지 확인
+        if (response.status >= 500 && attempt < MAX_RETRIES) {
+          setRetryCount(attempt + 1);
+          // 지수 백오프: 1초, 2초, 4초
+          const delay = Math.pow(2, attempt) * 1000;
+          await new Promise(resolve => setTimeout(resolve, delay));
+          return processPaymentWithRetry(productId, attempt + 1);
+        }
+
+        throw new Error(errorData.message || '결제 요청 생성에 실패했습니다.');
       }
 
       const data = await response.json();
@@ -87,14 +110,28 @@ export default function PaymentPage() {
       await tossPayments.requestPayment('카드', {
         amount: data.amount,
         orderId: data.order_id,
-        orderName: products[selectedProduct].name,
+        orderName: products[productId].name,
         successUrl: data.payment_data.successUrl,
         failUrl: data.payment_data.failUrl,
       });
     } catch (err: any) {
-      setError(err.message || '결제 처리 중 오류가 발생했습니다.');
+      // 네트워크 오류시 재시도
+      if (err.name === 'TypeError' && attempt < MAX_RETRIES) {
+        setRetryCount(attempt + 1);
+        const delay = Math.pow(2, attempt) * 1000;
+        await new Promise(resolve => setTimeout(resolve, delay));
+        return processPaymentWithRetry(productId, attempt + 1);
+      }
+
+      // 토스페이먼츠 결제창 취소는 에러 메시지 표시하지 않음
+      if (err.code === 'USER_CANCEL') {
+        setRetryCount(0);
+        return;
+      }
+
+      throw err;
     } finally {
-      setLoading(false);
+      setRetryCount(0);
     }
   };
 
@@ -216,12 +253,19 @@ export default function PaymentPage() {
                   d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                 />
               </svg>
-              처리 중...
+              {retryCount > 0 ? `재시도 중... (${retryCount}/${MAX_RETRIES})` : '처리 중...'}
             </span>
           ) : (
             '결제하기'
           )}
         </button>
+
+        {/* 재시도 안내 */}
+        {retryCount > 0 && (
+          <p className="text-center text-sm text-yellow-600 mt-2">
+            네트워크 오류로 인해 자동으로 재시도 중입니다...
+          </p>
+        )}
 
         {/* 안내 문구 */}
         <div className="mt-6 text-center text-sm text-gray-500">

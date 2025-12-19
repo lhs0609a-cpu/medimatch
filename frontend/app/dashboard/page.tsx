@@ -41,56 +41,91 @@ export default function DashboardPage() {
 
   const fetchDashboardData = async () => {
     try {
-      // 실제 구현에서는 API 호출
-      // Mock 데이터
-      setStats({
-        totalSimulations: 12,
-        totalBids: 5,
-        successfulBids: 2,
-        pendingAlerts: 3,
-        credits: 5,
-        subscriptionStatus: 'ACTIVE',
-        subscriptionExpires: '2025-02-15',
+      const token = localStorage.getItem('token');
+      if (!token) {
+        window.location.href = '/login';
+        return;
+      }
+
+      // 사용자 정보 조회
+      const userResponse = await fetch('/api/v1/users/me', {
+        headers: { Authorization: `Bearer ${token}` },
       });
 
-      setActivities([
-        {
-          id: 1,
-          type: 'simulation',
-          title: '시뮬레이션 완료',
-          description: '강남구 역삼동 피부과 개원 시뮬레이션',
-          timestamp: '2025-01-15T10:30:00',
-          status: 'completed',
-        },
-        {
-          id: 2,
-          type: 'bid',
-          title: '입찰 등록',
-          description: '서초구 서초동 약국 슬롯 입찰',
-          timestamp: '2025-01-14T14:20:00',
-          status: 'pending',
-        },
-        {
-          id: 3,
-          type: 'alert',
-          title: '새로운 프로스펙트',
-          description: '송파구 잠실동에 새로운 입지 발견',
-          timestamp: '2025-01-14T09:00:00',
-          status: 'new',
-        },
-        {
-          id: 4,
-          type: 'payment',
-          title: '결제 완료',
-          description: 'SalesScanner 월 구독',
-          timestamp: '2025-01-10T16:45:00',
-          status: 'completed',
-        },
-      ]);
+      if (!userResponse.ok) {
+        if (userResponse.status === 401) {
+          localStorage.removeItem('token');
+          window.location.href = '/login';
+          return;
+        }
+        throw new Error('Failed to fetch user data');
+      }
 
-      setUserRole('DOCTOR');
+      const userData = await userResponse.json();
+      setUserRole(userData.role || 'DOCTOR');
+
+      // 대시보드 통계 조회
+      const statsResponse = await fetch('/api/v1/dashboard/stats', {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (statsResponse.ok) {
+        const statsData = await statsResponse.json();
+        setStats({
+          totalSimulations: statsData.total_simulations || 0,
+          totalBids: statsData.total_bids || 0,
+          successfulBids: statsData.successful_bids || 0,
+          pendingAlerts: statsData.pending_alerts || 0,
+          credits: statsData.credits || 0,
+          subscriptionStatus: statsData.subscription_status || 'INACTIVE',
+          subscriptionExpires: statsData.subscription_expires || null,
+        });
+      } else {
+        // API 실패시 기본값
+        setStats({
+          totalSimulations: 0,
+          totalBids: 0,
+          successfulBids: 0,
+          pendingAlerts: 0,
+          credits: 0,
+          subscriptionStatus: 'INACTIVE',
+          subscriptionExpires: null,
+        });
+      }
+
+      // 최근 활동 조회
+      const activitiesResponse = await fetch('/api/v1/dashboard/activities?limit=5', {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (activitiesResponse.ok) {
+        const activitiesData = await activitiesResponse.json();
+        setActivities(
+          activitiesData.items?.map((item: any) => ({
+            id: item.id,
+            type: item.type,
+            title: item.title,
+            description: item.description,
+            timestamp: item.created_at,
+            status: item.status,
+          })) || []
+        );
+      } else {
+        setActivities([]);
+      }
     } catch (err) {
       console.error('Failed to fetch dashboard data:', err);
+      // 에러 발생시 기본값 설정
+      setStats({
+        totalSimulations: 0,
+        totalBids: 0,
+        successfulBids: 0,
+        pendingAlerts: 0,
+        credits: 0,
+        subscriptionStatus: 'INACTIVE',
+        subscriptionExpires: null,
+      });
+      setActivities([]);
     } finally {
       setLoading(false);
     }

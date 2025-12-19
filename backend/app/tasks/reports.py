@@ -7,6 +7,9 @@ from datetime import datetime, timedelta
 import logging
 import json
 import asyncio
+import httpx
+
+from app.core.config import settings
 
 logger = logging.getLogger(__name__)
 
@@ -82,14 +85,12 @@ async def _generate_simulation_report_async(simulation_id: int):
 
 async def _generate_ai_report(simulation) -> Dict[str, Any]:
     """
-    AI 기반 리포트 생성
+    AI 기반 리포트 생성 (OpenAI GPT-4o Mini 사용)
     """
-    # 실제 구현 시 GPT-4o Mini API 호출
-    # 현재는 템플릿 기반 리포트 생성
-
     result = simulation.result or {}
 
-    report = {
+    # 기본 분석 데이터 구성
+    base_report = {
         "summary": {
             "title": f"{simulation.address} 개원 시뮬레이션 리포트",
             "generated_at": datetime.utcnow().isoformat(),
@@ -114,45 +115,144 @@ async def _generate_ai_report(simulation) -> Dict[str, Any]:
             "public_transport": result.get("public_transport", []),
             "foot_traffic": result.get("foot_traffic", "보통"),
         },
+    }
+
+    # OpenAI API로 SWOT 분석 및 추천 생성
+    ai_analysis = await _call_openai_for_analysis(simulation, result)
+
+    base_report["recommendations"] = ai_analysis.get("recommendations", {
+        "strengths": ["데이터 분석 중"],
+        "weaknesses": ["데이터 분석 중"],
+        "opportunities": ["데이터 분석 중"],
+        "threats": ["데이터 분석 중"],
+    })
+
+    base_report["action_items"] = ai_analysis.get("action_items", [
+        {"priority": "HIGH", "action": "현장 답사 진행", "deadline": "1주 내"},
+    ])
+
+    base_report["ai_summary"] = ai_analysis.get("summary", "")
+
+    return base_report
+
+
+async def _call_openai_for_analysis(simulation, result: Dict) -> Dict[str, Any]:
+    """
+    OpenAI GPT-4o Mini API 호출하여 분석 생성
+    """
+    if not settings.OPENAI_API_KEY:
+        logger.warning("OpenAI API key not configured, using template analysis")
+        return _generate_template_analysis(simulation, result)
+
+    prompt = f"""
+당신은 의료 시장 분석 전문가입니다. 다음 데이터를 기반으로 병원 개원 분석을 해주세요.
+
+[입력 데이터]
+- 주소: {simulation.address}
+- 진료과목: {simulation.specialty}
+- 예상 월 매출: {result.get("monthly_revenue", 0):,}원
+- 예상 일일 환자: {result.get("daily_patients", 0)}명
+- 반경 1km 경쟁 병원 수: {len(result.get("nearby_hospitals", []))}개
+- 인구밀도: {result.get("population_density", 0)}명/km²
+- 유동인구: {result.get("floating_population", 0)}명
+- 40대 이상 비율: {result.get("age_40_plus_ratio", 0.4) * 100:.1f}%
+
+다음 JSON 형식으로 응답해주세요:
+{{
+    "summary": "전체 분석 요약 (2-3문장)",
+    "recommendations": {{
+        "strengths": ["강점 3개"],
+        "weaknesses": ["약점 2개"],
+        "opportunities": ["기회 2개"],
+        "threats": ["위협 2개"]
+    }},
+    "action_items": [
+        {{"priority": "HIGH/MEDIUM/LOW", "action": "구체적 액션", "deadline": "기한"}}
+    ]
+}}
+"""
+
+    try:
+        async with httpx.AsyncClient(timeout=30.0) as client:
+            response = await client.post(
+                "https://api.openai.com/v1/chat/completions",
+                headers={
+                    "Authorization": f"Bearer {settings.OPENAI_API_KEY}",
+                    "Content-Type": "application/json",
+                },
+                json={
+                    "model": "gpt-4o-mini",
+                    "messages": [
+                        {"role": "system", "content": "당신은 의료 시장 분석 전문가입니다. JSON 형식으로만 응답하세요."},
+                        {"role": "user", "content": prompt}
+                    ],
+                    "temperature": 0.7,
+                    "max_tokens": 1500,
+                    "response_format": {"type": "json_object"}
+                }
+            )
+
+            if response.status_code == 200:
+                data = response.json()
+                content = data["choices"][0]["message"]["content"]
+                return json.loads(content)
+            else:
+                logger.error(f"OpenAI API error: {response.status_code} - {response.text}")
+                return _generate_template_analysis(simulation, result)
+
+    except Exception as e:
+        logger.error(f"OpenAI API call failed: {e}")
+        return _generate_template_analysis(simulation, result)
+
+
+def _generate_template_analysis(simulation, result: Dict) -> Dict[str, Any]:
+    """
+    OpenAI 사용 불가시 템플릿 기반 분석 생성
+    """
+    nearby_count = len(result.get("nearby_hospitals", []))
+    monthly_revenue = result.get("monthly_revenue", 0)
+
+    # 경쟁 수준에 따른 동적 분석
+    if nearby_count <= 3:
+        competition_strength = "해당 지역 내 경쟁이 적어 시장 선점 유리"
+        competition_threat = "신규 경쟁자 진입 가능성"
+    elif nearby_count <= 7:
+        competition_strength = "적정 수준의 경쟁으로 수요 검증됨"
+        competition_threat = "기존 경쟁자와의 차별화 필요"
+    else:
+        competition_strength = "의료 수요가 높은 지역으로 검증됨"
+        competition_threat = "치열한 경쟁으로 마케팅 비용 증가 예상"
+
+    return {
+        "summary": f"{simulation.address}는 {simulation.specialty} 개원에 {'적합한' if monthly_revenue > 50000000 else '보통의'} 입지입니다. "
+                   f"반경 1km 내 {nearby_count}개의 경쟁 병원이 있으며, 예상 월 매출은 {monthly_revenue:,}원입니다.",
         "recommendations": {
             "strengths": [
-                "해당 지역 전문의 부족으로 수요 높음",
+                competition_strength,
                 "대중교통 접근성 우수",
-                "주변 오피스 밀집 지역",
+                "주변 상업시설 밀집으로 유동인구 확보",
             ],
             "weaknesses": [
-                "초기 임대료 높음",
-                "주차 공간 제한적",
+                "초기 임대료 및 인테리어 비용 부담",
+                "주차 공간 확보 필요",
             ],
             "opportunities": [
-                "인근 신규 아파트 단지 입주 예정",
-                "지역 고령화로 의료 수요 증가",
+                "지역 내 의료 서비스 수요 증가 추세",
+                "온라인 마케팅을 통한 신규 환자 유치 가능",
             ],
             "threats": [
-                "대형 병원 인근 위치",
-                "경쟁 의원 증가 추세",
+                competition_threat,
+                "의료 정책 변화에 따른 수익성 영향",
             ],
         },
         "action_items": [
-            {
-                "priority": "HIGH",
-                "action": "임대 계약 협상",
-                "deadline": "개원 3개월 전",
-            },
-            {
-                "priority": "MEDIUM",
-                "action": "인테리어 업체 선정",
-                "deadline": "개원 2개월 전",
-            },
-            {
-                "priority": "LOW",
-                "action": "마케팅 계획 수립",
-                "deadline": "개원 1개월 전",
-            },
+            {"priority": "HIGH", "action": "현장 답사 및 상권 분석", "deadline": "1주 내"},
+            {"priority": "HIGH", "action": "임대 조건 협상", "deadline": "2주 내"},
+            {"priority": "MEDIUM", "action": "인테리어 업체 비교 견적", "deadline": "1개월 내"},
+            {"priority": "MEDIUM", "action": "의료기기 도입 계획 수립", "deadline": "2개월 내"},
+            {"priority": "LOW", "action": "마케팅 전략 수립", "deadline": "개원 1개월 전"},
         ],
     }
-
-    return report
 
 
 @shared_task(bind=True, max_retries=3)
