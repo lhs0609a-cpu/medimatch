@@ -43,7 +43,7 @@ interface MarkerData {
   lat: number;
   lng: number;
   title: string;
-  type: 'hospital' | 'prospect' | 'pharmacy' | 'default';
+  type: 'hospital' | 'prospect' | 'pharmacy' | 'default' | 'closed_hospital' | 'listing';
   info?: {
     address?: string;
     score?: number;
