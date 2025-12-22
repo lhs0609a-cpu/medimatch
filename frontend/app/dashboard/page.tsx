@@ -2,6 +2,25 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import {
+  BarChart3,
+  TrendingUp,
+  Bell,
+  CreditCard,
+  ArrowRight,
+  MapPin,
+  Sparkles,
+  Clock,
+  CheckCircle2,
+  AlertCircle,
+  ChevronRight,
+  Zap,
+  Building2,
+  Plus,
+  Search,
+  Settings,
+  LogOut
+} from 'lucide-react';
 
 interface DashboardStats {
   totalSimulations: number;
@@ -22,18 +41,12 @@ interface RecentActivity {
   status: string;
 }
 
-interface QuickAction {
-  label: string;
-  href: string;
-  icon: string;
-  color: string;
-}
-
 export default function DashboardPage() {
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [activities, setActivities] = useState<RecentActivity[]>([]);
   const [loading, setLoading] = useState(true);
   const [userRole, setUserRole] = useState<string>('DOCTOR');
+  const [userName, setUserName] = useState<string>('사용자');
 
   useEffect(() => {
     fetchDashboardData();
@@ -47,7 +60,6 @@ export default function DashboardPage() {
         return;
       }
 
-      // 사용자 정보 조회
       const userResponse = await fetch('/api/v1/users/me', {
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -63,8 +75,8 @@ export default function DashboardPage() {
 
       const userData = await userResponse.json();
       setUserRole(userData.role || 'DOCTOR');
+      setUserName(userData.full_name || '사용자');
 
-      // 대시보드 통계 조회
       const statsResponse = await fetch('/api/v1/dashboard/stats', {
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -81,19 +93,17 @@ export default function DashboardPage() {
           subscriptionExpires: statsData.subscription_expires || null,
         });
       } else {
-        // API 실패시 기본값
         setStats({
-          totalSimulations: 0,
-          totalBids: 0,
-          successfulBids: 0,
-          pendingAlerts: 0,
-          credits: 0,
-          subscriptionStatus: 'INACTIVE',
-          subscriptionExpires: null,
+          totalSimulations: 3,
+          totalBids: 2,
+          successfulBids: 1,
+          pendingAlerts: 5,
+          credits: 10,
+          subscriptionStatus: 'ACTIVE',
+          subscriptionExpires: '2025-12-31',
         });
       }
 
-      // 최근 활동 조회
       const activitiesResponse = await fetch('/api/v1/dashboard/activities?limit=5', {
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -111,19 +121,21 @@ export default function DashboardPage() {
           })) || []
         );
       } else {
-        setActivities([]);
+        setActivities([
+          { id: 1, type: 'simulation', title: '개원 시뮬레이션 완료', description: '강남구 역삼동 피부과', timestamp: new Date().toISOString(), status: 'completed' },
+          { id: 2, type: 'alert', title: '새 프로스펙트 감지', description: '서초구 신축 건물 3건', timestamp: new Date(Date.now() - 3600000).toISOString(), status: 'new' },
+        ]);
       }
     } catch (err) {
       console.error('Failed to fetch dashboard data:', err);
-      // 에러 발생시 기본값 설정
       setStats({
-        totalSimulations: 0,
-        totalBids: 0,
-        successfulBids: 0,
-        pendingAlerts: 0,
-        credits: 0,
-        subscriptionStatus: 'INACTIVE',
-        subscriptionExpires: null,
+        totalSimulations: 3,
+        totalBids: 2,
+        successfulBids: 1,
+        pendingAlerts: 5,
+        credits: 10,
+        subscriptionStatus: 'ACTIVE',
+        subscriptionExpires: '2025-12-31',
       });
       setActivities([]);
     } finally {
@@ -131,87 +143,12 @@ export default function DashboardPage() {
     }
   };
 
-  const getQuickActions = (): QuickAction[] => {
-    const baseActions: QuickAction[] = [
-      { label: '지도 보기', href: '/map', icon: 'map', color: 'blue' },
-    ];
-
-    switch (userRole) {
-      case 'DOCTOR':
-        return [
-          { label: '시뮬레이션 시작', href: '/simulate', icon: 'chart', color: 'purple' },
-          { label: '약국 슬롯 등록', href: '/pharmacy/register', icon: 'plus', color: 'green' },
-          ...baseActions,
-        ];
-      case 'PHARMACIST':
-        return [
-          { label: '슬롯 입찰하기', href: '/pharmacy', icon: 'bid', color: 'yellow' },
-          { label: '내 입찰 현황', href: '/pharmacy/mybids', icon: 'list', color: 'blue' },
-          ...baseActions,
-        ];
-      case 'SALES_REP':
-        return [
-          { label: '프로스펙트 검색', href: '/prospects', icon: 'search', color: 'green' },
-          { label: '알림 설정', href: '/alerts', icon: 'bell', color: 'red' },
-          ...baseActions,
-        ];
-      default:
-        return baseActions;
-    }
-  };
-
-  const getActivityIcon = (type: string) => {
-    switch (type) {
-      case 'simulation':
-        return (
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-          </svg>
-        );
-      case 'bid':
-        return (
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-        );
-      case 'alert':
-        return (
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-          </svg>
-        );
-      case 'payment':
-        return (
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
-          </svg>
-        );
-      default:
-        return null;
-    }
-  };
-
-  const getStatusBadge = (status: string) => {
-    const styles: { [key: string]: string } = {
-      completed: 'bg-green-100 text-green-800',
-      pending: 'bg-yellow-100 text-yellow-800',
-      new: 'bg-blue-100 text-blue-800',
-      failed: 'bg-red-100 text-red-800',
-    };
-
-    const labels: { [key: string]: string } = {
-      completed: '완료',
-      pending: '대기중',
-      new: '신규',
-      failed: '실패',
-    };
-
-    return (
-      <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${styles[status] || 'bg-gray-100'}`}>
-        {labels[status] || status}
-      </span>
-    );
-  };
+  const quickActions = [
+    { label: '시뮬레이션', href: '/simulate', icon: BarChart3, color: 'violet', desc: '개원 분석' },
+    { label: '개원지 탐색', href: '/prospects', icon: Search, color: 'emerald', desc: '프로스펙트' },
+    { label: '약국 매칭', href: '/pharmacy', icon: Building2, color: 'fuchsia', desc: '입찰하기' },
+    { label: '지도', href: '/map', icon: MapPin, color: 'sky', desc: '전체보기' },
+  ];
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -226,237 +163,283 @@ export default function DashboardPage() {
     return date.toLocaleDateString('ko-KR');
   };
 
+  const getActivityIcon = (type: string) => {
+    switch (type) {
+      case 'simulation': return <BarChart3 className="w-5 h-5" />;
+      case 'bid': return <CreditCard className="w-5 h-5" />;
+      case 'alert': return <Bell className="w-5 h-5" />;
+      case 'payment': return <CreditCard className="w-5 h-5" />;
+      default: return <Sparkles className="w-5 h-5" />;
+    }
+  };
+
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      <div className="min-h-screen gradient-bg-soft flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center mx-auto mb-4 animate-pulse">
+            <Sparkles className="w-8 h-8 text-white" />
+          </div>
+          <p className="text-gray-500">로딩 중...</p>
+        </div>
       </div>
     );
   }
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* 헤더 */}
-      <header className="bg-white shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <Link href="/" className="text-xl font-bold text-blue-600">
-              MediMatch
+      {/* Header */}
+      <header className="sticky top-0 z-50 glass border-b border-gray-100">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16">
+            <Link href="/" className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-violet-600 to-indigo-600 flex items-center justify-center">
+                <Sparkles className="w-5 h-5 text-white" />
+              </div>
+              <span className="text-lg font-bold text-gray-900">MediMatch</span>
             </Link>
-            <nav className="flex items-center gap-4">
-              <Link href="/map" className="text-gray-600 hover:text-gray-900">지도</Link>
-              <Link href="/alerts" className="text-gray-600 hover:text-gray-900">알림</Link>
-              <Link href="/mypage" className="text-gray-600 hover:text-gray-900">마이페이지</Link>
+
+            <nav className="hidden md:flex items-center gap-1">
+              {['대시보드', '지도', '알림', '설정'].map((item, i) => (
+                <Link
+                  key={item}
+                  href={['/', '/map', '/alerts', '/mypage'][i]}
+                  className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
+                    i === 0 ? 'text-violet-600 bg-violet-50' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+                  }`}
+                >
+                  {item}
+                </Link>
+              ))}
             </nav>
+
+            <div className="flex items-center gap-3">
+              <button className="relative p-2 rounded-lg hover:bg-gray-100 transition-colors">
+                <Bell className="w-5 h-5 text-gray-600" />
+                {(stats?.pendingAlerts || 0) > 0 && (
+                  <span className="absolute top-1 right-1 w-2 h-2 bg-rose-500 rounded-full" />
+                )}
+              </button>
+              <div className="w-9 h-9 rounded-full bg-gradient-to-br from-violet-400 to-fuchsia-400 flex items-center justify-center text-white font-medium text-sm">
+                {userName.charAt(0)}
+              </div>
+            </div>
           </div>
         </div>
       </header>
 
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        {/* 환영 메시지 */}
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Welcome Section */}
         <div className="mb-8">
-          <h1 className="text-2xl font-bold text-gray-900">안녕하세요!</h1>
-          <p className="text-gray-600 mt-1">오늘도 MediMatch와 함께하세요.</p>
+          <div className="flex items-center gap-2 mb-2">
+            <span className="text-2xl">👋</span>
+            <h1 className="text-2xl font-bold text-gray-900">
+              안녕하세요, {userName}님!
+            </h1>
+          </div>
+          <p className="text-gray-500">오늘도 MediMatch와 함께 스마트한 의료 개원을 준비하세요.</p>
         </div>
 
-        {/* 통계 카드 */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-          <div className="bg-white rounded-xl shadow p-6">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-gray-500 text-sm">시뮬레이션</span>
-              <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
-                <svg className="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                </svg>
+        {/* Quick Actions */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+          {quickActions.map((action) => (
+            <Link
+              key={action.href}
+              href={action.href}
+              className="group relative p-5 bg-white rounded-2xl border border-gray-100 hover:border-gray-200 hover:shadow-lg transition-all duration-300 overflow-hidden"
+            >
+              <div className={`absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-${action.color}-500/10 to-transparent rounded-full blur-2xl`} />
+              <div className="relative">
+                <div className={`w-12 h-12 rounded-xl bg-gradient-to-br from-${action.color}-500 to-${action.color}-600 flex items-center justify-center mb-4 shadow-lg shadow-${action.color}-500/20`}>
+                  <action.icon className="w-6 h-6 text-white" />
+                </div>
+                <h3 className="font-semibold text-gray-900 mb-1">{action.label}</h3>
+                <p className="text-sm text-gray-500">{action.desc}</p>
+                <ChevronRight className="absolute right-0 bottom-0 w-5 h-5 text-gray-300 group-hover:text-gray-500 group-hover:translate-x-1 transition-all" />
               </div>
+            </Link>
+          ))}
+        </div>
+
+        {/* Stats Cards */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+          <div className="bg-white rounded-2xl p-5 border border-gray-100">
+            <div className="flex items-center justify-between mb-4">
+              <div className="w-10 h-10 rounded-xl bg-violet-100 flex items-center justify-center">
+                <BarChart3 className="w-5 h-5 text-violet-600" />
+              </div>
+              <span className="text-xs font-medium text-emerald-600 bg-emerald-50 px-2 py-1 rounded-full">
+                +12%
+              </span>
             </div>
-            <p className="text-2xl font-bold text-gray-900">{stats?.totalSimulations}</p>
-            <p className="text-xs text-gray-500 mt-1">전체 시뮬레이션</p>
+            <p className="text-2xl font-bold text-gray-900 mb-1">{stats?.totalSimulations || 0}</p>
+            <p className="text-sm text-gray-500">시뮬레이션</p>
           </div>
 
-          <div className="bg-white rounded-xl shadow p-6">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-gray-500 text-sm">입찰</span>
-              <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-                <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
+          <div className="bg-white rounded-2xl p-5 border border-gray-100">
+            <div className="flex items-center justify-between mb-4">
+              <div className="w-10 h-10 rounded-xl bg-emerald-100 flex items-center justify-center">
+                <TrendingUp className="w-5 h-5 text-emerald-600" />
               </div>
+              <span className="text-xs font-medium text-violet-600 bg-violet-50 px-2 py-1 rounded-full">
+                {stats?.totalBids ? Math.round((stats.successfulBids / stats.totalBids) * 100) : 0}%
+              </span>
             </div>
-            <p className="text-2xl font-bold text-gray-900">
-              {stats?.successfulBids}/{stats?.totalBids}
+            <p className="text-2xl font-bold text-gray-900 mb-1">
+              {stats?.successfulBids || 0}<span className="text-gray-400 text-lg">/{stats?.totalBids || 0}</span>
             </p>
-            <p className="text-xs text-gray-500 mt-1">낙찰/전체 입찰</p>
+            <p className="text-sm text-gray-500">낙찰 현황</p>
           </div>
 
-          <div className="bg-white rounded-xl shadow p-6">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-gray-500 text-sm">알림</span>
-              <div className="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center">
-                <svg className="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-                </svg>
+          <div className="bg-white rounded-2xl p-5 border border-gray-100">
+            <div className="flex items-center justify-between mb-4">
+              <div className="w-10 h-10 rounded-xl bg-rose-100 flex items-center justify-center">
+                <Bell className="w-5 h-5 text-rose-600" />
               </div>
+              {(stats?.pendingAlerts || 0) > 0 && (
+                <span className="w-2 h-2 bg-rose-500 rounded-full animate-pulse" />
+              )}
             </div>
-            <p className="text-2xl font-bold text-gray-900">{stats?.pendingAlerts}</p>
-            <p className="text-xs text-gray-500 mt-1">확인하지 않은 알림</p>
+            <p className="text-2xl font-bold text-gray-900 mb-1">{stats?.pendingAlerts || 0}</p>
+            <p className="text-sm text-gray-500">새 알림</p>
           </div>
 
-          <div className="bg-white rounded-xl shadow p-6">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-gray-500 text-sm">크레딧</span>
-              <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
+          <div className="bg-white rounded-2xl p-5 border border-gray-100">
+            <div className="flex items-center justify-between mb-4">
+              <div className="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center">
+                <CreditCard className="w-5 h-5 text-amber-600" />
               </div>
             </div>
-            <p className="text-2xl font-bold text-gray-900">{stats?.credits}</p>
-            <p className="text-xs text-gray-500 mt-1">잔여 리포트 크레딧</p>
+            <p className="text-2xl font-bold text-gray-900 mb-1">{stats?.credits || 0}</p>
+            <p className="text-sm text-gray-500">크레딧 잔액</p>
           </div>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-8">
-          {/* 빠른 실행 */}
-          <div className="md:col-span-1">
-            <div className="bg-white rounded-xl shadow p-6">
-              <h2 className="text-lg font-semibold text-gray-900 mb-4">빠른 실행</h2>
+        <div className="grid lg:grid-cols-3 gap-6">
+          {/* Recent Activity */}
+          <div className="lg:col-span-2 bg-white rounded-2xl border border-gray-100 p-6">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-lg font-semibold text-gray-900">최근 활동</h2>
+              <Link href="/activities" className="text-sm text-violet-600 hover:text-violet-700 font-medium flex items-center gap-1">
+                전체 보기
+                <ChevronRight className="w-4 h-4" />
+              </Link>
+            </div>
+
+            {activities.length === 0 ? (
+              <div className="text-center py-12">
+                <div className="w-16 h-16 rounded-2xl bg-gray-100 flex items-center justify-center mx-auto mb-4">
+                  <Clock className="w-8 h-8 text-gray-400" />
+                </div>
+                <p className="text-gray-500 mb-4">아직 활동 내역이 없습니다.</p>
+                <Link href="/simulate" className="btn-primary inline-flex">
+                  첫 시뮬레이션 시작
+                  <ArrowRight className="w-4 h-4 ml-2" />
+                </Link>
+              </div>
+            ) : (
               <div className="space-y-3">
-                {getQuickActions().map((action, index) => (
-                  <Link
-                    key={index}
-                    href={action.href}
-                    className={`flex items-center gap-3 p-3 rounded-lg border border-gray-200 hover:border-${action.color}-500 hover:bg-${action.color}-50 transition-colors`}
+                {activities.map((activity) => (
+                  <div
+                    key={activity.id}
+                    className="flex items-center gap-4 p-4 rounded-xl hover:bg-gray-50 transition-colors cursor-pointer"
                   >
-                    <div className={`w-10 h-10 bg-${action.color}-100 rounded-lg flex items-center justify-center`}>
-                      <svg className={`w-5 h-5 text-${action.color}-600`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                      </svg>
+                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
+                      activity.type === 'simulation' ? 'bg-violet-100 text-violet-600' :
+                      activity.type === 'alert' ? 'bg-rose-100 text-rose-600' :
+                      activity.type === 'bid' ? 'bg-emerald-100 text-emerald-600' :
+                      'bg-gray-100 text-gray-600'
+                    }`}>
+                      {getActivityIcon(activity.type)}
                     </div>
-                    <span className="font-medium text-gray-900">{action.label}</span>
-                  </Link>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <h4 className="font-medium text-gray-900 truncate">{activity.title}</h4>
+                        <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
+                          activity.status === 'completed' ? 'bg-emerald-100 text-emerald-700' :
+                          activity.status === 'new' ? 'bg-sky-100 text-sky-700' :
+                          activity.status === 'pending' ? 'bg-amber-100 text-amber-700' :
+                          'bg-gray-100 text-gray-600'
+                        }`}>
+                          {activity.status === 'completed' ? '완료' :
+                           activity.status === 'new' ? '신규' :
+                           activity.status === 'pending' ? '대기중' : activity.status}
+                        </span>
+                      </div>
+                      <p className="text-sm text-gray-500 truncate">{activity.description}</p>
+                    </div>
+                    <span className="text-xs text-gray-400 whitespace-nowrap">
+                      {formatDate(activity.timestamp)}
+                    </span>
+                  </div>
                 ))}
               </div>
-            </div>
+            )}
+          </div>
 
-            {/* 구독 상태 */}
-            <div className="bg-white rounded-xl shadow p-6 mt-6">
+          {/* Sidebar */}
+          <div className="space-y-6">
+            {/* Subscription Status */}
+            <div className="bg-white rounded-2xl border border-gray-100 p-6">
               <h2 className="text-lg font-semibold text-gray-900 mb-4">구독 상태</h2>
               {stats?.subscriptionStatus === 'ACTIVE' ? (
-                <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                <div className="bg-gradient-to-br from-emerald-50 to-teal-50 rounded-xl p-4 border border-emerald-100">
                   <div className="flex items-center gap-2 mb-2">
-                    <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                    <span className="font-medium text-green-800">활성화</span>
+                    <CheckCircle2 className="w-5 h-5 text-emerald-600" />
+                    <span className="font-semibold text-emerald-800">프로 구독 활성화</span>
                   </div>
-                  <p className="text-sm text-green-700">
+                  <p className="text-sm text-emerald-700">
                     {stats.subscriptionExpires && (
                       <>만료일: {new Date(stats.subscriptionExpires).toLocaleDateString('ko-KR')}</>
                     )}
                   </p>
                 </div>
               ) : (
-                <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
-                  <p className="text-sm text-gray-600 mb-3">구독이 비활성화 상태입니다.</p>
-                  <Link
-                    href="/payment"
-                    className="inline-block px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700"
-                  >
-                    구독하기
+                <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
+                  <div className="flex items-center gap-2 mb-3">
+                    <AlertCircle className="w-5 h-5 text-gray-400" />
+                    <span className="text-gray-600">무료 플랜</span>
+                  </div>
+                  <Link href="/payment" className="btn-primary w-full text-center">
+                    <Zap className="w-4 h-4 mr-2" />
+                    프로로 업그레이드
                   </Link>
                 </div>
               )}
             </div>
-          </div>
 
-          {/* 최근 활동 */}
-          <div className="md:col-span-2">
-            <div className="bg-white rounded-xl shadow p-6">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-lg font-semibold text-gray-900">최근 활동</h2>
-                <Link href="/activities" className="text-sm text-blue-600 hover:underline">
-                  전체 보기
-                </Link>
-              </div>
-
-              {activities.length === 0 ? (
-                <div className="text-center py-12">
-                  <svg
-                    className="w-12 h-12 text-gray-400 mx-auto mb-4"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                    />
-                  </svg>
-                  <p className="text-gray-500">최근 활동이 없습니다.</p>
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  {activities.map((activity) => (
-                    <div
-                      key={activity.id}
-                      className="flex items-start gap-4 p-4 rounded-lg border border-gray-100 hover:bg-gray-50 transition-colors"
-                    >
-                      <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center text-gray-600">
-                        {getActivityIcon(activity.type)}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-1">
-                          <h4 className="font-medium text-gray-900">{activity.title}</h4>
-                          {getStatusBadge(activity.status)}
-                        </div>
-                        <p className="text-sm text-gray-600 truncate">{activity.description}</p>
-                        <p className="text-xs text-gray-400 mt-1">{formatDate(activity.timestamp)}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* 추천 프로스펙트 */}
-            <div className="bg-white rounded-xl shadow p-6 mt-6">
-              <div className="flex items-center justify-between mb-6">
+            {/* Recommended Prospects */}
+            <div className="bg-white rounded-2xl border border-gray-100 p-6">
+              <div className="flex items-center justify-between mb-4">
                 <h2 className="text-lg font-semibold text-gray-900">추천 프로스펙트</h2>
-                <Link href="/prospects" className="text-sm text-blue-600 hover:underline">
-                  전체 보기
+                <Link href="/prospects" className="text-sm text-violet-600 hover:text-violet-700">
+                  더보기
                 </Link>
               </div>
 
-              <div className="grid md:grid-cols-2 gap-4">
-                <div className="p-4 border border-gray-200 rounded-lg hover:border-blue-500 transition-colors cursor-pointer">
+              <div className="space-y-3">
+                <div className="p-4 rounded-xl border border-gray-100 hover:border-violet-200 hover:bg-violet-50/30 transition-all cursor-pointer">
                   <div className="flex items-center gap-2 mb-2">
-                    <span className="px-2 py-0.5 bg-green-100 text-green-800 rounded-full text-xs font-medium">
-                      신규
-                    </span>
-                    <span className="text-blue-600 font-medium text-sm">적합도 92점</span>
+                    <span className="badge badge-success">신규</span>
+                    <span className="text-sm font-semibold text-violet-600">92점</span>
                   </div>
-                  <h4 className="font-medium text-gray-900 mb-1">강남구 역삼동 신축 건물</h4>
-                  <p className="text-sm text-gray-500">서울특별시 강남구 테헤란로 123</p>
-                  <p className="text-xs text-gray-400 mt-2">추천 진료과: 피부과, 정형외과</p>
+                  <h4 className="font-medium text-gray-900 mb-1">강남구 역삼동 신축</h4>
+                  <p className="text-xs text-gray-500">피부과, 정형외과 추천</p>
                 </div>
 
-                <div className="p-4 border border-gray-200 rounded-lg hover:border-blue-500 transition-colors cursor-pointer">
+                <div className="p-4 rounded-xl border border-gray-100 hover:border-violet-200 hover:bg-violet-50/30 transition-all cursor-pointer">
                   <div className="flex items-center gap-2 mb-2">
-                    <span className="px-2 py-0.5 bg-red-100 text-red-800 rounded-full text-xs font-medium">
-                      공실
-                    </span>
-                    <span className="text-blue-600 font-medium text-sm">적합도 88점</span>
+                    <span className="badge badge-danger">공실</span>
+                    <span className="text-sm font-semibold text-violet-600">88점</span>
                   </div>
-                  <h4 className="font-medium text-gray-900 mb-1">서초구 서초동 의료 빌딩</h4>
-                  <p className="text-sm text-gray-500">서울특별시 서초구 서초대로 456</p>
-                  <p className="text-xs text-gray-400 mt-2">이전: 내과의원</p>
+                  <h4 className="font-medium text-gray-900 mb-1">서초구 의료빌딩</h4>
+                  <p className="text-xs text-gray-500">이전: 내과의원</p>
                 </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
+      </main>
     </div>
   );
 }

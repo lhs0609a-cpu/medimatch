@@ -6,6 +6,7 @@ from .bids import router as bids_router
 from .prospects import router as prospects_router
 from .alerts import router as alerts_router
 from .export import router as export_router
+from .map import router as map_router
 
 api_router = APIRouter()
 
@@ -16,3 +17,4 @@ api_router.include_router(bids_router, prefix="/bids", tags=["PharmMatch - Bids"
 api_router.include_router(prospects_router, prefix="/prospects", tags=["SalesScanner - Prospects"])
 api_router.include_router(alerts_router, prefix="/alerts", tags=["SalesScanner - Alerts"])
 api_router.include_router(export_router, prefix="/export", tags=["Export"])
+api_router.include_router(map_router, prefix="/map", tags=["Map"])

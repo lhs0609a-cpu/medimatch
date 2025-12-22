@@ -20,7 +20,8 @@
       "Bash(node_modules/.bin/next build)",
       "Bash(dir:*)",
       "Bash(cd:*)",
-      "Bash(cat:*)"
+      "Bash(cat:*)",
+      "Bash(ls:*)"
     ]
   }
 }

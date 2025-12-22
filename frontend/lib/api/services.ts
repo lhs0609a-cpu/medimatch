@@ -1,4 +1,4 @@
-import { apiClient, SimulationRequest, SimulationResponse, Token, User, PharmacySlot, ProspectLocation } from './client'
+import { apiClient, SimulationRequest, SimulationResponse, Token, User, PharmacySlot, ProspectLocation, MapMarkersResponse, MapMarkerDetail } from './client'
 
 // Auth Services
 export const authService = {
@@ -232,6 +232,30 @@ export const exportService = {
     const response = await apiClient.get('/export/csv', {
       params,
       responseType: 'blob',
+    })
+    return response.data
+  },
+}
+
+// Map Services
+export const mapService = {
+  getMarkers: async (params: {
+    min_lat: number
+    max_lat: number
+    min_lng: number
+    max_lng: number
+    types?: string
+    min_score?: number
+    max_score?: number
+    clinic_types?: string
+  }): Promise<MapMarkersResponse> => {
+    const response = await apiClient.get('/map/markers', { params })
+    return response.data
+  },
+
+  getMarkerDetail: async (markerId: string, markerType: string): Promise<MapMarkerDetail> => {
+    const response = await apiClient.get(`/map/markers/${markerId}`, {
+      params: { marker_type: markerType }
     })
     return response.data
   },

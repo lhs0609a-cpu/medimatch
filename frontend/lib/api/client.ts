@@ -172,3 +172,64 @@ export interface ProspectLocation {
   detected_at: string
   created_at: string
 }
+
+// Map Types
+export interface MapMarkerInfo {
+  address?: string
+  score?: number
+  specialty?: string
+  previous_clinic?: string
+  floor_area?: number
+  est_revenue?: number
+}
+
+export interface MapMarker {
+  id: string
+  lat: number
+  lng: number
+  title: string
+  type: 'hospital' | 'prospect' | 'pharmacy'
+  info?: MapMarkerInfo
+}
+
+export interface MapMarkersResponse {
+  markers: MapMarker[]
+  total: number
+  bounds: {
+    min_lat: number
+    max_lat: number
+    min_lng: number
+    max_lng: number
+  }
+}
+
+export interface MapMarkerDetail {
+  id: string
+  type: string
+  name?: string
+  address: string
+  latitude: number
+  longitude: number
+  clinic_type?: string
+  doctor_count?: number
+  phone?: string
+  established?: string
+  floor_info?: string
+  area_pyeong?: number
+  parking_available?: boolean
+  prospect_type?: string
+  zoning?: string
+  floor_area?: number
+  clinic_fit_score?: number
+  recommended_dept?: string[]
+  previous_clinic?: string
+  rent_estimate?: number
+  description?: string
+  detected_at?: string
+  clinic_name?: string
+  est_daily_rx?: number
+  est_monthly_revenue?: number
+  min_bid_amount?: number
+  status?: string
+  bid_deadline?: string
+}
