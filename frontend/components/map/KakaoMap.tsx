@@ -9,11 +9,11 @@ declare global {
 }
 
 interface Marker {
-  id: number;
+  id: string | number;
   lat: number;
   lng: number;
   title: string;
-  type: 'hospital' | 'prospect' | 'pharmacy' | 'default';
+  type: 'hospital' | 'prospect' | 'pharmacy' | 'default' | 'closed_hospital' | 'listing';
   info?: {
     address?: string;
     score?: number;
