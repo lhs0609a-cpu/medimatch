@@ -35,6 +35,10 @@ class User(Base):
     bids = relationship("Bid", back_populates="pharmacist")
     alerts = relationship("UserAlert", back_populates="user")
     simulations = relationship("Simulation", back_populates="user")
+    partner_inquiries = relationship("PartnerInquiry", back_populates="user")
+    payments = relationship("Payment", back_populates="user")
+    subscriptions = relationship("Subscription", back_populates="user")
+    credits = relationship("UsageCredit", back_populates="user")
 
     def __repr__(self):
         return f"<User {self.email}>"

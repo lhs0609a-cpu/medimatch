@@ -260,3 +260,156 @@ export const mapService = {
     return response.data
   },
 }
+
+// Partner Services
+export const partnerService = {
+  getCategories: async () => {
+    const response = await apiClient.get('/partners/categories')
+    return response.data
+  },
+
+  getPartners: async (params?: {
+    category?: string
+    region?: string
+    search?: string
+    is_premium?: boolean
+    is_verified?: boolean
+    sort_by?: string
+    page?: number
+    page_size?: number
+  }) => {
+    const response = await apiClient.get('/partners', { params })
+    return response.data
+  },
+
+  getPartner: async (id: number) => {
+    const response = await apiClient.get(`/partners/${id}`)
+    return response.data
+  },
+
+  getPartnerReviews: async (id: number, page = 1, pageSize = 10) => {
+    const response = await apiClient.get(`/partners/${id}/reviews`, {
+      params: { page, page_size: pageSize }
+    })
+    return response.data
+  },
+
+  createInquiry: async (data: {
+    partner_id: number
+    inquiry_type: string
+    title: string
+    content: string
+    project_location?: string
+    project_size?: string
+    budget_range?: string
+    expected_start_date?: string
+    contact_name?: string
+    contact_phone?: string
+    contact_email?: string
+  }) => {
+    const response = await apiClient.post('/partners/inquiries', data)
+    return response.data
+  },
+
+  getMyInquiries: async (status?: string) => {
+    const response = await apiClient.get('/partners/inquiries/my', {
+      params: { status }
+    })
+    return response.data
+  },
+
+  createReview: async (data: {
+    partner_id: number
+    rating: number
+    quality_rating?: number
+    price_rating?: number
+    communication_rating?: number
+    timeliness_rating?: number
+    title?: string
+    content?: string
+  }) => {
+    const response = await apiClient.post('/partners/reviews', data)
+    return response.data
+  },
+
+  getRecommended: async (userRole: string) => {
+    const response = await apiClient.get(`/partners/recommended/${userRole}`)
+    return response.data
+  },
+}
+
+// Payment Services
+export const paymentService = {
+  getProducts: async () => {
+    const response = await apiClient.get('/payments/products')
+    return response.data
+  },
+
+  preparePayment: async (data: {
+    product_id: string
+    product_name: string
+    amount: number
+  }) => {
+    const response = await apiClient.post('/payments/prepare', data)
+    return response.data
+  },
+
+  confirmPayment: async (data: {
+    payment_key: string
+    order_id: string
+    amount: number
+  }) => {
+    const response = await apiClient.post('/payments/confirm', data)
+    return response.data
+  },
+
+  cancelPayment: async (orderId: string, cancelReason?: string) => {
+    const response = await apiClient.post(`/payments/cancel/${orderId}`, null, {
+      params: { cancel_reason: cancelReason }
+    })
+    return response.data
+  },
+
+  getHistory: async () => {
+    const response = await apiClient.get('/payments/history')
+    return response.data
+  },
+
+  getSubscription: async () => {
+    const response = await apiClient.get('/payments/subscription')
+    return response.data
+  },
+
+  getCredits: async () => {
+    const response = await apiClient.get('/payments/credits')
+    return response.data
+  },
+}
+
+// OAuth Services
+export const oauthService = {
+  getGoogleLoginUrl: async () => {
+    const response = await apiClient.get('/oauth/google/login')
+    return response.data
+  },
+
+  googleCallback: async (code: string, state?: string) => {
+    const response = await apiClient.post('/oauth/google/callback', { code, state })
+    return response.data
+  },
+
+  getKakaoLoginUrl: async () => {
+    const response = await apiClient.get('/oauth/kakao/login')
+    return response.data
+  },
+
+  kakaoCallback: async (code: string, state?: string) => {
+    const response = await apiClient.post('/oauth/kakao/callback', { code, state })
+    return response.data
+  },
+
+  disconnect: async (provider: string) => {
+    const response = await apiClient.post(`/oauth/disconnect/${provider}`)
+    return response.data
+  },
+}
