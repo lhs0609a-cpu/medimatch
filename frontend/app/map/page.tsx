@@ -39,7 +39,7 @@ const KakaoMap = dynamic(() => import('@/components/map/KakaoMap'), {
 });
 
 interface MarkerData {
-  id: string;
+  id: string | number;
   lat: number;
   lng: number;
   title: string;
