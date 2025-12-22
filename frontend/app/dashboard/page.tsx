@@ -54,19 +54,20 @@ export default function DashboardPage() {
 
   const fetchDashboardData = async () => {
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('access_token');
       if (!token) {
         window.location.href = '/login';
         return;
       }
 
-      const userResponse = await fetch('/api/v1/users/me', {
+      const userResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1'}/auth/me`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
       if (!userResponse.ok) {
         if (userResponse.status === 401) {
-          localStorage.removeItem('token');
+          localStorage.removeItem('access_token');
+          localStorage.removeItem('refresh_token');
           window.location.href = '/login';
           return;
         }
@@ -77,7 +78,8 @@ export default function DashboardPage() {
       setUserRole(userData.role || 'DOCTOR');
       setUserName(userData.full_name || '사용자');
 
-      const statsResponse = await fetch('/api/v1/dashboard/stats', {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1';
+      const statsResponse = await fetch(`${apiUrl}/dashboard/stats`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -104,7 +106,7 @@ export default function DashboardPage() {
         });
       }
 
-      const activitiesResponse = await fetch('/api/v1/dashboard/activities?limit=5', {
+      const activitiesResponse = await fetch(`${apiUrl}/dashboard/activities?limit=5`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 

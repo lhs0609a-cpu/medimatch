@@ -388,6 +388,7 @@ export const paymentService = {
 
 // OAuth Services
 export const oauthService = {
+  // Google
   getGoogleLoginUrl: async () => {
     const response = await apiClient.get('/oauth/google/login')
     return response.data
@@ -398,6 +399,18 @@ export const oauthService = {
     return response.data
   },
 
+  // Naver
+  getNaverLoginUrl: async () => {
+    const response = await apiClient.get('/oauth/naver/login')
+    return response.data
+  },
+
+  naverCallback: async (code: string, state?: string) => {
+    const response = await apiClient.post('/oauth/naver/callback', { code, state })
+    return response.data
+  },
+
+  // Kakao
   getKakaoLoginUrl: async () => {
     const response = await apiClient.get('/oauth/kakao/login')
     return response.data

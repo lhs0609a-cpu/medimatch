@@ -1,5 +1,5 @@
 """
-소셜 로그인 API (Google, Kakao)
+소셜 로그인 API (Google, Naver, Kakao)
 """
 from fastapi import APIRouter, Depends, HTTPException, Query
 from fastapi.responses import RedirectResponse
@@ -11,6 +11,7 @@ from datetime import datetime, timedelta
 import httpx
 import os
 import secrets
+import urllib.parse
 
 from app.core.database import get_db
 from app.core.security import create_access_token, create_refresh_token
@@ -25,6 +26,11 @@ router = APIRouter(prefix="/oauth", tags=["oauth"])
 GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID", "")
 GOOGLE_CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET", "")
 GOOGLE_REDIRECT_URI = os.getenv("GOOGLE_REDIRECT_URI", "http://localhost:3000/api/auth/callback/google")
+
+# Naver OAuth
+NAVER_CLIENT_ID = os.getenv("NAVER_CLIENT_ID", "")
+NAVER_CLIENT_SECRET = os.getenv("NAVER_CLIENT_SECRET", "")
+NAVER_REDIRECT_URI = os.getenv("NAVER_REDIRECT_URI", "http://localhost:3000/api/auth/callback/naver")
 
 # Kakao OAuth
 KAKAO_CLIENT_ID = os.getenv("KAKAO_CLIENT_ID", "")
@@ -130,6 +136,99 @@ async def google_callback(
             email=user_data["email"],
             name=user_data.get("name", user_data["email"].split("@")[0]),
             picture=user_data.get("picture"),
+        )
+
+        # 3. 사용자 생성/조회
+        return await process_oauth_user(db, user_info)
+
+    except httpx.RequestError as e:
+        raise HTTPException(status_code=500, detail=f"OAuth 처리 중 오류: {str(e)}")
+
+
+# ============ Naver OAuth ============
+
+@router.get("/naver/login")
+async def naver_login():
+    """Naver OAuth 로그인 URL 생성"""
+    if not NAVER_CLIENT_ID:
+        raise HTTPException(status_code=500, detail="Naver OAuth가 설정되지 않았습니다")
+
+    state = secrets.token_urlsafe(32)
+
+    auth_url = (
+        "https://nid.naver.com/oauth2.0/authorize"
+        f"?client_id={NAVER_CLIENT_ID}"
+        f"&redirect_uri={urllib.parse.quote(NAVER_REDIRECT_URI)}"
+        f"&response_type=code"
+        f"&state={state}"
+    )
+
+    return {"auth_url": auth_url, "state": state}
+
+
+@router.post("/naver/callback", response_model=OAuthTokenResponse)
+async def naver_callback(
+    data: OAuthCallbackRequest,
+    db: AsyncSession = Depends(get_db)
+):
+    """Naver OAuth 콜백 처리"""
+    if not NAVER_CLIENT_ID or not NAVER_CLIENT_SECRET:
+        raise HTTPException(status_code=500, detail="Naver OAuth가 설정되지 않았습니다")
+
+    try:
+        # 1. 인증 코드로 액세스 토큰 교환
+        async with httpx.AsyncClient() as client:
+            token_response = await client.post(
+                "https://nid.naver.com/oauth2.0/token",
+                data={
+                    "grant_type": "authorization_code",
+                    "client_id": NAVER_CLIENT_ID,
+                    "client_secret": NAVER_CLIENT_SECRET,
+                    "code": data.code,
+                    "state": data.state or "",
+                },
+                timeout=30.0,
+            )
+
+        if token_response.status_code != 200:
+            raise HTTPException(status_code=400, detail="Naver 인증 실패")
+
+        token_data = token_response.json()
+
+        if token_data.get("error"):
+            raise HTTPException(status_code=400, detail=token_data.get("error_description", "Naver 인증 실패"))
+
+        access_token = token_data.get("access_token")
+
+        # 2. 사용자 정보 가져오기
+        async with httpx.AsyncClient() as client:
+            user_response = await client.get(
+                "https://openapi.naver.com/v1/nid/me",
+                headers={"Authorization": f"Bearer {access_token}"},
+                timeout=30.0,
+            )
+
+        if user_response.status_code != 200:
+            raise HTTPException(status_code=400, detail="사용자 정보 조회 실패")
+
+        user_data = user_response.json()
+
+        if user_data.get("resultcode") != "00":
+            raise HTTPException(status_code=400, detail="사용자 정보 조회 실패")
+
+        response_data = user_data.get("response", {})
+
+        # 이메일이 없는 경우 네이버 ID로 대체 이메일 생성
+        email = response_data.get("email")
+        if not email:
+            email = f"naver_{response_data['id']}@naver.local"
+
+        user_info = OAuthUserInfo(
+            provider="naver",
+            provider_id=response_data["id"],
+            email=email,
+            name=response_data.get("name") or response_data.get("nickname") or f"User{response_data['id']}",
+            picture=response_data.get("profile_image"),
         )
 
         # 3. 사용자 생성/조회
