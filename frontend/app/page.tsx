@@ -26,8 +26,8 @@ export default function HomePage() {
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
             <Link href="/" className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-foreground flex items-center justify-center">
-                <span className="text-background font-bold text-sm">M</span>
+              <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
+                <span className="text-primary-foreground font-bold text-sm">M</span>
               </div>
               <span className="font-semibold text-foreground">MediMatch</span>
             </Link>
@@ -107,8 +107,8 @@ export default function HomePage() {
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="max-w-3xl">
             {/* Badge */}
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-secondary text-sm text-muted-foreground mb-6 animate-fade-in">
-              <span className="w-1.5 h-1.5 rounded-full bg-green-500"></span>
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-sm text-primary mb-6 animate-fade-in">
+              <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>
               AI 기반 의료 개원 분석
             </div>
 
@@ -116,7 +116,7 @@ export default function HomePage() {
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-semibold tracking-tight text-foreground mb-6 animate-fade-in-up">
               데이터로 시작하는
               <br />
-              <span className="text-muted-foreground">성공적인 개원</span>
+              <span className="text-primary">성공적인 개원</span>
             </h1>
 
             {/* Description */}
@@ -160,11 +160,11 @@ export default function HomePage() {
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           {/* Section Header */}
           <div className="max-w-2xl mb-16">
-            <p className="text-sm font-medium text-muted-foreground mb-3">서비스</p>
+            <p className="text-sm font-medium text-primary mb-3">서비스</p>
             <h2 className="text-3xl md:text-4xl font-semibold tracking-tight mb-4">
               하나의 플랫폼,
               <br />
-              세 가지 솔루션
+              <span className="text-primary">세 가지 솔루션</span>
             </h2>
             <p className="text-muted-foreground">
               의사, 약사, 영업사원을 위한 맞춤형 서비스를 제공합니다.
@@ -176,18 +176,18 @@ export default function HomePage() {
             {/* OpenSim */}
             <Link href="/simulate" className="group">
               <div className="feature-card h-full">
-                <div className="feature-icon">
-                  <BarChart3 className="w-6 h-6 text-foreground" />
+                <div className="w-12 h-12 rounded-xl bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center mb-4">
+                  <BarChart3 className="w-6 h-6 text-blue-600 dark:text-blue-400" />
                 </div>
                 <h3 className="text-xl font-semibold mb-2">OpenSim</h3>
                 <p className="text-muted-foreground text-sm mb-6 leading-relaxed">
                   개원 시뮬레이터. 주소와 진료과목만 입력하면 예상 매출, 비용, 손익분기점을 분석합니다.
                 </p>
                 <div className="flex items-center gap-2 mb-6">
-                  <span className="badge-default">AI 분석</span>
+                  <span className="badge-info">AI 분석</span>
                   <span className="badge-default">3분 완료</span>
                 </div>
-                <div className="flex items-center text-sm font-medium text-foreground group-hover:gap-1 transition-all">
+                <div className="flex items-center text-sm font-medium text-primary group-hover:gap-1 transition-all">
                   시뮬레이션 시작
                   <ChevronRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
                 </div>
@@ -197,8 +197,8 @@ export default function HomePage() {
             {/* SalesScanner */}
             <Link href="/prospects" className="group">
               <div className="feature-card h-full">
-                <div className="feature-icon">
-                  <MapPin className="w-6 h-6 text-foreground" />
+                <div className="w-12 h-12 rounded-xl bg-green-100 dark:bg-green-900/30 flex items-center justify-center mb-4">
+                  <MapPin className="w-6 h-6 text-green-600 dark:text-green-400" />
                 </div>
                 <h3 className="text-xl font-semibold mb-2">SalesScanner</h3>
                 <p className="text-muted-foreground text-sm mb-6 leading-relaxed">
@@ -208,7 +208,7 @@ export default function HomePage() {
                   <span className="badge-success">실시간 알림</span>
                   <span className="badge-default">B2B</span>
                 </div>
-                <div className="flex items-center text-sm font-medium text-foreground group-hover:gap-1 transition-all">
+                <div className="flex items-center text-sm font-medium text-primary group-hover:gap-1 transition-all">
                   개원지 탐색
                   <ChevronRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
                 </div>
@@ -218,8 +218,8 @@ export default function HomePage() {
             {/* PharmMatch */}
             <Link href="/pharmacy-match" className="group">
               <div className="feature-card h-full">
-                <div className="feature-icon">
-                  <Pill className="w-6 h-6 text-foreground" />
+                <div className="w-12 h-12 rounded-xl bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center mb-4">
+                  <Pill className="w-6 h-6 text-purple-600 dark:text-purple-400" />
                 </div>
                 <h3 className="text-xl font-semibold mb-2">PharmMatch</h3>
                 <p className="text-muted-foreground text-sm mb-6 leading-relaxed">
@@ -229,7 +229,7 @@ export default function HomePage() {
                   <span className="badge-info">입찰 시스템</span>
                   <span className="badge-default">매칭</span>
                 </div>
-                <div className="flex items-center text-sm font-medium text-foreground group-hover:gap-1 transition-all">
+                <div className="flex items-center text-sm font-medium text-primary group-hover:gap-1 transition-all">
                   약국 자리 찾기
                   <ChevronRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
                 </div>
@@ -286,28 +286,28 @@ export default function HomePage() {
       </section>
 
       {/* CTA Section */}
-      <section className="section-sm bg-foreground text-background">
+      <section className="section-sm bg-primary text-primary-foreground">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-8">
             <div>
               <h2 className="text-2xl md:text-3xl font-semibold tracking-tight mb-2">
                 지금 바로 시작하세요
               </h2>
-              <p className="text-background/70">
+              <p className="text-primary-foreground/80">
                 첫 시뮬레이션은 무료입니다. 데이터 기반의 정확한 분석을 경험해보세요.
               </p>
             </div>
             <div className="flex flex-col sm:flex-row gap-3">
               <Link
                 href="/simulate"
-                className="inline-flex items-center justify-center gap-2 px-6 py-3 text-sm font-medium bg-background text-foreground rounded-lg hover:bg-background/90 transition-colors"
+                className="inline-flex items-center justify-center gap-2 px-6 py-3 text-sm font-medium bg-white text-primary rounded-lg hover:bg-white/90 transition-colors"
               >
                 무료 시뮬레이션
                 <ArrowUpRight className="w-4 h-4" />
               </Link>
               <Link
                 href="/register"
-                className="inline-flex items-center justify-center px-6 py-3 text-sm font-medium border border-background/20 rounded-lg hover:bg-background/10 transition-colors"
+                className="inline-flex items-center justify-center px-6 py-3 text-sm font-medium border border-white/30 rounded-lg hover:bg-white/10 transition-colors"
               >
                 회원가입
               </Link>
@@ -322,8 +322,8 @@ export default function HomePage() {
           <div className="grid md:grid-cols-4 gap-8 mb-12">
             <div>
               <Link href="/" className="flex items-center gap-2 mb-4">
-                <div className="w-8 h-8 rounded-lg bg-foreground flex items-center justify-center">
-                  <span className="text-background font-bold text-sm">M</span>
+                <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
+                  <span className="text-primary-foreground font-bold text-sm">M</span>
                 </div>
                 <span className="font-semibold">MediMatch</span>
               </Link>

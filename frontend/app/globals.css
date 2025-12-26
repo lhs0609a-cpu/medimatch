@@ -7,33 +7,32 @@
 
 @layer base {
   :root {
-    /* Modern Minimal Color Palette */
+    /* Modern Minimal with Accent Color */
     --background: 0 0% 100%;
     --foreground: 0 0% 9%;
     --card: 0 0% 100%;
     --card-foreground: 0 0% 9%;
     --popover: 0 0% 100%;
     --popover-foreground: 0 0% 9%;
-    --primary: 0 0% 9%;
+    --primary: 221 83% 53%;
     --primary-foreground: 0 0% 100%;
     --secondary: 0 0% 96%;
     --secondary-foreground: 0 0% 9%;
     --muted: 0 0% 96%;
     --muted-foreground: 0 0% 45%;
-    --accent: 0 0% 96%;
-    --accent-foreground: 0 0% 9%;
+    --accent: 221 83% 96%;
+    --accent-foreground: 221 83% 53%;
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
     --border: 0 0% 90%;
     --input: 0 0% 90%;
-    --ring: 0 0% 9%;
+    --ring: 221 83% 53%;
     --radius: 0.625rem;
 
-    /* Accent Colors */
-    --accent-blue: 217 91% 60%;
-    --accent-green: 142 71% 45%;
-    --accent-purple: 262 83% 58%;
-    --accent-orange: 25 95% 53%;
+    /* Brand Colors */
+    --brand: 221 83% 53%;
+    --brand-light: 221 83% 96%;
+    --brand-dark: 221 83% 45%;
   }
 
   .dark {
@@ -43,19 +42,23 @@
     --card-foreground: 0 0% 98%;
     --popover: 0 0% 7%;
     --popover-foreground: 0 0% 98%;
-    --primary: 0 0% 98%;
-    --primary-foreground: 0 0% 9%;
+    --primary: 221 83% 60%;
+    --primary-foreground: 0 0% 100%;
     --secondary: 0 0% 12%;
     --secondary-foreground: 0 0% 98%;
     --muted: 0 0% 12%;
     --muted-foreground: 0 0% 64%;
-    --accent: 0 0% 12%;
-    --accent-foreground: 0 0% 98%;
+    --accent: 221 83% 15%;
+    --accent-foreground: 221 83% 60%;
     --destructive: 0 62% 30%;
     --destructive-foreground: 0 0% 98%;
     --border: 0 0% 15%;
     --input: 0 0% 15%;
-    --ring: 0 0% 98%;
+    --ring: 221 83% 60%;
+
+    --brand: 221 83% 60%;
+    --brand-light: 221 83% 15%;
+    --brand-dark: 221 83% 70%;
   }
 }
 
@@ -100,8 +103,8 @@
 
   .btn-primary {
     @apply btn px-5 py-2.5
-           bg-foreground text-background
-           hover:bg-foreground/90
+           bg-primary text-primary-foreground
+           hover:bg-primary/90
            active:scale-[0.98];
   }
 
