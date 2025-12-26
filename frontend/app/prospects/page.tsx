@@ -5,8 +5,8 @@ import { useQuery } from '@tanstack/react-query'
 import Link from 'next/link'
 import dynamic from 'next/dynamic'
 import {
-  ArrowLeft, MapPin, Building2, TrendingUp, Bell, Download,
-  ChevronRight, Filter, Search, Map, List, Star, Clock
+  ArrowLeft, MapPin, Building2, Bell, Download,
+  ChevronRight, Search, Map, List, Clock
 } from 'lucide-react'
 import { prospectsService } from '@/lib/api/services'
 import { ProspectLocation } from '@/lib/api/client'
@@ -28,26 +28,26 @@ interface MarkerData {
 const KakaoMap = dynamic(() => import('@/components/map/KakaoMap'), {
   ssr: false,
   loading: () => (
-    <div className="w-full h-full min-h-[600px] bg-gray-100 flex items-center justify-center">
+    <div className="w-full h-full min-h-[600px] bg-secondary flex items-center justify-center">
       <div className="text-center">
-        <div className="animate-spin h-8 w-8 border-4 border-green-600 border-t-transparent rounded-full mx-auto mb-4" />
-        <p className="text-gray-600">지도를 불러오는 중...</p>
+        <div className="animate-spin h-8 w-8 border-4 border-foreground border-t-transparent rounded-full mx-auto mb-4" />
+        <p className="text-muted-foreground">지도를 불러오는 중...</p>
       </div>
     </div>
   ),
 })
 
-const typeLabels: Record<string, { label: string; color: string }> = {
-  NEW_BUILD: { label: '신축', color: 'bg-blue-100 text-blue-700' },
-  VACANCY: { label: '공실', color: 'bg-orange-100 text-orange-700' },
-  RELOCATION: { label: '이전예정', color: 'bg-purple-100 text-purple-700' },
+const typeLabels: Record<string, { label: string; style: string }> = {
+  NEW_BUILD: { label: '신축', style: 'badge-info' },
+  VACANCY: { label: '공실', style: 'badge-warning' },
+  RELOCATION: { label: '이전예정', style: 'badge-default' },
 }
 
-const statusLabels: Record<string, { label: string; color: string }> = {
-  NEW: { label: '신규', color: 'bg-green-100 text-green-700' },
-  CONTACTED: { label: '컨택중', color: 'bg-yellow-100 text-yellow-700' },
-  CONVERTED: { label: '계약완료', color: 'bg-purple-100 text-purple-700' },
-  CLOSED: { label: '종료', color: 'bg-gray-100 text-gray-700' },
+const statusLabels: Record<string, { label: string; style: string }> = {
+  NEW: { label: '신규', style: 'badge-success' },
+  CONTACTED: { label: '컨택중', style: 'badge-warning' },
+  CONVERTED: { label: '계약완료', style: 'badge-default' },
+  CLOSED: { label: '종료', style: 'badge-default' },
 }
 
 export default function ProspectsPage() {
@@ -97,7 +97,7 @@ export default function ProspectsPage() {
   const getScoreColor = (score: number) => {
     if (score >= 80) return 'text-green-600'
     if (score >= 60) return 'text-blue-600'
-    if (score >= 40) return 'text-yellow-600'
+    if (score >= 40) return 'text-amber-600'
     return 'text-red-600'
   }
 
@@ -114,69 +114,71 @@ export default function ProspectsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="bg-white border-b sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <Link href="/" className="text-gray-500 hover:text-gray-700">
-              <ArrowLeft className="w-5 h-5" />
-            </Link>
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center">
-                <MapPin className="w-4 h-4 text-white" />
+      <header className="glass sticky top-0 z-50">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6">
+          <div className="flex items-center justify-between h-16">
+            <div className="flex items-center gap-4">
+              <Link href="/" className="text-muted-foreground hover:text-foreground transition-colors">
+                <ArrowLeft className="w-5 h-5" />
+              </Link>
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 bg-foreground rounded-lg flex items-center justify-center">
+                  <MapPin className="w-4 h-4 text-background" />
+                </div>
+                <span className="text-lg font-semibold text-foreground">SalesScanner</span>
               </div>
-              <span className="text-xl font-bold text-gray-900">SalesScanner</span>
             </div>
-          </div>
-          <div className="flex items-center gap-2">
-            <Link
-              href="/alerts"
-              className="flex items-center gap-2 px-4 py-2 rounded-lg border hover:bg-gray-50"
-            >
-              <Bell className="w-4 h-4" />
-              <span className="hidden md:inline">알림 설정</span>
-            </Link>
-            <Link
-              href="/login"
-              className="bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-green-700"
-            >
-              시작하기
-            </Link>
+            <div className="flex items-center gap-2">
+              <Link
+                href="/alerts"
+                className="btn-ghost"
+              >
+                <Bell className="w-4 h-4" />
+                <span className="hidden md:inline">알림 설정</span>
+              </Link>
+              <Link
+                href="/login"
+                className="btn-primary"
+              >
+                시작하기
+              </Link>
+            </div>
           </div>
         </div>
       </header>
 
-      <main className="container mx-auto px-4 py-8">
+      <main className="max-w-6xl mx-auto px-4 sm:px-6 py-8">
         {/* Hero Section */}
-        <div className="bg-gradient-to-r from-green-600 to-emerald-600 rounded-2xl p-8 mb-8 text-white">
-          <h1 className="text-3xl font-bold mb-2">개원 예정지 스캐너</h1>
-          <p className="text-green-100 mb-6">
+        <div className="bg-foreground text-background rounded-2xl p-8 mb-8">
+          <h1 className="text-2xl md:text-3xl font-semibold mb-2">개원 예정지 스캐너</h1>
+          <p className="text-background/70 mb-6">
             신축 건물, 폐업 공실 등 병원 개원 가능 위치를 실시간으로 탐지합니다.<br />
             원하는 조건을 설정하면 새로운 기회가 생길 때 바로 알림을 받을 수 있습니다.
           </p>
           <div className="flex gap-4">
-            <div className="bg-white/20 rounded-xl px-4 py-2">
+            <div className="bg-background/10 rounded-xl px-4 py-3">
               <div className="text-2xl font-bold">{prospects.length}</div>
-              <div className="text-sm text-green-100">신규 탐지</div>
+              <div className="text-sm text-background/70">신규 탐지</div>
             </div>
-            <div className="bg-white/20 rounded-xl px-4 py-2">
+            <div className="bg-background/10 rounded-xl px-4 py-3">
               <div className="text-2xl font-bold">일 1회</div>
-              <div className="text-sm text-green-100">데이터 갱신</div>
+              <div className="text-sm text-background/70">데이터 갱신</div>
             </div>
           </div>
         </div>
 
         {/* Filters */}
-        <div className="bg-white rounded-xl border p-4 mb-6">
+        <div className="card p-4 mb-6">
           <div className="flex flex-col md:flex-row gap-4 items-center">
             {/* Search */}
             <div className="flex-1 relative w-full">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
               <input
                 type="text"
                 placeholder="주소 또는 지역으로 검색"
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                className="input pl-12"
               />
             </div>
 
@@ -184,11 +186,7 @@ export default function ProspectsPage() {
             <div className="flex gap-2">
               <button
                 onClick={() => setTypeFilter(null)}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
-                  !typeFilter
-                    ? 'bg-green-600 text-white'
-                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                }`}
+                className={`btn-sm ${!typeFilter ? 'btn-primary' : 'btn-secondary'}`}
               >
                 전체
               </button>
@@ -196,11 +194,7 @@ export default function ProspectsPage() {
                 <button
                   key={key}
                   onClick={() => setTypeFilter(key)}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
-                    typeFilter === key
-                      ? 'bg-green-600 text-white'
-                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                  }`}
+                  className={`btn-sm ${typeFilter === key ? 'btn-primary' : 'btn-secondary'}`}
                 >
                   {label}
                 </button>
@@ -208,11 +202,11 @@ export default function ProspectsPage() {
             </div>
 
             {/* View Toggle */}
-            <div className="flex gap-1 bg-gray-100 rounded-lg p-1">
+            <div className="flex gap-1 bg-secondary rounded-lg p-1">
               <button
                 onClick={() => setViewMode('list')}
                 className={`p-2 rounded-md transition ${
-                  viewMode === 'list' ? 'bg-white shadow-sm' : ''
+                  viewMode === 'list' ? 'bg-background shadow-sm' : ''
                 }`}
               >
                 <List className="w-4 h-4" />
@@ -220,7 +214,7 @@ export default function ProspectsPage() {
               <button
                 onClick={() => setViewMode('map')}
                 className={`p-2 rounded-md transition ${
-                  viewMode === 'map' ? 'bg-white shadow-sm' : ''
+                  viewMode === 'map' ? 'bg-background shadow-sm' : ''
                 }`}
               >
                 <Map className="w-4 h-4" />
@@ -228,22 +222,22 @@ export default function ProspectsPage() {
             </div>
 
             {/* Export */}
-            <button className="flex items-center gap-2 px-4 py-2 border rounded-lg hover:bg-gray-50">
+            <button className="btn-outline btn-sm">
               <Download className="w-4 h-4" />
               내보내기
             </button>
           </div>
 
           {/* Score Filter */}
-          <div className="mt-4 pt-4 border-t flex items-center gap-4">
-            <span className="text-sm text-gray-600">최소 적합도:</span>
+          <div className="mt-4 pt-4 border-t border-border flex items-center gap-4">
+            <span className="text-sm text-muted-foreground">최소 적합도:</span>
             <input
               type="range"
               min="0"
               max="100"
               value={minScore}
               onChange={(e) => setMinScore(Number(e.target.value))}
-              className="w-32"
+              className="w-32 accent-foreground"
             />
             <span className="text-sm font-medium">{minScore}점</span>
           </div>
@@ -252,36 +246,36 @@ export default function ProspectsPage() {
         {/* Results */}
         {isLoading ? (
           <div className="text-center py-12">
-            <div className="animate-spin h-8 w-8 border-4 border-green-600 border-t-transparent rounded-full mx-auto mb-4" />
-            <p className="text-gray-600">개원 예정지를 탐색 중...</p>
+            <div className="animate-spin h-8 w-8 border-4 border-foreground border-t-transparent rounded-full mx-auto mb-4" />
+            <p className="text-muted-foreground">개원 예정지를 탐색 중...</p>
           </div>
         ) : viewMode === 'list' ? (
           /* List View */
           <div className="space-y-4">
             {prospects.length === 0 ? (
-              <div className="text-center py-12 bg-white rounded-2xl border">
-                <MapPin className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-gray-900 mb-2">탐지된 개원 예정지가 없습니다</h3>
-                <p className="text-gray-600">필터 조건을 조정해보세요</p>
+              <div className="text-center py-12 card">
+                <MapPin className="w-12 h-12 text-muted-foreground/30 mx-auto mb-4" />
+                <h3 className="text-lg font-medium text-foreground mb-2">탐지된 개원 예정지가 없습니다</h3>
+                <p className="text-muted-foreground">필터 조건을 조정해보세요</p>
               </div>
             ) : (
               prospects.map((prospect) => (
                 <Link
                   key={prospect.id}
                   href={`/prospects/${prospect.id}`}
-                  className="block bg-white rounded-xl border hover:shadow-lg transition-all"
+                  className="block card card-interactive"
                 >
                   <div className="p-6">
                     <div className="flex items-start justify-between mb-4">
                       <div className="flex gap-2">
-                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${typeLabels[prospect.type].color}`}>
+                        <span className={typeLabels[prospect.type].style}>
                           {typeLabels[prospect.type].label}
                         </span>
-                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${statusLabels[prospect.status].color}`}>
+                        <span className={statusLabels[prospect.status].style}>
                           {statusLabels[prospect.status].label}
                         </span>
                       </div>
-                      <span className="text-xs text-gray-500 flex items-center gap-1">
+                      <span className="text-xs text-muted-foreground flex items-center gap-1">
                         <Clock className="w-3 h-3" />
                         {formatDate(prospect.detected_at)}
                       </span>
@@ -293,23 +287,23 @@ export default function ProspectsPage() {
                         <div className={`text-3xl font-bold ${getScoreColor(prospect.clinic_fit_score || 0)}`}>
                           {prospect.clinic_fit_score || '-'}
                         </div>
-                        <div className="text-xs text-gray-500">적합도</div>
+                        <div className="text-xs text-muted-foreground">적합도</div>
                       </div>
 
                       {/* Info */}
                       <div className="flex-1">
                         <div className="flex items-start gap-2 mb-2">
-                          <MapPin className="w-4 h-4 text-gray-400 mt-0.5" />
+                          <MapPin className="w-4 h-4 text-muted-foreground mt-0.5" />
                           <div>
-                            <p className="font-medium text-gray-900">{prospect.address}</p>
+                            <p className="font-medium text-foreground">{prospect.address}</p>
                             {prospect.floor_info && (
-                              <p className="text-sm text-gray-500">{prospect.floor_info}</p>
+                              <p className="text-sm text-muted-foreground">{prospect.floor_info}</p>
                             )}
                           </div>
                         </div>
 
                         {prospect.previous_clinic && (
-                          <p className="text-sm text-gray-500 mb-2">
+                          <p className="text-sm text-muted-foreground mb-2">
                             이전: {prospect.previous_clinic}
                           </p>
                         )}
@@ -317,11 +311,11 @@ export default function ProspectsPage() {
                         {/* Recommended Departments */}
                         {prospect.recommended_dept && prospect.recommended_dept.length > 0 && (
                           <div className="flex flex-wrap gap-1 mt-3">
-                            <span className="text-xs text-gray-500">추천 진료과:</span>
+                            <span className="text-xs text-muted-foreground">추천 진료과:</span>
                             {prospect.recommended_dept.map((dept) => (
                               <span
                                 key={dept}
-                                className="bg-gray-100 text-gray-700 px-2 py-0.5 rounded text-xs"
+                                className="badge-default"
                               >
                                 {dept}
                               </span>
@@ -331,23 +325,23 @@ export default function ProspectsPage() {
                       </div>
 
                       {/* Arrow */}
-                      <ChevronRight className="w-5 h-5 text-gray-400" />
+                      <ChevronRight className="w-5 h-5 text-muted-foreground" />
                     </div>
 
                     {/* Additional Info */}
-                    <div className="mt-4 pt-4 border-t grid grid-cols-3 gap-4 text-sm">
+                    <div className="mt-4 pt-4 border-t border-border grid grid-cols-3 gap-4 text-sm">
                       <div>
-                        <span className="text-gray-500">용도</span>
+                        <span className="text-muted-foreground">용도</span>
                         <p className="font-medium">{prospect.zoning || '-'}</p>
                       </div>
                       <div>
-                        <span className="text-gray-500">면적</span>
+                        <span className="text-muted-foreground">면적</span>
                         <p className="font-medium">
                           {prospect.floor_area ? `${prospect.floor_area}㎡` : '-'}
                         </p>
                       </div>
                       <div>
-                        <span className="text-gray-500">예상 임대료</span>
+                        <span className="text-muted-foreground">예상 임대료</span>
                         <p className="font-medium">
                           {prospect.rent_estimate
                             ? `${(prospect.rent_estimate / 10000).toLocaleString()}만원`
@@ -362,7 +356,7 @@ export default function ProspectsPage() {
           </div>
         ) : (
           /* Map View */
-          <div className="bg-white rounded-xl border h-[600px] overflow-hidden relative">
+          <div className="card h-[600px] overflow-hidden relative">
             <KakaoMap
               center={mapCenter}
               level={6}
@@ -374,29 +368,29 @@ export default function ProspectsPage() {
 
             {/* Selected Prospect Info */}
             {selectedProspect && (
-              <div className="absolute bottom-4 left-4 right-4 bg-white rounded-xl shadow-lg p-4 max-w-md">
+              <div className="absolute bottom-4 left-4 right-4 card p-4 max-w-md shadow-xl">
                 <div className="flex items-start justify-between mb-2">
                   <div className="flex gap-2">
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${typeLabels[selectedProspect.type].color}`}>
+                    <span className={typeLabels[selectedProspect.type].style}>
                       {typeLabels[selectedProspect.type].label}
                     </span>
                   </div>
                   <button
                     onClick={() => setSelectedProspect(null)}
-                    className="text-gray-400 hover:text-gray-600"
+                    className="text-muted-foreground hover:text-foreground"
                   >
                     ✕
                   </button>
                 </div>
-                <p className="font-medium text-gray-900 mb-1">{selectedProspect.address}</p>
-                <p className="text-sm text-gray-500 mb-3">
+                <p className="font-medium text-foreground mb-1">{selectedProspect.address}</p>
+                <p className="text-sm text-muted-foreground mb-3">
                   적합도: <span className={getScoreColor(selectedProspect.clinic_fit_score || 0)}>
                     {selectedProspect.clinic_fit_score || '-'}점
                   </span>
                 </p>
                 <Link
                   href={`/prospects/${selectedProspect.id}`}
-                  className="block text-center bg-green-600 text-white py-2 rounded-lg text-sm font-medium hover:bg-green-700"
+                  className="btn-primary w-full justify-center"
                 >
                   상세보기
                 </Link>
@@ -406,45 +400,25 @@ export default function ProspectsPage() {
         )}
 
         {/* Info Section */}
-        <div className="mt-12 bg-white rounded-2xl border p-8">
-          <h2 className="text-xl font-bold text-gray-900 mb-6">SalesScanner 활용 안내</h2>
+        <div className="mt-12 card p-8">
+          <h2 className="text-xl font-semibold text-foreground mb-6">SalesScanner 활용 안내</h2>
           <div className="grid md:grid-cols-4 gap-6">
-            <div className="text-center">
-              <div className="w-12 h-12 bg-green-100 text-green-600 rounded-xl flex items-center justify-center mx-auto mb-3">
-                1
+            {[
+              { step: '1', title: '실시간 탐지', desc: '신축 건물, 폐업 공실을 자동으로 탐지합니다' },
+              { step: '2', title: '적합도 분석', desc: 'AI가 병원 개원 적합도를 0-100점으로 평가합니다' },
+              { step: '3', title: '맞춤 알림', desc: '원하는 조건에 맞는 새 기회를 알림으로 받으세요' },
+              { step: '4', title: '내보내기', desc: 'Excel, CSV로 내보내 CRM과 연동하세요' },
+            ].map((item) => (
+              <div key={item.step} className="text-center">
+                <div className="w-12 h-12 bg-secondary text-foreground rounded-xl flex items-center justify-center mx-auto mb-3 font-bold">
+                  {item.step}
+                </div>
+                <h3 className="font-medium text-foreground mb-2">{item.title}</h3>
+                <p className="text-sm text-muted-foreground">
+                  {item.desc}
+                </p>
               </div>
-              <h3 className="font-medium text-gray-900 mb-2">실시간 탐지</h3>
-              <p className="text-sm text-gray-600">
-                신축 건물, 폐업 공실을 자동으로 탐지합니다
-              </p>
-            </div>
-            <div className="text-center">
-              <div className="w-12 h-12 bg-green-100 text-green-600 rounded-xl flex items-center justify-center mx-auto mb-3">
-                2
-              </div>
-              <h3 className="font-medium text-gray-900 mb-2">적합도 분석</h3>
-              <p className="text-sm text-gray-600">
-                AI가 병원 개원 적합도를 0-100점으로 평가합니다
-              </p>
-            </div>
-            <div className="text-center">
-              <div className="w-12 h-12 bg-green-100 text-green-600 rounded-xl flex items-center justify-center mx-auto mb-3">
-                3
-              </div>
-              <h3 className="font-medium text-gray-900 mb-2">맞춤 알림</h3>
-              <p className="text-sm text-gray-600">
-                원하는 조건에 맞는 새 기회를 알림으로 받으세요
-              </p>
-            </div>
-            <div className="text-center">
-              <div className="w-12 h-12 bg-green-100 text-green-600 rounded-xl flex items-center justify-center mx-auto mb-3">
-                4
-              </div>
-              <h3 className="font-medium text-gray-900 mb-2">내보내기</h3>
-              <p className="text-sm text-gray-600">
-                Excel, CSV로 내보내 CRM과 연동하세요
-              </p>
-            </div>
+            ))}
           </div>
         </div>
       </main>

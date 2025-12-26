@@ -55,20 +55,18 @@ export default function SimulatePage() {
     mutation.mutate(data)
   }
 
-  const getRecommendationColor = (recommendation: string) => {
+  const getRecommendationStyle = (recommendation: string) => {
     switch (recommendation) {
       case 'VERY_POSITIVE':
-        return 'text-green-600 bg-green-100'
       case 'POSITIVE':
-        return 'text-green-500 bg-green-50'
+        return 'bg-green-50 text-green-900 border-green-200'
       case 'NEUTRAL':
-        return 'text-yellow-600 bg-yellow-100'
+        return 'bg-amber-50 text-amber-900 border-amber-200'
       case 'NEGATIVE':
-        return 'text-orange-600 bg-orange-100'
       case 'VERY_NEGATIVE':
-        return 'text-red-600 bg-red-100'
+        return 'bg-red-50 text-red-900 border-red-200'
       default:
-        return 'text-gray-600 bg-gray-100'
+        return 'bg-secondary text-secondary-foreground border-border'
     }
   }
 
@@ -112,298 +110,298 @@ export default function SimulatePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="bg-white border-b sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <Link href="/" className="text-gray-500 hover:text-gray-700">
-              <ArrowLeft className="w-5 h-5" />
-            </Link>
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center">
-                <TrendingUp className="w-4 h-4 text-white" />
+      <header className="glass sticky top-0 z-50">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6">
+          <div className="flex items-center justify-between h-16">
+            <div className="flex items-center gap-4">
+              <Link href="/" className="text-muted-foreground hover:text-foreground transition-colors">
+                <ArrowLeft className="w-5 h-5" />
+              </Link>
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 bg-foreground rounded-lg flex items-center justify-center">
+                  <TrendingUp className="w-4 h-4 text-background" />
+                </div>
+                <span className="text-lg font-semibold text-foreground">OpenSim</span>
               </div>
-              <span className="text-xl font-bold text-gray-900">OpenSim</span>
             </div>
+            <span className="text-sm text-muted-foreground">개원 시뮬레이터</span>
           </div>
-          <span className="text-sm text-gray-500">개원 시뮬레이터</span>
         </div>
       </header>
 
-      <main className="container mx-auto px-4 py-8">
-        <div className="max-w-6xl mx-auto">
-          {!result ? (
-            /* Form Section */
-            <div className="bg-white rounded-2xl shadow-sm border p-8">
-              <div className="max-w-xl mx-auto">
-                <h1 className="text-2xl font-bold text-gray-900 mb-2">
-                  3분 개원 시뮬레이션
-                </h1>
-                <p className="text-gray-600 mb-8">
-                  주소와 진료과목만 입력하면 예상 매출, 비용, 손익분기점을 분석해드립니다.
-                </p>
+      <main className="max-w-6xl mx-auto px-4 sm:px-6 py-8 md:py-12">
+        {!result ? (
+          /* Form Section */
+          <div className="card p-8 md:p-12">
+            <div className="max-w-xl mx-auto">
+              <h1 className="text-2xl md:text-3xl font-semibold text-foreground mb-2">
+                3분 개원 시뮬레이션
+              </h1>
+              <p className="text-muted-foreground mb-8">
+                주소와 진료과목만 입력하면 예상 매출, 비용, 손익분기점을 분석해드립니다.
+              </p>
 
-                <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-                  {/* Address */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      개원 예정 주소 *
-                    </label>
-                    <div className="relative">
-                      <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                      <input
-                        {...register('address')}
-                        type="text"
-                        placeholder="예: 서울시 강남구 역삼동 123-45"
-                        className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-                      />
-                    </div>
-                    {errors.address && (
-                      <p className="mt-1 text-sm text-red-500">{errors.address.message}</p>
-                    )}
-                  </div>
-
-                  {/* Clinic Type */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      진료과목 *
-                    </label>
-                    <div className="relative">
-                      <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                      <select
-                        {...register('clinic_type')}
-                        className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 appearance-none bg-white"
-                      >
-                        <option value="">진료과목 선택</option>
-                        {clinicTypes.map((type) => (
-                          <option key={type} value={type}>
-                            {type}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                    {errors.clinic_type && (
-                      <p className="mt-1 text-sm text-red-500">{errors.clinic_type.message}</p>
-                    )}
-                  </div>
-
-                  {/* Optional Fields */}
-                  <div className="grid md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        면적 (평) <span className="text-gray-400">선택</span>
-                      </label>
-                      <input
-                        {...register('size_pyeong', { valueAsNumber: true })}
-                        type="number"
-                        placeholder="예: 30"
-                        className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        예산 (백만원) <span className="text-gray-400">선택</span>
-                      </label>
-                      <input
-                        {...register('budget_million', { valueAsNumber: true })}
-                        type="number"
-                        placeholder="예: 500"
-                        className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-                      />
-                    </div>
-                  </div>
-
-                  <button
-                    type="submit"
-                    disabled={mutation.isPending}
-                    className="w-full bg-primary-600 text-white py-4 rounded-xl font-medium hover:bg-primary-700 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                  >
-                    {mutation.isPending ? (
-                      <>
-                        <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
-                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                        </svg>
-                        분석 중...
-                      </>
-                    ) : (
-                      <>
-                        시뮬레이션 시작
-                        <ChevronRight className="w-5 h-5" />
-                      </>
-                    )}
-                  </button>
-                </form>
-
-                <p className="mt-4 text-center text-sm text-gray-500">
-                  심평원, 국토교통부, 소상공인진흥공단 데이터 기반 분석
-                </p>
-              </div>
-            </div>
-          ) : (
-            /* Results Section */
-            <div className="space-y-6">
-              {/* Header */}
-              <div className="flex items-center justify-between">
+              <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+                {/* Address */}
                 <div>
-                  <h1 className="text-2xl font-bold text-gray-900">시뮬레이션 결과</h1>
-                  <p className="text-gray-600">{result.address} · {result.clinic_type}</p>
-                </div>
-                <button
-                  onClick={() => setResult(null)}
-                  className="text-primary-600 hover:text-primary-700 font-medium"
-                >
-                  새로운 시뮬레이션
-                </button>
-              </div>
-
-              {/* Recommendation Card */}
-              <div className={`rounded-2xl p-6 ${getRecommendationColor(result.recommendation)}`}>
-                <div className="flex items-center gap-3 mb-2">
-                  {getRecommendationIcon(result.recommendation)}
-                  <span className="font-bold text-lg">
-                    개원 추천: {getRecommendationText(result.recommendation)}
-                  </span>
-                </div>
-                <p>{result.recommendation_reason}</p>
-                <div className="mt-4 flex items-center gap-2">
-                  <div className="bg-white/50 rounded-full px-3 py-1 text-sm font-medium">
-                    신뢰도 {result.confidence_score}%
+                  <label className="label mb-2 block">
+                    개원 예정 주소 *
+                  </label>
+                  <div className="relative">
+                    <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                    <input
+                      {...register('address')}
+                      type="text"
+                      placeholder="예: 서울시 강남구 역삼동 123-45"
+                      className="input pl-12"
+                    />
                   </div>
-                </div>
-              </div>
-
-              {/* Main Stats Grid */}
-              <div className="grid md:grid-cols-3 gap-6">
-                {/* Revenue Card */}
-                <div className="bg-white rounded-2xl border p-6">
-                  <h3 className="text-sm font-medium text-gray-500 mb-4">예상 월 매출</h3>
-                  <div className="text-3xl font-bold text-gray-900 mb-2">
-                    {formatCurrency(result.estimated_monthly_revenue.avg)}
-                  </div>
-                  <div className="text-sm text-gray-500">
-                    {formatCurrency(result.estimated_monthly_revenue.min)} ~ {formatCurrency(result.estimated_monthly_revenue.max)}
-                  </div>
-                </div>
-
-                {/* Cost Card */}
-                <div className="bg-white rounded-2xl border p-6">
-                  <h3 className="text-sm font-medium text-gray-500 mb-4">예상 월 비용</h3>
-                  <div className="text-3xl font-bold text-gray-900 mb-2">
-                    {formatCurrency(result.estimated_monthly_cost.total)}
-                  </div>
-                  <div className="text-sm text-gray-500 space-y-1">
-                    <div>임대료: {formatCurrency(result.estimated_monthly_cost.rent)}</div>
-                    <div>인건비: {formatCurrency(result.estimated_monthly_cost.labor)}</div>
-                  </div>
-                </div>
-
-                {/* Profit Card */}
-                <div className="bg-white rounded-2xl border p-6">
-                  <h3 className="text-sm font-medium text-gray-500 mb-4">예상 월 순이익</h3>
-                  <div className={`text-3xl font-bold mb-2 ${result.profitability.monthly_profit_avg >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                    {formatCurrency(result.profitability.monthly_profit_avg)}
-                  </div>
-                  <div className="text-sm text-gray-500">
-                    손익분기점: {result.profitability.breakeven_months}개월
-                  </div>
-                </div>
-              </div>
-
-              {/* ROI Card */}
-              <div className="bg-gradient-to-r from-primary-600 to-primary-700 rounded-2xl p-6 text-white">
-                <div className="grid md:grid-cols-3 gap-6">
-                  <div>
-                    <div className="text-sm opacity-80 mb-1">연 예상 ROI</div>
-                    <div className="text-3xl font-bold">{result.profitability.annual_roi_percent}%</div>
-                  </div>
-                  <div>
-                    <div className="text-sm opacity-80 mb-1">손익분기점</div>
-                    <div className="text-3xl font-bold">{result.profitability.breakeven_months}개월</div>
-                  </div>
-                  <div>
-                    <div className="text-sm opacity-80 mb-1">경쟁 병원</div>
-                    <div className="text-3xl font-bold">{result.competition.same_dept_count}개</div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Competition & Demographics */}
-              <div className="grid md:grid-cols-2 gap-6">
-                {/* Competition */}
-                <div className="bg-white rounded-2xl border p-6">
-                  <h3 className="font-bold text-gray-900 mb-4 flex items-center gap-2">
-                    <Target className="w-5 h-5 text-primary-600" />
-                    경쟁 현황
-                  </h3>
-                  <div className="space-y-4">
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">분석 반경</span>
-                      <span className="font-medium">{result.competition.radius_m}m</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">동일 진료과 병원</span>
-                      <span className="font-medium">{result.competition.same_dept_count}개</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">전체 의료기관</span>
-                      <span className="font-medium">{result.competition.total_clinic_count}개</span>
-                    </div>
-                  </div>
-
-                  {result.competitors.length > 0 && (
-                    <div className="mt-4 pt-4 border-t">
-                      <h4 className="text-sm font-medium text-gray-700 mb-3">주요 경쟁 병원</h4>
-                      <div className="space-y-2">
-                        {result.competitors.slice(0, 3).map((comp, idx) => (
-                          <div key={idx} className="flex justify-between text-sm">
-                            <span className="text-gray-600">{comp.name}</span>
-                            <span className="text-gray-500">{comp.distance_m}m</span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
+                  {errors.address && (
+                    <p className="mt-2 text-sm text-red-500">{errors.address.message}</p>
                   )}
                 </div>
 
-                {/* Demographics */}
-                <div className="bg-white rounded-2xl border p-6">
-                  <h3 className="font-bold text-gray-900 mb-4 flex items-center gap-2">
-                    <Users className="w-5 h-5 text-primary-600" />
-                    인구 현황
-                  </h3>
-                  <div className="space-y-4">
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">반경 1km 인구</span>
-                      <span className="font-medium">{result.demographics.population_1km.toLocaleString()}명</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">40대 이상 비율</span>
-                      <span className="font-medium">{(result.demographics.age_40_plus_ratio * 100).toFixed(1)}%</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">일 유동인구</span>
-                      <span className="font-medium">{result.demographics.floating_population_daily.toLocaleString()}명</span>
-                    </div>
+                {/* Clinic Type */}
+                <div>
+                  <label className="label mb-2 block">
+                    진료과목 *
+                  </label>
+                  <div className="relative">
+                    <Building2 className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                    <select
+                      {...register('clinic_type')}
+                      className="select pl-12"
+                    >
+                      <option value="">진료과목 선택</option>
+                      {clinicTypes.map((type) => (
+                        <option key={type} value={type}>
+                          {type}
+                        </option>
+                      ))}
+                    </select>
                   </div>
+                  {errors.clinic_type && (
+                    <p className="mt-2 text-sm text-red-500">{errors.clinic_type.message}</p>
+                  )}
+                </div>
+
+                {/* Optional Fields */}
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="label mb-2 block">
+                      면적 (평) <span className="text-muted-foreground font-normal">선택</span>
+                    </label>
+                    <input
+                      {...register('size_pyeong', { valueAsNumber: true })}
+                      type="number"
+                      placeholder="예: 30"
+                      className="input"
+                    />
+                  </div>
+                  <div>
+                    <label className="label mb-2 block">
+                      예산 (백만원) <span className="text-muted-foreground font-normal">선택</span>
+                    </label>
+                    <input
+                      {...register('budget_million', { valueAsNumber: true })}
+                      type="number"
+                      placeholder="예: 500"
+                      className="input"
+                    />
+                  </div>
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={mutation.isPending}
+                  className="btn-primary w-full h-12 text-base"
+                >
+                  {mutation.isPending ? (
+                    <>
+                      <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                      </svg>
+                      분석 중...
+                    </>
+                  ) : (
+                    <>
+                      시뮬레이션 시작
+                      <ChevronRight className="w-5 h-5" />
+                    </>
+                  )}
+                </button>
+              </form>
+
+              <p className="mt-6 text-center text-sm text-muted-foreground">
+                심평원, 국토교통부, 소상공인진흥공단 데이터 기반 분석
+              </p>
+            </div>
+          </div>
+        ) : (
+          /* Results Section */
+          <div className="space-y-6">
+            {/* Header */}
+            <div className="flex items-center justify-between">
+              <div>
+                <h1 className="text-2xl font-semibold text-foreground">시뮬레이션 결과</h1>
+                <p className="text-muted-foreground">{result.address} · {result.clinic_type}</p>
+              </div>
+              <button
+                onClick={() => setResult(null)}
+                className="btn-ghost"
+              >
+                새로운 시뮬레이션
+              </button>
+            </div>
+
+            {/* Recommendation Card */}
+            <div className={`rounded-xl p-6 border ${getRecommendationStyle(result.recommendation)}`}>
+              <div className="flex items-center gap-3 mb-2">
+                {getRecommendationIcon(result.recommendation)}
+                <span className="font-semibold text-lg">
+                  개원 추천: {getRecommendationText(result.recommendation)}
+                </span>
+              </div>
+              <p className="opacity-80">{result.recommendation_reason}</p>
+              <div className="mt-4">
+                <span className="badge-default">
+                  신뢰도 {result.confidence_score}%
+                </span>
+              </div>
+            </div>
+
+            {/* Main Stats Grid */}
+            <div className="grid md:grid-cols-3 gap-6">
+              {/* Revenue Card */}
+              <div className="card p-6">
+                <h3 className="text-sm font-medium text-muted-foreground mb-4">예상 월 매출</h3>
+                <div className="text-3xl font-bold text-foreground mb-2">
+                  {formatCurrency(result.estimated_monthly_revenue.avg)}
+                </div>
+                <div className="text-sm text-muted-foreground">
+                  {formatCurrency(result.estimated_monthly_revenue.min)} ~ {formatCurrency(result.estimated_monthly_revenue.max)}
                 </div>
               </div>
 
-              {/* CTA */}
-              <div className="bg-white rounded-2xl border p-6 flex flex-col md:flex-row items-center justify-between gap-4">
-                <div>
-                  <h3 className="font-bold text-gray-900">상세 리포트 받기</h3>
-                  <p className="text-gray-600">AI 분석이 포함된 PDF 리포트를 받아보세요</p>
+              {/* Cost Card */}
+              <div className="card p-6">
+                <h3 className="text-sm font-medium text-muted-foreground mb-4">예상 월 비용</h3>
+                <div className="text-3xl font-bold text-foreground mb-2">
+                  {formatCurrency(result.estimated_monthly_cost.total)}
                 </div>
-                <button className="bg-primary-600 text-white px-6 py-3 rounded-xl font-medium hover:bg-primary-700 transition flex items-center gap-2">
-                  <Download className="w-5 h-5" />
-                  리포트 구매 (3만원)
-                </button>
+                <div className="text-sm text-muted-foreground space-y-1">
+                  <div>임대료: {formatCurrency(result.estimated_monthly_cost.rent)}</div>
+                  <div>인건비: {formatCurrency(result.estimated_monthly_cost.labor)}</div>
+                </div>
+              </div>
+
+              {/* Profit Card */}
+              <div className="card p-6">
+                <h3 className="text-sm font-medium text-muted-foreground mb-4">예상 월 순이익</h3>
+                <div className={`text-3xl font-bold mb-2 ${result.profitability.monthly_profit_avg >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                  {formatCurrency(result.profitability.monthly_profit_avg)}
+                </div>
+                <div className="text-sm text-muted-foreground">
+                  손익분기점: {result.profitability.breakeven_months}개월
+                </div>
               </div>
             </div>
-          )}
-        </div>
+
+            {/* ROI Card */}
+            <div className="bg-foreground text-background rounded-xl p-6">
+              <div className="grid md:grid-cols-3 gap-6">
+                <div>
+                  <div className="text-sm opacity-70 mb-1">연 예상 ROI</div>
+                  <div className="text-3xl font-bold">{result.profitability.annual_roi_percent}%</div>
+                </div>
+                <div>
+                  <div className="text-sm opacity-70 mb-1">손익분기점</div>
+                  <div className="text-3xl font-bold">{result.profitability.breakeven_months}개월</div>
+                </div>
+                <div>
+                  <div className="text-sm opacity-70 mb-1">경쟁 병원</div>
+                  <div className="text-3xl font-bold">{result.competition.same_dept_count}개</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Competition & Demographics */}
+            <div className="grid md:grid-cols-2 gap-6">
+              {/* Competition */}
+              <div className="card p-6">
+                <h3 className="font-semibold text-foreground mb-4 flex items-center gap-2">
+                  <Target className="w-5 h-5" />
+                  경쟁 현황
+                </h3>
+                <div className="space-y-4">
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">분석 반경</span>
+                    <span className="font-medium">{result.competition.radius_m}m</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">동일 진료과 병원</span>
+                    <span className="font-medium">{result.competition.same_dept_count}개</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">전체 의료기관</span>
+                    <span className="font-medium">{result.competition.total_clinic_count}개</span>
+                  </div>
+                </div>
+
+                {result.competitors.length > 0 && (
+                  <div className="mt-4 pt-4 border-t border-border">
+                    <h4 className="text-sm font-medium text-foreground mb-3">주요 경쟁 병원</h4>
+                    <div className="space-y-2">
+                      {result.competitors.slice(0, 3).map((comp, idx) => (
+                        <div key={idx} className="flex justify-between text-sm">
+                          <span className="text-muted-foreground">{comp.name}</span>
+                          <span className="text-muted-foreground">{comp.distance_m}m</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Demographics */}
+              <div className="card p-6">
+                <h3 className="font-semibold text-foreground mb-4 flex items-center gap-2">
+                  <Users className="w-5 h-5" />
+                  인구 현황
+                </h3>
+                <div className="space-y-4">
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">반경 1km 인구</span>
+                    <span className="font-medium">{result.demographics.population_1km.toLocaleString()}명</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">40대 이상 비율</span>
+                    <span className="font-medium">{(result.demographics.age_40_plus_ratio * 100).toFixed(1)}%</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">일 유동인구</span>
+                    <span className="font-medium">{result.demographics.floating_population_daily.toLocaleString()}명</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* CTA */}
+            <div className="card p-6 flex flex-col md:flex-row items-center justify-between gap-4">
+              <div>
+                <h3 className="font-semibold text-foreground">상세 리포트 받기</h3>
+                <p className="text-muted-foreground">AI 분석이 포함된 PDF 리포트를 받아보세요</p>
+              </div>
+              <button className="btn-primary">
+                <Download className="w-5 h-5" />
+                리포트 구매 (3만원)
+              </button>
+            </div>
+          </div>
+        )}
       </main>
     </div>
   )
