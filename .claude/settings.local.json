@@ -21,7 +21,19 @@
       "Bash(dir:*)",
       "Bash(cd:*)",
       "Bash(cat:*)",
-      "Bash(ls:*)"
+      "Bash(ls:*)",
+      "Bash(docker --version:*)",
+      "Bash(docker-compose:*)",
+      "Bash(npx tsc --noEmit)",
+      "WebFetch(domain:www.data.go.kr)",
+      "Bash(fly version:*)",
+      "Bash(fly auth whoami:*)",
+      "Bash(fly apps create:*)",
+      "Bash(fly postgres create:*)",
+      "Bash(fly postgres attach:*)",
+      "Bash(fly secrets set:*)",
+      "Bash(fly deploy:*)",
+      "Bash(curl:*)"
     ]
   }
 }

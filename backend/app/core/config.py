@@ -1,6 +1,7 @@
 from pydantic_settings import BaseSettings
 from typing import List, Optional
 from functools import lru_cache
+import os
 
 
 class Settings(BaseSettings):
@@ -12,20 +13,40 @@ class Settings(BaseSettings):
 
     # Server
     HOST: str = "0.0.0.0"
-    PORT: int = 8000
+    PORT: int = 8080
 
-    # Database
+    # Database - fly.io uses DATABASE_URL with postgres:// prefix
     DATABASE_URL: str = "postgresql+asyncpg://user:password@localhost:5432/medimatch"
     DATABASE_ECHO: bool = False
+
+    @property
+    def async_database_url(self) -> str:
+        """Convert postgres:// to postgresql+asyncpg:// for SQLAlchemy async"""
+        url = self.DATABASE_URL
+        if url.startswith("postgres://"):
+            url = url.replace("postgres://", "postgresql+asyncpg://", 1)
+        elif url.startswith("postgresql://"):
+            url = url.replace("postgresql://", "postgresql+asyncpg://", 1)
+        # Remove sslmode parameter if present (not supported by asyncpg directly)
+        if "?sslmode=" in url:
+            url = url.split("?sslmode=")[0]
+        return url
 
     # Redis
     REDIS_URL: str = "redis://localhost:6379"
 
     # JWT Authentication
-    JWT_SECRET_KEY: str = "your-super-secret-key-change-in-production"
+    SECRET_KEY: str = "your-super-secret-key-change-in-production"
+    JWT_SECRET_KEY: str = ""  # Falls back to SECRET_KEY
     JWT_ALGORITHM: str = "HS256"
+    ALGORITHM: str = "HS256"  # Alias for JWT_ALGORITHM
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
     REFRESH_TOKEN_EXPIRE_DAYS: int = 7
+
+    @property
+    def get_jwt_secret(self) -> str:
+        """Get JWT secret key, falling back to SECRET_KEY"""
+        return self.JWT_SECRET_KEY or self.SECRET_KEY
 
     # Public Data APIs
     HIRA_API_KEY: str = ""  # 건강보험심사평가원
@@ -47,12 +68,22 @@ class Settings(BaseSettings):
     AWS_REGION: str = "ap-northeast-2"
     S3_BUCKET_NAME: str = "medimatch-files"
 
-    # Payment (Toss Payments)
+    # Payment (Toss Payments) - 결제위젯 연동 키
     TOSS_CLIENT_KEY: str = ""
     TOSS_SECRET_KEY: str = ""
 
+    # Toss Payments - 자동결제(빌링) 키
+    TOSS_BILLING_MID: str = ""
+    TOSS_BILLING_CLIENT_KEY: str = ""
+    TOSS_BILLING_SECRET_KEY: str = ""
+
     # CORS
-    CORS_ORIGINS: List[str] = ["http://localhost:3000", "http://localhost:8000"]
+    CORS_ORIGINS: List[str] = [
+        "http://localhost:3000",
+        "http://localhost:8000",
+        "https://medimatch-sooty-two-82.vercel.app",
+    ]
+    FRONTEND_URL: str = "http://localhost:3000"
 
     # Email (SMTP)
     SMTP_HOST: str = ""

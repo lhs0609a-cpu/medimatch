@@ -37,18 +37,24 @@ class SimulationService:
         geo_data = await external_api_service.geocode_address(request.address)
         latitude = geo_data.get("latitude", 37.5665) if geo_data else 37.5665
         longitude = geo_data.get("longitude", 126.9780) if geo_data else 126.9780
+        region_code = geo_data.get("region_code", "") if geo_data else ""
 
-        # 2. 주변 병원 데이터 수집
-        nearby_hospitals = await external_api_service.get_nearby_hospitals(
+        # 2. 주변 병원 데이터 수집 (매출 데이터 포함)
+        nearby_hospitals = await external_api_service.get_nearby_hospitals_with_revenue(
             latitude, longitude, 1000, request.clinic_type
         )
 
-        # 3. 상권 데이터 수집
+        # 3. 지역/진료과별 평균 통계 조회
+        region_stats = await external_api_service.get_clinic_type_stats(
+            region_code, request.clinic_type
+        )
+
+        # 4. 상권 데이터 수집
         commercial_data = await external_api_service.get_commercial_data(
             latitude, longitude
         )
 
-        # 4. 인구통계 데이터 수집
+        # 5. 인구통계 데이터 수집
         demographics_data = await external_api_service.get_demographics(
             latitude, longitude
         )

@@ -4,11 +4,13 @@ from sqlalchemy import select, and_, or_
 from typing import Optional, List
 from pydantic import BaseModel
 from enum import Enum
+from math import radians, sin, cos, sqrt, atan2
 
 from ..deps import get_db
 from ...models.hospital import Hospital
 from ...models.prospect import ProspectLocation, ProspectStatus
 from ...models.pharmacy import PharmacySlot, SlotStatus
+from ...services.external_api import external_api_service
 
 router = APIRouter()
 
@@ -269,3 +271,130 @@ async def get_marker_detail(
             }
 
     return {"error": "Marker not found"}
+
+
+def calculate_distance(lat1: float, lon1: float, lat2: float, lon2: float) -> int:
+    """두 좌표 간 거리 계산 (미터)"""
+    R = 6371000
+    lat1_rad = radians(lat1)
+    lat2_rad = radians(lat2)
+    delta_lat = radians(lat2 - lat1)
+    delta_lon = radians(lon2 - lon1)
+    a = sin(delta_lat/2)**2 + cos(lat1_rad) * cos(lat2_rad) * sin(delta_lon/2)**2
+    c = 2 * atan2(sqrt(a), sqrt(1-a))
+    return int(R * c)
+
+
+@router.get("/hira/hospitals")
+async def get_hira_hospitals_on_map(
+    latitude: float = Query(..., description="중심 위도"),
+    longitude: float = Query(..., description="중심 경도"),
+    radius_m: int = Query(1000, ge=100, le=3000, description="검색 반경 (미터)"),
+    clinic_type: Optional[str] = Query(None, description="진료과목 필터")
+):
+    """
+    심평원 API에서 실시간 병원 데이터 조회 (지도용)
+
+    DB가 아닌 심평원 API에서 직접 조회하여 최신 데이터 반환
+    """
+    hospitals = await external_api_service.get_nearby_hospitals(
+        latitude=latitude,
+        longitude=longitude,
+        radius_m=radius_m,
+        clinic_type=clinic_type
+    )
+
+    # 거리 계산 및 마커 형식 변환
+    markers = []
+    for h in hospitals:
+        h_lat = h.get("latitude", 0)
+        h_lng = h.get("longitude", 0)
+        distance = calculate_distance(latitude, longitude, h_lat, h_lng)
+
+        if distance <= radius_m:
+            markers.append(MapMarker(
+                id=h.get("ykiho", ""),
+                lat=h_lat,
+                lng=h_lng,
+                title=h.get("name", ""),
+                type=MarkerType.HOSPITAL,
+                info=MarkerInfo(
+                    address=h.get("address"),
+                    specialty=h.get("clinic_type"),
+                    est_revenue=h.get("est_monthly_revenue")
+                )
+            ))
+
+    # 거리순 정렬
+    markers.sort(key=lambda m: calculate_distance(latitude, longitude, m.lat, m.lng))
+
+    return {
+        "markers": markers,
+        "total": len(markers),
+        "source": "hira_api",
+        "center": {"latitude": latitude, "longitude": longitude},
+        "radius_m": radius_m
+    }
+
+
+@router.get("/hira/pharmacies")
+async def get_hira_pharmacies_on_map(
+    latitude: float = Query(..., description="중심 위도"),
+    longitude: float = Query(..., description="중심 경도"),
+    radius_m: int = Query(500, ge=100, le=2000, description="검색 반경 (미터)")
+):
+    """
+    심평원 API에서 실시간 약국 데이터 조회 (지도용)
+    """
+    pharmacies = await external_api_service.get_nearby_pharmacies(
+        latitude=latitude,
+        longitude=longitude,
+        radius_m=radius_m
+    )
+
+    # 거리 계산 및 마커 형식 변환
+    markers = []
+    for p in pharmacies:
+        p_lat = p.get("latitude", 0)
+        p_lng = p.get("longitude", 0)
+        distance = calculate_distance(latitude, longitude, p_lat, p_lng)
+
+        if distance <= radius_m:
+            markers.append({
+                "id": p.get("ykiho", ""),
+                "lat": p_lat,
+                "lng": p_lng,
+                "title": p.get("name", ""),
+                "type": "pharmacy_hira",
+                "info": {
+                    "address": p.get("address"),
+                    "phone": p.get("phone"),
+                    "pharmacists": p.get("pharmacists"),
+                    "distance_m": distance
+                }
+            })
+
+    # 거리순 정렬
+    markers.sort(key=lambda m: m["info"]["distance_m"])
+
+    return {
+        "markers": markers,
+        "total": len(markers),
+        "source": "hira_api",
+        "center": {"latitude": latitude, "longitude": longitude},
+        "radius_m": radius_m
+    }
+
+
+@router.get("/hira/hospital/{ykiho}/detail")
+async def get_hira_hospital_detail(ykiho: str):
+    """
+    심평원 API에서 병원 상세 + 청구 통계 조회
+    """
+    billing = await external_api_service.get_hospital_billing_stats(ykiho)
+
+    return {
+        "ykiho": ykiho,
+        "billing": billing,
+        "source": "hira_api"
+    }

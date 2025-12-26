@@ -233,3 +233,343 @@ export interface MapMarkerDetail {
   status?: string
   bid_deadline?: string
 }
+
+// PharmMatch v2 - Anonymous Matching Types
+export type ListingStatus = 'DRAFT' | 'ACTIVE' | 'PAUSED' | 'MATCHED' | 'EXPIRED' | 'WITHDRAWN'
+export type PharmacyType = 'GENERAL' | 'DISPENSING' | 'ORIENTAL' | 'HOSPITAL'
+export type TransferReason = 'RETIREMENT' | 'RELOCATION' | 'HEALTH' | 'CAREER_CHANGE' | 'FAMILY' | 'OTHER'
+export type InterestType = 'L2P' | 'P2L'
+export type MatchStatus = 'PENDING' | 'MUTUAL' | 'CHATTING' | 'MEETING' | 'CONTRACTED' | 'CANCELLED'
+
+export interface AnonymousListing {
+  id: string
+  anonymous_id: string
+  region_code: string
+  region_name: string
+  pharmacy_type: PharmacyType
+  nearby_hospital_types: string[]
+  monthly_revenue_min?: number
+  monthly_revenue_max?: number
+  monthly_rx_count?: number
+  area_pyeong_min?: number
+  area_pyeong_max?: number
+  premium_min?: number
+  premium_max?: number
+  monthly_rent?: number
+  deposit?: number
+  transfer_reason?: TransferReason
+  operation_years?: number
+  employee_count: number
+  has_auto_dispenser: boolean
+  has_parking: boolean
+  floor_info?: string
+  description?: string
+  status: ListingStatus
+  view_count: number
+  interest_count: number
+  created_at: string
+  // Private fields (only for owner or matched)
+  exact_address?: string
+  pharmacy_name?: string
+  owner_phone?: string
+  latitude?: number
+  longitude?: number
+  expires_at?: string
+  updated_at?: string
+}
+
+export interface PharmacistProfile {
+  id: string
+  anonymous_id: string
+  preferred_regions: string[]
+  preferred_region_names: string[]
+  budget_min?: number
+  budget_max?: number
+  preferred_area_min?: number
+  preferred_area_max?: number
+  preferred_revenue_min?: number
+  preferred_revenue_max?: number
+  experience_years: number
+  license_year?: number
+  has_management_experience: boolean
+  specialty_areas: string[]
+  preferred_pharmacy_types: string[]
+  preferred_hospital_types: string[]
+  introduction?: string
+  is_active: boolean
+  last_active_at: string
+  // Private fields
+  full_name?: string
+  phone?: string
+  email?: string
+  license_number?: string
+  created_at?: string
+  updated_at?: string
+}
+
+export interface Interest {
+  id: string
+  listing_id: string
+  pharmacist_profile_id: string
+  interest_type: InterestType
+  message?: string
+  created_at: string
+  target_anonymous_id: string
+  target_summary: string
+}
+
+export interface MatchScoreBreakdown {
+  region: number
+  budget: number
+  size: number
+  revenue: number
+  type: number
+  experience: number
+}
+
+export interface Match {
+  id: string
+  listing_id: string
+  pharmacist_profile_id: string
+  status: MatchStatus
+  match_score?: number
+  match_score_breakdown?: MatchScoreBreakdown
+  listing_info: AnonymousListing
+  profile_info: PharmacistProfile
+  listing_private?: AnonymousListing
+  profile_private?: PharmacistProfile
+  contact_revealed_at?: string
+  first_message_at?: string
+  meeting_scheduled_at?: string
+  contracted_at?: string
+  commission_rate: number
+  commission_amount?: number
+  created_at: string
+  updated_at: string
+}
+
+export interface MatchMessage {
+  id: string
+  match_id: string
+  sender_id: string
+  sender_anonymous_id: string
+  content: string
+  is_read: boolean
+  read_at?: string
+  created_at: string
+}
+
+export interface Recommendation {
+  listing?: AnonymousListing
+  profile?: PharmacistProfile
+  match_score: number
+  match_score_breakdown: MatchScoreBreakdown
+  recommendation_reason: string
+}
+
+// Escrow Types
+export type EscrowStatus = 'INITIATED' | 'FUNDED' | 'IN_PROGRESS' | 'COMPLETED' | 'RELEASED' | 'DISPUTED' | 'REFUNDED' | 'CANCELLED'
+export type MilestoneStatus = 'PENDING' | 'FUNDED' | 'IN_PROGRESS' | 'SUBMITTED' | 'APPROVED' | 'RELEASED' | 'REJECTED'
+export type ContractStatus = 'DRAFT' | 'PENDING_CUSTOMER' | 'PENDING_PARTNER' | 'SIGNED' | 'ACTIVE' | 'COMPLETED' | 'CANCELLED'
+export type MessageType = 'TEXT' | 'FILE' | 'IMAGE' | 'SYSTEM'
+export type DisputeStatus = 'OPEN' | 'UNDER_REVIEW' | 'RESOLVED_CUSTOMER' | 'RESOLVED_PARTNER' | 'RESOLVED_SPLIT' | 'CLOSED'
+
+export interface EscrowContract {
+  id: number
+  contract_number: string
+  customer_id: string
+  partner_id: number
+  inquiry_id?: number
+  title: string
+  description?: string
+  contract_content: string
+  terms_and_conditions?: string
+  total_amount: number
+  deposit_amount?: number
+  commission_rate: number
+  commission_amount?: number
+  service_start_date?: string
+  service_end_date?: string
+  customer_signed: boolean
+  customer_signature?: string
+  customer_signed_at?: string
+  partner_signed: boolean
+  partner_signature?: string
+  partner_signed_at?: string
+  status: ContractStatus
+  created_at: string
+  updated_at?: string
+  partner_name?: string
+}
+
+export interface EscrowMilestone {
+  id: string
+  escrow_id: string
+  name: string
+  description?: string
+  sequence: number
+  amount: number
+  percentage: number
+  status: MilestoneStatus
+  due_date?: string
+  submitted_at?: string
+  approved_at?: string
+  released_at?: string
+  proof_description?: string
+  proof_files: string[]
+  created_at: string
+}
+
+export interface EscrowTransaction {
+  id: string
+  escrow_number: string
+  customer_id: string
+  partner_id: number
+  contract_id: number
+  total_amount: number
+  platform_fee: number
+  partner_payout: number
+  status: EscrowStatus
+  payment_key?: string
+  order_id?: string
+  payout_account_bank?: string
+  payout_account_number?: string
+  payout_account_holder?: string
+  paid_at?: string
+  created_at: string
+  funded_at?: string
+  completed_at?: string
+  released_at?: string
+  milestones?: EscrowMilestone[]
+  contract?: EscrowContract
+  partner_name?: string
+}
+
+export interface EscrowMessage {
+  id: string
+  escrow_id: string
+  sender_id: string
+  sender_name?: string
+  message_type: MessageType
+  content: string
+  filtered_content?: string
+  attachments: string[]
+  contains_contact_info: boolean
+  is_read: boolean
+  read_at?: string
+  created_at: string
+  warning_message?: string
+}
+
+export interface EscrowDispute {
+  id: number
+  escrow_id: string
+  raised_by: string
+  reason: string
+  description: string
+  evidence_files: string[]
+  status: DisputeStatus
+  resolution_notes?: string
+  refund_amount?: number
+  assigned_admin_id?: string
+  created_at: string
+  resolved_at?: string
+}
+
+// HIRA (심평원) Types
+export interface HospitalInfo {
+  ykiho: string
+  name: string
+  address: string
+  phone?: string
+  clinic_type: string
+  latitude: number
+  longitude: number
+  established?: string
+  doctors: number
+  beds: number
+  distance_m?: number
+}
+
+export interface HospitalBillingStats {
+  ykiho: string
+  year_month?: string
+  claim_count: number
+  total_amount: number
+  avg_per_claim: number
+  patient_count: number
+}
+
+export interface HospitalWithRevenue extends HospitalInfo {
+  billing_data?: HospitalBillingStats
+  est_monthly_revenue: number
+  claim_count: number
+  patient_count: number
+}
+
+export interface ClinicTypeStats {
+  region_code: string
+  clinic_type: string
+  avg_monthly_revenue: number
+  avg_claim_count: number
+  avg_per_claim: number
+  total_clinics: number
+  is_default: boolean
+}
+
+export interface PharmacyInfoHira {
+  ykiho: string
+  name: string
+  address: string
+  phone?: string
+  latitude: number
+  longitude: number
+  established?: string
+  pharmacists: number
+  distance_m?: number
+}
+
+export interface PharmacyWithStats extends PharmacyInfoHira {
+  billing_data?: {
+    rx_count: number
+    total_amount: number
+    avg_per_rx: number
+    year_month?: string
+  }
+  est_monthly_revenue: number
+  nearby_hospitals: string[]
+  nearby_hospital_count: number
+}
+
+export interface NearbyHospitalsResponse {
+  items: HospitalWithRevenue[]
+  total: number
+  center: { latitude: number; longitude: number }
+  radius_m: number
+}
+
+export interface NearbyPharmaciesResponse {
+  items: PharmacyWithStats[]
+  total: number
+  center: { latitude: number; longitude: number }
+  radius_m: number
+}
+
+export interface RegionStatsResponse {
+  stats: ClinicTypeStats
+  comparison?: {
+    vs_national_percent: number
+    national_avg_revenue: number
+    region_rank?: number
+  }
+}
+
+export interface ClinicTypeCode {
+  code: string
+  name: string
+}
+
+export interface RegionCode {
+  sido_code: string
+  name: string
+}

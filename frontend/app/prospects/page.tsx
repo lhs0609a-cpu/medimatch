@@ -1,14 +1,41 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import Link from 'next/link'
+import dynamic from 'next/dynamic'
 import {
   ArrowLeft, MapPin, Building2, TrendingUp, Bell, Download,
   ChevronRight, Filter, Search, Map, List, Star, Clock
 } from 'lucide-react'
 import { prospectsService } from '@/lib/api/services'
 import { ProspectLocation } from '@/lib/api/client'
+
+interface MarkerData {
+  id: string | number;
+  lat: number;
+  lng: number;
+  title: string;
+  type: 'hospital' | 'prospect' | 'pharmacy' | 'default' | 'closed_hospital' | 'listing';
+  info?: {
+    address?: string;
+    score?: number;
+    specialty?: string;
+  };
+}
+
+// SSR 비활성화
+const KakaoMap = dynamic(() => import('@/components/map/KakaoMap'), {
+  ssr: false,
+  loading: () => (
+    <div className="w-full h-full min-h-[600px] bg-gray-100 flex items-center justify-center">
+      <div className="text-center">
+        <div className="animate-spin h-8 w-8 border-4 border-green-600 border-t-transparent rounded-full mx-auto mb-4" />
+        <p className="text-gray-600">지도를 불러오는 중...</p>
+      </div>
+    </div>
+  ),
+})
 
 const typeLabels: Record<string, { label: string; color: string }> = {
   NEW_BUILD: { label: '신축', color: 'bg-blue-100 text-blue-700' },
@@ -27,6 +54,8 @@ export default function ProspectsPage() {
   const [viewMode, setViewMode] = useState<'list' | 'map'>('list')
   const [typeFilter, setTypeFilter] = useState<string | null>(null)
   const [minScore, setMinScore] = useState<number>(0)
+  const [selectedProspect, setSelectedProspect] = useState<ProspectLocation | null>(null)
+  const [mapCenter, setMapCenter] = useState({ lat: 37.5665, lng: 126.978 })
 
   const { data, isLoading } = useQuery({
     queryKey: ['prospects', typeFilter, minScore],
@@ -39,6 +68,31 @@ export default function ProspectsPage() {
   })
 
   const prospects: ProspectLocation[] = data?.items || []
+
+  // prospects를 마커 데이터로 변환
+  const mapMarkers: MarkerData[] = useMemo(() => {
+    return prospects
+      .filter(p => p.lat && p.lng)
+      .map(p => ({
+        id: p.id,
+        lat: p.lat!,
+        lng: p.lng!,
+        title: p.address,
+        type: 'prospect' as const,
+        info: {
+          address: p.address,
+          score: p.clinic_fit_score || 0,
+          specialty: p.recommended_dept?.join(', '),
+        },
+      }))
+  }, [prospects])
+
+  const handleMarkerClick = (marker: MarkerData) => {
+    const prospect = prospects.find(p => p.id === marker.id)
+    if (prospect) {
+      setSelectedProspect(prospect)
+    }
+  }
 
   const getScoreColor = (score: number) => {
     if (score >= 80) return 'text-green-600'
@@ -307,12 +361,47 @@ export default function ProspectsPage() {
             )}
           </div>
         ) : (
-          /* Map View Placeholder */
-          <div className="bg-white rounded-xl border h-[600px] flex items-center justify-center">
-            <div className="text-center">
-              <Map className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-              <p className="text-gray-600">지도 보기는 카카오맵 API 연동 후 사용 가능합니다</p>
-            </div>
+          /* Map View */
+          <div className="bg-white rounded-xl border h-[600px] overflow-hidden relative">
+            <KakaoMap
+              center={mapCenter}
+              level={6}
+              markers={mapMarkers}
+              onMarkerClick={handleMarkerClick}
+              showCurrentLocation
+              className="w-full h-full"
+            />
+
+            {/* Selected Prospect Info */}
+            {selectedProspect && (
+              <div className="absolute bottom-4 left-4 right-4 bg-white rounded-xl shadow-lg p-4 max-w-md">
+                <div className="flex items-start justify-between mb-2">
+                  <div className="flex gap-2">
+                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${typeLabels[selectedProspect.type].color}`}>
+                      {typeLabels[selectedProspect.type].label}
+                    </span>
+                  </div>
+                  <button
+                    onClick={() => setSelectedProspect(null)}
+                    className="text-gray-400 hover:text-gray-600"
+                  >
+                    ✕
+                  </button>
+                </div>
+                <p className="font-medium text-gray-900 mb-1">{selectedProspect.address}</p>
+                <p className="text-sm text-gray-500 mb-3">
+                  적합도: <span className={getScoreColor(selectedProspect.clinic_fit_score || 0)}>
+                    {selectedProspect.clinic_fit_score || '-'}점
+                  </span>
+                </p>
+                <Link
+                  href={`/prospects/${selectedProspect.id}`}
+                  className="block text-center bg-green-600 text-white py-2 rounded-lg text-sm font-medium hover:bg-green-700"
+                >
+                  상세보기
+                </Link>
+              </div>
+            )}
           </div>
         )}
 

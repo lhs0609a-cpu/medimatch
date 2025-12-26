@@ -3,6 +3,7 @@
 - 인테리어 업체, 의료 장비, 컨설팅, 금융 서비스 등
 """
 from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Text, Boolean, Numeric, Float
+from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 from datetime import datetime
 
@@ -27,6 +28,9 @@ class Partner(Base):
     __tablename__ = "partners"
 
     id = Column(Integer, primary_key=True, index=True)
+
+    # 파트너 소유자/담당자 (User 연결)
+    user_id = Column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=True, index=True)
 
     # 기본 정보
     name = Column(String(200), nullable=False)
@@ -70,9 +74,17 @@ class Partner(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
+    # 정산 계좌 정보
+    payout_bank = Column(String(50), nullable=True)
+    payout_account = Column(String(50), nullable=True)
+    payout_holder = Column(String(100), nullable=True)
+
     # 관계
+    user = relationship("User", back_populates="partner")
     inquiries = relationship("PartnerInquiry", back_populates="partner")
     contracts = relationship("PartnerContract", back_populates="partner")
+    escrow_transactions = relationship("EscrowTransaction", back_populates="partner")
+    escrow_contracts = relationship("EscrowContract", back_populates="partner")
 
 
 class PartnerInquiry(Base):
