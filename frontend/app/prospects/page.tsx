@@ -72,11 +72,11 @@ export default function ProspectsPage() {
   // prospects를 마커 데이터로 변환
   const mapMarkers: MarkerData[] = useMemo(() => {
     return prospects
-      .filter(p => p.lat && p.lng)
+      .filter(p => p.latitude && p.longitude)
       .map(p => ({
         id: p.id,
-        lat: p.lat!,
-        lng: p.lng!,
+        lat: p.latitude,
+        lng: p.longitude,
         title: p.address,
         type: 'prospect' as const,
         info: {
