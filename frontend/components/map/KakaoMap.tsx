@@ -44,24 +44,47 @@ export default function KakaoMap({
   const [map, setMap] = useState<any>(null);
   const [kakaoMarkers, setKakaoMarkers] = useState<any[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [currentPosition, setCurrentPosition] = useState<{ lat: number; lng: number } | null>(null);
 
   // 카카오맵 스크립트 로드
   useEffect(() => {
+    // 이미 로드된 경우 스킵
+    if (window.kakao && window.kakao.maps) {
+      setIsLoaded(true);
+      return;
+    }
+
+    const apiKey = process.env.NEXT_PUBLIC_KAKAO_MAP_KEY;
+    if (!apiKey) {
+      setLoadError('카카오맵 API 키가 설정되지 않았습니다. NEXT_PUBLIC_KAKAO_MAP_KEY를 확인해주세요.');
+      return;
+    }
+
     const script = document.createElement('script');
-    script.src = `//dapi.kakao.com/v2/maps/sdk.js?appkey=${process.env.NEXT_PUBLIC_KAKAO_MAP_KEY}&autoload=false&libraries=services,clusterer`;
+    script.src = `//dapi.kakao.com/v2/maps/sdk.js?appkey=${apiKey}&autoload=false&libraries=services,clusterer`;
     script.async = true;
 
     script.onload = () => {
-      window.kakao.maps.load(() => {
-        setIsLoaded(true);
-      });
+      if (window.kakao && window.kakao.maps) {
+        window.kakao.maps.load(() => {
+          setIsLoaded(true);
+        });
+      } else {
+        setLoadError('카카오맵 SDK 로드에 실패했습니다.');
+      }
+    };
+
+    script.onerror = () => {
+      setLoadError('카카오맵 스크립트를 불러올 수 없습니다. API 키 또는 도메인 설정을 확인해주세요.');
     };
 
     document.head.appendChild(script);
 
     return () => {
-      document.head.removeChild(script);
+      if (script.parentNode) {
+        document.head.removeChild(script);
+      }
     };
   }, []);
 
@@ -237,7 +260,20 @@ export default function KakaoMap({
   return (
     <div className={`relative ${className}`}>
       <div ref={mapRef} className="w-full h-full min-h-[400px]" />
-      {!isLoaded && (
+      {loadError && (
+        <div className="absolute inset-0 flex items-center justify-center bg-gray-100">
+          <div className="text-center p-6 max-w-md">
+            <div className="rounded-full h-12 w-12 bg-red-100 flex items-center justify-center mx-auto mb-4">
+              <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+            </div>
+            <p className="text-red-600 font-medium mb-2">지도 로드 실패</p>
+            <p className="text-gray-500 text-sm">{loadError}</p>
+          </div>
+        </div>
+      )}
+      {!isLoaded && !loadError && (
         <div className="absolute inset-0 flex items-center justify-center bg-gray-100">
           <div className="text-center">
             <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600 mx-auto mb-4"></div>
