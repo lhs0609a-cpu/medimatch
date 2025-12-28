@@ -23,8 +23,8 @@ from ..core.database import Base
 # Enums
 # ============================================================
 
-class ListingStatus(str, enum.Enum):
-    """매물 상태"""
+class AnonymousListingStatus(str, enum.Enum):
+    """익명 매물 상태"""
     DRAFT = "DRAFT"           # 임시저장
     ACTIVE = "ACTIVE"         # 활성 (매칭 중)
     PAUSED = "PAUSED"         # 일시중지
@@ -161,7 +161,7 @@ class AnonymousListing(Base):
     longitude = Column(Float, nullable=True)
 
     # === 메타데이터 ===
-    status = Column(SQLEnum(ListingStatus), default=ListingStatus.DRAFT)
+    status = Column(SQLEnum(AnonymousListingStatus), default=AnonymousListingStatus.DRAFT)
     view_count = Column(Integer, default=0)
     interest_count = Column(Integer, default=0)
 

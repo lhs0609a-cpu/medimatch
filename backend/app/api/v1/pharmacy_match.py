@@ -11,7 +11,7 @@ from ...models.user import User
 from ...schemas.pharmacy_match import (
     # Listing
     ListingCreate, ListingUpdate, ListingPublicResponse, ListingPrivateResponse,
-    ListingListResponse, ListingFilter, ListingStatus,
+    ListingListResponse, ListingFilter, AnonymousListingStatus,
     # Profile
     ProfileCreate, ProfileUpdate, ProfilePublicResponse, ProfilePrivateResponse,
     ProfileListResponse, ProfileFilter,
@@ -72,7 +72,7 @@ async def get_listings(
         area_max=area_max,
         has_auto_dispenser=has_auto_dispenser,
         has_parking=has_parking,
-        status=ListingStatus.ACTIVE
+        status=AnonymousListingStatus.ACTIVE
     )
     result = await pharmacy_match_service.get_listings(db, filters, page, page_size)
 

@@ -15,7 +15,7 @@ import logging
 
 from ..models.pharmacy_match import (
     AnonymousListing, PharmacistProfile, Interest, Match, MatchMessage,
-    ListingStatus, InterestType, MatchStatus,
+    AnonymousListingStatus, InterestType, MatchStatus,
     generate_anonymous_id, mask_personal_info
 )
 from ..models.user import User
@@ -82,7 +82,7 @@ class PharmacyMatchService:
             latitude=listing_data.latitude,
             longitude=listing_data.longitude,
             # 상태
-            status=ListingStatus.ACTIVE,
+            status=AnonymousListingStatus.ACTIVE,
         )
 
         # 만료일 설정 (90일)
@@ -212,7 +212,7 @@ class PharmacyMatchService:
         if not listing or listing.owner_id != owner_id:
             return False
 
-        listing.status = ListingStatus.WITHDRAWN
+        listing.status = AnonymousListingStatus.WITHDRAWN
         await db.commit()
         return True
 
@@ -372,7 +372,7 @@ class PharmacyMatchService:
         # 약사 → 매물
         if interest_data.listing_id:
             listing = await self.get_listing(db, interest_data.listing_id, increment_view=False)
-            if not listing or listing.status != ListingStatus.ACTIVE:
+            if not listing or listing.status != AnonymousListingStatus.ACTIVE:
                 raise ValueError("Invalid or inactive listing")
 
             profile = await self.get_my_profile(db, user_id)
@@ -399,7 +399,7 @@ class PharmacyMatchService:
                 raise ValueError("You need to have a listing to express interest")
 
             # 활성 매물이 있는지 확인
-            active_listings = [l for l in my_listings if l.status == ListingStatus.ACTIVE]
+            active_listings = [l for l in my_listings if l.status == AnonymousListingStatus.ACTIVE]
             if not active_listings:
                 raise ValueError("You need an active listing")
 
@@ -687,7 +687,7 @@ class PharmacyMatchService:
             # 매물 상태 변경
             listing = await self.get_listing(db, match.listing_id, increment_view=False)
             if listing:
-                listing.status = ListingStatus.MATCHED
+                listing.status = AnonymousListingStatus.MATCHED
 
         await db.commit()
         await db.refresh(match)
@@ -892,7 +892,7 @@ class PharmacyMatchService:
             listings_result = await db.execute(
                 select(AnonymousListing)
                 .where(
-                    AnonymousListing.status == ListingStatus.ACTIVE,
+                    AnonymousListing.status == AnonymousListingStatus.ACTIVE,
                     AnonymousListing.owner_id != user_id
                 )
                 .limit(50)
@@ -912,7 +912,7 @@ class PharmacyMatchService:
 
         # 매물주인 경우: 약사 추천
         if my_listings:
-            active_listing = next((l for l in my_listings if l.status == ListingStatus.ACTIVE), None)
+            active_listing = next((l for l in my_listings if l.status == AnonymousListingStatus.ACTIVE), None)
             if active_listing:
                 profiles_result = await db.execute(
                     select(PharmacistProfile)

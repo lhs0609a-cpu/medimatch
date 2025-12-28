@@ -12,7 +12,7 @@ from enum import Enum
 # Enums (API용)
 # ============================================================
 
-class ListingStatus(str, Enum):
+class AnonymousListingStatus(str, Enum):
     DRAFT = "DRAFT"
     ACTIVE = "ACTIVE"
     PAUSED = "PAUSED"
@@ -127,7 +127,7 @@ class ListingUpdate(BaseModel):
     floor_info: Optional[str] = None
 
     description: Optional[str] = None
-    status: Optional[ListingStatus] = None
+    status: Optional[AnonymousListingStatus] = None
 
 
 class ListingPublicResponse(BaseModel):
@@ -163,7 +163,7 @@ class ListingPublicResponse(BaseModel):
 
     description: Optional[str]
 
-    status: ListingStatus
+    status: AnonymousListingStatus
     view_count: int
     interest_count: int
 
@@ -481,7 +481,7 @@ class ListingFilter(BaseModel):
     area_max: Optional[float] = None
     has_auto_dispenser: Optional[bool] = None
     has_parking: Optional[bool] = None
-    status: Optional[ListingStatus] = ListingStatus.ACTIVE
+    status: Optional[AnonymousListingStatus] = AnonymousListingStatus.ACTIVE
 
 
 class ProfileFilter(BaseModel):

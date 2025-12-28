@@ -8,7 +8,7 @@ from .payment import Payment, Subscription, UsageCredit, PaymentStatus, PaymentM
 from .partner import Partner, PartnerInquiry, PartnerContract, PartnerReview, PartnerCategory
 from .pharmacy_match import (
     AnonymousListing, PharmacistProfile, Interest, Match, MatchMessage,
-    ListingStatus, PharmacyType, TransferReason, InterestType, MatchStatus
+    AnonymousListingStatus, PharmacyType, TransferReason, InterestType, MatchStatus
 )
 from .escrow import (
     EscrowTransaction, EscrowContract, EscrowMilestone, EscrowMessage,
@@ -44,7 +44,7 @@ __all__ = [
     "Interest",
     "Match",
     "MatchMessage",
-    "ListingStatus",
+    "AnonymousListingStatus",
     "PharmacyType",
     "TransferReason",
     "InterestType",

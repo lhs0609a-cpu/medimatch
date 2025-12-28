@@ -16,7 +16,7 @@ from .simulation import (
 )
 from .pharmacy_match import (
     # Enums
-    ListingStatus, PharmacyType, TransferReason, InterestType, MatchStatus,
+    AnonymousListingStatus, PharmacyType, TransferReason, InterestType, MatchStatus,
     # Listing
     ListingCreate, ListingUpdate, ListingPublicResponse, ListingPrivateResponse, ListingListResponse,
     # Profile
@@ -51,7 +51,7 @@ __all__ = [
     "SimulationRequest", "SimulationResponse", "SimulationListResponse",
     "CompetitorInfo", "ReportPurchaseRequest", "ReportResponse",
     # PharmMatch v2 (익명 매칭)
-    "ListingStatus", "PharmacyType", "TransferReason", "InterestType", "MatchStatus",
+    "AnonymousListingStatus", "PharmacyType", "TransferReason", "InterestType", "MatchStatus",
     "ListingCreate", "ListingUpdate", "ListingPublicResponse", "ListingPrivateResponse", "ListingListResponse",
     "ProfileCreate", "ProfileUpdate", "ProfilePublicResponse", "ProfilePrivateResponse", "ProfileListResponse",
     "InterestCreate", "InterestResponse", "InterestListResponse",
