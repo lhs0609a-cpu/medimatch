@@ -2,6 +2,7 @@
 결제 관련 모델
 """
 from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Enum, Text, Boolean
+from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 from datetime import datetime
 import enum
@@ -29,7 +30,7 @@ class Payment(Base):
     __tablename__ = "payments"
 
     id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    user_id = Column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False)
     order_id = Column(String(100), unique=True, nullable=False, index=True)
     payment_key = Column(String(200), unique=True, nullable=True)
 
@@ -64,7 +65,7 @@ class Subscription(Base):
     __tablename__ = "subscriptions"
 
     id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    user_id = Column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False)
 
     plan = Column(String(50), nullable=False)  # monthly, yearly
     product_id = Column(String(50), nullable=False)
@@ -93,7 +94,7 @@ class UsageCredit(Base):
     __tablename__ = "usage_credits"
 
     id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    user_id = Column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False)
 
     credit_type = Column(String(50), nullable=False)  # simulation_report
     total_credits = Column(Integer, default=0)

@@ -92,7 +92,7 @@ class PartnerInquiry(Base):
     __tablename__ = "partner_inquiries"
 
     id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    user_id = Column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False)
     partner_id = Column(Integer, ForeignKey("partners.id"), nullable=False)
 
     # 문의 내용
@@ -130,7 +130,7 @@ class PartnerContract(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     inquiry_id = Column(Integer, ForeignKey("partner_inquiries.id"), nullable=False)
-    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    user_id = Column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False)
     partner_id = Column(Integer, ForeignKey("partners.id"), nullable=False)
 
     # 계약 정보
@@ -158,7 +158,7 @@ class PartnerReview(Base):
     __tablename__ = "partner_reviews"
 
     id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    user_id = Column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False)
     partner_id = Column(Integer, ForeignKey("partners.id"), nullable=False)
     contract_id = Column(Integer, ForeignKey("partner_contracts.id"), nullable=True)
 
