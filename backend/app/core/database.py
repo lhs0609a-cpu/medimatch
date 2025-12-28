@@ -2,13 +2,20 @@ from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sess
 from sqlalchemy.orm import declarative_base
 from sqlalchemy.pool import NullPool
 from typing import AsyncGenerator
+import os
 from .config import settings
 
-# Create async engine
+# Create async engine (Fly.io internal connections don't need SSL)
+connect_args = {}
+if os.getenv("FLY_APP_NAME"):
+    # Fly.io internal connections - disable SSL completely
+    connect_args["ssl"] = False
+
 engine = create_async_engine(
     settings.async_database_url,
     echo=settings.DATABASE_ECHO,
     poolclass=NullPool,
+    connect_args=connect_args,
 )
 
 # Create async session factory
