@@ -49,7 +49,9 @@ export default function SimulatePage() {
       toast.success('시뮬레이션이 완료되었습니다!')
     },
     onError: (error: any) => {
-      if (error.response?.status === 403 || error.response?.status === 401) {
+      const status = error.response?.status || error.status
+      // CORS 에러나 인증 에러 모두 로그인 필요로 처리
+      if (status === 403 || status === 401 || error.message?.includes('403') || error.message?.includes('Network Error')) {
         setIsAuthRequired(true)
       } else {
         toast.error(error.response?.data?.detail || '시뮬레이션에 실패했습니다.')

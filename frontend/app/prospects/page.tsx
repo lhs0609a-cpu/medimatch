@@ -68,8 +68,13 @@ export default function ProspectsPage() {
     retry: false,
   })
 
-  // 인증 필요 여부 확인
-  const isAuthRequired = error && (error as any)?.response?.status === 403
+  // 인증 필요 여부 확인 (CORS 에러 포함)
+  const isAuthRequired = error && (
+    (error as any)?.response?.status === 403 ||
+    (error as any)?.response?.status === 401 ||
+    (error as any)?.message?.includes('403') ||
+    (error as any)?.message?.includes('Network Error')
+  )
 
   const prospects: ProspectLocation[] = data?.items || []
 
