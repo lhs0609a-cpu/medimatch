@@ -8,7 +8,7 @@ import { useMutation } from '@tanstack/react-query'
 import Link from 'next/link'
 import {
   ArrowLeft, MapPin, Building2, TrendingUp, Users, Target,
-  ChevronRight, Download, AlertCircle, CheckCircle2, MinusCircle
+  ChevronRight, Download, AlertCircle, CheckCircle2, MinusCircle, Lock, LogIn
 } from 'lucide-react'
 import { simulationService } from '@/lib/api/services'
 import { SimulationResponse } from '@/lib/api/client'
@@ -31,6 +31,7 @@ const clinicTypes = [
 
 export default function SimulatePage() {
   const [result, setResult] = useState<SimulationResponse | null>(null)
+  const [isAuthRequired, setIsAuthRequired] = useState(false)
 
   const {
     register,
@@ -44,10 +45,15 @@ export default function SimulatePage() {
     mutationFn: simulationService.create,
     onSuccess: (data) => {
       setResult(data)
+      setIsAuthRequired(false)
       toast.success('시뮬레이션이 완료되었습니다!')
     },
     onError: (error: any) => {
-      toast.error(error.response?.data?.detail || '시뮬레이션에 실패했습니다.')
+      if (error.response?.status === 403 || error.response?.status === 401) {
+        setIsAuthRequired(true)
+      } else {
+        toast.error(error.response?.data?.detail || '시뮬레이션에 실패했습니다.')
+      }
     },
   })
 
@@ -132,7 +138,34 @@ export default function SimulatePage() {
       </header>
 
       <main className="max-w-6xl mx-auto px-4 sm:px-6 py-8 md:py-12">
-        {!result ? (
+        {isAuthRequired ? (
+          /* Login Required */
+          <div className="card p-12 text-center max-w-lg mx-auto">
+            <div className="w-16 h-16 bg-secondary rounded-2xl flex items-center justify-center mx-auto mb-6">
+              <Lock className="w-8 h-8 text-muted-foreground" />
+            </div>
+            <h3 className="text-xl font-semibold text-foreground mb-2">로그인이 필요합니다</h3>
+            <p className="text-muted-foreground mb-6">
+              개원 시뮬레이션은 로그인한 사용자만 이용할 수 있습니다.<br />
+              로그인 후 AI 기반 개원 분석을 받아보세요.
+            </p>
+            <div className="flex gap-3 justify-center">
+              <Link href="/login" className="btn-primary">
+                <LogIn className="w-4 h-4" />
+                로그인
+              </Link>
+              <Link href="/register" className="btn-secondary">
+                회원가입
+              </Link>
+            </div>
+            <button
+              onClick={() => setIsAuthRequired(false)}
+              className="mt-4 text-sm text-muted-foreground hover:text-foreground"
+            >
+              다시 시도
+            </button>
+          </div>
+        ) : !result ? (
           /* Form Section */
           <div className="card p-8 md:p-12">
             <div className="max-w-xl mx-auto">

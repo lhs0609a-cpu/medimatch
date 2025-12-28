@@ -6,7 +6,7 @@ import Link from 'next/link'
 import dynamic from 'next/dynamic'
 import {
   ArrowLeft, MapPin, Building2, Bell, Download,
-  ChevronRight, Search, Map, List, Clock
+  ChevronRight, Search, Map, List, Clock, LogIn, Lock
 } from 'lucide-react'
 import { prospectsService } from '@/lib/api/services'
 import { ProspectLocation } from '@/lib/api/client'
@@ -57,7 +57,7 @@ export default function ProspectsPage() {
   const [selectedProspect, setSelectedProspect] = useState<ProspectLocation | null>(null)
   const [mapCenter, setMapCenter] = useState({ lat: 37.5665, lng: 126.978 })
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, error } = useQuery({
     queryKey: ['prospects', typeFilter, minScore],
     queryFn: () => prospectsService.getAll({
       type: typeFilter || undefined,
@@ -65,7 +65,11 @@ export default function ProspectsPage() {
       page: 1,
       page_size: 20,
     }),
+    retry: false,
   })
+
+  // 인증 필요 여부 확인
+  const isAuthRequired = error && (error as any)?.response?.status === 403
 
   const prospects: ProspectLocation[] = data?.items || []
 
@@ -244,7 +248,27 @@ export default function ProspectsPage() {
         </div>
 
         {/* Results */}
-        {isLoading ? (
+        {isAuthRequired ? (
+          <div className="card p-12 text-center">
+            <div className="w-16 h-16 bg-secondary rounded-2xl flex items-center justify-center mx-auto mb-6">
+              <Lock className="w-8 h-8 text-muted-foreground" />
+            </div>
+            <h3 className="text-xl font-semibold text-foreground mb-2">로그인이 필요합니다</h3>
+            <p className="text-muted-foreground mb-6 max-w-md mx-auto">
+              개원 예정지 스캐너는 로그인한 사용자만 이용할 수 있습니다.<br />
+              로그인 후 실시간 개원 예정지 정보를 확인하세요.
+            </p>
+            <div className="flex gap-3 justify-center">
+              <Link href="/login" className="btn-primary">
+                <LogIn className="w-4 h-4" />
+                로그인
+              </Link>
+              <Link href="/register" className="btn-secondary">
+                회원가입
+              </Link>
+            </div>
+          </div>
+        ) : isLoading ? (
           <div className="text-center py-12">
             <div className="animate-spin h-8 w-8 border-4 border-foreground border-t-transparent rounded-full mx-auto mb-4" />
             <p className="text-muted-foreground">개원 예정지를 탐색 중...</p>
