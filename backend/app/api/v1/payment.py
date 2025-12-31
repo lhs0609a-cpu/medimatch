@@ -14,6 +14,8 @@ import os
 
 from app.core.database import get_db
 from app.models.payment import Payment, Subscription, UsageCredit, PaymentStatus, PaymentMethod
+from app.models.user import User
+from app.api.deps import get_current_active_user
 
 router = APIRouter(prefix="/payments", tags=["payments"])
 
@@ -147,12 +149,10 @@ async def get_products():
 @router.post("/prepare", response_model=PaymentPrepareResponse)
 async def prepare_payment(
     data: PaymentPrepare,
-    db: AsyncSession = Depends(get_db)
-    # current_user = Depends(get_current_user)
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_active_user)
 ):
     """결제 준비 (주문 ID 생성)"""
-    user_id = 1  # TODO: current_user.id
-
     # 상품 확인
     if data.product_id not in PRODUCTS:
         raise HTTPException(status_code=400, detail="유효하지 않은 상품입니다")
@@ -166,7 +166,7 @@ async def prepare_payment(
 
     # 결제 레코드 생성
     payment = Payment(
-        user_id=user_id,
+        user_id=current_user.id,
         order_id=order_id,
         product_id=data.product_id,
         product_name=data.product_name,
@@ -378,15 +378,13 @@ async def cancel_payment(
 
 @router.get("/history", response_model=list[PaymentResponse])
 async def get_payment_history(
-    db: AsyncSession = Depends(get_db)
-    # current_user = Depends(get_current_user)
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_active_user)
 ):
     """결제 내역 조회"""
-    user_id = 1  # TODO: current_user.id
-
     result = await db.execute(
         select(Payment)
-        .where(Payment.user_id == user_id)
+        .where(Payment.user_id == current_user.id)
         .order_by(Payment.created_at.desc())
     )
     payments = result.scalars().all()
@@ -396,14 +394,12 @@ async def get_payment_history(
 
 @router.get("/subscription", response_model=Optional[SubscriptionResponse])
 async def get_subscription(
-    db: AsyncSession = Depends(get_db)
-    # current_user = Depends(get_current_user)
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_active_user)
 ):
     """현재 구독 상태 조회"""
-    user_id = 1  # TODO: current_user.id
-
     result = await db.execute(
-        select(Subscription).where(Subscription.user_id == user_id)
+        select(Subscription).where(Subscription.user_id == current_user.id)
     )
     subscription = result.scalar_one_or_none()
 
@@ -420,15 +416,13 @@ async def get_subscription(
 
 @router.get("/credits", response_model=CreditResponse)
 async def get_credits(
-    db: AsyncSession = Depends(get_db)
-    # current_user = Depends(get_current_user)
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_active_user)
 ):
     """크레딧 잔액 조회"""
-    user_id = 1  # TODO: current_user.id
-
     result = await db.execute(
         select(UsageCredit).where(
-            UsageCredit.user_id == user_id,
+            UsageCredit.user_id == current_user.id,
             UsageCredit.credit_type == "simulation_report"
         )
     )

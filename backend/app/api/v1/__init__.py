@@ -13,6 +13,9 @@ from .oauth import router as oauth_router
 from .pharmacy_match import router as pharmacy_match_router
 from .escrow import router as escrow_router
 from .hira import router as hira_router
+from .realestate import router as realestate_router
+from .prospect import router as prospect_router
+from .campaign import router as campaign_router
 
 api_router = APIRouter()
 
@@ -30,3 +33,6 @@ api_router.include_router(map_router, prefix="/map", tags=["Map"])
 api_router.include_router(partner_router, tags=["Partners"])
 api_router.include_router(payment_router, tags=["Payments"])
 api_router.include_router(escrow_router, prefix="/escrow", tags=["Escrow - Partner Transactions"])
+api_router.include_router(realestate_router, prefix="/realestate", tags=["Real Estate - 부동산 매물"])
+api_router.include_router(prospect_router, prefix="/pharmacy-prospects", tags=["Pharmacy Prospects - 약국 타겟팅"])
+api_router.include_router(campaign_router, prefix="/campaigns", tags=["Campaigns - 아웃바운드 캠페인"])

@@ -473,14 +473,18 @@ async def _process_alerts_async():
                 )
 
                 # 필터 적용
-                if alert.region_filter:
-                    regions = alert.region_filter.split(",")
-                    # 지역 필터 적용
-                    pass
+                if alert.region_names:
+                    # 지역 필터: 주소에 지역명이 포함된 프로스펙트만 조회
+                    from sqlalchemy import or_
+                    region_conditions = [
+                        ProspectLocation.address.ilike(f"%{region}%")
+                        for region in alert.region_names
+                    ]
+                    if region_conditions:
+                        query = query.where(or_(*region_conditions))
 
-                if alert.type_filter:
-                    types = alert.type_filter.split(",")
-                    query = query.where(ProspectLocation.type.in_(types))
+                if alert.prospect_types:
+                    query = query.where(ProspectLocation.type.in_(alert.prospect_types))
 
                 if alert.min_score:
                     query = query.where(ProspectLocation.clinic_fit_score >= alert.min_score)

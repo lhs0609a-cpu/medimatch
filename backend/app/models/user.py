@@ -31,6 +31,10 @@ class User(Base):
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     last_login = Column(DateTime, nullable=True)
 
+    # OAuth 연결 정보
+    oauth_provider = Column(String(20), nullable=True)  # google, naver, kakao
+    oauth_provider_id = Column(String(255), nullable=True)  # OAuth provider's user ID
+
     # Relationships
     bids = relationship("Bid", back_populates="pharmacist")
     alerts = relationship("UserAlert", back_populates="user")

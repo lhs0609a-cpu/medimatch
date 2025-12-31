@@ -33,7 +33,22 @@
       "Bash(fly postgres attach:*)",
       "Bash(fly secrets set:*)",
       "Bash(fly deploy:*)",
-      "Bash(curl:*)"
+      "Bash(curl:*)",
+      "Bash(fly apps list:*)",
+      "Bash(echo:*)",
+      "Bash(fly apps restart:*)",
+      "Bash(fly status:*)",
+      "Bash(fly scale count:*)",
+      "Bash(fly machine start:*)",
+      "Bash(fly logs:*)",
+      "Bash(fly secrets list:*)",
+      "Bash(gh repo edit:*)",
+      "Bash(gh repo view:*)",
+      "Bash(find:*)",
+      "Bash(grep:*)",
+      "Bash(tree:*)",
+      "Bash(python:*)",
+      "Bash(node:*)"
     ]
   }
 }

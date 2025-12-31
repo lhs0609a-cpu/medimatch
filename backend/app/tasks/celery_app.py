@@ -17,6 +17,9 @@ celery_app = Celery(
         "app.tasks.reports",
         "app.tasks.crawl",
         "app.tasks.bidding",
+        "app.tasks.realestate_tasks",
+        "app.tasks.prospect_tasks",
+        "app.tasks.campaign_tasks",
     ]
 )
 
@@ -60,5 +63,31 @@ celery_app.conf.beat_schedule = {
     "process-alerts": {
         "task": "app.tasks.notifications.process_pending_alerts",
         "schedule": crontab(minute=0),
+    },
+
+    # ===== 부동산 매물 수집 =====
+    # 매일 새벽 3시: 부동산 매물 크롤링
+    "daily-realestate-crawl": {
+        "task": "app.tasks.realestate_tasks.run_realestate_crawl",
+        "schedule": crontab(hour=3, minute=0),
+    },
+    # 매일 새벽 4시: 만료 매물 정리
+    "update-expired-listings": {
+        "task": "app.tasks.realestate_tasks.update_expired_listings",
+        "schedule": crontab(hour=4, minute=0),
+    },
+
+    # ===== 약국 타겟팅 =====
+    # 매주 월요일 새벽 5시: 전국 약국 타겟팅 스캔
+    "weekly-pharmacy-prospect-scan": {
+        "task": "app.tasks.prospect_tasks.run_pharmacy_prospect_scan",
+        "schedule": crontab(day_of_week=1, hour=5, minute=0),
+    },
+
+    # ===== 캠페인 통계 =====
+    # 매일 오후 6시: 캠페인 통계 집계
+    "daily-campaign-stats": {
+        "task": "app.tasks.campaign_tasks.get_campaign_stats",
+        "schedule": crontab(hour=18, minute=0),
     },
 }

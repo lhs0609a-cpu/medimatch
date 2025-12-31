@@ -11,6 +11,8 @@ from datetime import datetime
 
 from app.core.database import get_db
 from app.models.partner import Partner, PartnerInquiry, PartnerContract, PartnerReview, PartnerCategory
+from app.models.user import User
+from app.api.deps import get_current_active_user
 
 router = APIRouter(prefix="/partners", tags=["partners"])
 
@@ -280,8 +282,8 @@ async def get_partner_reviews(
 @router.post("/inquiries", response_model=InquiryResponse)
 async def create_inquiry(
     inquiry: InquiryCreate,
-    db: AsyncSession = Depends(get_db)
-    # current_user = Depends(get_current_user)  # 인증 필요
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_active_user)
 ):
     """파트너에게 문의하기"""
     # 파트너 존재 확인
@@ -295,7 +297,7 @@ async def create_inquiry(
 
     # 문의 생성
     new_inquiry = PartnerInquiry(
-        user_id=1,  # TODO: current_user.id
+        user_id=current_user.id,
         partner_id=inquiry.partner_id,
         inquiry_type=inquiry.inquiry_type,
         title=inquiry.title,
@@ -313,7 +315,19 @@ async def create_inquiry(
     await db.commit()
     await db.refresh(new_inquiry)
 
-    # TODO: 파트너에게 알림 이메일 발송
+    # 파트너에게 알림 이메일 발송
+    from app.tasks.notifications import send_email_notification
+    if partner.email:
+        send_email_notification.delay(
+            email=partner.email,
+            subject=f"[MediMatch] 새 문의가 도착했습니다 - {inquiry.title}",
+            template="daily_digest",
+            context={
+                "user_name": partner.name,
+                "date": datetime.now().strftime("%Y-%m-%d"),
+                "new_prospects": f"문의 유형: {inquiry.inquiry_type}"
+            }
+        )
 
     return InquiryResponse.model_validate(new_inquiry)
 
@@ -321,13 +335,11 @@ async def create_inquiry(
 @router.get("/inquiries/my", response_model=List[InquiryResponse])
 async def get_my_inquiries(
     status: Optional[str] = None,
-    db: AsyncSession = Depends(get_db)
-    # current_user = Depends(get_current_user)
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_active_user)
 ):
     """내 문의 목록"""
-    user_id = 1  # TODO: current_user.id
-
-    query = select(PartnerInquiry).where(PartnerInquiry.user_id == user_id)
+    query = select(PartnerInquiry).where(PartnerInquiry.user_id == current_user.id)
     if status:
         query = query.where(PartnerInquiry.status == status)
 
@@ -342,12 +354,10 @@ async def get_my_inquiries(
 @router.post("/reviews", response_model=ReviewResponse)
 async def create_review(
     review: ReviewCreate,
-    db: AsyncSession = Depends(get_db)
-    # current_user = Depends(get_current_user)
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_active_user)
 ):
     """리뷰 작성"""
-    user_id = 1  # TODO: current_user.id
-
     # 파트너 존재 확인
     result = await db.execute(
         select(Partner).where(Partner.id == review.partner_id)
@@ -359,7 +369,7 @@ async def create_review(
 
     # 리뷰 생성
     new_review = PartnerReview(
-        user_id=user_id,
+        user_id=current_user.id,
         partner_id=review.partner_id,
         rating=review.rating,
         quality_rating=review.quality_rating,

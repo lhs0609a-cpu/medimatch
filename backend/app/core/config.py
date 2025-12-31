@@ -53,6 +53,13 @@ class Settings(BaseSettings):
     BUILDING_API_KEY: str = ""  # 국토교통부 건축물대장
     COMMERCIAL_API_KEY: str = ""  # 소상공인진흥공단 상권정보
     MOIS_API_KEY: str = ""  # 행정안전부
+    REALESTATE_API_KEY: str = ""  # 국토교통부 부동산 실거래가
+    VWORLD_API_KEY: str = ""  # 브이월드 (공간정보)
+
+    # SMS API (Solapi)
+    SOLAPI_API_KEY: str = ""
+    SOLAPI_API_SECRET: str = ""
+    SOLAPI_SENDER_PHONE: str = ""  # 발신번호
 
     # Map APIs
     KAKAO_MAP_API_KEY: str = ""

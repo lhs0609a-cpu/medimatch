@@ -16,6 +16,7 @@ import urllib.parse
 from app.core.database import get_db
 from app.core.security import create_access_token, create_refresh_token
 from app.models.user import User, UserRole
+from app.api.deps import get_current_active_user
 
 router = APIRouter(prefix="/oauth", tags=["oauth"])
 
@@ -350,10 +351,18 @@ async def process_oauth_user(db: AsyncSession, user_info: OAuthUserInfo) -> OAut
             role=UserRole.DOCTOR,  # 기본 역할
             is_active=True,
             is_verified=True,  # OAuth 로그인은 이메일 인증 불필요
+            oauth_provider=user_info.provider,
+            oauth_provider_id=user_info.provider_id,
         )
         db.add(user)
         await db.commit()
         await db.refresh(user)
+    else:
+        # 기존 사용자 OAuth 정보 업데이트 (최초 OAuth 로그인 시)
+        if not user.oauth_provider:
+            user.oauth_provider = user_info.provider
+            user.oauth_provider_id = user_info.provider_id
+            await db.commit()
 
     # 로그인 시간 업데이트
     user.last_login = datetime.utcnow()
@@ -381,11 +390,42 @@ async def process_oauth_user(db: AsyncSession, user_info: OAuthUserInfo) -> OAut
 @router.post("/disconnect/{provider}")
 async def disconnect_oauth(
     provider: str,
-    db: AsyncSession = Depends(get_db)
-    # current_user = Depends(get_current_user)
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_active_user)
 ):
     """OAuth 연결 해제"""
-    # TODO: 사용자의 OAuth 연결 정보 삭제
-    # 실제 구현에서는 별도의 OAuth 연결 테이블이 필요
+    # 지원되는 제공자 확인
+    valid_providers = ["google", "naver", "kakao"]
+    if provider.lower() not in valid_providers:
+        raise HTTPException(status_code=400, detail="지원하지 않는 OAuth 제공자입니다")
 
-    return {"message": f"{provider} 연결이 해제되었습니다"}
+    # 현재 사용자의 OAuth 연결 확인
+    if not current_user.oauth_provider:
+        raise HTTPException(status_code=400, detail="연결된 OAuth 계정이 없습니다")
+
+    if current_user.oauth_provider.lower() != provider.lower():
+        raise HTTPException(
+            status_code=400,
+            detail=f"현재 연결된 계정은 {current_user.oauth_provider}입니다"
+        )
+
+    # OAuth 연결 해제 (비밀번호 로그인으로 전환하려면 비밀번호 설정 필요)
+    current_user.oauth_provider = None
+    current_user.oauth_provider_id = None
+    await db.commit()
+
+    return {
+        "message": f"{provider} 연결이 해제되었습니다",
+        "warning": "비밀번호 로그인을 사용하려면 비밀번호를 설정해주세요"
+    }
+
+
+@router.get("/status")
+async def get_oauth_status(
+    current_user: User = Depends(get_current_active_user)
+):
+    """현재 사용자의 OAuth 연결 상태 조회"""
+    return {
+        "oauth_connected": current_user.oauth_provider is not None,
+        "provider": current_user.oauth_provider,
+    }
