@@ -5,12 +5,17 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func, and_, or_
+from sqlalchemy.orm import selectinload
 from typing import List, Optional
 from pydantic import BaseModel
 from datetime import datetime
+from decimal import Decimal
 
 from app.core.database import get_db
-from app.models.partner import Partner, PartnerInquiry, PartnerContract, PartnerReview, PartnerCategory
+from app.models.partner import Partner, PartnerInquiry, PartnerContract, PartnerReview, PartnerCategory, PartnerStatus, PartnerTier
+from app.models.partner_category import PartnerCategoryModel, DEFAULT_CATEGORIES
+from app.models.partner_portfolio import PartnerPortfolio, PartnerServiceArea
+from app.models.partner_subscription import PartnerSubscription, SubscriptionPlan, SUBSCRIPTION_PLANS
 from app.models.user import User
 from app.api.deps import get_current_active_user
 
@@ -112,6 +117,137 @@ class CategoryInfo(BaseModel):
     name: str
     description: str
     icon: str
+
+
+class CategoryDetailResponse(BaseModel):
+    """카테고리 상세 (DB 기반)"""
+    id: int
+    code: str
+    name: str
+    description: Optional[str] = None
+    icon: Optional[str] = None
+    lead_fee: int
+    commission_rate: float
+    is_active: bool
+
+    class Config:
+        from_attributes = True
+
+
+class PortfolioResponse(BaseModel):
+    """포트폴리오 응답"""
+    id: int
+    title: str
+    project_type: Optional[str] = None
+    project_size: Optional[int] = None
+    project_cost: Optional[int] = None
+    project_duration: Optional[int] = None
+    description: Optional[str] = None
+    images: List[str] = []
+    is_featured: bool
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
+class PortfolioCreate(BaseModel):
+    """포트폴리오 생성"""
+    title: str
+    project_type: Optional[str] = None
+    project_size: Optional[int] = None
+    project_cost: Optional[int] = None
+    project_duration: Optional[int] = None
+    location: Optional[str] = None
+    client_type: Optional[str] = None
+    description: Optional[str] = None
+    images: List[str] = []
+    is_featured: bool = False
+
+
+class ServiceAreaResponse(BaseModel):
+    """서비스 지역 응답"""
+    id: int
+    sido: str
+    sigungu: Optional[str] = None
+    is_primary: bool
+
+    class Config:
+        from_attributes = True
+
+
+class PartnerFullDetailResponse(BaseModel):
+    """파트너 전체 상세 (포트폴리오 포함)"""
+    id: int
+    name: str
+    category: str
+    short_description: Optional[str] = None
+    description: Optional[str] = None
+
+    # 연락처 (플랫폼 내 채팅만 가능하므로 실제 연락처는 숨김)
+    has_contact: bool = True
+
+    # 위치
+    sido: Optional[str] = None
+    sigungu: Optional[str] = None
+    address: Optional[str] = None
+
+    # 사업 정보
+    established_year: Optional[int] = None
+    employee_count: Optional[int] = None
+    annual_projects: Optional[int] = None
+
+    # 가격 정보
+    price_range_min: Optional[int] = None
+    price_range_max: Optional[int] = None
+    price_unit: str = "total"
+
+    # 전문 분야
+    specialties: List[str] = []
+
+    # 이미지
+    logo_url: Optional[str] = None
+    cover_image_url: Optional[str] = None
+
+    # 평점
+    rating: float
+    review_count: int
+
+    # 통계
+    inquiry_count: int = 0
+    contract_count: int = 0
+    response_rate: float = 0
+    avg_response_time: int = 0
+
+    # 등급
+    tier: str
+    status: str
+    is_premium: bool
+    is_verified: bool
+    premium_badge_text: Optional[str] = None
+
+    # 포트폴리오
+    portfolios: List[PortfolioResponse] = []
+
+    # 서비스 지역
+    service_areas: List[ServiceAreaResponse] = []
+
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
+class SubscriptionPlanInfo(BaseModel):
+    """구독 플랜 정보"""
+    plan: str
+    name: str
+    monthly_price: int
+    yearly_price: int
+    lead_fee_discount: int
+    commission_discount: float
+    max_portfolios: int
+    features: List[str]
 
 
 # ============ Endpoints ============
@@ -435,3 +571,278 @@ async def get_recommended_partners(
     partners = result.scalars().all()
 
     return [PartnerResponse.model_validate(p) for p in partners]
+
+
+# ============ 상세 조회 (포트폴리오 포함) ============
+
+@router.get("/{partner_id}/full", response_model=PartnerFullDetailResponse)
+async def get_partner_full_detail(
+    partner_id: int,
+    db: AsyncSession = Depends(get_db)
+):
+    """파트너 전체 상세 조회 (포트폴리오, 서비스 지역 포함)"""
+    result = await db.execute(
+        select(Partner)
+        .where(Partner.id == partner_id, Partner.is_active == True)
+        .options(
+            selectinload(Partner.portfolios),
+            selectinload(Partner.service_areas)
+        )
+    )
+    partner = result.scalar_one_or_none()
+
+    if not partner:
+        raise HTTPException(status_code=404, detail="파트너를 찾을 수 없습니다")
+
+    # 포트폴리오 변환
+    portfolios = []
+    for p in partner.portfolios:
+        if p.is_visible:
+            portfolios.append(PortfolioResponse(
+                id=p.id,
+                title=p.title,
+                project_type=p.project_type,
+                project_size=p.project_size,
+                project_cost=p.project_cost,
+                project_duration=p.project_duration,
+                description=p.description,
+                images=p.images or [],
+                is_featured=p.is_featured,
+                created_at=p.created_at
+            ))
+
+    # 서비스 지역 변환
+    service_areas = []
+    for sa in partner.service_areas:
+        service_areas.append(ServiceAreaResponse(
+            id=sa.id,
+            sido=sa.sido,
+            sigungu=sa.sigungu,
+            is_primary=sa.is_primary
+        ))
+
+    return PartnerFullDetailResponse(
+        id=partner.id,
+        name=partner.name,
+        category=partner.category,
+        short_description=partner.short_description,
+        description=partner.description,
+        has_contact=bool(partner.phone or partner.email),
+        sido=partner.sido,
+        sigungu=partner.sigungu,
+        address=partner.address,
+        established_year=partner.established_year,
+        employee_count=partner.employee_count,
+        annual_projects=partner.annual_projects,
+        price_range_min=partner.price_range_min,
+        price_range_max=partner.price_range_max,
+        price_unit=partner.price_unit or "total",
+        specialties=partner.specialties or [],
+        logo_url=partner.logo_url,
+        cover_image_url=partner.cover_image_url,
+        rating=float(partner.rating or 0),
+        review_count=partner.review_count or 0,
+        inquiry_count=partner.inquiry_count or 0,
+        contract_count=partner.contract_count or 0,
+        response_rate=float(partner.response_rate or 0),
+        avg_response_time=partner.avg_response_time or 0,
+        tier=partner.tier.value if partner.tier else PartnerTier.BASIC.value,
+        status=partner.status.value if partner.status else PartnerStatus.ACTIVE.value,
+        is_premium=partner.is_premium or False,
+        is_verified=partner.is_verified or False,
+        premium_badge_text=partner.premium_badge_text,
+        portfolios=portfolios,
+        service_areas=service_areas,
+        created_at=partner.created_at
+    )
+
+
+# ============ 포트폴리오 관리 ============
+
+@router.get("/{partner_id}/portfolios", response_model=List[PortfolioResponse])
+async def get_partner_portfolios(
+    partner_id: int,
+    db: AsyncSession = Depends(get_db)
+):
+    """파트너 포트폴리오 목록"""
+    result = await db.execute(
+        select(PartnerPortfolio)
+        .where(
+            PartnerPortfolio.partner_id == partner_id,
+            PartnerPortfolio.is_visible == True
+        )
+        .order_by(PartnerPortfolio.is_featured.desc(), PartnerPortfolio.display_order)
+    )
+    portfolios = result.scalars().all()
+
+    return [
+        PortfolioResponse(
+            id=p.id,
+            title=p.title,
+            project_type=p.project_type,
+            project_size=p.project_size,
+            project_cost=p.project_cost,
+            project_duration=p.project_duration,
+            description=p.description,
+            images=p.images or [],
+            is_featured=p.is_featured,
+            created_at=p.created_at
+        )
+        for p in portfolios
+    ]
+
+
+@router.post("/{partner_id}/portfolios", response_model=PortfolioResponse)
+async def create_portfolio(
+    partner_id: int,
+    portfolio: PortfolioCreate,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_active_user)
+):
+    """포트폴리오 추가 (파트너 본인만)"""
+    # 파트너 확인 및 권한 체크
+    result = await db.execute(
+        select(Partner).where(Partner.id == partner_id)
+    )
+    partner = result.scalar_one_or_none()
+
+    if not partner:
+        raise HTTPException(status_code=404, detail="파트너를 찾을 수 없습니다")
+
+    if str(partner.user_id) != str(current_user.id):
+        raise HTTPException(status_code=403, detail="본인 업체의 포트폴리오만 관리할 수 있습니다")
+
+    # 포트폴리오 개수 제한 확인
+    count_result = await db.execute(
+        select(func.count()).select_from(PartnerPortfolio).where(
+            PartnerPortfolio.partner_id == partner_id
+        )
+    )
+    current_count = count_result.scalar() or 0
+
+    # 구독 플랜에 따른 제한
+    max_portfolios = 3  # 기본 FREE 플랜
+    if partner.subscription:
+        plan_info = SUBSCRIPTION_PLANS.get(partner.subscription.plan.value, {})
+        max_portfolios = plan_info.get("max_portfolios", 3)
+
+    if current_count >= max_portfolios:
+        raise HTTPException(
+            status_code=400,
+            detail=f"포트폴리오 최대 개수({max_portfolios}개)를 초과했습니다. 구독 플랜을 업그레이드하세요."
+        )
+
+    # 다음 display_order
+    order_result = await db.execute(
+        select(func.max(PartnerPortfolio.display_order)).where(
+            PartnerPortfolio.partner_id == partner_id
+        )
+    )
+    next_order = (order_result.scalar() or 0) + 1
+
+    new_portfolio = PartnerPortfolio(
+        partner_id=partner_id,
+        title=portfolio.title,
+        project_type=portfolio.project_type,
+        project_size=portfolio.project_size,
+        project_cost=portfolio.project_cost,
+        project_duration=portfolio.project_duration,
+        location=portfolio.location,
+        client_type=portfolio.client_type,
+        description=portfolio.description,
+        images=portfolio.images,
+        is_featured=portfolio.is_featured,
+        display_order=next_order
+    )
+
+    db.add(new_portfolio)
+    await db.commit()
+    await db.refresh(new_portfolio)
+
+    return PortfolioResponse(
+        id=new_portfolio.id,
+        title=new_portfolio.title,
+        project_type=new_portfolio.project_type,
+        project_size=new_portfolio.project_size,
+        project_cost=new_portfolio.project_cost,
+        project_duration=new_portfolio.project_duration,
+        description=new_portfolio.description,
+        images=new_portfolio.images or [],
+        is_featured=new_portfolio.is_featured,
+        created_at=new_portfolio.created_at
+    )
+
+
+@router.delete("/{partner_id}/portfolios/{portfolio_id}")
+async def delete_portfolio(
+    partner_id: int,
+    portfolio_id: int,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_active_user)
+):
+    """포트폴리오 삭제"""
+    # 파트너 권한 확인
+    result = await db.execute(
+        select(Partner).where(Partner.id == partner_id)
+    )
+    partner = result.scalar_one_or_none()
+
+    if not partner:
+        raise HTTPException(status_code=404, detail="파트너를 찾을 수 없습니다")
+
+    if str(partner.user_id) != str(current_user.id):
+        raise HTTPException(status_code=403, detail="본인 업체의 포트폴리오만 관리할 수 있습니다")
+
+    # 포트폴리오 삭제
+    portfolio_result = await db.execute(
+        select(PartnerPortfolio).where(
+            PartnerPortfolio.id == portfolio_id,
+            PartnerPortfolio.partner_id == partner_id
+        )
+    )
+    portfolio = portfolio_result.scalar_one_or_none()
+
+    if not portfolio:
+        raise HTTPException(status_code=404, detail="포트폴리오를 찾을 수 없습니다")
+
+    await db.delete(portfolio)
+    await db.commit()
+
+    return {"success": True, "message": "포트폴리오가 삭제되었습니다"}
+
+
+# ============ 구독 플랜 ============
+
+@router.get("/subscription-plans", response_model=List[SubscriptionPlanInfo])
+async def get_subscription_plans():
+    """구독 플랜 목록"""
+    plans = []
+    for plan_code, info in SUBSCRIPTION_PLANS.items():
+        plans.append(SubscriptionPlanInfo(
+            plan=plan_code,
+            name=info["name"],
+            monthly_price=info["monthly_price"],
+            yearly_price=info["yearly_price"],
+            lead_fee_discount=info["lead_fee_discount"],
+            commission_discount=float(info["commission_discount"]),
+            max_portfolios=info["max_portfolios"],
+            features=info["features"]
+        ))
+    return plans
+
+
+# ============ 카테고리 상세 (DB 기반) ============
+
+@router.get("/categories/db", response_model=List[CategoryDetailResponse])
+async def get_categories_from_db(
+    db: AsyncSession = Depends(get_db)
+):
+    """DB 기반 카테고리 목록 (수수료 정보 포함)"""
+    result = await db.execute(
+        select(PartnerCategoryModel)
+        .where(PartnerCategoryModel.is_active == True)
+        .order_by(PartnerCategoryModel.display_order)
+    )
+    categories = result.scalars().all()
+
+    return [CategoryDetailResponse.model_validate(c) for c in categories]

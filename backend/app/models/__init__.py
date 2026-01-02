@@ -5,7 +5,14 @@ from .simulation import Simulation, SimulationReport
 from .hospital import Hospital, CommercialData
 from .listing import RealEstateListing
 from .payment import Payment, Subscription, UsageCredit, PaymentStatus, PaymentMethod
-from .partner import Partner, PartnerInquiry, PartnerContract, PartnerReview, PartnerCategory
+from .partner import (
+    Partner, PartnerInquiry, PartnerContract, PartnerReview, PartnerCategory,
+    PartnerStatus, PartnerTier
+)
+from .partner_category import PartnerCategoryModel, DEFAULT_CATEGORIES
+from .partner_portfolio import PartnerPortfolio, PartnerServiceArea
+from .partner_subscription import PartnerSubscription, SubscriptionPlan, SUBSCRIPTION_PLANS
+from .chat import ChatRoom, ChatMessage, ChatRoomStatus, ChatMessageType, generate_room_code
 from .pharmacy_match import (
     AnonymousListing, PharmacistProfile, Interest, Match, MatchMessage,
     AnonymousListingStatus, PharmacyType, TransferReason, InterestType, MatchStatus
@@ -33,11 +40,27 @@ __all__ = [
     "UsageCredit",
     "PaymentStatus",
     "PaymentMethod",
+    # 파트너 시스템
     "Partner",
     "PartnerInquiry",
     "PartnerContract",
     "PartnerReview",
     "PartnerCategory",
+    "PartnerStatus",
+    "PartnerTier",
+    "PartnerCategoryModel",
+    "DEFAULT_CATEGORIES",
+    "PartnerPortfolio",
+    "PartnerServiceArea",
+    "PartnerSubscription",
+    "SubscriptionPlan",
+    "SUBSCRIPTION_PLANS",
+    # 채팅 시스템
+    "ChatRoom",
+    "ChatMessage",
+    "ChatRoomStatus",
+    "ChatMessageType",
+    "generate_room_code",
     # PharmMatch v2 (익명 매칭)
     "AnonymousListing",
     "PharmacistProfile",

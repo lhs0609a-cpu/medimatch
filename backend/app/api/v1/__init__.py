@@ -16,6 +16,7 @@ from .hira import router as hira_router
 from .realestate import router as realestate_router
 from .prospect import router as prospect_router
 from .campaign import router as campaign_router
+from .chat import router as chat_router
 
 api_router = APIRouter()
 
@@ -36,3 +37,4 @@ api_router.include_router(escrow_router, prefix="/escrow", tags=["Escrow - Partn
 api_router.include_router(realestate_router, prefix="/realestate", tags=["Real Estate - 부동산 매물"])
 api_router.include_router(prospect_router, prefix="/pharmacy-prospects", tags=["Pharmacy Prospects - 약국 타겟팅"])
 api_router.include_router(campaign_router, prefix="/campaigns", tags=["Campaigns - 아웃바운드 캠페인"])
+api_router.include_router(chat_router, tags=["Chat - 파트너 채팅"])
