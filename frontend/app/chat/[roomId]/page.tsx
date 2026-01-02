@@ -16,8 +16,10 @@ import {
   FileText,
   Shield,
   X,
+  FileSignature,
+  CreditCard,
 } from 'lucide-react'
-import { chatService } from '@/lib/api/services'
+import { chatService, escrowService } from '@/lib/api/services'
 
 interface Message {
   id: string
@@ -61,6 +63,15 @@ export default function ChatRoomPage() {
   const [showWarning, setShowWarning] = useState(false)
   const [warningMessage, setWarningMessage] = useState('')
   const [currentUserId] = useState('current-user-id') // Should come from auth context
+  const [showContractModal, setShowContractModal] = useState(false)
+  const [contractForm, setContractForm] = useState({
+    title: '',
+    description: '',
+    total_amount: '',
+    service_start_date: '',
+    service_end_date: '',
+  })
+  const [isCreatingContract, setIsCreatingContract] = useState(false)
 
   useEffect(() => {
     loadRoom()
@@ -238,6 +249,41 @@ export default function ChatRoomPage() {
   const formatDate = (dateStr: string) => {
     const date = new Date(dateStr)
     return date.toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' })
+  }
+
+  const handleCreateContract = async () => {
+    if (!room || !contractForm.title || !contractForm.total_amount) return
+
+    setIsCreatingContract(true)
+    try {
+      const contract = await escrowService.createContract({
+        partner_id: room.partner_id,
+        inquiry_id: room.inquiry_id,
+        title: contractForm.title,
+        description: contractForm.description,
+        contract_content: `${contractForm.title}\n\n${contractForm.description}`,
+        total_amount: Number(contractForm.total_amount),
+        service_start_date: contractForm.service_start_date || undefined,
+        service_end_date: contractForm.service_end_date || undefined,
+      })
+
+      // 계약서 생성 메시지 전송
+      await chatService.sendMessage(room.id, {
+        message_type: 'CONTRACT',
+        content: `📋 계약서가 생성되었습니다.\n\n${contractForm.title}\n금액: ${Number(contractForm.total_amount).toLocaleString()}원\n\n계약서를 확인하고 서명해주세요.`,
+        metadata: { contract_id: contract.id },
+      })
+
+      setShowContractModal(false)
+      setContractForm({ title: '', description: '', total_amount: '', service_start_date: '', service_end_date: '' })
+
+      // 에스크로 페이지로 이동
+      router.push(`/escrow/${contract.id}`)
+    } catch (error) {
+      alert('계약서 생성에 실패했습니다.')
+    } finally {
+      setIsCreatingContract(false)
+    }
   }
 
   const shouldShowDate = (currentMsg: Message, prevMsg?: Message) => {
@@ -434,6 +480,13 @@ export default function ChatRoomPage() {
             <button className="p-2 text-gray-400 hover:text-gray-600 transition-colors">
               <Paperclip className="w-5 h-5" />
             </button>
+            <button
+              onClick={() => setShowContractModal(true)}
+              className="p-2 text-violet-600 hover:text-violet-700 transition-colors"
+              title="계약 제안"
+            >
+              <FileSignature className="w-5 h-5" />
+            </button>
 
             <div className="flex-1 relative">
               <textarea
@@ -466,6 +519,117 @@ export default function ChatRoomPage() {
           <p className="text-gray-500">
             {room.status === 'CONTRACTED' ? '계약이 완료된 채팅방입니다.' : '종료된 채팅방입니다.'}
           </p>
+        </div>
+      )}
+
+      {/* Contract Modal */}
+      {showContractModal && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto">
+            <div className="sticky top-0 bg-white border-b p-4 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <FileSignature className="w-6 h-6 text-violet-600" />
+                <h2 className="font-bold text-lg">계약 제안</h2>
+              </div>
+              <button
+                onClick={() => setShowContractModal(false)}
+                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="p-6 space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">계약 제목 *</label>
+                <input
+                  type="text"
+                  value={contractForm.title}
+                  onChange={(e) => setContractForm({ ...contractForm, title: e.target.value })}
+                  placeholder="예: 강남 피부과 인테리어 공사"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-violet-500 focus:border-transparent"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">총 금액 (원) *</label>
+                <input
+                  type="number"
+                  value={contractForm.total_amount}
+                  onChange={(e) => setContractForm({ ...contractForm, total_amount: e.target.value })}
+                  placeholder="100000000"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-violet-500 focus:border-transparent"
+                />
+                {contractForm.total_amount && (
+                  <p className="text-sm text-gray-500 mt-1">
+                    {Number(contractForm.total_amount).toLocaleString()}원
+                  </p>
+                )}
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">시작일</label>
+                  <input
+                    type="date"
+                    value={contractForm.service_start_date}
+                    onChange={(e) => setContractForm({ ...contractForm, service_start_date: e.target.value })}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-violet-500 focus:border-transparent"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">종료일</label>
+                  <input
+                    type="date"
+                    value={contractForm.service_end_date}
+                    onChange={(e) => setContractForm({ ...contractForm, service_end_date: e.target.value })}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-violet-500 focus:border-transparent"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">상세 내용</label>
+                <textarea
+                  value={contractForm.description}
+                  onChange={(e) => setContractForm({ ...contractForm, description: e.target.value })}
+                  placeholder="작업 범위, 포함 사항 등을 상세히 기재해주세요"
+                  rows={4}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-violet-500 focus:border-transparent resize-none"
+                />
+              </div>
+
+              {/* 에스크로 안내 */}
+              <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
+                <div className="flex items-start gap-3">
+                  <Shield className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                  <div className="text-sm text-blue-700">
+                    <p className="font-medium">에스크로 결제 시스템</p>
+                    <p className="mt-1">계약 금액은 에스크로에 예치되며, 마일스톤(30%-40%-30%) 완료 시 단계별로 지급됩니다.</p>
+                    <p className="mt-1">플랫폼 수수료: 3%</p>
+                  </div>
+                </div>
+              </div>
+
+              <button
+                onClick={handleCreateContract}
+                disabled={!contractForm.title || !contractForm.total_amount || isCreatingContract}
+                className="w-full py-3 bg-violet-600 text-white rounded-xl font-semibold hover:bg-violet-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              >
+                {isCreatingContract ? (
+                  <>
+                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    계약서 생성 중...
+                  </>
+                ) : (
+                  <>
+                    <CreditCard className="w-5 h-5" />
+                    계약서 생성 및 에스크로 시작
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>
