@@ -375,6 +375,93 @@ export const partnerService = {
     const response = await apiClient.get(`/partners/recommended/${userRole}`)
     return response.data
   },
+
+  // 상세 조회 (포트폴리오 포함)
+  getPartnerFull: async (id: number) => {
+    const response = await apiClient.get(`/partners/${id}/full`)
+    return response.data
+  },
+
+  // 포트폴리오
+  getPortfolios: async (partnerId: number) => {
+    const response = await apiClient.get(`/partners/${partnerId}/portfolios`)
+    return response.data
+  },
+
+  createPortfolio: async (partnerId: number, data: {
+    title: string
+    project_type?: string
+    project_size?: number
+    project_cost?: number
+    project_duration?: number
+    location?: string
+    client_type?: string
+    description?: string
+    images?: string[]
+    is_featured?: boolean
+  }) => {
+    const response = await apiClient.post(`/partners/${partnerId}/portfolios`, data)
+    return response.data
+  },
+
+  deletePortfolio: async (partnerId: number, portfolioId: number) => {
+    const response = await apiClient.delete(`/partners/${partnerId}/portfolios/${portfolioId}`)
+    return response.data
+  },
+
+  // 구독 플랜
+  getSubscriptionPlans: async () => {
+    const response = await apiClient.get('/partners/subscription-plans')
+    return response.data
+  },
+
+  // 카테고리 (DB 기반, 수수료 정보 포함)
+  getCategoriesFromDB: async () => {
+    const response = await apiClient.get('/partners/categories/db')
+    return response.data
+  },
+}
+
+// Chat Services
+export const chatService = {
+  // 채팅방 목록
+  getRooms: async (params?: { status?: string; page?: number; page_size?: number }) => {
+    const response = await apiClient.get('/chat/rooms', { params })
+    return response.data
+  },
+
+  // 채팅방 상세 (메시지 포함)
+  getRoom: async (roomId: number, params?: { before?: string; limit?: number }) => {
+    const response = await apiClient.get(`/chat/rooms/${roomId}`, { params })
+    return response.data
+  },
+
+  // 채팅방 생성
+  createRoom: async (data: {
+    partner_id: number
+    inquiry_id?: number
+    initial_message?: string
+  }) => {
+    const response = await apiClient.post('/chat/rooms', data)
+    return response.data
+  },
+
+  // 메시지 전송
+  sendMessage: async (roomId: number, data: {
+    message_type?: string
+    content: string
+    attachments?: any[]
+    metadata?: any
+  }) => {
+    const response = await apiClient.post(`/chat/rooms/${roomId}/messages`, data)
+    return response.data
+  },
+
+  // 읽음 처리
+  markAsRead: async (roomId: number) => {
+    const response = await apiClient.post(`/chat/rooms/${roomId}/read`)
+    return response.data
+  },
 }
 
 // Payment Services
