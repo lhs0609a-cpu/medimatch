@@ -1,20 +1,33 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
+import logging
 
 from .core.config import settings
 from .core.database import init_db
+from .core.logging import setup_logging, LoggingMiddleware, get_logger
+from .core.rate_limit import RateLimitMiddleware
 from .api.v1 import api_router
 from .api.v1.websocket import router as websocket_router
+
+# 로깅 초기화
+setup_logging(
+    log_level="DEBUG" if settings.DEBUG else "INFO",
+    json_format=not settings.DEBUG  # 개발 환경에서는 일반 포맷, 프로덕션에서는 JSON
+)
+logger = get_logger("medimatch.app")
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Application lifespan events."""
     # Startup
+    logger.info(f"Starting {settings.APP_NAME} v{settings.APP_VERSION}")
     await init_db()
+    logger.info("Database initialized")
     yield
     # Shutdown
+    logger.info("Shutting down application")
 
 
 app = FastAPI(
@@ -47,6 +60,12 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Logging Middleware (요청/응답 로깅)
+app.add_middleware(LoggingMiddleware)
+
+# Rate Limit Middleware (API 요청 제한)
+app.add_middleware(RateLimitMiddleware, enabled=not settings.DEBUG)
 
 # Include API router
 app.include_router(api_router, prefix=settings.API_V1_PREFIX)
