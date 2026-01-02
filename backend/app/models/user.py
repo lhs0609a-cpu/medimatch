@@ -44,6 +44,9 @@ class User(Base):
     subscriptions = relationship("Subscription", back_populates="user")
     credits = relationship("UsageCredit", back_populates="user")
     partner = relationship("Partner", back_populates="user", uselist=False)
+    devices = relationship("UserDevice", back_populates="user", cascade="all, delete-orphan")
+    notifications = relationship("UserNotification", back_populates="user", cascade="all, delete-orphan")
+    notification_preference = relationship("NotificationPreference", back_populates="user", uselist=False, cascade="all, delete-orphan")
 
     def __repr__(self):
         return f"<User {self.email}>"

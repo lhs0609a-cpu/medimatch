@@ -5,6 +5,7 @@ from contextlib import asynccontextmanager
 from .core.config import settings
 from .core.database import init_db
 from .api.v1 import api_router
+from .api.v1.websocket import router as websocket_router
 
 
 @asynccontextmanager
@@ -49,6 +50,9 @@ app.add_middleware(
 
 # Include API router
 app.include_router(api_router, prefix=settings.API_V1_PREFIX)
+
+# Include WebSocket router
+app.include_router(websocket_router, tags=["WebSocket"])
 
 
 @app.get("/")

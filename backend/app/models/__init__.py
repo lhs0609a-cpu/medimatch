@@ -22,6 +22,10 @@ from .escrow import (
     EscrowDispute, ContactDetectionLog,
     EscrowStatus, MilestoneStatus, ContractStatus, MessageType, DetectionAction, DisputeStatus
 )
+from .notification import (
+    UserDevice, UserNotification, NotificationPreference,
+    DevicePlatform, NotificationType
+)
 
 __all__ = [
     "User",
@@ -85,4 +89,10 @@ __all__ = [
     "MessageType",
     "DetectionAction",
     "DisputeStatus",
+    # 알림 시스템
+    "UserDevice",
+    "UserNotification",
+    "NotificationPreference",
+    "DevicePlatform",
+    "NotificationType",
 ]

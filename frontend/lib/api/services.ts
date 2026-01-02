@@ -938,3 +938,120 @@ export const hiraService = {
     return response.data
   },
 }
+
+// Notification Types
+export type DevicePlatform = 'WEB' | 'IOS' | 'ANDROID'
+export type NotificationType =
+  | 'WELCOME' | 'SYSTEM'
+  | 'PROSPECT_NEW' | 'PROSPECT_ALERT' | 'CLOSED_HOSPITAL'
+  | 'PARTNER_INQUIRY' | 'PARTNER_RESPONSE' | 'CHAT_MESSAGE'
+  | 'PAYMENT_SUCCESS' | 'PAYMENT_FAILED'
+  | 'ESCROW_FUNDED' | 'ESCROW_RELEASED' | 'MILESTONE_SUBMITTED' | 'MILESTONE_APPROVED'
+  | 'MATCH_NEW' | 'MATCH_INTEREST' | 'MATCH_MESSAGE'
+
+export interface UserDevice {
+  id: string
+  platform: DevicePlatform
+  device_name?: string
+  is_active: boolean
+  created_at: string
+}
+
+export interface UserNotification {
+  id: string
+  notification_type: NotificationType
+  title: string
+  body: string
+  data?: Record<string, any>
+  is_read: boolean
+  created_at: string
+}
+
+export interface NotificationPreference {
+  email_enabled: boolean
+  push_enabled: boolean
+  sms_enabled: boolean
+  kakao_enabled: boolean
+  prospect_alerts: boolean
+  chat_messages: boolean
+  payment_updates: boolean
+  match_updates: boolean
+  marketing: boolean
+}
+
+// Notification Services
+export const notificationService = {
+  // 디바이스 등록
+  registerDevice: async (data: {
+    fcm_token: string
+    platform?: DevicePlatform
+    device_name?: string
+  }): Promise<UserDevice> => {
+    const response = await apiClient.post('/notifications/devices', data)
+    return response.data
+  },
+
+  // 등록된 디바이스 목록
+  getDevices: async (): Promise<UserDevice[]> => {
+    const response = await apiClient.get('/notifications/devices')
+    return response.data
+  },
+
+  // 디바이스 등록 해제
+  unregisterDevice: async (deviceId: string): Promise<void> => {
+    await apiClient.delete(`/notifications/devices/${deviceId}`)
+  },
+
+  // 모든 디바이스 등록 해제
+  unregisterAllDevices: async (): Promise<void> => {
+    await apiClient.delete('/notifications/devices')
+  },
+
+  // 알림 목록 조회
+  getNotifications: async (params?: {
+    skip?: number
+    limit?: number
+    unread_only?: boolean
+    notification_type?: NotificationType
+  }): Promise<{
+    notifications: UserNotification[]
+    total: number
+    unread_count: number
+  }> => {
+    const response = await apiClient.get('/notifications', { params })
+    return response.data
+  },
+
+  // 알림 읽음 처리
+  markAsRead: async (notificationId: string): Promise<void> => {
+    await apiClient.post(`/notifications/${notificationId}/read`)
+  },
+
+  // 모든 알림 읽음 처리
+  markAllAsRead: async (): Promise<void> => {
+    await apiClient.post('/notifications/read-all')
+  },
+
+  // 알림 삭제
+  deleteNotification: async (notificationId: string): Promise<void> => {
+    await apiClient.delete(`/notifications/${notificationId}`)
+  },
+
+  // 알림 설정 조회
+  getPreferences: async (): Promise<NotificationPreference> => {
+    const response = await apiClient.get('/notifications/preferences')
+    return response.data
+  },
+
+  // 알림 설정 업데이트
+  updatePreferences: async (data: Partial<NotificationPreference>): Promise<NotificationPreference> => {
+    const response = await apiClient.put('/notifications/preferences', data)
+    return response.data
+  },
+
+  // 테스트 알림 발송
+  sendTestNotification: async (): Promise<{ message: string; devices_count: number }> => {
+    const response = await apiClient.post('/notifications/test')
+    return response.data
+  },
+}
