@@ -15,6 +15,7 @@ import {
   AlertCircle,
   RefreshCw,
 } from 'lucide-react'
+import { apiClient } from '@/lib/api/client'
 
 interface SettingsData {
   general: {
@@ -60,8 +61,11 @@ export default function AdminSettingsPage() {
   const loadSettings = async () => {
     setIsLoading(true)
     try {
-      // TODO: API 연동
-      await new Promise(r => setTimeout(r, 500))
+      const response = await apiClient.get("/admin/settings")
+      setSettings(response.data)
+    } catch (error) {
+      console.error("Settings load failed:", error)
+      // Fallback to default settings
       setSettings({
         general: {
           site_name: 'MediMatch',
@@ -104,8 +108,7 @@ export default function AdminSettingsPage() {
     setIsSaving(true)
     setSaveMessage(null)
     try {
-      // TODO: API 연동
-      await new Promise(r => setTimeout(r, 1000))
+      await apiClient.put("/admin/settings", settings)
       setSaveMessage({ type: 'success', text: '설정이 저장되었습니다.' })
     } catch (error) {
       setSaveMessage({ type: 'error', text: '설정 저장에 실패했습니다.' })
@@ -116,8 +119,7 @@ export default function AdminSettingsPage() {
 
   const handleTriggerCrawl = async () => {
     try {
-      // TODO: API 연동
-      await new Promise(r => setTimeout(r, 500))
+      await apiClient.post("/admin/crawler/trigger")
       setSaveMessage({ type: 'success', text: '크롤링이 시작되었습니다.' })
     } catch (error) {
       setSaveMessage({ type: 'error', text: '크롤링 시작에 실패했습니다.' })

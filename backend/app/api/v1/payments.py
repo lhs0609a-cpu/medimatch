@@ -364,36 +364,46 @@ async def get_credits(
     }
 
 
+def verify_webhook_signature(payload: bytes, signature: str, secret_key: str) -> bool:
+    import hmac, hashlib, base64
+    expected = base64.b64encode(hmac.new(secret_key.encode(), payload, hashlib.sha256).digest()).decode()
+    return hmac.compare_digest(signature, expected)
+
+
 @router.post("/webhook")
 async def payment_webhook(request: Request, db: AsyncSession = Depends(get_db)):
     """토스페이먼츠 웹훅 처리"""
+    import os, json, logging
+    logger = logging.getLogger(__name__)
+    
+    signature = request.headers.get("Toss-Signature", "")
+    secret_key = os.getenv("TOSS_SECRET_KEY", "")
+    payload = await request.body()
+    
+    if signature and secret_key and not verify_webhook_signature(payload, signature, secret_key):
+        logger.warning("Invalid webhook signature")
+        return {"status": "error", "message": "Invalid signature"}
+
     try:
-        body = await request.json()
+        body = json.loads(payload)
         event_type = body.get("eventType")
         data = body.get("data", {})
 
         if event_type == "PAYMENT_STATUS_CHANGED":
             payment_key = data.get("paymentKey")
-            status = data.get("status")
-
-            # 결제 상태 업데이트
-            result = await db.execute(
-                select(Payment).where(Payment.payment_key == payment_key)
-            )
+            payment_status = data.get("status")
+            result = await db.execute(select(Payment).where(Payment.payment_key == payment_key))
             payment = result.scalar_one_or_none()
-
             if payment:
-                new_status = {
-                    "DONE": PaymentStatus.COMPLETED,
-                    "CANCELED": PaymentStatus.CANCELED,
-                    "PARTIAL_CANCELED": PaymentStatus.REFUNDED,
-                }.get(status)
-
+                new_status = {"DONE": PaymentStatus.COMPLETED, "CANCELED": PaymentStatus.CANCELED, "PARTIAL_CANCELED": PaymentStatus.REFUNDED}.get(payment_status)
                 if new_status:
                     payment.status = new_status
                     await db.commit()
+                    logger.info(f"Payment {payment_key} updated to {new_status}")
 
         return {"status": "ok"}
-
+    except json.JSONDecodeError:
+        return {"status": "error", "message": "Invalid JSON"}
     except Exception as e:
-        return {"status": "error", "message": str(e)}
+        logger.error(f"Webhook error: {e}")
+        return {"status": "error", "message": "Internal error"}

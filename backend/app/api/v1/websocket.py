@@ -9,8 +9,8 @@ from datetime import datetime
 from uuid import UUID
 import logging
 
-from app.core.security import decode_access_token
-from app.core.database import AsyncSessionLocal
+from app.core.security import verify_token as security_verify_token
+from app.core.database import async_session
 from sqlalchemy import select, update
 from app.models.chat import ChatRoom, ChatMessage, ChatMessageType
 from app.models.user import User
@@ -101,12 +101,12 @@ manager = ConnectionManager()
 async def verify_token(token: str) -> Optional[User]:
     """JWT 토큰 검증 및 사용자 조회"""
     try:
-        payload = decode_access_token(token)
+        payload = security_verify_token(token)
         user_id = payload.get("sub")
         if not user_id:
             return None
 
-        async with AsyncSessionLocal() as db:
+        async with async_session() as db:
             result = await db.execute(
                 select(User).where(User.id == UUID(user_id))
             )
@@ -118,7 +118,7 @@ async def verify_token(token: str) -> Optional[User]:
 
 async def verify_room_access(user_id: str, room_id: int) -> bool:
     """사용자가 해당 채팅방에 접근 권한이 있는지 확인"""
-    async with AsyncSessionLocal() as db:
+    async with async_session() as db:
         result = await db.execute(
             select(ChatRoom).where(
                 ChatRoom.id == room_id
@@ -190,7 +190,7 @@ async def websocket_chat(
                 # 연락처 감지
                 detection_result = contact_detector.detect_and_mask(content)
 
-                async with AsyncSessionLocal() as db:
+                async with async_session() as db:
                     # 메시지 저장
                     message = ChatMessage(
                         room_id=room_id,
@@ -245,7 +245,7 @@ async def websocket_chat(
                 }, exclude_user=user_id)
 
             elif msg_type == "read":
-                async with AsyncSessionLocal() as db:
+                async with async_session() as db:
                     # 읽음 처리
                     await db.execute(
                         update(ChatMessage)

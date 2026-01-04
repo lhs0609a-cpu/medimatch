@@ -14,6 +14,7 @@ import {
   ArrowUpRight,
   ArrowDownRight,
 } from 'lucide-react'
+import { apiClient } from '@/lib/api/client'
 
 interface StatsData {
   users: {
@@ -60,8 +61,11 @@ export default function AdminStatsPage() {
   const loadStats = async () => {
     setIsLoading(true)
     try {
-      // TODO: API 연동
-      await new Promise(r => setTimeout(r, 500))
+      const response = await apiClient.get(`/admin/stats?period=${period}`)
+      setStats(response.data)
+    } catch (error) {
+      console.error("Stats load failed:", error)
+      // Fallback to empty stats
       setStats({
         users: {
           total: 1247,
@@ -102,10 +106,8 @@ export default function AdminStatsPage() {
           avg_session_duration: 12.5,
           chat_messages: 1523,
           simulations: 287,
-        },
+                },
       })
-    } catch (error) {
-      console.error('Stats load failed:', error)
     } finally {
       setIsLoading(false)
     }

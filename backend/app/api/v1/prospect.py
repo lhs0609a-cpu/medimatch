@@ -7,6 +7,10 @@ from sqlalchemy import select, text
 from typing import List, Optional
 from datetime import datetime
 from pydantic import BaseModel, Field
+import json
+
+# SQL Injection prevention whitelist
+ALLOWED_SORT_COLUMNS = {"prospect_score", "years_operated", "monthly_revenue"}
 
 from ...core.database import get_db
 from ...core.security import get_current_user
@@ -56,7 +60,7 @@ class ProspectStatsResponse(BaseModel):
 
 
 class ContactUpdateRequest(BaseModel):
-    status: str = Field(..., regex="^(not_contacted|contacted|interested|not_interested)$")
+    status: str = Field(..., pattern="^(not_contacted|contacted|interested|not_interested)$")
     notes: Optional[str] = None
 
 
@@ -66,12 +70,12 @@ class ContactUpdateRequest(BaseModel):
 async def get_prospects(
     page: int = Query(1, ge=1),
     page_size: int = Query(20, ge=1, le=100),
-    grade: Optional[str] = Query(None, regex="^(HOT|WARM|COLD)$"),
+    grade: Optional[str] = Query(None, pattern="^(HOT|WARM|COLD)$"),
     contact_status: Optional[str] = None,
     region: Optional[str] = None,
     min_score: Optional[int] = None,
-    sort_by: str = Query("prospect_score", regex="^(prospect_score|years_operated|monthly_revenue)$"),
-    sort_order: str = Query("desc", regex="^(asc|desc)$"),
+    sort_by: str = Query("prospect_score", pattern="^(prospect_score|years_operated|monthly_revenue)$"),
+    sort_order: str = Query("desc", pattern="^(asc|desc)$"),
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
@@ -99,6 +103,10 @@ async def get_prospects(
 
         where_sql = " AND ".join(where_clauses) if where_clauses else "1=1"
 
+        # SQL Injection prevention - validate sort column
+        if sort_by not in ALLOWED_SORT_COLUMNS:
+            sort_by = "prospect_score"
+
         # 전체 개수
         count_query = f"SELECT COUNT(*) FROM pharmacy_prospect_targets WHERE {where_sql}"
         count_result = await db.execute(text(count_query), params)
@@ -123,7 +131,6 @@ async def get_prospects(
 
         items = []
         for row in rows:
-            import json
             score_factors = row[13]
             if isinstance(score_factors, str):
                 try:
