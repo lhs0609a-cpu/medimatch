@@ -430,10 +430,10 @@ export default function SimulatePage() {
                 <h3 className="font-semibold text-foreground">상세 리포트 받기</h3>
                 <p className="text-muted-foreground">AI 분석이 포함된 PDF 리포트를 받아보세요</p>
               </div>
-              <button className="btn-primary">
+              <Link href={`/simulate/report/${result.simulation_id}`} className="btn-primary">
                 <Download className="w-5 h-5" />
                 리포트 구매 (3만원)
-              </button>
+              </Link>
             </div>
           </div>
         )}

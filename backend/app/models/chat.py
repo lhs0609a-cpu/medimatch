@@ -104,7 +104,7 @@ class ChatMessage(Base):
     read_at = Column(DateTime, nullable=True)
 
     # 메타데이터 (견적서, 계약서 정보 등)
-    metadata = Column(JSONB, default={})
+    message_metadata = Column(JSONB, default={})
 
     created_at = Column(DateTime, default=datetime.utcnow)
 

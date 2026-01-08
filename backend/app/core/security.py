@@ -156,3 +156,10 @@ class UserRole:
     PHARMACIST = "PHARMACIST"
     SALES_REP = "SALES_REP"
     DOCTOR = "DOCTOR"
+    LANDLORD = "LANDLORD"
+    PARTNER = "PARTNER"
+
+
+def require_roles(*roles: str):
+    """Factory function to create role checker dependency."""
+    return RoleChecker(list(roles))

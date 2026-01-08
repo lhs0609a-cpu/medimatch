@@ -19,8 +19,8 @@ router = APIRouter()
 
 class CampaignCreate(BaseModel):
     name: str
-    campaign_type: str = Field(..., regex="^(SMS|EMAIL)$")
-    target_grade: str = Field(..., regex="^(HOT|WARM|COLD)$")
+    campaign_type: str = Field(..., pattern="^(SMS|EMAIL)$")
+    target_grade: str = Field(..., pattern="^(HOT|WARM|COLD)$")
     message_template: Optional[str] = None
     email_subject: Optional[str] = None
     email_body: Optional[str] = None

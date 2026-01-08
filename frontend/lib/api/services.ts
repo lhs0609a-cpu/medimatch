@@ -76,16 +76,27 @@ export const simulationService = {
     return response.data
   },
 
-  purchaseReport: async (simulationId: string) => {
+  purchaseReport: async (simulationId: string, paymentKey?: string) => {
     const response = await apiClient.post('/simulate/reports/purchase', {
       simulation_id: simulationId,
       payment_method: 'card',
+      payment_key: paymentKey,
     })
     return response.data
   },
 
-  downloadReport: async (reportId: string) => {
-    const response = await apiClient.get(`/simulate/reports/${reportId}/download`)
+  downloadReport: async (simulationId: string): Promise<{ download_url: string; expires_at: string }> => {
+    const response = await apiClient.get(`/simulate/reports/${simulationId}/download`)
+    return response.data
+  },
+
+  generateReport: async (simulationId: string): Promise<{ report_id: string; status: string }> => {
+    const response = await apiClient.post(`/simulate/reports/${simulationId}/generate`)
+    return response.data
+  },
+
+  getReportPreview: async (simulationId: string) => {
+    const response = await apiClient.get(`/simulate/reports/${simulationId}/preview`)
     return response.data
   },
 
@@ -743,6 +754,40 @@ export const pharmacyMatchService = {
     const response = await apiClient.get('/pharmacy-match/recommendations', { params: { limit } })
     return response.data
   },
+
+  // Access Level
+  getAccessLevel: async (listingId: string): Promise<{
+    listing_id: string
+    access_level: 'MINIMAL' | 'PARTIAL' | 'FULL'
+    granted_at: string | null
+    can_upgrade_to: Array<'PARTIAL' | 'FULL'>
+  }> => {
+    const response = await apiClient.get(`/pharmacy-match/listings/${listingId}/access`)
+    return response.data
+  },
+
+  upgradeAccessLevel: async (listingId: string, targetLevel: 'PARTIAL' | 'FULL'): Promise<{
+    listing_id: string
+    access_level: 'MINIMAL' | 'PARTIAL' | 'FULL'
+    payment_id: number
+  }> => {
+    const response = await apiClient.post(`/pharmacy-match/listings/${listingId}/upgrade`, {
+      target_level: targetLevel,
+    })
+    return response.data
+  },
+
+  // Get listing with access level (returns data based on user's access)
+  getListingWithAccess: async (listingId: string): Promise<AnonymousListing & {
+    access_level: 'MINIMAL' | 'PARTIAL' | 'FULL'
+    exact_address?: string
+    pharmacy_name?: string
+    owner_phone?: string
+    owner_email?: string
+  }> => {
+    const response = await apiClient.get(`/pharmacy-match/listings/${listingId}`)
+    return response.data
+  },
 }
 
 // Escrow Services
@@ -874,6 +919,146 @@ export const escrowService = {
   },
 }
 
+// Landlord Services (건물주 셀프 등록)
+export const landlordService = {
+  // 건물주 매물 등록
+  createListing: async (data: {
+    title: string
+    building_name?: string
+    address: string
+    latitude?: number
+    longitude?: number
+    region_code?: string
+    region_name?: string
+    floor?: string
+    area_pyeong?: number
+    area_m2?: number
+    rent_deposit?: number
+    rent_monthly?: number
+    maintenance_fee?: number
+    premium?: number
+    preferred_tenants?: string[]
+    nearby_hospital_types?: string[]
+    nearby_facilities?: Record<string, any>
+    has_parking?: boolean
+    parking_count?: number
+    has_elevator?: boolean
+    building_age?: number
+    previous_use?: string
+    description?: string
+    features?: string[]
+    images?: string[]
+    contact_name?: string
+    contact_phone?: string
+    contact_email?: string
+    show_exact_address?: boolean
+    show_contact?: boolean
+  }) => {
+    const response = await apiClient.post('/landlord/listings', data)
+    return response.data
+  },
+
+  // 내 매물 목록
+  getMyListings: async (params?: {
+    status?: string
+    page?: number
+    page_size?: number
+  }) => {
+    const response = await apiClient.get('/landlord/listings/my', { params })
+    return response.data
+  },
+
+  // 매물 상세
+  getListing: async (id: string) => {
+    const response = await apiClient.get(`/landlord/listings/${id}`)
+    return response.data
+  },
+
+  // 매물 수정
+  updateListing: async (id: string, data: any) => {
+    const response = await apiClient.patch(`/landlord/listings/${id}`, data)
+    return response.data
+  },
+
+  // 매물 삭제
+  deleteListing: async (id: string) => {
+    await apiClient.delete(`/landlord/listings/${id}`)
+  },
+
+  // 증빙서류 업로드
+  uploadDocs: async (id: string, data: FormData) => {
+    const response = await apiClient.post(`/landlord/listings/${id}/docs`, data, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    })
+    return response.data
+  },
+
+  // 매물 통계
+  getStats: async () => {
+    const response = await apiClient.get('/landlord/stats')
+    return response.data
+  },
+
+  // 받은 문의 목록
+  getInquiries: async (listingId?: string) => {
+    const response = await apiClient.get('/landlord/inquiries', {
+      params: listingId ? { listing_id: listingId } : undefined
+    })
+    return response.data
+  },
+
+  // 문의 응답
+  respondToInquiry: async (inquiryId: number, response: string) => {
+    const res = await apiClient.post(`/landlord/inquiries/${inquiryId}/respond`, { response })
+    return res.data
+  },
+}
+
+// Buildings Services (건물 검색 - 의사/약사용)
+export const buildingsService = {
+  // 건물 검색
+  search: async (params?: {
+    region_code?: string
+    region_name?: string
+    min_area?: number
+    max_area?: number
+    max_rent?: number
+    preferred_tenant?: string
+    has_parking?: boolean
+    has_elevator?: boolean
+    page?: number
+    page_size?: number
+  }) => {
+    const response = await apiClient.get('/buildings', { params })
+    return response.data
+  },
+
+  // 건물 상세
+  getBuilding: async (id: string) => {
+    const response = await apiClient.get(`/buildings/${id}`)
+    return response.data
+  },
+
+  // 문의하기
+  inquire: async (buildingId: string, data: {
+    message: string
+    inquiry_type?: string
+    inquirer_name?: string
+    inquirer_phone?: string
+    inquirer_email?: string
+    inquirer_clinic_type?: string
+  }) => {
+    const response = await apiClient.post(`/buildings/${buildingId}/inquire`, data)
+    return response.data
+  },
+
+  // 내 문의 목록
+  getMyInquiries: async () => {
+    const response = await apiClient.get('/buildings/inquiries/my')
+    return response.data
+  },
+}
+
 // HIRA (심평원) Services
 export const hiraService = {
   // 주변 병원 검색
@@ -935,6 +1120,181 @@ export const hiraService = {
   // 지역 코드 목록
   getRegionCodes: async (): Promise<RegionCode[]> => {
     const response = await apiClient.get('/hira/region-codes')
+    return response.data
+  },
+}
+
+// Banner Services (CPM 광고)
+export const bannerService = {
+  // 배너 조회 (위치별)
+  getBanners: async (position: string) => {
+    const response = await apiClient.get('/banners', { params: { position } })
+    return response.data
+  },
+
+  // 노출 기록
+  recordImpression: async (bannerId: number, sessionId?: string) => {
+    const response = await apiClient.post(`/banners/${bannerId}/impression`, {
+      session_id: sessionId,
+    })
+    return response.data
+  },
+
+  // 클릭 기록
+  recordClick: async (bannerId: number, sessionId?: string) => {
+    const response = await apiClient.post(`/banners/${bannerId}/click`, {
+      session_id: sessionId,
+    })
+    return response.data
+  },
+
+  // 파트너용: 내 광고 목록
+  getMyAds: async () => {
+    const response = await apiClient.get('/partners/ads/my')
+    return response.data
+  },
+
+  // 파트너용: 광고 생성
+  createAd: async (data: {
+    title: string
+    subtitle?: string
+    image_url: string
+    link_url?: string
+    position: string
+    cpm_rate?: number
+    daily_budget?: number
+    total_budget: number
+    target_regions?: string[]
+    target_user_roles?: string[]
+    start_date: string
+    end_date: string
+  }) => {
+    const response = await apiClient.post('/partners/ads', data)
+    return response.data
+  },
+
+  // 파트너용: 광고 통계
+  getAdStats: async (adId: number) => {
+    const response = await apiClient.get(`/partners/ads/${adId}/stats`)
+    return response.data
+  },
+
+  // 파트너용: 광고 일시정지/재개
+  toggleAdStatus: async (adId: number, pause: boolean) => {
+    const response = await apiClient.post(`/partners/ads/${adId}/${pause ? 'pause' : 'resume'}`)
+    return response.data
+  },
+
+  // 파트너용: 예산 충전
+  addBudget: async (adId: number, amount: number) => {
+    const response = await apiClient.post(`/partners/ads/${adId}/budget`, { amount })
+    return response.data
+  },
+}
+
+// Sales Match Services (영업사원 매칭)
+export const salesMatchService = {
+  // 프로필 생성/수정
+  createProfile: async (data: {
+    company: string
+    department?: string
+    position?: string
+    business_card_url?: string
+    product_categories?: string[]
+    product_details?: string
+    target_specialties?: string[]
+    service_regions?: string[]
+    experience_years?: number
+    introduction?: string
+  }) => {
+    const response = await apiClient.post('/sales/profile', data)
+    return response.data
+  },
+
+  // 내 프로필 조회
+  getMyProfile: async () => {
+    const response = await apiClient.get('/sales/profile/me')
+    return response.data
+  },
+
+  // 프로필 수정
+  updateProfile: async (data: any) => {
+    const response = await apiClient.patch('/sales/profile/me', data)
+    return response.data
+  },
+
+  // 개원 준비중 의사 목록 조회
+  getDoctors: async (params?: {
+    region?: string
+    specialty?: string
+    opening_status?: string
+    page?: number
+    page_size?: number
+  }) => {
+    const response = await apiClient.get('/sales/doctors', { params })
+    return response.data
+  },
+
+  // 매칭 요청
+  requestMatch: async (data: {
+    doctor_id: string
+    product_category: string
+    message?: string
+  }) => {
+    const response = await apiClient.post('/sales/match/request', data)
+    return response.data
+  },
+
+  // 결제 후 매칭 확정
+  confirmMatch: async (requestId: string, paymentKey: string) => {
+    const response = await apiClient.post(`/sales/match/${requestId}/confirm`, {
+      payment_key: paymentKey,
+    })
+    return response.data
+  },
+
+  // 내 매칭 요청 목록
+  getMyRequests: async (params?: { status?: string; page?: number }) => {
+    const response = await apiClient.get('/sales/match/my-requests', { params })
+    return response.data
+  },
+
+  // 매칭 상세
+  getMatch: async (matchId: string) => {
+    const response = await apiClient.get(`/sales/match/${matchId}`)
+    return response.data
+  },
+
+  // 컨택 결과 기록
+  recordContactResult: async (matchId: string, data: {
+    contact_result: string
+    contact_note?: string
+  }) => {
+    const response = await apiClient.post(`/sales/match/${matchId}/contact-result`, data)
+    return response.data
+  },
+
+  // 리뷰 작성
+  createReview: async (matchId: string, data: {
+    rating: number
+    comment?: string
+  }) => {
+    const response = await apiClient.post(`/sales/match/${matchId}/review`, data)
+    return response.data
+  },
+
+  // 의사용: 받은 매칭 요청 목록
+  getReceivedRequests: async () => {
+    const response = await apiClient.get('/doctor/match-requests')
+    return response.data
+  },
+
+  // 의사용: 매칭 응답
+  respondToMatch: async (matchId: string, data: {
+    response: 'ACCEPTED' | 'REJECTED'
+    reject_reason?: string
+  }) => {
+    const response = await apiClient.post(`/doctor/match/${matchId}/respond`, data)
     return response.data
   },
 }

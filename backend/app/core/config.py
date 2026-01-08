@@ -1,4 +1,6 @@
-from pydantic_settings import BaseSettings\nfrom pydantic import field_validator\nimport warnings
+from pydantic_settings import BaseSettings
+from pydantic import field_validator
+import warnings
 from typing import List, Optional
 from functools import lru_cache
 import os
@@ -116,6 +118,7 @@ class Settings(BaseSettings):
     class Config:
         env_file = ".env"
         case_sensitive = True
+        extra = "ignore"
 
 
 @lru_cache()

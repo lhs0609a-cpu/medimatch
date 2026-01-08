@@ -35,6 +35,15 @@ class User(Base):
     oauth_provider = Column(String(20), nullable=True)  # google, naver, kakao
     oauth_provider_id = Column(String(255), nullable=True)  # OAuth provider's user ID
 
+    # 개원 준비 관련 필드 (DOCTOR용)
+    is_opening_preparation = Column(Boolean, default=False)  # 개원 준비중 여부
+    opening_region = Column(String(100), nullable=True)  # 희망 개원 지역 (시/구)
+    opening_region_detail = Column(String(200), nullable=True)  # 상세 지역
+    specialty = Column(String(50), nullable=True)  # 진료과목
+    opening_status = Column(String(50), nullable=True)  # 개원 준비 상태: PLANNING, SEARCHING, NEGOTIATING
+    expected_opening_date = Column(String(20), nullable=True)  # 예상 개원 시기 (YYYY-MM 형식)
+    planned_clinic_name = Column(String(200), nullable=True)  # 예정 병원명
+
     # Relationships
     bids = relationship("Bid", back_populates="pharmacist")
     alerts = relationship("UserAlert", back_populates="user")
