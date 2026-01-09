@@ -98,8 +98,6 @@ export default function AdminSettingsPage() {
           last_crawl_at: '2024-01-02T10:30:00Z',
         },
       })
-    } catch (error) {
-      console.error('Settings load failed:', error)
     } finally {
       setIsLoading(false)
     }
