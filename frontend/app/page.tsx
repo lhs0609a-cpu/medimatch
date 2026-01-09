@@ -10,7 +10,7 @@ import {
   Building2,
   Users,
   Briefcase,
-  Handshake,
+  Link2,
   MessageSquare,
   Shield,
   TrendingUp,
@@ -59,7 +59,7 @@ const roleServices = {
     services: [
       { name: '개원 시뮬레이션', desc: 'AI 기반 매출/비용 분석', href: '/simulate', icon: BarChart3 },
       { name: '매물 검색', desc: '개원 적합 건물 찾기', href: '/buildings', icon: Building2 },
-      { name: '파트너 찾기', desc: '인테리어/의료기기 업체', href: '/partners', icon: Handshake },
+      { name: '파트너 찾기', desc: '인테리어/의료기기 업체', href: '/partners', icon: Link2 },
       { name: '영업 요청 관리', desc: '영업사원 매칭 수락/거절', href: '/doctor/sales-requests', icon: Users },
     ]
   },
@@ -104,7 +104,7 @@ const roleServices = {
   partner: {
     title: '파트너사',
     subtitle: '의료 서비스를 제공하는',
-    icon: Handshake,
+    icon: Link2,
     color: 'indigo',
     gradient: roleColors.partner,
     services: [
@@ -118,7 +118,7 @@ const roleServices = {
 // 주요 통계
 const stats = [
   { value: '50,000+', label: '등록 의료기관', icon: Building2 },
-  { value: '1,200+', label: '매칭 성사', icon: Handshake },
+  { value: '1,200+', label: '매칭 성사', icon: Link2 },
   { value: '85%', label: '예측 정확도', icon: Target },
   { value: '3분', label: '평균 분석 시간', icon: Clock },
 ]
@@ -235,7 +235,7 @@ export default function HomePage() {
                             <span className="text-sm">건물주 - 매물 등록</span>
                           </Link>
                           <Link href="/partners" className="flex items-center gap-3 p-3 rounded-xl hover:bg-accent transition-colors">
-                            <Handshake className="w-5 h-5 text-indigo-500" />
+                            <Link2 className="w-5 h-5 text-indigo-500" />
                             <span className="text-sm">파트너사</span>
                           </Link>
                         </div>
@@ -331,7 +331,7 @@ export default function HomePage() {
                     <span>건물주 - 매물 등록</span>
                   </Link>
                   <Link href="/partners" className="flex items-center gap-3 p-3 rounded-xl hover:bg-accent" onClick={() => setMobileMenuOpen(false)}>
-                    <Handshake className="w-5 h-5 text-indigo-500" />
+                    <Link2 className="w-5 h-5 text-indigo-500" />
                     <span>파트너사</span>
                   </Link>
                 </div>
