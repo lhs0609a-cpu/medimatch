@@ -189,17 +189,41 @@ async def get_chat_room(
         room.partner_unread_count = 0
     await db.commit()
 
+    # 발신자 정보 조회를 위해 sender_id 수집
+    sender_ids = list(set(msg.sender_id for msg in messages if msg.sender_id))
+    sender_names = {}
+
+    if sender_ids:
+        # 사용자 정보 조회
+        users_result = await db.execute(
+            select(User).where(User.id.in_(sender_ids))
+        )
+        users = users_result.scalars().all()
+        for user in users:
+            sender_names[str(user.id)] = user.full_name or "사용자"
+
+    # 파트너 이름 (채팅방에서 조회)
+    partner_name = room.partner.name if room.partner else "파트너"
+
     # 메시지 응답 생성
     message_responses = []
     for msg in reversed(messages):  # 시간순 정렬
         # 사용자에게는 필터링된 내용 표시
         display_content = msg.filtered_content if msg.contains_contact else msg.content
 
+        # 발신자 이름 결정
+        if msg.sender_type == "system":
+            sender_name = "시스템"
+        elif msg.sender_type == "partner":
+            sender_name = partner_name
+        else:  # user
+            sender_name = sender_names.get(str(msg.sender_id), "사용자")
+
         message_responses.append(ChatMessageResponse(
             id=str(msg.id),
             sender_id=str(msg.sender_id),
             sender_type=msg.sender_type,
-            sender_name=None,  # TODO: 발신자 이름 조회
+            sender_name=sender_name,
             message_type=msg.message_type.value if msg.message_type else "TEXT",
             content=display_content,
             filtered_content=msg.filtered_content,

@@ -112,20 +112,49 @@ async def update_settings(
 
 @router.post("/crawler/trigger")
 async def trigger_crawler(
+    crawl_type: str = "all",
     region: Optional[str] = None,
     admin: User = Depends(require_admin)
 ):
-    """크롤러 수동 실행"""
+    """
+    크롤러 수동 실행
+
+    crawl_type:
+    - all: 전체 크롤링 (병원, 건물, 상권)
+    - hospitals: 심평원 병원 데이터만
+    - closed: 폐업 병원 탐지만
+    """
     global _settings_store
     if _settings_store:
         _settings_store.crawler.last_crawl_at = datetime.utcnow().isoformat()
 
-    # TODO: 실제 크롤러 작업 트리거
-    return {
-        "status": "triggered",
-        "region": region or "all",
-        "started_at": datetime.utcnow().isoformat()
-    }
+    # Celery 태스크 트리거
+    try:
+        from app.tasks.crawl import run_daily_crawl, crawl_hira_hospitals, check_closed_hospitals
+
+        if crawl_type == "hospitals":
+            task = crawl_hira_hospitals.delay()
+            task_name = "병원 데이터 크롤링"
+        elif crawl_type == "closed":
+            task = check_closed_hospitals.delay()
+            task_name = "폐업 병원 탐지"
+        else:  # all
+            task = run_daily_crawl.delay()
+            task_name = "전체 일일 크롤링"
+
+        return {
+            "status": "triggered",
+            "task_id": task.id,
+            "task_name": task_name,
+            "crawl_type": crawl_type,
+            "region": region or "all",
+            "started_at": datetime.utcnow().isoformat()
+        }
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"크롤러 실행 실패: {str(e)}"
+        )
 
 
 # ===== Stats API =====

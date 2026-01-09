@@ -11,6 +11,7 @@
 from datetime import datetime, timedelta
 from typing import Optional, List
 from uuid import UUID
+import logging
 
 from fastapi import APIRouter, Depends, HTTPException, Query, BackgroundTasks
 from sqlalchemy import select, and_, or_, func, case
@@ -27,7 +28,12 @@ from ...models.sales_match import (
     DOCTOR_VISIBLE_FIELDS, SALES_REP_VISIBLE_FIELDS
 )
 from ...models.payment import Payment, PaymentStatus
+from ...models.notification import UserNotification, UserDevice, NotificationType
+from ...services.toss_payments import toss_payments_service, PaymentResult
+from ...services.notification import PushNotificationService, EmailService
 from pydantic import BaseModel, Field
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
@@ -461,12 +467,24 @@ async def pay_match_request(
     if not match_request:
         raise HTTPException(status_code=404, detail="매칭 요청을 찾을 수 없습니다")
 
-    # TODO: 토스페이먼츠 결제 확인
-    # payment = await verify_payment(payment_key, match_request.match_fee)
-
-    # 결제 기록 생성
+    # 토스페이먼츠 결제 확인
     import uuid as uuid_lib
     order_id = f"SALES_{uuid_lib.uuid4().hex[:16]}"
+
+    payment_result = await toss_payments_service.confirm_payment(
+        payment_key=payment_key,
+        order_id=order_id,
+        amount=match_request.match_fee
+    )
+
+    if not payment_result.success:
+        logger.error(f"결제 확인 실패: {payment_result.error_code} - {payment_result.error_message}")
+        raise HTTPException(
+            status_code=400,
+            detail=f"결제 확인 실패: {payment_result.error_message or '알 수 없는 오류'}"
+        )
+
+    # 결제 기록 생성
     payment = Payment(
         user_id=current_user.id,
         order_id=order_id,
@@ -474,7 +492,8 @@ async def pay_match_request(
         product_name="개원의 매칭 수수료",
         amount=match_request.match_fee,
         payment_key=payment_key,
-        status=PaymentStatus.COMPLETED
+        status=PaymentStatus.COMPLETED,
+        receipt_url=payment_result.receipt_url
     )
     db.add(payment)
     await db.flush()
@@ -496,8 +515,16 @@ async def pay_match_request(
 
     await db.commit()
 
-    # TODO: 의사에게 알림 발송 (백그라운드)
-    # background_tasks.add_task(send_match_notification, match_request.doctor_id, match_request.id)
+    # 의사에게 알림 발송 (백그라운드)
+    background_tasks.add_task(
+        send_match_request_notification,
+        db,
+        match_request.doctor_id,
+        match_request.id,
+        current_user.full_name,
+        profile.company if profile else "",
+        match_request.product_category
+    )
 
     return {
         "success": True,
@@ -785,15 +812,37 @@ async def respond_to_match_request(
         match_request.status = MatchRequestStatus.REJECTED
         match_request.reject_reason = data.reject_reason
 
-        # TODO: 환불 처리
-        # await process_refund(match_request)
+        # 환불 처리
+        if match_request.payment_id:
+            payment = await db.get(Payment, match_request.payment_id)
+            if payment and payment.payment_key:
+                refund_result = await toss_payments_service.cancel_payment(
+                    payment_key=payment.payment_key,
+                    cancel_reason="의사 거절"
+                )
+                if refund_result.success:
+                    payment.status = PaymentStatus.REFUNDED
+                    match_request.refunded_at = datetime.utcnow()
+                    match_request.refund_reason = "의사 거절"
+                    logger.info(f"환불 처리 완료: match_request_id={match_request.id}")
+                else:
+                    logger.error(f"환불 처리 실패: {refund_result.error_code} - {refund_result.error_message}")
 
         message = "매칭 요청을 거절했습니다. 영업사원에게 수수료가 환불됩니다."
 
     await db.commit()
 
-    # TODO: 영업사원에게 알림 발송
-    # background_tasks.add_task(send_response_notification, match_request.sales_rep_id, match_request.id)
+    # 영업사원에게 알림 발송
+    is_accepted = data.response == DoctorResponse.ACCEPTED
+    background_tasks.add_task(
+        send_match_response_notification,
+        db,
+        match_request.sales_rep_id,
+        match_request.id,
+        is_accepted,
+        current_user.full_name if is_accepted else None,
+        data.reject_reason if not is_accepted else None
+    )
 
     return {"success": True, "message": message}
 
@@ -1020,9 +1069,145 @@ async def process_expired_requests(db: AsyncSession):
         req.status = MatchRequestStatus.EXPIRED
         req.doctor_response = DoctorResponse.EXPIRED
 
-        # TODO: 환불 처리
-        # await process_refund(req)
+        # 환불 처리
+        if req.payment_id:
+            payment = await db.get(Payment, req.payment_id)
+            if payment and payment.payment_key:
+                refund_result = await toss_payments_service.cancel_payment(
+                    payment_key=payment.payment_key,
+                    cancel_reason="매칭 만료 (무응답)"
+                )
+                if refund_result.success:
+                    payment.status = PaymentStatus.REFUNDED
+                    req.refunded_at = datetime.utcnow()
+                    req.refund_reason = "매칭 만료 (무응답)"
+                    logger.info(f"만료 환불 처리 완료: match_request_id={req.id}")
+                else:
+                    logger.error(f"만료 환불 처리 실패: {refund_result.error_code} - {refund_result.error_message}")
 
     await db.commit()
 
     return len(expired_requests)
+
+
+# ==================== 알림 헬퍼 함수 ====================
+
+async def send_match_request_notification(
+    db: AsyncSession,
+    doctor_id: UUID,
+    match_request_id: UUID,
+    sales_rep_name: str,
+    company: str,
+    product_category: str
+):
+    """의사에게 새 매칭 요청 알림 발송"""
+    try:
+        # 의사 정보 조회
+        doctor = await db.get(User, doctor_id)
+        if not doctor:
+            logger.warning(f"알림 발송 실패: 의사를 찾을 수 없음 (doctor_id={doctor_id})")
+            return
+
+        title = "새로운 영업사원 매칭 요청"
+        body = f"{company}에서 {product_category} 관련 매칭을 요청했습니다."
+
+        # DB 알림 기록
+        notification = UserNotification(
+            user_id=doctor_id,
+            notification_type=NotificationType.MATCH_NEW,
+            title=title,
+            body=body,
+            data={"match_request_id": str(match_request_id), "action": "open_match_request"},
+            is_read=False
+        )
+        db.add(notification)
+
+        # 푸시 알림 발송
+        devices_result = await db.execute(
+            select(UserDevice).where(
+                and_(
+                    UserDevice.user_id == doctor_id,
+                    UserDevice.is_active == True
+                )
+            )
+        )
+        devices = devices_result.scalars().all()
+
+        for device in devices:
+            await PushNotificationService.send_push(
+                token=device.fcm_token,
+                title=title,
+                body=body,
+                data={"match_request_id": str(match_request_id), "action": "open_match_request"}
+            )
+
+        await db.commit()
+        logger.info(f"매칭 요청 알림 발송 완료: doctor_id={doctor_id}, match_request_id={match_request_id}")
+
+    except Exception as e:
+        logger.error(f"매칭 요청 알림 발송 실패: {e}")
+
+
+async def send_match_response_notification(
+    db: AsyncSession,
+    sales_rep_id: UUID,
+    match_request_id: UUID,
+    is_accepted: bool,
+    doctor_name: Optional[str] = None,
+    reject_reason: Optional[str] = None
+):
+    """영업사원에게 매칭 응답 알림 발송"""
+    try:
+        # 영업사원 정보 조회
+        sales_rep = await db.get(User, sales_rep_id)
+        if not sales_rep:
+            logger.warning(f"알림 발송 실패: 영업사원을 찾을 수 없음 (sales_rep_id={sales_rep_id})")
+            return
+
+        if is_accepted:
+            title = "매칭 수락!"
+            body = f"의사가 매칭을 수락했습니다. 연락처가 공개되었습니다."
+            noti_type = NotificationType.MATCH_INTEREST
+        else:
+            title = "매칭 거절"
+            body = f"의사가 매칭을 거절했습니다."
+            if reject_reason:
+                body += f" 사유: {reject_reason}"
+            body += " 수수료가 환불됩니다."
+            noti_type = NotificationType.MATCH_MESSAGE
+
+        # DB 알림 기록
+        notification = UserNotification(
+            user_id=sales_rep_id,
+            notification_type=noti_type,
+            title=title,
+            body=body,
+            data={"match_request_id": str(match_request_id), "action": "open_match_request", "accepted": is_accepted},
+            is_read=False
+        )
+        db.add(notification)
+
+        # 푸시 알림 발송
+        devices_result = await db.execute(
+            select(UserDevice).where(
+                and_(
+                    UserDevice.user_id == sales_rep_id,
+                    UserDevice.is_active == True
+                )
+            )
+        )
+        devices = devices_result.scalars().all()
+
+        for device in devices:
+            await PushNotificationService.send_push(
+                token=device.fcm_token,
+                title=title,
+                body=body,
+                data={"match_request_id": str(match_request_id), "action": "open_match_request"}
+            )
+
+        await db.commit()
+        logger.info(f"매칭 응답 알림 발송 완료: sales_rep_id={sales_rep_id}, is_accepted={is_accepted}")
+
+    except Exception as e:
+        logger.error(f"매칭 응답 알림 발송 실패: {e}")

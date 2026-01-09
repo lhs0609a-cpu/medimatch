@@ -8,7 +8,7 @@ import { useMutation } from '@tanstack/react-query'
 import Link from 'next/link'
 import {
   ArrowLeft, MapPin, Building2, TrendingUp, Users, Target,
-  ChevronRight, Download, AlertCircle, CheckCircle2, MinusCircle, Lock, LogIn
+  ChevronRight, Download, AlertCircle, CheckCircle2, MinusCircle, Lock, LogIn, Award
 } from 'lucide-react'
 import { simulationService } from '@/lib/api/services'
 import { SimulationResponse } from '@/lib/api/client'
@@ -423,6 +423,45 @@ export default function SimulatePage() {
                 </div>
               </div>
             </div>
+
+            {/* Region Rank Card */}
+            {result.region_stats && (
+              <div className="card p-6">
+                <h3 className="font-semibold text-foreground mb-4 flex items-center gap-2">
+                  <Award className="w-5 h-5" />
+                  지역 순위 (전국 {result.clinic_type} 기준)
+                </h3>
+                <div className="grid md:grid-cols-4 gap-6">
+                  <div className="text-center p-4 bg-violet-50 rounded-xl">
+                    <div className="text-3xl font-bold text-violet-600">
+                      {result.region_stats.region_rank || '-'}
+                      <span className="text-lg font-normal text-violet-400">위</span>
+                    </div>
+                    <div className="text-sm text-violet-600 mt-1">
+                      전국 {result.region_stats.total_regions}개 시도 중
+                    </div>
+                  </div>
+                  <div className="text-center p-4 bg-secondary rounded-xl">
+                    <div className="text-2xl font-bold text-foreground">
+                      상위 {result.region_stats.rank_percentile?.toFixed(0) || '-'}%
+                    </div>
+                    <div className="text-sm text-muted-foreground mt-1">순위 백분위</div>
+                  </div>
+                  <div className="text-center p-4 bg-secondary rounded-xl">
+                    <div className={`text-2xl font-bold ${result.region_stats.vs_national_percent >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                      {result.region_stats.vs_national_percent >= 0 ? '+' : ''}{result.region_stats.vs_national_percent}%
+                    </div>
+                    <div className="text-sm text-muted-foreground mt-1">전국 평균 대비</div>
+                  </div>
+                  <div className="text-center p-4 bg-secondary rounded-xl">
+                    <div className="text-2xl font-bold text-foreground">
+                      {formatCurrency(result.region_stats.national_avg_revenue)}
+                    </div>
+                    <div className="text-sm text-muted-foreground mt-1">전국 평균 매출</div>
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* CTA */}
             <div className="card p-6 flex flex-col md:flex-row items-center justify-between gap-4">

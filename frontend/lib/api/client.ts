@@ -130,6 +130,13 @@ export interface SimulationResponse {
   recommendation: 'VERY_POSITIVE' | 'POSITIVE' | 'NEUTRAL' | 'NEGATIVE' | 'VERY_NEGATIVE'
   recommendation_reason: string
   ai_analysis?: string
+  region_stats?: {
+    vs_national_percent: number
+    national_avg_revenue: number
+    region_rank: number | null
+    total_regions: number
+    rank_percentile: number | null
+  }
   created_at: string
 }
 

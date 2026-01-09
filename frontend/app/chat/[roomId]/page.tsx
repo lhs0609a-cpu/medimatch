@@ -392,9 +392,11 @@ export default function ChatRoomPage() {
                 /* User/Partner Message */
                 <div className={`flex mb-3 ${isMe ? 'justify-end' : 'justify-start'}`}>
                   <div className={`max-w-[75%] ${isMe ? 'order-1' : ''}`}>
-                    {/* Sender Name (for partner) */}
+                    {/* Sender Name (for partner or other users) */}
                     {!isMe && (
-                      <span className="text-xs text-gray-500 ml-1 mb-1 block">{room.partner_name}</span>
+                      <span className="text-xs text-gray-500 ml-1 mb-1 block">
+                        {msg.sender_name || room.partner_name}
+                      </span>
                     )}
 
                     <div className={`flex items-end gap-2 ${isMe ? 'flex-row-reverse' : ''}`}>

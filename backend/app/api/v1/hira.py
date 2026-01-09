@@ -19,6 +19,27 @@ from ...core.security import TokenData
 
 router = APIRouter()
 
+# 전국 시도 코드 목록
+REGION_CODES = {
+    "110000": "서울특별시",
+    "210000": "부산광역시",
+    "220000": "대구광역시",
+    "230000": "인천광역시",
+    "240000": "광주광역시",
+    "250000": "대전광역시",
+    "260000": "울산광역시",
+    "290000": "세종특별자치시",
+    "310000": "경기도",
+    "320000": "강원특별자치도",
+    "330000": "충청북도",
+    "340000": "충청남도",
+    "350000": "전북특별자치도",
+    "360000": "전라남도",
+    "370000": "경상북도",
+    "380000": "경상남도",
+    "390000": "제주특별자치도",
+}
+
 
 def calculate_distance(lat1: float, lon1: float, lat2: float, lon2: float) -> int:
     """두 좌표 간 거리 계산 (미터)"""
@@ -184,11 +205,43 @@ async def get_region_stats(
     if national_stats and stats:
         national_avg = national_stats.get("avg_monthly_revenue", 0)
         region_avg = stats.get("avg_monthly_revenue", 0)
+
+        # 지역별 순위 계산
+        region_rank = None
+        total_regions = len(REGION_CODES)
+
+        if region_code in REGION_CODES:
+            # 모든 시도의 통계 수집
+            all_region_stats = []
+            for code in REGION_CODES.keys():
+                try:
+                    region_data = await external_api_service.get_clinic_type_stats(code, clinic_type)
+                    if region_data:
+                        all_region_stats.append({
+                            "code": code,
+                            "name": REGION_CODES[code],
+                            "revenue": region_data.get("avg_monthly_revenue", 0)
+                        })
+                except Exception:
+                    continue
+
+            # 매출 기준 내림차순 정렬
+            if all_region_stats:
+                all_region_stats.sort(key=lambda x: x["revenue"], reverse=True)
+                # 현재 지역의 순위 찾기
+                for idx, r in enumerate(all_region_stats):
+                    if r["code"] == region_code:
+                        region_rank = idx + 1
+                        break
+                total_regions = len(all_region_stats)
+
         if national_avg > 0:
             comparison = {
                 "vs_national_percent": round((region_avg / national_avg - 1) * 100, 1),
                 "national_avg_revenue": national_avg,
-                "region_rank": None  # 추후 구현
+                "region_rank": region_rank,
+                "total_regions": total_regions,
+                "rank_percentile": round((total_regions - region_rank + 1) / total_regions * 100, 1) if region_rank else None
             }
 
     return RegionStatsResponse(

@@ -51,8 +51,11 @@ export default function AdminSettingsPage() {
   const [settings, setSettings] = useState<SettingsData | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [isSaving, setIsSaving] = useState(false)
+  const [isCrawling, setIsCrawling] = useState(false)
   const [saveMessage, setSaveMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
   const [activeTab, setActiveTab] = useState<'general' | 'notifications' | 'payment' | 'security' | 'crawler'>('general')
+  const [crawlType, setCrawlType] = useState<'all' | 'hospitals' | 'closed'>('all')
+  const [lastCrawlResult, setLastCrawlResult] = useState<{ task_id: string; task_name: string } | null>(null)
 
   useEffect(() => {
     loadSettings()
@@ -118,11 +121,30 @@ export default function AdminSettingsPage() {
   }
 
   const handleTriggerCrawl = async () => {
+    setIsCrawling(true)
     try {
-      await apiClient.post("/admin/crawler/trigger")
-      setSaveMessage({ type: 'success', text: '크롤링이 시작되었습니다.' })
+      const response = await apiClient.post("/admin/crawler/trigger", null, {
+        params: { crawl_type: crawlType }
+      })
+      setLastCrawlResult({
+        task_id: response.data.task_id,
+        task_name: response.data.task_name
+      })
+      setSaveMessage({ type: 'success', text: `${response.data.task_name}이(가) 시작되었습니다. (Task ID: ${response.data.task_id})` })
+      // Update last crawl time
+      if (settings) {
+        setSettings({
+          ...settings,
+          crawler: {
+            ...settings.crawler,
+            last_crawl_at: response.data.started_at
+          }
+        })
+      }
     } catch (error) {
       setSaveMessage({ type: 'error', text: '크롤링 시작에 실패했습니다.' })
+    } finally {
+      setIsCrawling(false)
     }
   }
 
@@ -570,8 +592,26 @@ export default function AdminSettingsPage() {
               />
             </div>
 
-            <div className="p-4 bg-gray-50 rounded-xl">
-              <div className="flex items-center justify-between">
+            {/* 수동 크롤링 실행 */}
+            <div className="p-6 bg-gray-50 rounded-xl space-y-4">
+              <h4 className="font-medium text-gray-900">수동 크롤링 실행</h4>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  크롤링 유형
+                </label>
+                <select
+                  value={crawlType}
+                  onChange={(e) => setCrawlType(e.target.value as 'all' | 'hospitals' | 'closed')}
+                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-violet-500 focus:border-transparent bg-white"
+                >
+                  <option value="all">전체 크롤링 (병원 + 건물 + 상권)</option>
+                  <option value="hospitals">병원 데이터만 (심평원)</option>
+                  <option value="closed">폐업 병원 탐지만</option>
+                </select>
+              </div>
+
+              <div className="flex items-center justify-between pt-2">
                 <div>
                   <p className="text-sm text-gray-500">마지막 크롤링</p>
                   <p className="font-medium text-gray-900">
@@ -580,12 +620,29 @@ export default function AdminSettingsPage() {
                 </div>
                 <button
                   onClick={handleTriggerCrawl}
-                  className="flex items-center gap-2 px-4 py-2 bg-violet-600 text-white rounded-lg text-sm font-medium hover:bg-violet-700"
+                  disabled={isCrawling}
+                  className="flex items-center gap-2 px-4 py-2 bg-violet-600 text-white rounded-lg text-sm font-medium hover:bg-violet-700 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  <RefreshCw className="w-4 h-4" />
-                  지금 크롤링
+                  {isCrawling ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <RefreshCw className="w-4 h-4" />
+                  )}
+                  {isCrawling ? '시작 중...' : '크롤링 시작'}
                 </button>
               </div>
+
+              {/* 마지막 실행 결과 */}
+              {lastCrawlResult && (
+                <div className="mt-4 p-3 bg-violet-50 rounded-lg">
+                  <p className="text-sm text-violet-700">
+                    <span className="font-medium">{lastCrawlResult.task_name}</span> 실행됨
+                  </p>
+                  <p className="text-xs text-violet-500 mt-1">
+                    Task ID: {lastCrawlResult.task_id}
+                  </p>
+                </div>
+              )}
             </div>
           </div>
         )}
