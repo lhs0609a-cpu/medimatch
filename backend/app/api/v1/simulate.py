@@ -495,7 +495,7 @@ async def pay_report(
         )
 
         # S3 업로드 시도
-        filename = f"medimatch_report_{report.simulation_id}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.pdf"
+        filename = f"mediplaton_report_{report.simulation_id}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.pdf"
         pdf_url = await pdf_generator_service.upload_to_s3(pdf_bytes, filename)
 
         if not pdf_url:
@@ -568,7 +568,7 @@ async def download_report_pdf(
         simulation, ai_analysis
     )
 
-    filename = f"MediMatch_상권분석_{simulation.clinic_type}_{datetime.now().strftime('%Y%m%d')}.pdf"
+    filename = f"메디플라톤_상권분석_{simulation.clinic_type}_{datetime.now().strftime('%Y%m%d')}.pdf"
 
     return StreamingResponse(
         BytesIO(pdf_bytes),

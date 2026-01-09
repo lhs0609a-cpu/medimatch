@@ -243,14 +243,14 @@ class PDFGeneratorService:
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>MediMatch 상권분석 리포트</title>
+    <title>메디플라톤 상권분석 리포트</title>
 </head>
 <body>
     <div class="report-container">
         <!-- 헤더 -->
         <header class="report-header">
             <div class="logo">
-                <h1>MediMatch</h1>
+                <h1>메디플라톤</h1>
                 <p>AI 상권분석 리포트</p>
             </div>
             <div class="report-meta">
@@ -403,7 +403,7 @@ class PDFGeneratorService:
         <footer class="report-footer">
             <p>본 리포트는 공공데이터 및 AI 분석을 기반으로 생성되었습니다.</p>
             <p>실제 개원 결정 시 추가적인 현장 조사 및 전문가 상담을 권장합니다.</p>
-            <p class="copyright">© {datetime.now().year} MediMatch. All rights reserved.</p>
+            <p class="copyright">© {datetime.now().year} 메디플라톤. All rights reserved.</p>
         </footer>
     </div>
 </body>

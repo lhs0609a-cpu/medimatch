@@ -1,1 +1,1 @@
-# MediMatch Backend Application
+# 메디플라톤 Backend Application

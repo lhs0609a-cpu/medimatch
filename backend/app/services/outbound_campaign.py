@@ -484,7 +484,7 @@ class OutboundCampaignService:
 ✓ 에스크로 안전거래
 ✓ 첫 3개월 수수료 0%
 
-▶ 무료등록: medimatch.kr/p
+▶ 무료등록: mediplaton.kr/p
 
 수신거부 080-xxxx-xxxx"""
 
@@ -529,12 +529,12 @@ class OutboundCampaignService:
 
             <p><strong>지금 등록하시면 첫 3개월 수수료 무료!</strong></p>
 
-            <a href="https://medimatch.kr/pharmacy-match/listings/new" class="cta-button">
+            <a href="https://mediplaton.kr/pharmacy-match/listings/new" class="cta-button">
                 무료로 매물 등록하기
             </a>
 
             <p>궁금하신 점이 있으시면 언제든 연락 주세요.</p>
-            <p>전화: 02-xxxx-xxxx<br>이메일: support@medimatch.kr</p>
+            <p>전화: 02-xxxx-xxxx<br>이메일: support@mediplaton.kr</p>
         </div>
         <div class="footer">
             <p>본 메일은 정보 제공 목적으로 발송되었습니다.</p>

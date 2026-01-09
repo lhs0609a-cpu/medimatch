@@ -19,9 +19,9 @@ router = APIRouter()
 # ===== Schemas =====
 
 class GeneralSettings(BaseModel):
-    site_name: str = "MediMatch"
-    site_url: str = "https://medimatch.kr"
-    support_email: str = "support@medimatch.kr"
+    site_name: str = "메디플라톤"
+    site_url: str = "https://mediplaton.kr"
+    support_email: str = "support@mediplaton.kr"
     maintenance_mode: bool = False
 
 

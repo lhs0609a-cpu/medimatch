@@ -380,7 +380,7 @@ async def _send_daily_digest_async():
                 # 간단한 버전: 전체 새 프로스펙트 수만 전송
                 send_email_notification.delay(
                     user.email,
-                    f"[MediMatch] 오늘의 새로운 기회 {new_prospects_count}건",
+                    f"[메디플라톤] 오늘의 새로운 기회 {new_prospects_count}건",
                     "daily_digest",
                     {
                         "user_name": user.name,

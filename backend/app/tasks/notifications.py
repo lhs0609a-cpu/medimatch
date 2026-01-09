@@ -25,7 +25,7 @@ EMAIL_TEMPLATES = {
 <head><meta charset="UTF-8"></head>
 <body style="font-family: 'Apple SD Gothic Neo', sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
     <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px; border-radius: 10px 10px 0 0;">
-        <h1 style="color: white; margin: 0;">MediMatch</h1>
+        <h1 style="color: white; margin: 0;">메디플라톤</h1>
         <p style="color: rgba(255,255,255,0.9); margin: 10px 0 0 0;">오늘의 새로운 기회</p>
     </div>
     <div style="background: #f9fafb; padding: 30px; border-radius: 0 0 10px 10px;">
@@ -34,7 +34,7 @@ EMAIL_TEMPLATES = {
             <h2 style="color: #1f2937; margin: 0 0 15px 0; font-size: 18px;">{date} 리포트</h2>
             <p style="color: #6b7280; margin: 0;">오늘 새로 발견된 프로스펙트: <strong style="color: #059669; font-size: 24px;">{new_prospects}건</strong></p>
         </div>
-        <a href="https://medimatch.kr/prospects" style="display: inline-block; background: #3b82f6; color: white; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: 500;">자세히 보기</a>
+        <a href="https://mediplaton.kr/prospects" style="display: inline-block; background: #3b82f6; color: white; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: 500;">자세히 보기</a>
     </div>
 </body>
 </html>
@@ -53,7 +53,7 @@ EMAIL_TEMPLATES = {
             <h3 style="color: #1f2937; margin: 0 0 10px 0;">{address}</h3>
             <p style="color: #6b7280; margin: 5px 0;">적합도 점수: <strong style="color: #3b82f6;">{score}점</strong></p>
         </div>
-        <a href="https://medimatch.kr/prospects/{prospect_id}" style="display: inline-block; background: #3b82f6; color: white; padding: 12px 24px; border-radius: 6px; text-decoration: none;">상세 정보 보기</a>
+        <a href="https://mediplaton.kr/prospects/{prospect_id}" style="display: inline-block; background: #3b82f6; color: white; padding: 12px 24px; border-radius: 6px; text-decoration: none;">상세 정보 보기</a>
     </div>
 </body>
 </html>
@@ -145,7 +145,7 @@ async def _send_fcm_notification(user_id: int, title: str, body: str, data: Dict
                                 "title": title,
                                 "body": body,
                                 "icon": "/icons/notification.png",
-                                "click_action": "https://medimatch.kr/notifications",
+                                "click_action": "https://mediplaton.kr/notifications",
                             },
                             "data": data or {},
                             "android": {
@@ -383,15 +383,15 @@ def _get_kakao_template_content(template_code: str, variables: Dict) -> str:
     카카오 알림톡 템플릿 내용 생성
     """
     templates = {
-        "MEDIMATCH_NEW_PROSPECT": """[MediMatch] 새로운 입지 발견!
+        "MEDIMATCH_NEW_PROSPECT": """[메디플라톤] 새로운 입지 발견!
 
 안녕하세요, {user_name}님!
 
 {address}에 새로운 병원 개원 가능 입지가 발견되었습니다.
 
-▶ 자세히 보기: https://medimatch.kr/prospects""",
+▶ 자세히 보기: https://mediplaton.kr/prospects""",
 
-        "MEDIMATCH_BID_RESULT": """[MediMatch] 입찰 결과 안내
+        "MEDIMATCH_BID_RESULT": """[메디플라톤] 입찰 결과 안내
 
 안녕하세요, {user_name}님!
 
@@ -399,9 +399,9 @@ def _get_kakao_template_content(template_code: str, variables: Dict) -> str:
 
 결과: {result}
 
-▶ 상세 확인: https://medimatch.kr/bids""",
+▶ 상세 확인: https://mediplaton.kr/bids""",
 
-        "MEDIMATCH_PAYMENT": """[MediMatch] 결제 완료 안내
+        "MEDIMATCH_PAYMENT": """[메디플라톤] 결제 완료 안내
 
 안녕하세요, {user_name}님!
 
@@ -410,7 +410,7 @@ def _get_kakao_template_content(template_code: str, variables: Dict) -> str:
 상품: {product_name}
 금액: {amount}원
 
-▶ 결제 내역: https://medimatch.kr/payments""",
+▶ 결제 내역: https://mediplaton.kr/payments""",
     }
 
     template = templates.get(template_code, "")
@@ -505,7 +505,7 @@ async def _process_alerts_async():
                     elif alert.notification_type == "EMAIL":
                         send_email_notification.delay(
                             user.email,
-                            "[MediMatch] 새로운 입지 알림",
+                            "[메디플라톤] 새로운 입지 알림",
                             "new_prospect",
                             {
                                 "user_name": user.name,
@@ -677,7 +677,7 @@ async def _send_bid_notification_async(bid_id: int, notification_type: str):
                 )
                 send_email_notification.delay(
                     user.email,
-                    "[MediMatch] 낙찰 안내",
+                    "[메디플라톤] 낙찰 안내",
                     "bid_accepted",
                     {
                         "user_name": user.name,

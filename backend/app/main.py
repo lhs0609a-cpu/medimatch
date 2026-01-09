@@ -15,7 +15,7 @@ setup_logging(
     log_level="DEBUG" if settings.DEBUG else "INFO",
     json_format=not settings.DEBUG  # 개발 환경에서는 일반 포맷, 프로덕션에서는 JSON
 )
-logger = get_logger("medimatch.app")
+logger = get_logger("mediplaton.app")
 
 
 @asynccontextmanager
@@ -34,7 +34,7 @@ app = FastAPI(
     title=settings.APP_NAME,
     version=settings.APP_VERSION,
     description="""
-## MediMatch Platform API
+## 메디플라톤 Platform API
 
 의료 개원 통합 솔루션 플랫폼 API
 

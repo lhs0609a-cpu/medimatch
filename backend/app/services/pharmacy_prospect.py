@@ -388,7 +388,7 @@ class PharmacyProspectService:
 ✓ 에스크로 안전 거래
 ✓ 첫 3개월 수수료 무료!
 
-▶ 무료 상담: medimatch.kr/pharmacy
+▶ 무료 상담: mediplaton.kr/pharmacy
 ▶ 전화 문의: 02-xxxx-xxxx
 
 수신거부: 080-xxxx-xxxx"""

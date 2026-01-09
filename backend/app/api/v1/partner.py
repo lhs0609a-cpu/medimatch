@@ -456,7 +456,7 @@ async def create_inquiry(
     if partner.email:
         send_email_notification.delay(
             email=partner.email,
-            subject=f"[MediMatch] 새 문의가 도착했습니다 - {inquiry.title}",
+            subject=f"[메디플라톤] 새 문의가 도착했습니다 - {inquiry.title}",
             template="daily_digest",
             context={
                 "user_name": partner.name,

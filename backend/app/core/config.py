@@ -8,7 +8,7 @@ import os
 
 class Settings(BaseSettings):
     # Application
-    APP_NAME: str = "MediMatch API"
+    APP_NAME: str = "메디플라톤 API"
     APP_VERSION: str = "1.0.0"
     DEBUG: bool = False
     API_V1_PREFIX: str = "/api/v1"
@@ -18,7 +18,7 @@ class Settings(BaseSettings):
     PORT: int = 8080
 
     # Database - fly.io uses DATABASE_URL with postgres:// prefix
-    DATABASE_URL: str = "postgresql+asyncpg://user:password@localhost:5432/medimatch"
+    DATABASE_URL: str = "postgresql+asyncpg://user:password@localhost:5432/mediplaton"
     DATABASE_ECHO: bool = False
 
     @property
@@ -75,7 +75,7 @@ class Settings(BaseSettings):
     AWS_ACCESS_KEY_ID: str = ""
     AWS_SECRET_ACCESS_KEY: str = ""
     AWS_REGION: str = "ap-northeast-2"
-    S3_BUCKET_NAME: str = "medimatch-files"
+    S3_BUCKET_NAME: str = "mediplaton-files"
 
     # Payment (Toss Payments) - 결제위젯 연동 키
     TOSS_CLIENT_KEY: str = ""
@@ -99,8 +99,8 @@ class Settings(BaseSettings):
     SMTP_PORT: int = 587
     SMTP_USER: str = ""
     SMTP_PASSWORD: str = ""
-    SMTP_FROM_EMAIL: str = "noreply@medimatch.kr"
-    SMTP_FROM_NAME: str = "MediMatch"
+    SMTP_FROM_EMAIL: str = "noreply@mediplaton.kr"
+    SMTP_FROM_NAME: str = "메디플라톤"
 
     # FCM (Firebase Cloud Messaging)
     FCM_SERVER_KEY: str = ""

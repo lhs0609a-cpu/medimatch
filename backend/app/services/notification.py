@@ -27,8 +27,8 @@ SMTP_HOST = os.getenv("SMTP_HOST", "smtp.gmail.com")
 SMTP_PORT = int(os.getenv("SMTP_PORT", "587"))
 SMTP_USER = os.getenv("SMTP_USER", "")
 SMTP_PASSWORD = os.getenv("SMTP_PASSWORD", "")
-SMTP_FROM = os.getenv("SMTP_FROM", "noreply@medimatch.kr")
-SMTP_FROM_NAME = os.getenv("SMTP_FROM_NAME", "MediMatch")
+SMTP_FROM = os.getenv("SMTP_FROM", "noreply@mediplaton.kr")
+SMTP_FROM_NAME = os.getenv("SMTP_FROM_NAME", "메디플라톤")
 
 # Firebase 설정 (푸시 알림)
 FIREBASE_CREDENTIALS_PATH = os.getenv("FIREBASE_CREDENTIALS_PATH", "firebase-credentials.json")
@@ -41,33 +41,33 @@ SLACK_WEBHOOK_URL = os.getenv("SLACK_WEBHOOK_URL", "")
 
 EMAIL_TEMPLATES = {
     "welcome": {
-        "subject": "MediMatch에 오신 것을 환영합니다!",
+        "subject": "메디플라톤에 오신 것을 환영합니다!",
         "body": """
         <html>
         <body style="font-family: 'Pretendard', sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
             <div style="text-align: center; margin-bottom: 30px;">
-                <h1 style="color: #7c3aed;">MediMatch</h1>
+                <h1 style="color: #7c3aed;">메디플라톤</h1>
             </div>
             <h2>안녕하세요, {name}님!</h2>
-            <p>MediMatch 회원가입을 환영합니다.</p>
+            <p>메디플라톤 회원가입을 환영합니다.</p>
             <p>이제 데이터 기반 개원 분석 서비스를 이용하실 수 있습니다.</p>
             <div style="background: linear-gradient(135deg, #7c3aed 0%, #4f46e5 100%); padding: 20px; border-radius: 12px; text-align: center; margin: 30px 0;">
                 <a href="{dashboard_url}" style="color: white; text-decoration: none; font-weight: bold; font-size: 16px;">
                     대시보드 바로가기 →
                 </a>
             </div>
-            <p style="color: #666;">감사합니다.<br>MediMatch 팀 드림</p>
+            <p style="color: #666;">감사합니다.<br>메디플라톤 팀 드림</p>
         </body>
         </html>
         """
     },
     "prospect_alert": {
-        "subject": "[MediMatch] 새로운 개원 후보지가 발견되었습니다!",
+        "subject": "[메디플라톤] 새로운 개원 후보지가 발견되었습니다!",
         "body": """
         <html>
         <body style="font-family: 'Pretendard', sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
             <div style="text-align: center; margin-bottom: 30px;">
-                <h1 style="color: #7c3aed;">MediMatch</h1>
+                <h1 style="color: #7c3aed;">메디플라톤</h1>
             </div>
             <h2>새로운 개원 후보지 알림</h2>
             <div style="background: #f3f4f6; padding: 20px; border-radius: 12px; margin: 20px 0;">
@@ -86,12 +86,12 @@ EMAIL_TEMPLATES = {
         """
     },
     "closed_hospital_alert": {
-        "subject": "[MediMatch] 폐업 병원이 감지되었습니다!",
+        "subject": "[메디플라톤] 폐업 병원이 감지되었습니다!",
         "body": """
         <html>
         <body style="font-family: 'Pretendard', sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
             <div style="text-align: center; margin-bottom: 30px;">
-                <h1 style="color: #7c3aed;">MediMatch</h1>
+                <h1 style="color: #7c3aed;">메디플라톤</h1>
             </div>
             <h2 style="color: #ef4444;">폐업 병원 알림</h2>
             <p>관심 지역에서 병원 폐업이 감지되었습니다. 새로운 개원 기회가 될 수 있습니다!</p>
@@ -111,12 +111,12 @@ EMAIL_TEMPLATES = {
         """
     },
     "partner_inquiry_response": {
-        "subject": "[MediMatch] 파트너 업체에서 답변이 왔습니다",
+        "subject": "[메디플라톤] 파트너 업체에서 답변이 왔습니다",
         "body": """
         <html>
         <body style="font-family: 'Pretendard', sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
             <div style="text-align: center; margin-bottom: 30px;">
-                <h1 style="color: #7c3aed;">MediMatch</h1>
+                <h1 style="color: #7c3aed;">메디플라톤</h1>
             </div>
             <h2>파트너 답변 알림</h2>
             <p><strong>{partner_name}</strong>에서 문의에 대한 답변을 보내왔습니다.</p>
@@ -133,12 +133,12 @@ EMAIL_TEMPLATES = {
         """
     },
     "payment_success": {
-        "subject": "[MediMatch] 결제가 완료되었습니다",
+        "subject": "[메디플라톤] 결제가 완료되었습니다",
         "body": """
         <html>
         <body style="font-family: 'Pretendard', sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
             <div style="text-align: center; margin-bottom: 30px;">
-                <h1 style="color: #7c3aed;">MediMatch</h1>
+                <h1 style="color: #7c3aed;">메디플라톤</h1>
             </div>
             <h2>결제 완료</h2>
             <div style="background: #f0fdf4; border: 1px solid #22c55e; padding: 20px; border-radius: 12px; margin: 20px 0;">
@@ -375,7 +375,7 @@ class NotificationService:
             template_name="welcome",
             variables={
                 "name": user_name,
-                "dashboard_url": "https://medimatch.kr/dashboard"
+                "dashboard_url": "https://mediplaton.kr/dashboard"
             }
         )
 
@@ -383,7 +383,7 @@ class NotificationService:
         if push_token:
             await PushNotificationService.send_push(
                 token=push_token,
-                title="MediMatch에 오신 것을 환영합니다!",
+                title="메디플라톤에 오신 것을 환영합니다!",
                 body="지금 바로 개원 분석을 시작해보세요.",
                 data={"action": "open_dashboard"}
             )
@@ -407,7 +407,7 @@ class NotificationService:
                 "address": address,
                 "score": score,
                 "prospect_type": prospect_type,
-                "detail_url": f"https://medimatch.kr/prospects/{prospect_id}"
+                "detail_url": f"https://mediplaton.kr/prospects/{prospect_id}"
             }
         )
 
@@ -439,7 +439,7 @@ class NotificationService:
                 "address": address,
                 "specialty": specialty,
                 "closed_date": closed_date,
-                "analysis_url": f"https://medimatch.kr/simulate?lat={lat}&lng={lng}"
+                "analysis_url": f"https://mediplaton.kr/simulate?lat={lat}&lng={lng}"
             }
         )
 

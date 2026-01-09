@@ -71,9 +71,9 @@ export default function AdminSettingsPage() {
       // Fallback to default settings
       setSettings({
         general: {
-          site_name: 'MediMatch',
-          site_url: 'https://medimatch.kr',
-          support_email: 'support@medimatch.kr',
+          site_name: '메디플라톤',
+          site_url: 'https://mediplaton.kr',
+          support_email: 'support@mediplaton.kr',
           maintenance_mode: false,
         },
         notifications: {

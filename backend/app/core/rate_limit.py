@@ -16,7 +16,7 @@ from starlette.middleware.base import BaseHTTPMiddleware
 from .config import settings
 from .logging import get_logger
 
-logger = get_logger("medimatch.rate_limit")
+logger = get_logger("mediplaton.rate_limit")
 
 
 class InMemoryRateLimiter:

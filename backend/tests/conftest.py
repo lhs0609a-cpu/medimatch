@@ -1,5 +1,5 @@
 """
-Pytest configuration and fixtures for MediMatch tests
+Pytest configuration and fixtures for 메디플라톤 tests
 """
 import pytest
 import asyncio

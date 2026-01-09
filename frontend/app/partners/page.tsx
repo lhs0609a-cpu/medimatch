@@ -209,7 +209,7 @@ export default function PartnersPage() {
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-600 to-indigo-600 flex items-center justify-center shadow-lg shadow-violet-500/30">
               <Sparkles className="w-5 h-5 text-white" />
             </div>
-            <span className="text-xl font-bold text-gray-900">MediMatch</span>
+            <span className="text-xl font-bold text-gray-900">메디플라톤</span>
           </Link>
           <nav className="hidden md:flex items-center gap-6">
             <Link href="/dashboard" className="text-gray-600 hover:text-gray-900 transition-colors">대시보드</Link>
@@ -228,7 +228,7 @@ export default function PartnersPage() {
             </h1>
             <p className="text-xl text-white/80 mb-8">
               검증된 인테리어, 의료장비, 컨설팅 파트너를 만나보세요.<br />
-              MediMatch가 엄선한 전문 업체와 함께 성공적인 개원을 시작하세요.
+              메디플라톤이 엄선한 전문 업체와 함께 성공적인 개원을 시작하세요.
             </p>
 
             {/* Search */}
@@ -417,7 +417,7 @@ export default function PartnersPage() {
               파트너로 등록하시겠습니까?
             </h2>
             <p className="text-gray-600 mb-8">
-              MediMatch의 파트너가 되어 수많은 개원 예정자들과 연결되세요.<br />
+              메디플라톤의 파트너가 되어 수많은 개원 예정자들과 연결되세요.<br />
               검증된 파트너에게는 프리미엄 노출 기회를 제공합니다.
             </p>
             <Link

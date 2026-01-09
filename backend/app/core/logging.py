@@ -113,7 +113,7 @@ class LoggingMiddleware(BaseHTTPMiddleware):
 
     def __init__(self, app, logger: logging.Logger = None):
         super().__init__(app)
-        self.logger = logger or logging.getLogger("medimatch.api")
+        self.logger = logger or logging.getLogger("mediplaton.api")
 
     async def dispatch(self, request: Request, call_next: Callable) -> Response:
         # 요청 ID 생성
@@ -187,7 +187,7 @@ def get_logger(name: str) -> logging.Logger:
     로거 인스턴스 반환
 
     Args:
-        name: 로거 이름 (예: "medimatch.api.auth")
+        name: 로거 이름 (예: "mediplaton.api.auth")
 
     Returns:
         Logger 인스턴스

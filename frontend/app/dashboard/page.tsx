@@ -198,7 +198,7 @@ export default function DashboardPage() {
               <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-violet-600 to-indigo-600 flex items-center justify-center">
                 <Sparkles className="w-5 h-5 text-white" />
               </div>
-              <span className="text-lg font-bold text-gray-900">MediMatch</span>
+              <span className="text-lg font-bold text-gray-900">메디플라톤</span>
             </Link>
 
             <nav className="hidden md:flex items-center gap-1">
@@ -239,7 +239,7 @@ export default function DashboardPage() {
               안녕하세요, {userName}님!
             </h1>
           </div>
-          <p className="text-gray-500">오늘도 MediMatch와 함께 스마트한 의료 개원을 준비하세요.</p>
+          <p className="text-gray-500">오늘도 메디플라톤과 함께 스마트한 의료 개원을 준비하세요.</p>
         </div>
 
         {/* Quick Actions */}

@@ -205,7 +205,7 @@ export default function MapPage() {
               <div className="w-8 h-8 rounded-lg bg-foreground flex items-center justify-center">
                 <span className="text-background font-bold text-sm">M</span>
               </div>
-              <span className="font-semibold text-foreground">MediMatch</span>
+              <span className="font-semibold text-foreground">메디플라톤</span>
             </Link>
 
             <nav className="hidden md:flex items-center gap-1">

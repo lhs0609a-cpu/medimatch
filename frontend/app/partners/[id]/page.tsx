@@ -293,7 +293,7 @@ export default function PartnerDetailPage() {
               <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-600 to-indigo-600 flex items-center justify-center shadow-lg shadow-violet-500/30">
                 <Sparkles className="w-5 h-5 text-white" />
               </div>
-              <span className="text-xl font-bold text-gray-900">MediMatch</span>
+              <span className="text-xl font-bold text-gray-900">메디플라톤</span>
             </Link>
           </div>
         </div>
@@ -533,7 +533,7 @@ export default function PartnerDetailPage() {
                   {partner.is_verified && (
                     <div className="flex items-center gap-3 text-blue-600">
                       <Shield className="w-5 h-5" />
-                      <span className="font-medium">MediMatch 인증 업체</span>
+                      <span className="font-medium">메디플라톤 인증 업체</span>
                     </div>
                   )}
                   <div className="flex items-center gap-3 text-green-600">

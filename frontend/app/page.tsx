@@ -161,7 +161,7 @@ export default function HomePage() {
               <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-500/25">
                 <span className="text-white font-bold text-lg">M</span>
               </div>
-              <span className="font-bold text-xl text-foreground">MediMatch</span>
+              <span className="font-bold text-xl text-foreground">메디플라톤</span>
             </Link>
 
             {/* Desktop Navigation */}
@@ -781,7 +781,7 @@ export default function HomePage() {
                 <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center">
                   <span className="text-white font-bold text-lg">M</span>
                 </div>
-                <span className="font-bold text-xl">MediMatch</span>
+                <span className="font-bold text-xl">메디플라톤</span>
               </Link>
               <p className="text-muted-foreground mb-6 max-w-sm">
                 의료 개원 생태계의 모든 이해관계자를 연결하는 데이터 기반 통합 플랫폼
@@ -831,7 +831,7 @@ export default function HomePage() {
           </div>
 
           <div className="pt-8 border-t border-border flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-muted-foreground">
-            <p>© 2025 MediMatch. All rights reserved.</p>
+            <p>© 2025 메디플라톤. All rights reserved.</p>
             <p>의료 개원의 모든 것을 연결합니다</p>
           </div>
         </div>
