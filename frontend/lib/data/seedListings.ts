@@ -44,6 +44,21 @@ function generateId(): string {
   return Math.random().toString(36).substring(2, 10)
 }
 
+// 익명 코드 생성 (예: PM-A7X2K)
+function generateAnonymousCode(prefix: string): string {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789' // 혼동하기 쉬운 문자 제외 (0, O, 1, I)
+  let code = ''
+  for (let i = 0; i < 5; i++) {
+    code += chars.charAt(Math.floor(Math.random() * chars.length))
+  }
+  return `${prefix}-${code}`
+}
+
+// 현실적인 라운드 숫자 생성
+function roundToRealistic(value: number, unit: number = 500): number {
+  return Math.round(value / unit) * unit
+}
+
 // 건물 매물 생성
 export interface BuildingListing {
   id: string
@@ -83,43 +98,73 @@ export function generateBuildingListings(count: number = 120): BuildingListing[]
   for (let i = 0; i < count; i++) {
     const region = randomChoice(regions)
     const subArea = randomChoice(region.subAreas)
-    const areaPyeong = randomInt(15, 80)
-    const isGoodLocation = Math.random() > 0.6
-    const createdHoursAgo = randomInt(0, 60 * 24) // 0~60일 전
-    const isNew = createdHoursAgo < 24 // 24시간 이내
-    const isHot = Math.random() > 0.75
+    const areaPyeong = roundToRealistic(randomInt(18, 70), 5) // 5평 단위
+    const isGoodLocation = Math.random() > 0.7
+    const createdHoursAgo = randomInt(0, 75 * 24) // 0~75일 전
+    const isNew = createdHoursAgo < 48 && Math.random() > 0.75 // 48시간 이내 + 25%만 NEW
 
-    // 긴급성 태그
-    const urgencyTags = ['오늘 마감', '이번 주 계약 예정', '급매', '협의 가능', '선착순']
-    const hasUrgency = Math.random() > 0.8
+    // 인기 매물은 12%만
+    const isHot = Math.random() > 0.88
+
+    // 문의 수: 현실적인 분포
+    const inquiryRandom = Math.random()
+    let inquiryCount: number
+    if (inquiryRandom > 0.92) {
+      inquiryCount = randomInt(15, 35) // 상위 8%
+    } else if (inquiryRandom > 0.6) {
+      inquiryCount = randomInt(5, 15) // 32%
+    } else {
+      inquiryCount = randomInt(1, 5) // 60%
+    }
+
+    // 긴급 태그: 8%만
+    const urgencyTags = ['이번 주 계약 예정', '급매', '협의 가능']
+    const hasUrgency = Math.random() > 0.92
+
+    // 현재 보는 사람: 대부분 0명
+    let currentViewers = 0
+    if (isHot && Math.random() > 0.6) {
+      currentViewers = randomInt(1, 3)
+    } else if (Math.random() > 0.9) {
+      currentViewers = 1
+    }
+
+    // 마지막 문의 시간: 40%만 표시
+    let lastInquiryTime = ''
+    if (Math.random() > 0.6) {
+      const minutesAgo = Math.random() > 0.6
+        ? randomInt(5, 120)    // 40%: 최근 2시간 내
+        : randomInt(120, 4320) // 60%: 2시간~3일 전
+      lastInquiryTime = getRelativeTime(minutesAgo)
+    }
 
     listings.push({
       id: `bld-${generateId()}`,
-      title: `${subArea} ${isGoodLocation ? '역세권 ' : ''}${randomChoice(['메디컬빌딩', '상가', '오피스텔', '빌딩'])} ${randomInt(1, 10)}층`,
+      title: `${subArea} ${isGoodLocation ? '역세권 ' : ''}${randomChoice(['메디컬빌딩', '상가', '빌딩'])} ${randomInt(1, 8)}층`,
       region: region.name,
       regionCode: region.code,
       address: `${region.name} ${subArea}`,
-      floor: `${randomInt(1, 15)}층`,
+      floor: `${randomInt(1, 12)}층`,
       areaPyeong,
-      deposit: randomInt(3000, 30000),
-      monthlyRent: randomInt(150, 800),
-      maintenanceFee: randomInt(10, 50),
-      premium: Math.random() > 0.3 ? randomInt(1000, 15000) : 0,
-      preferredTenants: randomChoices(hospitalTypes, randomInt(2, 4)),
-      nearbyHospitals: randomChoices(hospitalTypes, randomInt(1, 3)),
-      hasParking: Math.random() > 0.3,
-      hasElevator: Math.random() > 0.2,
-      buildingAge: randomInt(1, 25),
-      status: Math.random() > 0.85 ? 'RESERVED' : 'ACTIVE',
-      viewCount: randomInt(50, 500),
-      inquiryCount: randomInt(3, 30),
+      deposit: roundToRealistic(randomInt(5000, 25000), 1000),
+      monthlyRent: roundToRealistic(randomInt(200, 600), 50),
+      maintenanceFee: roundToRealistic(randomInt(15, 40), 5),
+      premium: Math.random() > 0.4 ? roundToRealistic(randomInt(2000, 12000), 1000) : 0,
+      preferredTenants: randomChoices(hospitalTypes, randomInt(2, 3)),
+      nearbyHospitals: randomChoices(hospitalTypes, randomInt(1, 2)),
+      hasParking: Math.random() > 0.35,
+      hasElevator: Math.random() > 0.25,
+      buildingAge: randomInt(2, 20),
+      status: Math.random() > 0.88 ? 'RESERVED' : 'ACTIVE',
+      viewCount: randomInt(60, 350),
+      inquiryCount,
       createdAt: new Date(now - createdHoursAgo * 60 * 60 * 1000).toISOString(),
-      isVerified: Math.random() > 0.4,
+      isVerified: Math.random() > 0.45,
       thumbnailIndex: randomInt(1, 8),
       isHot,
       isNew,
-      currentViewers: isHot ? randomInt(3, 15) : randomInt(0, 5),
-      lastInquiryTime: getRelativeTime(randomInt(1, 180)), // 1~180분 전
+      currentViewers,
+      lastInquiryTime,
       urgencyTag: hasUrgency ? randomChoice(urgencyTags) : undefined,
     })
   }
@@ -167,49 +212,92 @@ const transferReasons = ['은퇴', '이주', '건강', '진로변경', '가족�
 export function generatePharmacyListings(count: number = 80): PharmacyListing[] {
   const listings: PharmacyListing[] = []
   const now = Date.now()
-  let idCounter = 1
 
   for (let i = 0; i < count; i++) {
     const region = randomChoice(regions)
-    const baseRevenue = randomInt(3000, 15000)
-    const createdHoursAgo = randomInt(0, 45 * 24)
-    const isNew = createdHoursAgo < 24
-    const isHot = Math.random() > 0.7
-    const interestCount = randomInt(5, 40)
+    // 현실적인 매출 (500만 단위로 라운드)
+    const baseRevenue = roundToRealistic(randomInt(4000, 12000), 500)
+    const createdHoursAgo = randomInt(0, 60 * 24) // 0~60일 전
+    const isNew = createdHoursAgo < 48 && Math.random() > 0.7 // 48시간 이내 + 30%만 NEW 표시
 
-    const urgencyTags = ['관심자 다수', '협의 진행중', '급양도', '우대조건 있음']
-    const hasUrgency = Math.random() > 0.75
+    // 인기 매물은 10%만
+    const isHot = Math.random() > 0.9
+
+    // 관심 수: 대부분 낮고, 일부만 높음
+    const interestRandom = Math.random()
+    let interestCount: number
+    if (interestRandom > 0.9) {
+      interestCount = randomInt(20, 45) // 상위 10%: 높은 관심
+    } else if (interestRandom > 0.6) {
+      interestCount = randomInt(8, 20) // 30%: 중간 관심
+    } else {
+      interestCount = randomInt(1, 8) // 60%: 낮은 관심
+    }
+
+    // 경쟁도는 관심 수에 기반 (논리적으로)
+    let competitionLevel: 'low' | 'medium' | 'high'
+    if (interestCount >= 20) {
+      competitionLevel = 'high'
+    } else if (interestCount >= 8) {
+      competitionLevel = 'medium'
+    } else {
+      competitionLevel = 'low'
+    }
+
+    // 긴급 태그는 10%만, 경쟁 높을 때만
+    const urgencyTags = ['협의 진행중', '급양도', '우대조건']
+    const hasUrgency = competitionLevel === 'high' && Math.random() > 0.7
+
+    // 현재 보는 사람: 대부분 없음, 인기 매물만 1-3명
+    let currentViewers = 0
+    if (isHot && Math.random() > 0.5) {
+      currentViewers = randomInt(1, 3)
+    } else if (Math.random() > 0.85) {
+      currentViewers = randomInt(1, 2)
+    }
+
+    // 마지막 관심 시간: 50%만 표시, 시간도 다양하게
+    let lastInterestTime: string | undefined
+    if (Math.random() > 0.5) {
+      const minutesAgo = Math.random() > 0.7
+        ? randomInt(1, 60)  // 30%: 최근 1시간 내
+        : randomInt(60, 2880) // 70%: 1시간~2일 전
+      lastInterestTime = getRelativeTime(minutesAgo)
+    }
+
+    // 권리금도 1000만 단위로 라운드
+    const premiumBase = roundToRealistic(randomInt(8000, 35000), 1000)
 
     listings.push({
       id: `phm-${generateId()}`,
-      anonymousId: `${region.name.slice(0, 2)}-2024-${String(idCounter++).padStart(3, '0')}`,
+      anonymousId: generateAnonymousCode('PM'), // PM-A7X2K 형식
       region: region.name,
       regionCode: region.code,
       pharmacyType: randomChoice(pharmacyTypes),
-      nearbyHospitals: randomChoices(hospitalTypes, randomInt(2, 5)),
-      monthlyRevenueMin: baseRevenue - randomInt(500, 1500),
-      monthlyRevenueMax: baseRevenue + randomInt(500, 1500),
-      monthlyRxCount: randomInt(800, 4000),
-      premiumMin: randomInt(5000, 20000),
-      premiumMax: randomInt(20000, 50000),
-      monthlyRent: randomInt(200, 600),
-      deposit: randomInt(5000, 20000),
-      operationYears: randomInt(3, 20),
+      nearbyHospitals: randomChoices(hospitalTypes, randomInt(2, 4)),
+      monthlyRevenueMin: baseRevenue,
+      monthlyRevenueMax: baseRevenue + roundToRealistic(randomInt(1000, 3000), 500),
+      monthlyRxCount: roundToRealistic(randomInt(1000, 3500), 100),
+      premiumMin: premiumBase,
+      premiumMax: premiumBase + roundToRealistic(randomInt(3000, 8000), 1000),
+      monthlyRent: roundToRealistic(randomInt(200, 500), 50),
+      deposit: roundToRealistic(randomInt(5000, 15000), 1000),
+      operationYears: randomInt(3, 18),
       transferReason: randomChoice(transferReasons),
-      hasAutoDispenser: Math.random() > 0.4,
-      hasParking: Math.random() > 0.3,
-      floorInfo: Math.random() > 0.7 ? '1층' : `${randomInt(2, 5)}층`,
-      status: Math.random() > 0.9 ? 'MATCHED' : 'ACTIVE',
-      viewCount: randomInt(30, 300),
+      hasAutoDispenser: Math.random() > 0.5,
+      hasParking: Math.random() > 0.4,
+      floorInfo: Math.random() > 0.6 ? '1층' : `${randomInt(2, 4)}층`,
+      status: Math.random() > 0.92 ? 'MATCHED' : 'ACTIVE',
+      viewCount: randomInt(40, 250),
       interestCount,
-      matchScore: randomInt(65, 98),
+      matchScore: randomInt(72, 95),
       createdAt: new Date(now - createdHoursAgo * 60 * 60 * 1000).toISOString(),
       isHot,
       isNew,
-      currentViewers: isHot ? randomInt(2, 12) : randomInt(0, 4),
-      lastInterestTime: getRelativeTime(randomInt(1, 120)),
+      currentViewers,
+      lastInterestTime: lastInterestTime || '',
       urgencyTag: hasUrgency ? randomChoice(urgencyTags) : undefined,
-      competitionLevel: interestCount > 25 ? 'high' : interestCount > 15 ? 'medium' : 'low',
+      competitionLevel,
     })
   }
 

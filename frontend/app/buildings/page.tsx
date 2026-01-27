@@ -310,11 +310,13 @@ export default function BuildingsPage() {
                   <span className="text-muted-foreground/30 blur-[3px] select-none ml-1">상세주소</span>
                 </p>
 
-                {/* Last Inquiry */}
-                <p className="text-xs text-green-600 mb-3 flex items-center gap-1">
-                  <Clock className="w-3 h-3" />
-                  {listing.lastInquiryTime} 문의
-                </p>
+                {/* Last Inquiry - 있을 때만 표시 */}
+                {listing.lastInquiryTime && (
+                  <p className="text-xs text-muted-foreground mb-3 flex items-center gap-1">
+                    <Clock className="w-3 h-3" />
+                    {listing.lastInquiryTime} 문의
+                  </p>
+                )}
 
                 {/* Price - Partially Visible */}
                 <div className="flex items-center justify-between text-sm mb-3">

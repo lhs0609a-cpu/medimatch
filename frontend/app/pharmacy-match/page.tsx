@@ -389,9 +389,11 @@ export default function PharmacyMatchPage() {
                       </span>
                     )}
                   </div>
-                  <span className="text-xs text-green-600">
-                    {listing.lastInterestTime} 관심
-                  </span>
+                  {listing.lastInterestTime && (
+                    <span className="text-xs text-muted-foreground">
+                      {listing.lastInterestTime} 관심
+                    </span>
+                  )}
                 </div>
               </div>
 
