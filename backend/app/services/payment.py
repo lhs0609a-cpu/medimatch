@@ -310,34 +310,34 @@ PRODUCTS = {
     "landlord_pro": {
         "name": "건물주 프로 (월)",
         "price": 299000,
-        "description": "매물 3개, 상위 노출, 월 5건 리드",
+        "description": "매물 3개, 상위 노출, 월 5회 매칭",
         "category": "landlord_subscription",
         "tier": "pro",
         "features": [
             "매물 3개 등록",
             "검색 상위 노출",
-            "월 5건 의사/약사 리드 제공",
+            "월 5회 매칭 요청권",
             "상세 통계 리포트",
             "프로 배지 표시",
         ],
-        "leads_per_month": 5,
+        "matching_requests_per_month": 5,
         "recommended": True,
     },
     "landlord_premium": {
         "name": "건물주 프리미엄 (월)",
         "price": 599000,
-        "description": "무제한 등록, 최상위 노출, 무제한 리드",
+        "description": "무제한 등록, 최상위 노출, 무제한 매칭",
         "category": "landlord_subscription",
         "tier": "premium",
         "features": [
             "무제한 매물 등록",
             "검색 최상위 노출",
-            "무제한 의사/약사 리드",
+            "무제한 매칭 요청권",
             "전담 매니저 배정",
             "프리미엄 배지",
             "홈페이지 배너 노출 (월 1회)",
         ],
-        "leads_per_month": -1,  # unlimited
+        "matching_requests_per_month": -1,  # unlimited
     },
     "landlord_pro_yearly": {
         "name": "건물주 프로 (연)",
@@ -347,46 +347,30 @@ PRODUCTS = {
         "tier": "pro",
         "features": [
             "프로 플랜 전체 혜택",
-            "연 60건 리드 제공",
+            "우선 매칭 기회",
             "2개월 무료 혜택",
         ],
-        "leads_per_month": 5,
     },
-    # ===== 건물주 리드 구매 (건당) =====
-    "landlord_lead_doctor": {
-        "name": "개원 준비 의사 리드",
-        "price": 100000,
-        "description": "개원 준비 중인 의사 연락처 1건",
-        "category": "landlord_lead",
-        "lead_type": "doctor",
+    # ===== 건물주 매칭 서비스 (양방향 동의 기반) =====
+    "landlord_matching_request": {
+        "name": "매칭 요청",
+        "price": 50000,
+        "description": "관심 회원에게 매칭 요청 발송 (상대방 수락 시에만 연락처 공개)",
+        "category": "landlord_matching",
     },
-    "landlord_lead_pharmacist": {
-        "name": "개국 준비 약사 리드",
-        "price": 100000,
-        "description": "개국 준비 중인 약사 연락처 1건",
-        "category": "landlord_lead",
-        "lead_type": "pharmacist",
+    "landlord_matching_pack_5": {
+        "name": "매칭 요청 5회권",
+        "price": 200000,  # 20% 할인
+        "description": "매칭 요청 5회 (20% 할인)",
+        "category": "landlord_matching",
+        "count": 5,
     },
-    "landlord_lead_interest": {
-        "name": "관심 회원 리드",
-        "price": 30000,
-        "description": "내 매물에 관심 표시한 회원 연락처",
-        "category": "landlord_lead",
-        "lead_type": "interest",
-    },
-    "landlord_lead_pack_10": {
-        "name": "리드 10건 패키지",
-        "price": 800000,  # 20% 할인
-        "description": "의사/약사 리드 10건 (20% 할인)",
-        "category": "landlord_lead",
-        "lead_count": 10,
-    },
-    "landlord_lead_pack_30": {
-        "name": "리드 30건 패키지",
-        "price": 2100000,  # 30% 할인
-        "description": "의사/약사 리드 30건 (30% 할인)",
-        "category": "landlord_lead",
-        "lead_count": 30,
+    "landlord_matching_pack_10": {
+        "name": "매칭 요청 10회권",
+        "price": 350000,  # 30% 할인
+        "description": "매칭 요청 10회 (30% 할인)",
+        "category": "landlord_matching",
+        "count": 10,
     },
     # ===== 건물주 광고/부스팅 =====
     "landlord_boost_top": {

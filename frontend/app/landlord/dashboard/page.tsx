@@ -15,8 +15,8 @@ const mockSubscription = {
   planName: '프로',
   price: 299000,
   nextBillingDate: '2024-02-25',
-  leadsRemaining: 3,
-  leadsTotal: 5,
+  matchingRemaining: 3,
+  matchingTotal: 5,
   listingsUsed: 2,
   listingsTotal: 3,
 }
@@ -48,7 +48,7 @@ const mockListings = [
   },
 ]
 
-const mockLeads = [
+const mockMatches = [
   {
     id: '1',
     type: 'doctor',
@@ -56,8 +56,8 @@ const mockLeads = [
     specialty: '내과',
     region: '서울 강남구',
     phone: '010-****-5678',
-    status: 'new',
-    purchasedAt: '2024-01-24',
+    status: 'accepted',  // 매칭 수락됨 - 연락처 공개
+    matchedAt: '2024-01-24',
   },
   {
     id: '2',
@@ -65,9 +65,9 @@ const mockLeads = [
     name: '이OO',
     specialty: '일반약국',
     region: '경기 성남시',
-    phone: '010-****-1234',
-    status: 'contacted',
-    purchasedAt: '2024-01-22',
+    phone: null,  // 대기 중 - 연락처 비공개
+    status: 'pending',
+    matchedAt: '2024-01-22',
   },
   {
     id: '3',
@@ -76,8 +76,8 @@ const mockLeads = [
     specialty: '정형외과',
     region: '서울 송파구',
     phone: '010-****-9012',
-    status: 'interested',
-    purchasedAt: '2024-01-20',
+    status: 'accepted',
+    matchedAt: '2024-01-20',
   },
 ]
 
@@ -88,15 +88,15 @@ const mockActivities = [
   { type: 'lead', message: '새로운 리드가 추가되었습니다: 김OO 내과', time: '어제' },
 ]
 
-const leadStatusLabels = {
-  new: { label: '신규', style: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400' },
-  contacted: { label: '연락완료', style: 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400' },
-  interested: { label: '관심', style: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' },
-  rejected: { label: '불발', style: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400' },
+const matchStatusLabels = {
+  pending: { label: '수락 대기', style: 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400' },
+  accepted: { label: '매칭 완료', style: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' },
+  rejected: { label: '거절됨', style: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400' },
+  expired: { label: '만료', style: 'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-400' },
 }
 
 export default function LandlordDashboardPage() {
-  const [activeTab, setActiveTab] = useState<'overview' | 'listings' | 'leads' | 'ads'>('overview')
+  const [activeTab, setActiveTab] = useState<'overview' | 'listings' | 'matches' | 'ads'>('overview')
 
   const formatPrice = (price: number) => {
     if (price >= 10000) {
@@ -164,9 +164,9 @@ export default function LandlordDashboardPage() {
               </div>
               <div className="text-center">
                 <p className="text-2xl font-bold text-foreground">
-                  {mockSubscription.leadsRemaining}/{mockSubscription.leadsTotal}
+                  {mockSubscription.matchingRemaining}/{mockSubscription.matchingTotal}
                 </p>
-                <p className="text-xs text-muted-foreground">이번 달 리드</p>
+                <p className="text-xs text-muted-foreground">매칭 요청권</p>
               </div>
             </div>
           </div>
@@ -177,7 +177,7 @@ export default function LandlordDashboardPage() {
           {[
             { id: 'overview', label: '개요', icon: TrendingUp },
             { id: 'listings', label: '내 매물', icon: Building2 },
-            { id: 'leads', label: '리드 관리', icon: Users },
+            { id: 'matches', label: '매칭 관리', icon: Users },
             { id: 'ads', label: '광고/부스팅', icon: Zap },
           ].map((tab) => (
             <button
@@ -277,14 +277,14 @@ export default function LandlordDashboardPage() {
 
             {/* Quick Actions */}
             <div className="grid md:grid-cols-3 gap-4">
-              <Link href="/landlord/leads/purchase" className="card p-4 hover:shadow-md transition-shadow">
+              <Link href="/landlord/pricing" className="card p-4 hover:shadow-md transition-shadow">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
                     <Users className="w-5 h-5 text-primary" />
                   </div>
                   <div className="flex-1">
-                    <p className="font-medium text-foreground">리드 구매하기</p>
-                    <p className="text-xs text-muted-foreground">의사/약사 연락처 획득</p>
+                    <p className="font-medium text-foreground">매칭 요청권 구매</p>
+                    <p className="text-xs text-muted-foreground">관심 회원에게 매칭 요청</p>
                   </div>
                   <ChevronRight className="w-5 h-5 text-muted-foreground" />
                 </div>
@@ -377,54 +377,67 @@ export default function LandlordDashboardPage() {
           </div>
         )}
 
-        {/* Leads Tab */}
-        {activeTab === 'leads' && (
+        {/* Matches Tab */}
+        {activeTab === 'matches' && (
           <div className="space-y-4">
             <div className="flex items-center justify-between mb-4">
               <p className="text-sm text-muted-foreground">
-                보유 리드 {mockLeads.length}건 · 이번 달 남은 무료 리드 {mockSubscription.leadsRemaining}건
+                매칭 {mockMatches.length}건 · 이번 달 남은 요청권 {mockSubscription.matchingRemaining}회
               </p>
-              <Link href="/landlord/leads/purchase" className="btn-primary text-sm">
-                리드 구매
+              <Link href="/landlord/pricing" className="btn-primary text-sm">
+                요청권 구매
               </Link>
             </div>
 
-            {mockLeads.map((lead) => (
-              <div key={lead.id} className="card p-5">
+            <div className="card p-4 mb-4 bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800">
+              <p className="text-sm text-blue-700 dark:text-blue-400">
+                <strong>양방향 동의 매칭:</strong> 내 매물에 관심 표시한 회원에게 매칭 요청을 보내면,
+                상대방이 수락해야만 연락처가 공개됩니다.
+              </p>
+            </div>
+
+            {mockMatches.map((match) => (
+              <div key={match.id} className="card p-5">
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                   <div className="flex items-center gap-4">
                     <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
-                      lead.type === 'doctor'
+                      match.type === 'doctor'
                         ? 'bg-blue-100 dark:bg-blue-900/30'
                         : 'bg-purple-100 dark:bg-purple-900/30'
                     }`}>
                       <Users className={`w-6 h-6 ${
-                        lead.type === 'doctor' ? 'text-blue-600' : 'text-purple-600'
+                        match.type === 'doctor' ? 'text-blue-600' : 'text-purple-600'
                       }`} />
                     </div>
                     <div>
                       <div className="flex items-center gap-2 mb-1">
-                        <h3 className="font-semibold text-foreground">{lead.name}</h3>
-                        <span className={`px-2 py-0.5 text-xs rounded-full ${leadStatusLabels[lead.status as keyof typeof leadStatusLabels].style}`}>
-                          {leadStatusLabels[lead.status as keyof typeof leadStatusLabels].label}
+                        <h3 className="font-semibold text-foreground">{match.name}</h3>
+                        <span className={`px-2 py-0.5 text-xs rounded-full ${matchStatusLabels[match.status as keyof typeof matchStatusLabels].style}`}>
+                          {matchStatusLabels[match.status as keyof typeof matchStatusLabels].label}
                         </span>
                       </div>
                       <p className="text-sm text-muted-foreground">
-                        {lead.type === 'doctor' ? '의사' : '약사'} · {lead.specialty} · {lead.region}
+                        {match.type === 'doctor' ? '의사' : '약사'} · {match.specialty} · {match.region}
                       </p>
                       <p className="text-xs text-muted-foreground mt-1">
-                        구매일: {lead.purchasedAt}
+                        매칭 요청일: {match.matchedAt}
                       </p>
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
-                    <a
-                      href={`tel:${lead.phone}`}
-                      className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90"
-                    >
-                      <Phone className="w-4 h-4" />
-                      연락하기
-                    </a>
+                    {match.status === 'accepted' && match.phone ? (
+                      <a
+                        href={`tel:${match.phone}`}
+                        className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90"
+                      >
+                        <Phone className="w-4 h-4" />
+                        연락하기
+                      </a>
+                    ) : (
+                      <span className="px-4 py-2 bg-secondary text-muted-foreground rounded-lg text-sm">
+                        수락 대기 중
+                      </span>
+                    )}
                     <button className="px-4 py-2 bg-secondary text-secondary-foreground rounded-lg hover:bg-secondary/80">
                       메모
                     </button>

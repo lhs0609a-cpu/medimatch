@@ -21,7 +21,7 @@ const subscriptionPlans = [
       { text: '기본 검색 노출', included: true },
       { text: '문의 알림', included: true },
       { text: '기본 통계', included: true },
-      { text: '의사/약사 리드 제공', included: false },
+      { text: '매칭 요청권 제공', included: false },
       { text: '상위 노출', included: false },
       { text: '전담 매니저', included: false },
     ],
@@ -39,7 +39,7 @@ const subscriptionPlans = [
       { text: '검색 상위 노출', included: true },
       { text: '문의 알림', included: true },
       { text: '상세 통계 리포트', included: true },
-      { text: '월 5건 의사/약사 리드', included: true },
+      { text: '월 5회 매칭 요청권', included: true },
       { text: '프로 배지 표시', included: true },
       { text: '전담 매니저', included: false },
     ],
@@ -58,7 +58,7 @@ const subscriptionPlans = [
       { text: '검색 최상위 노출', included: true },
       { text: '모든 알림 기능', included: true },
       { text: '프리미엄 통계 + AI 분석', included: true },
-      { text: '무제한 의사/약사 리드', included: true },
+      { text: '무제한 매칭 요청권', included: true },
       { text: '프리미엄 배지', included: true },
       { text: '전담 매니저 배정', included: true },
     ],
@@ -67,13 +67,11 @@ const subscriptionPlans = [
   },
 ]
 
-// 리드 상품
-const leadProducts = [
-  { id: 'landlord_lead_doctor', name: '개원 준비 의사', price: 100000, desc: '개원 준비 중인 의사 연락처 1건' },
-  { id: 'landlord_lead_pharmacist', name: '개국 준비 약사', price: 100000, desc: '개국 준비 중인 약사 연락처 1건' },
-  { id: 'landlord_lead_interest', name: '관심 회원', price: 30000, desc: '내 매물에 관심 표시한 회원' },
-  { id: 'landlord_lead_pack_10', name: '10건 패키지', price: 800000, desc: '의사/약사 리드 10건 (20% 할인)', discount: 20 },
-  { id: 'landlord_lead_pack_30', name: '30건 패키지', price: 2100000, desc: '의사/약사 리드 30건 (30% 할인)', discount: 30 },
+// 매칭 서비스 (양방향 동의 기반)
+const matchingProducts = [
+  { id: 'landlord_matching_request', name: '매칭 요청 1회', price: 50000, desc: '관심 회원에게 매칭 요청 (수락 시 연락처 공개)' },
+  { id: 'landlord_matching_pack_5', name: '매칭 요청 5회권', price: 200000, desc: '5회 매칭 요청 (20% 할인)', discount: 20 },
+  { id: 'landlord_matching_pack_10', name: '매칭 요청 10회권', price: 350000, desc: '10회 매칭 요청 (30% 할인)', discount: 30 },
 ]
 
 // 광고 상품
@@ -256,17 +254,18 @@ export default function LandlordPricingPage() {
           ))}
         </div>
 
-        {/* Lead Products */}
+        {/* Matching Service */}
         <div className="mb-16">
           <div className="text-center mb-8">
-            <h2 className="text-2xl font-bold text-foreground mb-2">의사·약사 리드 구매</h2>
+            <h2 className="text-2xl font-bold text-foreground mb-2">매칭 서비스</h2>
             <p className="text-muted-foreground">
-              개원/개국 준비 중인 의사·약사 연락처를 직접 구매하세요
+              내 매물에 관심 표시한 의사·약사에게 매칭 요청을 보내세요<br />
+              <span className="text-sm">상대방이 수락해야만 연락처가 공개됩니다 (양방향 동의)</span>
             </p>
           </div>
 
-          <div className="grid md:grid-cols-3 lg:grid-cols-5 gap-4">
-            {leadProducts.map((product) => (
+          <div className="grid md:grid-cols-3 gap-4 max-w-3xl mx-auto">
+            {matchingProducts.map((product) => (
               <div key={product.id} className="card p-4 hover:shadow-md transition-shadow">
                 <div className="flex items-center justify-between mb-2">
                   <h3 className="font-semibold text-foreground">{product.name}</h3>
