@@ -1,67 +1,66 @@
-'use client';
+'use client'
 
-import { useState, useEffect } from 'react';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect } from 'react'
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+import {
+  ArrowLeft, User, Mail, Phone, Building2, Calendar,
+  CreditCard, Bell, BarChart3, LogOut, ChevronRight,
+  Crown, Sparkles, Shield, Edit2, Check, X, Heart, Settings
+} from 'lucide-react'
+import { useSubscription, SubscriptionBadge } from '@/lib/contexts/SubscriptionContext'
 
 interface UserProfile {
-  id: number;
-  email: string;
-  name: string;
-  phone: string;
-  role: string;
-  company: string | null;
-  createdAt: string;
-}
-
-interface Subscription {
-  plan: string;
-  status: string;
-  expires_at: string;
-  is_auto_renew: boolean;
+  id: number
+  email: string
+  name: string
+  phone: string
+  role: string
+  company: string | null
+  createdAt: string
 }
 
 export default function MyPage() {
-  const router = useRouter();
-  const [profile, setProfile] = useState<UserProfile | null>(null);
-  const [subscription, setSubscription] = useState<Subscription | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [isEditing, setIsEditing] = useState(false);
+  const router = useRouter()
+  const { subscription, isLoading: subscriptionLoading, refresh: refreshSubscription } = useSubscription()
+  const [profile, setProfile] = useState<UserProfile | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [isEditing, setIsEditing] = useState(false)
   const [editForm, setEditForm] = useState({
     name: '',
     phone: '',
     company: '',
-  });
+  })
+  const [saving, setSaving] = useState(false)
 
   useEffect(() => {
-    fetchUserData();
-  }, []);
+    fetchUserData()
+  }, [])
 
   const fetchUserData = async () => {
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('token')
       if (!token) {
-        router.push('/login');
-        return;
+        router.push('/login')
+        return
       }
 
-      // 사용자 프로필 조회
       const profileResponse = await fetch('/api/v1/users/me', {
         headers: {
           Authorization: `Bearer ${token}`,
         },
-      });
+      })
 
       if (!profileResponse.ok) {
         if (profileResponse.status === 401) {
-          localStorage.removeItem('token');
-          router.push('/login');
-          return;
+          localStorage.removeItem('token')
+          router.push('/login')
+          return
         }
-        throw new Error('Failed to fetch profile');
+        throw new Error('Failed to fetch profile')
       }
 
-      const profileData = await profileResponse.json();
+      const profileData = await profileResponse.json()
       setProfile({
         id: profileData.id,
         email: profileData.email,
@@ -70,45 +69,27 @@ export default function MyPage() {
         role: profileData.role,
         company: profileData.company || null,
         createdAt: profileData.created_at,
-      });
+      })
 
       setEditForm({
         name: profileData.name || '',
         phone: profileData.phone || '',
         company: profileData.company || '',
-      });
-
-      // 구독 정보 조회
-      const subscriptionResponse = await fetch('/api/v1/subscriptions/me', {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      if (subscriptionResponse.ok) {
-        const subscriptionData = await subscriptionResponse.json();
-        setSubscription({
-          plan: subscriptionData.plan,
-          status: subscriptionData.status,
-          expires_at: subscriptionData.expires_at,
-          is_auto_renew: subscriptionData.is_auto_renew,
-        });
-      } else {
-        setSubscription(null);
-      }
+      })
     } catch (err) {
-      console.error('Failed to fetch user data:', err);
+      console.error('Failed to fetch user data:', err)
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   const handleSaveProfile = async () => {
     try {
-      const token = localStorage.getItem('token');
+      setSaving(true)
+      const token = localStorage.getItem('token')
       if (!token) {
-        router.push('/login');
-        return;
+        router.push('/login')
+        return
       }
 
       const response = await fetch('/api/v1/users/me', {
@@ -122,13 +103,13 @@ export default function MyPage() {
           phone: editForm.phone,
           company: editForm.company,
         }),
-      });
+      })
 
       if (!response.ok) {
-        throw new Error('Failed to update profile');
+        throw new Error('Failed to update profile')
       }
 
-      const updatedData = await response.json();
+      const updatedData = await response.json()
 
       setProfile((prev) =>
         prev
@@ -139,18 +120,20 @@ export default function MyPage() {
               company: updatedData.company || editForm.company,
             }
           : null
-      );
-      setIsEditing(false);
+      )
+      setIsEditing(false)
     } catch (err) {
-      console.error('Failed to save profile:', err);
-      alert('프로필 저장에 실패했습니다. 다시 시도해주세요.');
+      console.error('Failed to save profile:', err)
+      alert('프로필 저장에 실패했습니다.')
+    } finally {
+      setSaving(false)
     }
-  };
+  }
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
-    router.push('/login');
-  };
+    localStorage.removeItem('token')
+    router.push('/login')
+  }
 
   const getRoleLabel = (role: string) => {
     const labels: { [key: string]: string } = {
@@ -158,143 +141,260 @@ export default function MyPage() {
       PHARMACIST: '약사',
       SALES_REP: '영업사원',
       ADMIN: '관리자',
-    };
-    return labels[role] || role;
-  };
+    }
+    return labels[role] || role
+  }
+
+  const getSubscriptionLabel = () => {
+    switch (subscription.tier) {
+      case 'vip':
+        return { label: 'VIP', icon: Crown, color: 'text-amber-600', bg: 'bg-amber-100 dark:bg-amber-900/30' }
+      case 'premium':
+        return { label: '프리미엄', icon: Sparkles, color: 'text-blue-600', bg: 'bg-blue-100 dark:bg-blue-900/30' }
+      default:
+        return { label: '무료', icon: Shield, color: 'text-muted-foreground', bg: 'bg-secondary' }
+    }
+  }
+
+  const subscriptionInfo = getSubscriptionLabel()
+  const SubscriptionIcon = subscriptionInfo.icon
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
       </div>
-    );
+    )
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* 헤더 */}
-      <header className="bg-white shadow-sm">
-        <div className="max-w-4xl mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <Link href="/dashboard" className="text-blue-600 hover:underline flex items-center gap-2">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-              </svg>
-              대시보드로 돌아가기
+    <div className="min-h-screen bg-background">
+      {/* Header */}
+      <header className="bg-card border-b sticky top-0 z-40">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6">
+          <div className="flex items-center justify-between h-16">
+            <Link href="/" className="text-muted-foreground hover:text-foreground transition-colors flex items-center gap-2">
+              <ArrowLeft className="w-5 h-5" />
+              <span>홈으로</span>
             </Link>
             <button
               onClick={handleLogout}
-              className="text-red-600 hover:underline text-sm"
+              className="text-red-600 hover:text-red-700 text-sm font-medium flex items-center gap-1"
             >
+              <LogOut className="w-4 h-4" />
               로그아웃
             </button>
           </div>
         </div>
       </header>
 
-      <div className="max-w-4xl mx-auto px-4 py-8">
-        <h1 className="text-2xl font-bold text-gray-900 mb-8">마이페이지</h1>
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8">
+        {/* Page Title */}
+        <h1 className="text-2xl font-bold text-foreground mb-8">마이페이지</h1>
 
-        {/* 프로필 카드 */}
-        <div className="bg-white rounded-xl shadow p-6 mb-6">
+        {/* Subscription Status Card - Prominent */}
+        <div className={`rounded-2xl p-6 mb-6 ${
+          subscription.tier === 'vip'
+            ? 'bg-gradient-to-br from-amber-500 to-orange-600 text-white'
+            : subscription.tier === 'premium'
+            ? 'bg-gradient-to-br from-blue-500 to-cyan-600 text-white'
+            : 'bg-card border'
+        }`}>
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-3">
+              <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
+                subscription.tier !== 'free' ? 'bg-white/20' : 'bg-primary/10'
+              }`}>
+                <SubscriptionIcon className={`w-6 h-6 ${
+                  subscription.tier !== 'free' ? 'text-white' : 'text-primary'
+                }`} />
+              </div>
+              <div>
+                <p className={`text-sm ${subscription.tier !== 'free' ? 'text-white/70' : 'text-muted-foreground'}`}>
+                  현재 멤버십
+                </p>
+                <p className={`text-xl font-bold ${subscription.tier !== 'free' ? 'text-white' : 'text-foreground'}`}>
+                  {subscriptionInfo.label} 회원
+                </p>
+              </div>
+            </div>
+            {subscription.tier === 'free' ? (
+              <Link
+                href="/subscribe"
+                className="btn-primary"
+              >
+                업그레이드
+              </Link>
+            ) : (
+              <Link
+                href="/subscribe"
+                className={`px-4 py-2 rounded-lg font-medium ${
+                  subscription.tier !== 'free'
+                    ? 'bg-white/20 hover:bg-white/30 text-white'
+                    : 'bg-primary/10 hover:bg-primary/20 text-primary'
+                } transition-colors`}
+              >
+                구독 관리
+              </Link>
+            )}
+          </div>
+
+          {/* Subscription Benefits / Usage */}
+          {subscription.tier !== 'free' ? (
+            <div className="grid grid-cols-3 gap-4 pt-4 border-t border-white/20">
+              <div>
+                <p className="text-white/70 text-sm">시뮬레이션</p>
+                <p className="text-lg font-semibold">
+                  {subscription.features.maxSimulations === 'unlimited' ? '무제한' : `${subscription.usedSimulations}/${subscription.features.maxSimulations}`}
+                </p>
+              </div>
+              <div>
+                <p className="text-white/70 text-sm">리포트</p>
+                <p className="text-lg font-semibold">
+                  {subscription.features.maxReportsPerMonth === 'unlimited' ? '무제한' : `${subscription.usedReports}/${subscription.features.maxReportsPerMonth}`}
+                </p>
+              </div>
+              <div>
+                <p className="text-white/70 text-sm">만료일</p>
+                <p className="text-lg font-semibold">
+                  {subscription.expiresAt
+                    ? new Date(subscription.expiresAt).toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' })
+                    : '-'}
+                </p>
+              </div>
+            </div>
+          ) : (
+            <div className="pt-4 border-t border-border">
+              <p className="text-sm text-muted-foreground">
+                프리미엄으로 업그레이드하고 무제한 시뮬레이션, 상세 리포트 등 다양한 혜택을 누려보세요.
+              </p>
+            </div>
+          )}
+        </div>
+
+        {/* Profile Card */}
+        <div className="card p-6 mb-6">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-lg font-semibold text-gray-900">프로필 정보</h2>
+            <h2 className="text-lg font-semibold text-foreground">프로필 정보</h2>
             {!isEditing ? (
               <button
                 onClick={() => setIsEditing(true)}
-                className="text-sm text-blue-600 hover:underline"
+                className="text-sm text-primary hover:underline flex items-center gap-1"
               >
+                <Edit2 className="w-4 h-4" />
                 수정
               </button>
             ) : (
               <div className="flex gap-2">
                 <button
                   onClick={() => setIsEditing(false)}
-                  className="text-sm text-gray-600 hover:underline"
+                  className="text-sm text-muted-foreground hover:text-foreground flex items-center gap-1"
+                  disabled={saving}
                 >
+                  <X className="w-4 h-4" />
                   취소
                 </button>
                 <button
                   onClick={handleSaveProfile}
-                  className="text-sm text-blue-600 hover:underline font-medium"
+                  className="text-sm text-primary hover:underline font-medium flex items-center gap-1"
+                  disabled={saving}
                 >
-                  저장
+                  <Check className="w-4 h-4" />
+                  {saving ? '저장 중...' : '저장'}
                 </button>
               </div>
             )}
           </div>
 
           <div className="flex items-start gap-6">
-            {/* 프로필 이미지 */}
-            <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
-              <span className="text-2xl font-bold text-blue-600">
+            {/* Profile Avatar */}
+            <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
+              <span className="text-2xl font-bold text-primary">
                 {profile?.name?.charAt(0) || 'U'}
               </span>
             </div>
 
-            {/* 프로필 정보 */}
+            {/* Profile Info */}
             <div className="flex-1">
               {isEditing ? (
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">이름</label>
+                    <label className="block text-sm font-medium text-foreground mb-1">이름</label>
                     <input
                       type="text"
                       value={editForm.name}
                       onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="input"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">연락처</label>
+                    <label className="block text-sm font-medium text-foreground mb-1">연락처</label>
                     <input
                       type="tel"
                       value={editForm.phone}
                       onChange={(e) => setEditForm({ ...editForm, phone: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="input"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">소속</label>
+                    <label className="block text-sm font-medium text-foreground mb-1">소속</label>
                     <input
                       type="text"
                       value={editForm.company}
                       onChange={(e) => setEditForm({ ...editForm, company: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="input"
                     />
                   </div>
                 </div>
               ) : (
-                <div className="space-y-3">
-                  <div>
-                    <p className="text-sm text-gray-500">이름</p>
-                    <p className="font-medium text-gray-900">{profile?.name}</p>
+                <div className="grid sm:grid-cols-2 gap-4">
+                  <div className="flex items-center gap-3">
+                    <User className="w-5 h-5 text-muted-foreground" />
+                    <div>
+                      <p className="text-xs text-muted-foreground">이름</p>
+                      <p className="font-medium text-foreground">{profile?.name}</p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="text-sm text-gray-500">이메일</p>
-                    <p className="font-medium text-gray-900">{profile?.email}</p>
+                  <div className="flex items-center gap-3">
+                    <Mail className="w-5 h-5 text-muted-foreground" />
+                    <div>
+                      <p className="text-xs text-muted-foreground">이메일</p>
+                      <p className="font-medium text-foreground">{profile?.email}</p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="text-sm text-gray-500">연락처</p>
-                    <p className="font-medium text-gray-900">{profile?.phone}</p>
+                  <div className="flex items-center gap-3">
+                    <Phone className="w-5 h-5 text-muted-foreground" />
+                    <div>
+                      <p className="text-xs text-muted-foreground">연락처</p>
+                      <p className="font-medium text-foreground">{profile?.phone || '-'}</p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="text-sm text-gray-500">회원 유형</p>
-                    <span className="inline-block px-2 py-0.5 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">
-                      {getRoleLabel(profile?.role || '')}
-                    </span>
+                  <div className="flex items-center gap-3">
+                    <Shield className="w-5 h-5 text-muted-foreground" />
+                    <div>
+                      <p className="text-xs text-muted-foreground">회원 유형</p>
+                      <span className="inline-block px-2 py-0.5 bg-primary/10 text-primary rounded-full text-sm font-medium">
+                        {getRoleLabel(profile?.role || '')}
+                      </span>
+                    </div>
                   </div>
                   {profile?.company && (
-                    <div>
-                      <p className="text-sm text-gray-500">소속</p>
-                      <p className="font-medium text-gray-900">{profile.company}</p>
+                    <div className="flex items-center gap-3">
+                      <Building2 className="w-5 h-5 text-muted-foreground" />
+                      <div>
+                        <p className="text-xs text-muted-foreground">소속</p>
+                        <p className="font-medium text-foreground">{profile.company}</p>
+                      </div>
                     </div>
                   )}
-                  <div>
-                    <p className="text-sm text-gray-500">가입일</p>
-                    <p className="font-medium text-gray-900">
-                      {profile?.createdAt && new Date(profile.createdAt).toLocaleDateString('ko-KR')}
-                    </p>
+                  <div className="flex items-center gap-3">
+                    <Calendar className="w-5 h-5 text-muted-foreground" />
+                    <div>
+                      <p className="text-xs text-muted-foreground">가입일</p>
+                      <p className="font-medium text-foreground">
+                        {profile?.createdAt && new Date(profile.createdAt).toLocaleDateString('ko-KR')}
+                      </p>
+                    </div>
                   </div>
                 </div>
               )}
@@ -302,121 +402,83 @@ export default function MyPage() {
           </div>
         </div>
 
-        {/* 구독 정보 */}
-        <div className="bg-white rounded-xl shadow p-6 mb-6">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-lg font-semibold text-gray-900">구독 정보</h2>
-            <Link href="/payment" className="text-sm text-blue-600 hover:underline">
-              구독 관리
-            </Link>
-          </div>
-
-          {subscription ? (
-            <div className="space-y-4">
-              <div className="flex items-center gap-3">
-                <div
-                  className={`w-3 h-3 rounded-full ${
-                    subscription.status === 'ACTIVE' ? 'bg-green-500' : 'bg-gray-400'
-                  }`}
-                ></div>
-                <span className="font-medium text-gray-900">
-                  {subscription.status === 'ACTIVE' ? '활성화됨' : '비활성화'}
-                </span>
-              </div>
-              <div className="grid md:grid-cols-3 gap-4">
-                <div className="p-4 bg-gray-50 rounded-lg">
-                  <p className="text-sm text-gray-500">구독 플랜</p>
-                  <p className="font-medium text-gray-900">
-                    {subscription.plan === 'monthly' ? '월간 구독' : '연간 구독'}
-                  </p>
-                </div>
-                <div className="p-4 bg-gray-50 rounded-lg">
-                  <p className="text-sm text-gray-500">만료일</p>
-                  <p className="font-medium text-gray-900">
-                    {new Date(subscription.expires_at).toLocaleDateString('ko-KR')}
-                  </p>
-                </div>
-                <div className="p-4 bg-gray-50 rounded-lg">
-                  <p className="text-sm text-gray-500">자동 결제</p>
-                  <p className="font-medium text-gray-900">
-                    {subscription.is_auto_renew ? '활성화' : '비활성화'}
-                  </p>
-                </div>
-              </div>
-            </div>
-          ) : (
-            <div className="text-center py-8">
-              <p className="text-gray-500 mb-4">활성화된 구독이 없습니다.</p>
-              <Link
-                href="/payment"
-                className="inline-block px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-              >
-                구독 시작하기
-              </Link>
-            </div>
-          )}
-        </div>
-
-        {/* 메뉴 */}
-        <div className="bg-white rounded-xl shadow overflow-hidden">
+        {/* Quick Menu */}
+        <div className="card overflow-hidden">
           <Link
-            href="/payment/history"
-            className="flex items-center justify-between px-6 py-4 hover:bg-gray-50 border-b"
+            href="/favorites"
+            className="flex items-center justify-between px-6 py-4 hover:bg-accent transition-colors border-b border-border"
           >
             <div className="flex items-center gap-3">
-              <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
-              </svg>
-              <span className="text-gray-900">결제 내역</span>
+              <Heart className="w-5 h-5 text-muted-foreground" />
+              <span className="text-foreground">찜한 매물</span>
             </div>
-            <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-            </svg>
-          </Link>
-
-          <Link
-            href="/alerts"
-            className="flex items-center justify-between px-6 py-4 hover:bg-gray-50 border-b"
-          >
-            <div className="flex items-center gap-3">
-              <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-              </svg>
-              <span className="text-gray-900">알림 설정</span>
-            </div>
-            <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-            </svg>
+            <ChevronRight className="w-5 h-5 text-muted-foreground" />
           </Link>
 
           <Link
             href="/simulate/history"
-            className="flex items-center justify-between px-6 py-4 hover:bg-gray-50 border-b"
+            className="flex items-center justify-between px-6 py-4 hover:bg-accent transition-colors border-b border-border"
           >
             <div className="flex items-center gap-3">
-              <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-              </svg>
-              <span className="text-gray-900">시뮬레이션 내역</span>
+              <BarChart3 className="w-5 h-5 text-muted-foreground" />
+              <span className="text-foreground">시뮬레이션 내역</span>
             </div>
-            <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-            </svg>
+            <ChevronRight className="w-5 h-5 text-muted-foreground" />
+          </Link>
+
+          <Link
+            href="/payment/history"
+            className="flex items-center justify-between px-6 py-4 hover:bg-accent transition-colors border-b border-border"
+          >
+            <div className="flex items-center gap-3">
+              <CreditCard className="w-5 h-5 text-muted-foreground" />
+              <span className="text-foreground">결제 내역</span>
+            </div>
+            <ChevronRight className="w-5 h-5 text-muted-foreground" />
+          </Link>
+
+          <Link
+            href="/alerts"
+            className="flex items-center justify-between px-6 py-4 hover:bg-accent transition-colors border-b border-border"
+          >
+            <div className="flex items-center gap-3">
+              <Bell className="w-5 h-5 text-muted-foreground" />
+              <span className="text-foreground">알림 설정</span>
+            </div>
+            <ChevronRight className="w-5 h-5 text-muted-foreground" />
+          </Link>
+
+          <Link
+            href="/settings"
+            className="flex items-center justify-between px-6 py-4 hover:bg-accent transition-colors border-b border-border"
+          >
+            <div className="flex items-center gap-3">
+              <Settings className="w-5 h-5 text-muted-foreground" />
+              <span className="text-foreground">설정</span>
+            </div>
+            <ChevronRight className="w-5 h-5 text-muted-foreground" />
           </Link>
 
           <button
             onClick={handleLogout}
-            className="w-full flex items-center justify-between px-6 py-4 hover:bg-gray-50 text-red-600"
+            className="w-full flex items-center justify-between px-6 py-4 hover:bg-accent transition-colors text-red-600"
           >
             <div className="flex items-center gap-3">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-              </svg>
+              <LogOut className="w-5 h-5" />
               <span>로그아웃</span>
             </div>
           </button>
         </div>
+
+        {/* Footer Links */}
+        <div className="mt-8 text-center space-x-4 text-sm text-muted-foreground">
+          <Link href="/terms" className="hover:text-foreground">이용약관</Link>
+          <span>|</span>
+          <Link href="/privacy" className="hover:text-foreground">개인정보처리방침</Link>
+          <span>|</span>
+          <Link href="/help" className="hover:text-foreground">고객센터</Link>
+        </div>
       </div>
     </div>
-  );
+  )
 }

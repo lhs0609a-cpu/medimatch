@@ -5,12 +5,13 @@
 - 증빙서류 업로드 및 검증
 - 관리자 승인 후 공개
 """
-from fastapi import APIRouter, Depends, HTTPException, status, Query, UploadFile, File
+from fastapi import APIRouter, Depends, HTTPException, status, Query, UploadFile, File, Body
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, and_, func
 from typing import Optional, List
 from uuid import UUID
 from datetime import datetime
+from pydantic import BaseModel, EmailStr
 
 from ..deps import get_db, get_current_active_user
 from ...core.security import get_current_user, TokenData
@@ -25,23 +26,84 @@ router = APIRouter()
 
 
 # ============================================================
+# Pydantic Schemas
+# ============================================================
+
+class LandlordListingCreate(BaseModel):
+    title: str
+    building_name: Optional[str] = None
+    address: str
+    latitude: Optional[float] = None
+    longitude: Optional[float] = None
+    region_code: Optional[str] = None
+    region_name: Optional[str] = None
+    floor: Optional[str] = None
+    area_pyeong: Optional[float] = None
+    area_m2: Optional[float] = None
+    rent_deposit: Optional[int] = None
+    rent_monthly: Optional[int] = None
+    maintenance_fee: Optional[int] = None
+    premium: Optional[int] = None
+    preferred_tenants: Optional[List[str]] = []
+    nearby_hospital_types: Optional[List[str]] = None
+    nearby_facilities: Optional[dict] = None
+    has_parking: Optional[bool] = False
+    parking_count: Optional[int] = None
+    has_elevator: Optional[bool] = False
+    building_age: Optional[int] = None
+    previous_use: Optional[str] = None
+    description: Optional[str] = None
+    features: Optional[List[str]] = None
+    images: Optional[List[str]] = None
+    contact_name: Optional[str] = None
+    contact_phone: Optional[str] = None
+    contact_email: Optional[str] = None
+    show_exact_address: Optional[bool] = False
+    show_contact: Optional[bool] = False
+
+
+class LandlordListingUpdate(BaseModel):
+    title: Optional[str] = None
+    building_name: Optional[str] = None
+    address: Optional[str] = None
+    floor: Optional[str] = None
+    area_pyeong: Optional[float] = None
+    rent_deposit: Optional[int] = None
+    rent_monthly: Optional[int] = None
+    maintenance_fee: Optional[int] = None
+    premium: Optional[int] = None
+    preferred_tenants: Optional[List[str]] = None
+    has_parking: Optional[bool] = None
+    parking_count: Optional[int] = None
+    has_elevator: Optional[bool] = None
+    building_age: Optional[int] = None
+    previous_use: Optional[str] = None
+    description: Optional[str] = None
+    features: Optional[List[str]] = None
+    images: Optional[List[str]] = None
+    contact_name: Optional[str] = None
+    contact_phone: Optional[str] = None
+    contact_email: Optional[str] = None
+    show_exact_address: Optional[bool] = None
+    show_contact: Optional[bool] = None
+
+
+class BuildingInquiryCreate(BaseModel):
+    message: str
+    inquiry_type: Optional[str] = "general"
+    inquirer_name: Optional[str] = None
+    inquirer_phone: Optional[str] = None
+    inquirer_email: Optional[str] = None
+    inquirer_clinic_type: Optional[str] = None
+
+
+# ============================================================
 # 건물주용 API
 # ============================================================
 
 @router.post("/listings", status_code=status.HTTP_201_CREATED)
 async def create_landlord_listing(
-    title: str,
-    address: str,
-    preferred_tenants: List[str] = Query(default=[]),
-    floor: Optional[str] = None,
-    area_pyeong: Optional[float] = None,
-    rent_deposit: Optional[int] = None,
-    rent_monthly: Optional[int] = None,
-    maintenance_fee: Optional[int] = None,
-    premium: Optional[int] = None,
-    has_parking: bool = False,
-    has_elevator: bool = False,
-    description: Optional[str] = None,
+    data: LandlordListingCreate,
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_active_user)
 ):
@@ -52,28 +114,42 @@ async def create_landlord_listing(
     관리자 승인 후 공개됩니다.
     """
     # 지역명 추출 (간단한 파싱)
-    region_name = " ".join(address.split()[:2]) if address else None
+    region_name = data.region_name or (" ".join(data.address.split()[:2]) if data.address else None)
 
     listing = LandlordListing(
         owner_id=current_user.id,
-        title=title,
-        address=address,
+        title=data.title,
+        building_name=data.building_name,
+        address=data.address,
+        latitude=data.latitude,
+        longitude=data.longitude,
+        region_code=data.region_code,
         region_name=region_name,
-        preferred_tenants=preferred_tenants,
-        floor=floor,
-        area_pyeong=area_pyeong,
-        rent_deposit=rent_deposit,
-        rent_monthly=rent_monthly,
-        maintenance_fee=maintenance_fee,
-        premium=premium,
-        has_parking=has_parking,
-        has_elevator=has_elevator,
-        description=description,
+        preferred_tenants=data.preferred_tenants or [],
+        floor=data.floor,
+        area_pyeong=data.area_pyeong,
+        area_m2=data.area_m2,
+        rent_deposit=data.rent_deposit,
+        rent_monthly=data.rent_monthly,
+        maintenance_fee=data.maintenance_fee,
+        premium=data.premium,
+        nearby_hospital_types=data.nearby_hospital_types,
+        nearby_facilities=data.nearby_facilities,
+        has_parking=data.has_parking or False,
+        parking_count=data.parking_count,
+        has_elevator=data.has_elevator or False,
+        building_age=data.building_age,
+        previous_use=data.previous_use,
+        description=data.description,
+        features=data.features,
+        images=data.images,
         status=LandlordListingStatus.DRAFT,
         verification_status=VerificationStatus.PENDING,
-        contact_name=current_user.full_name if hasattr(current_user, 'name') else None,
-        contact_phone=current_user.phone if hasattr(current_user, 'phone') else None,
-        contact_email=current_user.email,
+        contact_name=data.contact_name or (current_user.full_name if hasattr(current_user, 'full_name') else None),
+        contact_phone=data.contact_phone or (current_user.phone if hasattr(current_user, 'phone') else None),
+        contact_email=data.contact_email or current_user.email,
+        show_exact_address=data.show_exact_address or False,
+        show_contact=data.show_contact or False,
     )
 
     db.add(listing)
@@ -170,18 +246,7 @@ async def get_landlord_listing(
 @router.patch("/listings/{listing_id}")
 async def update_landlord_listing(
     listing_id: UUID,
-    title: Optional[str] = None,
-    address: Optional[str] = None,
-    floor: Optional[str] = None,
-    area_pyeong: Optional[float] = None,
-    rent_deposit: Optional[int] = None,
-    rent_monthly: Optional[int] = None,
-    maintenance_fee: Optional[int] = None,
-    premium: Optional[int] = None,
-    has_parking: Optional[bool] = None,
-    has_elevator: Optional[bool] = None,
-    description: Optional[str] = None,
-    preferred_tenants: Optional[List[str]] = Query(None),
+    data: LandlordListingUpdate,
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_active_user)
 ):
@@ -200,43 +265,65 @@ async def update_landlord_listing(
     # 승인된 매물은 일부 필드만 수정 가능
     if listing.status == LandlordListingStatus.ACTIVE:
         # 가격과 설명만 수정 가능
-        if rent_deposit is not None:
-            listing.rent_deposit = rent_deposit
-        if rent_monthly is not None:
-            listing.rent_monthly = rent_monthly
-        if maintenance_fee is not None:
-            listing.maintenance_fee = maintenance_fee
-        if premium is not None:
-            listing.premium = premium
-        if description is not None:
-            listing.description = description
+        if data.rent_deposit is not None:
+            listing.rent_deposit = data.rent_deposit
+        if data.rent_monthly is not None:
+            listing.rent_monthly = data.rent_monthly
+        if data.maintenance_fee is not None:
+            listing.maintenance_fee = data.maintenance_fee
+        if data.premium is not None:
+            listing.premium = data.premium
+        if data.description is not None:
+            listing.description = data.description
     else:
         # DRAFT 상태에서는 모든 필드 수정 가능
-        if title is not None:
-            listing.title = title
-        if address is not None:
-            listing.address = address
-            listing.region_name = " ".join(address.split()[:2])
-        if floor is not None:
-            listing.floor = floor
-        if area_pyeong is not None:
-            listing.area_pyeong = area_pyeong
-        if rent_deposit is not None:
-            listing.rent_deposit = rent_deposit
-        if rent_monthly is not None:
-            listing.rent_monthly = rent_monthly
-        if maintenance_fee is not None:
-            listing.maintenance_fee = maintenance_fee
-        if premium is not None:
-            listing.premium = premium
-        if has_parking is not None:
-            listing.has_parking = has_parking
-        if has_elevator is not None:
-            listing.has_elevator = has_elevator
-        if description is not None:
-            listing.description = description
-        if preferred_tenants is not None:
-            listing.preferred_tenants = preferred_tenants
+        if data.title is not None:
+            listing.title = data.title
+        if data.building_name is not None:
+            listing.building_name = data.building_name
+        if data.address is not None:
+            listing.address = data.address
+            listing.region_name = " ".join(data.address.split()[:2])
+        if data.floor is not None:
+            listing.floor = data.floor
+        if data.area_pyeong is not None:
+            listing.area_pyeong = data.area_pyeong
+        if data.rent_deposit is not None:
+            listing.rent_deposit = data.rent_deposit
+        if data.rent_monthly is not None:
+            listing.rent_monthly = data.rent_monthly
+        if data.maintenance_fee is not None:
+            listing.maintenance_fee = data.maintenance_fee
+        if data.premium is not None:
+            listing.premium = data.premium
+        if data.has_parking is not None:
+            listing.has_parking = data.has_parking
+        if data.parking_count is not None:
+            listing.parking_count = data.parking_count
+        if data.has_elevator is not None:
+            listing.has_elevator = data.has_elevator
+        if data.building_age is not None:
+            listing.building_age = data.building_age
+        if data.previous_use is not None:
+            listing.previous_use = data.previous_use
+        if data.description is not None:
+            listing.description = data.description
+        if data.features is not None:
+            listing.features = data.features
+        if data.images is not None:
+            listing.images = data.images
+        if data.preferred_tenants is not None:
+            listing.preferred_tenants = data.preferred_tenants
+        if data.contact_name is not None:
+            listing.contact_name = data.contact_name
+        if data.contact_phone is not None:
+            listing.contact_phone = data.contact_phone
+        if data.contact_email is not None:
+            listing.contact_email = data.contact_email
+        if data.show_exact_address is not None:
+            listing.show_exact_address = data.show_exact_address
+        if data.show_contact is not None:
+            listing.show_contact = data.show_contact
 
     listing.updated_at = datetime.utcnow()
     await db.commit()
@@ -611,9 +698,7 @@ async def get_building_detail(
 @router.post("/buildings/{listing_id}/inquire")
 async def inquire_building(
     listing_id: UUID,
-    message: str,
-    inquiry_type: str = "general",
-    clinic_type: Optional[str] = None,
+    data: BuildingInquiryCreate,
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_active_user)
 ):
@@ -637,12 +722,12 @@ async def inquire_building(
     inquiry = LandlordInquiry(
         listing_id=listing_id,
         user_id=current_user.id,
-        message=message,
-        inquiry_type=inquiry_type,
-        inquirer_name=current_user.full_name if hasattr(current_user, 'name') else None,
-        inquirer_phone=current_user.phone if hasattr(current_user, 'phone') else None,
-        inquirer_email=current_user.email,
-        inquirer_clinic_type=clinic_type,
+        message=data.message,
+        inquiry_type=data.inquiry_type or "general",
+        inquirer_name=data.inquirer_name or (current_user.full_name if hasattr(current_user, 'full_name') else None),
+        inquirer_phone=data.inquirer_phone or (current_user.phone if hasattr(current_user, 'phone') else None),
+        inquirer_email=data.inquirer_email or current_user.email,
+        inquirer_clinic_type=data.inquirer_clinic_type,
     )
 
     db.add(inquiry)

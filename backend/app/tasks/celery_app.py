@@ -20,6 +20,7 @@ celery_app = Celery(
         "app.tasks.realestate_tasks",
         "app.tasks.prospect_tasks",
         "app.tasks.campaign_tasks",
+        "app.tasks.sales_match_tasks",
     ]
 )
 
@@ -89,5 +90,17 @@ celery_app.conf.beat_schedule = {
     "daily-campaign-stats": {
         "task": "app.tasks.campaign_tasks.get_campaign_stats",
         "schedule": crontab(hour=18, minute=0),
+    },
+
+    # ===== 영업사원 매칭 =====
+    # 매 시간: 48시간 초과 매칭 요청 자동 만료 및 환불
+    "expire-pending-match-requests": {
+        "task": "app.tasks.sales_match_tasks.expire_pending_match_requests",
+        "schedule": crontab(minute=0),  # 매 정시
+    },
+    # 매 6시간: 매칭 요청 응답 리마인더 발송 (24시간 경과 건)
+    "match-request-reminder": {
+        "task": "app.tasks.sales_match_tasks.send_match_request_reminder",
+        "schedule": crontab(hour="*/6", minute=30),
     },
 }

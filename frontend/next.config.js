@@ -11,6 +11,14 @@ const nextConfig = {
         protocol: 'https',
         hostname: 'medimatch-files.s3.ap-northeast-2.amazonaws.com',
       },
+      {
+        protocol: 'https',
+        hostname: 'images.unsplash.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'source.unsplash.com',
+      },
     ],
   },
   async rewrites() {

@@ -238,6 +238,120 @@ export default function SuccessFeePage() {
           </div>
         </div>
 
+        {/* 청구 프로세스 안내 */}
+        <div className="card p-6 mb-6">
+          <h2 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
+            <Shield className="w-5 h-5 text-primary" />
+            성사 보수 청구 프로세스
+          </h2>
+
+          {/* Timeline */}
+          <div className="relative">
+            {/* Timeline line */}
+            <div className="absolute left-4 top-8 bottom-8 w-0.5 bg-border" />
+
+            <div className="space-y-6">
+              {/* Step 1 */}
+              <div className="flex gap-4">
+                <div className="w-8 h-8 rounded-full bg-green-100 dark:bg-green-900/50 flex items-center justify-center flex-shrink-0 relative z-10">
+                  <CheckCircle className="w-4 h-4 text-green-600" />
+                </div>
+                <div className="flex-1 pb-2">
+                  <h4 className="font-medium text-foreground">1단계: 매물 매칭 및 상담</h4>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    메디플라톤에서 매물을 찾고 양도인/양수인 간 상담을 진행합니다.
+                  </p>
+                  <span className="inline-block mt-2 px-2 py-1 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 text-xs rounded-full">완료</span>
+                </div>
+              </div>
+
+              {/* Step 2 */}
+              <div className="flex gap-4">
+                <div className="w-8 h-8 rounded-full bg-green-100 dark:bg-green-900/50 flex items-center justify-center flex-shrink-0 relative z-10">
+                  <CheckCircle className="w-4 h-4 text-green-600" />
+                </div>
+                <div className="flex-1 pb-2">
+                  <h4 className="font-medium text-foreground">2단계: 양도양수 계약 체결</h4>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    양측이 계약 조건에 합의하고 정식 계약서를 작성합니다.
+                  </p>
+                  <span className="inline-block mt-2 px-2 py-1 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 text-xs rounded-full">완료</span>
+                </div>
+              </div>
+
+              {/* Step 3 */}
+              <div className="flex gap-4">
+                <div className="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center flex-shrink-0 relative z-10 ring-2 ring-blue-500">
+                  <span className="text-sm font-bold text-blue-600">3</span>
+                </div>
+                <div className="flex-1 pb-2">
+                  <h4 className="font-medium text-foreground">3단계: 계약 확인 및 성사 보수 청구 <span className="text-primary">(현재 단계)</span></h4>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    메디플라톤에서 계약서 사본 또는 거래 증빙을 확인 후, 성사 보수를 청구합니다.
+                  </p>
+                  <div className="mt-2 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg text-sm">
+                    <p className="font-medium text-blue-700 dark:text-blue-400">청구 조건:</p>
+                    <ul className="mt-1 space-y-1 text-blue-600 dark:text-blue-300">
+                      <li>• 양도양수 계약서 체결 확인</li>
+                      <li>• 계약금 입금 확인 (선택)</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
+              {/* Step 4 */}
+              <div className="flex gap-4">
+                <div className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center flex-shrink-0 relative z-10">
+                  <span className="text-sm font-bold text-muted-foreground">4</span>
+                </div>
+                <div className="flex-1">
+                  <h4 className="font-medium text-muted-foreground">4단계: 결제 완료 및 거래 종료</h4>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    성사 보수 결제 후 거래가 완료 처리됩니다.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* 환불 및 이의제기 안내 */}
+        <div className="card p-6 mb-6 border-2 border-blue-200 dark:border-blue-800">
+          <h3 className="font-semibold text-foreground mb-3 flex items-center gap-2">
+            <Shield className="w-5 h-5 text-blue-600" />
+            환불 및 이의제기 정책
+          </h3>
+          <div className="space-y-4 text-sm">
+            <div className="flex gap-3">
+              <div className="w-6 h-6 rounded-full bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center flex-shrink-0">
+                <span className="text-xs font-bold text-blue-600">1</span>
+              </div>
+              <div>
+                <p className="font-medium text-foreground">계약 무효 시 전액 환불</p>
+                <p className="text-muted-foreground">계약이 법적으로 무효가 된 경우, 증빙 서류 제출 후 전액 환불됩니다.</p>
+              </div>
+            </div>
+            <div className="flex gap-3">
+              <div className="w-6 h-6 rounded-full bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center flex-shrink-0">
+                <span className="text-xs font-bold text-blue-600">2</span>
+              </div>
+              <div>
+                <p className="font-medium text-foreground">계약 해제 시 부분 환불</p>
+                <p className="text-muted-foreground">결제일로부터 14일 이내 계약 해제 시 50% 환불됩니다.</p>
+              </div>
+            </div>
+            <div className="flex gap-3">
+              <div className="w-6 h-6 rounded-full bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center flex-shrink-0">
+                <span className="text-xs font-bold text-blue-600">3</span>
+              </div>
+              <div>
+                <p className="font-medium text-foreground">이의제기 절차</p>
+                <p className="text-muted-foreground">청구 금액에 이의가 있을 경우, 결제 전 고객센터로 문의해주세요.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* Notice */}
         <div className="card p-6 mb-6 bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-800">
           <div className="flex gap-3">
@@ -245,10 +359,10 @@ export default function SuccessFeePage() {
             <div>
               <h3 className="font-medium text-foreground mb-2">결제 전 확인사항</h3>
               <ul className="space-y-1 text-sm text-muted-foreground">
-                <li>• 성사 보수는 양도양수 계약 체결 확인 후 청구됩니다</li>
-                <li>• 계약 취소 시 결제일로부터 7일 이내 환불 가능합니다</li>
-                <li>• 세금계산서 발행이 필요하시면 고객센터로 문의해주세요</li>
-                <li>• 결제 완료 후 거래 완료 처리됩니다</li>
+                <li>• 성사 보수는 양도양수 <strong>계약 체결 확인 후</strong>에만 청구됩니다</li>
+                <li>• 계약 무효 시 전액 환불, 해제 시 14일 이내 50% 환불</li>
+                <li>• 세금계산서 발행은 결제 완료 후 자동 발행됩니다</li>
+                <li>• 청구 금액에 이의가 있으시면 결제 전 고객센터로 문의해주세요</li>
               </ul>
             </div>
           </div>

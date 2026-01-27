@@ -486,6 +486,7 @@ export const paymentService = {
     product_id: string
     product_name: string
     amount: number
+    metadata?: Record<string, any>
   }) => {
     const response = await apiClient.post('/payments/prepare', data)
     return response.data
@@ -519,6 +520,56 @@ export const paymentService = {
 
   getCredits: async () => {
     const response = await apiClient.get('/payments/credits')
+    return response.data
+  },
+
+  // 구독 플랜 목록
+  getSubscriptionPlans: async () => {
+    const response = await apiClient.get('/payments/subscription-plans')
+    return response.data
+  },
+
+  // 구독 시작
+  startSubscription: async (data: {
+    plan_id: string
+    billing_cycle: 'monthly' | 'yearly'
+    payment_method: string
+  }) => {
+    const response = await apiClient.post('/payments/subscription/start', data)
+    return response.data
+  },
+
+  // 구독 취소
+  cancelSubscription: async (reason?: string) => {
+    const response = await apiClient.post('/payments/subscription/cancel', { reason })
+    return response.data
+  },
+
+  // 구독 플랜 변경
+  changeSubscriptionPlan: async (newPlanId: string) => {
+    const response = await apiClient.post('/payments/subscription/change', {
+      new_plan_id: newPlanId,
+    })
+    return response.data
+  },
+
+  // 시뮬레이션 결과 잠금해제 결제
+  unlockSimulation: async (simulationId: string) => {
+    const response = await apiClient.post('/payments/simulation/unlock', {
+      simulation_id: simulationId,
+    })
+    return response.data
+  },
+
+  // 단건 결제 (시뮬레이션 등)
+  createOneTimePayment: async (data: {
+    product_type: 'simulation_unlock' | 'report_purchase' | 'matching_request'
+    reference_id: string
+    amount: number
+    success_url: string
+    fail_url: string
+  }) => {
+    const response = await apiClient.post('/payments/one-time', data)
     return response.data
   },
 }
@@ -1029,13 +1080,13 @@ export const buildingsService = {
     page?: number
     page_size?: number
   }) => {
-    const response = await apiClient.get('/buildings', { params })
+    const response = await apiClient.get('/landlord/buildings', { params })
     return response.data
   },
 
   // 건물 상세
   getBuilding: async (id: string) => {
-    const response = await apiClient.get(`/buildings/${id}`)
+    const response = await apiClient.get(`/landlord/buildings/${id}`)
     return response.data
   },
 
@@ -1048,13 +1099,13 @@ export const buildingsService = {
     inquirer_email?: string
     inquirer_clinic_type?: string
   }) => {
-    const response = await apiClient.post(`/buildings/${buildingId}/inquire`, data)
+    const response = await apiClient.post(`/landlord/buildings/${buildingId}/inquire`, data)
     return response.data
   },
 
   // 내 문의 목록
   getMyInquiries: async () => {
-    const response = await apiClient.get('/buildings/inquiries/my')
+    const response = await apiClient.get('/landlord/inquiries/my')
     return response.data
   },
 }

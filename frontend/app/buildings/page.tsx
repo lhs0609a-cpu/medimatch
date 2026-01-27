@@ -5,13 +5,25 @@ import Link from 'next/link'
 import {
   Building2, MapPin, Search, Filter, Eye, MessageSquare,
   Car, Layers, CheckCircle, Lock, TrendingUp, Phone, ArrowLeft,
-  Flame, Clock, Users, Zap, Bell
+  Flame, Clock, Users, Zap, Bell, X, ArrowUpDown, ChevronDown
 } from 'lucide-react'
+import Image from 'next/image'
 import { generateBuildingListings, generateActivityFeed, platformStats, type BuildingListing } from '@/lib/data/seedListings'
+import { buildingListingImages } from '@/components/BlurredListingImage'
 
 // 시드 데이터 생성 (클라이언트에서 한 번만)
 const allListings = generateBuildingListings(120)
 const activityFeed = generateActivityFeed(20)
+
+type SortOption = 'latest' | 'popular' | 'priceAsc' | 'priceDesc' | 'inquiry'
+
+const sortOptions: { value: SortOption; label: string }[] = [
+  { value: 'latest', label: '최신순' },
+  { value: 'popular', label: '인기순' },
+  { value: 'priceAsc', label: '월세 낮은순' },
+  { value: 'priceDesc', label: '월세 높은순' },
+  { value: 'inquiry', label: '문의 많은순' },
+]
 
 export default function BuildingsPage() {
   const [filters, setFilters] = useState({
@@ -21,10 +33,42 @@ export default function BuildingsPage() {
     hasParking: false,
     hasElevator: false,
   })
+  const [sortBy, setSortBy] = useState<SortOption>('latest')
   const [showFilters, setShowFilters] = useState(false)
+  const [showSortMenu, setShowSortMenu] = useState(false)
   const [showInquiryModal, setShowInquiryModal] = useState(false)
   const [selectedListing, setSelectedListing] = useState<BuildingListing | null>(null)
   const [currentActivityIndex, setCurrentActivityIndex] = useState(0)
+
+  // 적용된 필터 개수 계산
+  const activeFilterCount = useMemo(() => {
+    let count = 0
+    if (filters.region) count++
+    if (filters.maxRent) count++
+    if (filters.preferredTenant) count++
+    if (filters.hasParking) count++
+    if (filters.hasElevator) count++
+    return count
+  }, [filters])
+
+  // 필터 초기화
+  const resetFilters = () => {
+    setFilters({
+      region: '',
+      maxRent: '',
+      preferredTenant: '',
+      hasParking: false,
+      hasElevator: false,
+    })
+  }
+
+  // 개별 필터 제거
+  const removeFilter = (key: keyof typeof filters) => {
+    setFilters(prev => ({
+      ...prev,
+      [key]: typeof prev[key] === 'boolean' ? false : '',
+    }))
+  }
 
   // 실시간 활동 피드 롤링
   useEffect(() => {
@@ -34,9 +78,9 @@ export default function BuildingsPage() {
     return () => clearInterval(interval)
   }, [])
 
-  // 필터링된 매물
+  // 필터링 및 정렬된 매물
   const filteredListings = useMemo(() => {
-    return allListings.filter(listing => {
+    let result = allListings.filter(listing => {
       if (filters.region && !listing.region.includes(filters.region) && !listing.address.includes(filters.region)) {
         return false
       }
@@ -54,7 +98,30 @@ export default function BuildingsPage() {
       }
       return true
     })
-  }, [filters])
+
+    // 정렬 적용
+    switch (sortBy) {
+      case 'popular':
+        result = [...result].sort((a, b) => b.viewCount - a.viewCount)
+        break
+      case 'priceAsc':
+        result = [...result].sort((a, b) => a.monthlyRent - b.monthlyRent)
+        break
+      case 'priceDesc':
+        result = [...result].sort((a, b) => b.monthlyRent - a.monthlyRent)
+        break
+      case 'inquiry':
+        result = [...result].sort((a, b) => b.inquiryCount - a.inquiryCount)
+        break
+      case 'latest':
+      default:
+        // 기본값: ID 기준 (최신순 가정)
+        result = [...result].sort((a, b) => b.id.localeCompare(a.id))
+        break
+    }
+
+    return result
+  }, [filters, sortBy])
 
   const formatCurrency = (value: number) => {
     if (value >= 10000) {
@@ -206,14 +273,104 @@ export default function BuildingsPage() {
       </header>
 
       <main className="container mx-auto px-4 py-6">
-        {/* Results Count */}
+        {/* Active Filter Chips */}
+        {activeFilterCount > 0 && (
+          <div className="mb-4 flex flex-wrap items-center gap-2">
+            <span className="text-sm text-muted-foreground">적용된 필터:</span>
+            {filters.region && (
+              <span className="inline-flex items-center gap-1 px-3 py-1 bg-primary/10 text-primary text-sm rounded-full">
+                지역: {filters.region}
+                <button onClick={() => removeFilter('region')} className="hover:bg-primary/20 rounded-full p-0.5">
+                  <X className="w-3 h-3" />
+                </button>
+              </span>
+            )}
+            {filters.maxRent && (
+              <span className="inline-flex items-center gap-1 px-3 py-1 bg-primary/10 text-primary text-sm rounded-full">
+                월세 {filters.maxRent}만원 이하
+                <button onClick={() => removeFilter('maxRent')} className="hover:bg-primary/20 rounded-full p-0.5">
+                  <X className="w-3 h-3" />
+                </button>
+              </span>
+            )}
+            {filters.preferredTenant && (
+              <span className="inline-flex items-center gap-1 px-3 py-1 bg-primary/10 text-primary text-sm rounded-full">
+                {filters.preferredTenant}
+                <button onClick={() => removeFilter('preferredTenant')} className="hover:bg-primary/20 rounded-full p-0.5">
+                  <X className="w-3 h-3" />
+                </button>
+              </span>
+            )}
+            {filters.hasParking && (
+              <span className="inline-flex items-center gap-1 px-3 py-1 bg-primary/10 text-primary text-sm rounded-full">
+                주차 가능
+                <button onClick={() => removeFilter('hasParking')} className="hover:bg-primary/20 rounded-full p-0.5">
+                  <X className="w-3 h-3" />
+                </button>
+              </span>
+            )}
+            {filters.hasElevator && (
+              <span className="inline-flex items-center gap-1 px-3 py-1 bg-primary/10 text-primary text-sm rounded-full">
+                엘리베이터
+                <button onClick={() => removeFilter('hasElevator')} className="hover:bg-primary/20 rounded-full p-0.5">
+                  <X className="w-3 h-3" />
+                </button>
+              </span>
+            )}
+            <button
+              onClick={resetFilters}
+              className="text-sm text-muted-foreground hover:text-foreground"
+            >
+              전체 초기화
+            </button>
+          </div>
+        )}
+
+        {/* Results Count & Sort */}
         <div className="mb-4 flex items-center justify-between">
           <p className="text-sm text-muted-foreground">
             총 <span className="font-semibold text-primary">{filteredListings.length}</span>개의 매물
           </p>
-          <p className="text-xs text-muted-foreground">
-            상세 정보 확인은 문의 후 가능합니다
-          </p>
+          <div className="flex items-center gap-3">
+            <p className="text-xs text-muted-foreground hidden sm:block">
+              상세 정보 확인은 문의 후 가능합니다
+            </p>
+            {/* Sort Dropdown */}
+            <div className="relative">
+              <button
+                onClick={() => setShowSortMenu(!showSortMenu)}
+                className="flex items-center gap-2 px-3 py-1.5 bg-secondary text-sm rounded-lg hover:bg-secondary/80 transition-colors"
+              >
+                <ArrowUpDown className="w-4 h-4" />
+                {sortOptions.find(o => o.value === sortBy)?.label}
+                <ChevronDown className={`w-4 h-4 transition-transform ${showSortMenu ? 'rotate-180' : ''}`} />
+              </button>
+              {showSortMenu && (
+                <>
+                  <div
+                    className="fixed inset-0 z-10"
+                    onClick={() => setShowSortMenu(false)}
+                  />
+                  <div className="absolute right-0 mt-2 w-40 bg-card border border-border rounded-lg shadow-lg z-20 py-1">
+                    {sortOptions.map(option => (
+                      <button
+                        key={option.value}
+                        onClick={() => {
+                          setSortBy(option.value)
+                          setShowSortMenu(false)
+                        }}
+                        className={`w-full text-left px-4 py-2 text-sm hover:bg-secondary transition-colors ${
+                          sortBy === option.value ? 'text-primary font-medium' : 'text-foreground'
+                        }`}
+                      >
+                        {option.label}
+                      </button>
+                    ))}
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
         </div>
 
         {/* Listings Grid */}
@@ -223,11 +380,18 @@ export default function BuildingsPage() {
               key={listing.id}
               className="card card-interactive overflow-hidden"
             >
-              {/* Image */}
+              {/* Image - 블러 처리된 실제 건물 사진 */}
               <div className="h-40 bg-gradient-to-br from-blue-100 to-cyan-100 dark:from-blue-900/30 dark:to-cyan-900/30 relative overflow-hidden">
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <Building2 className="w-16 h-16 text-blue-200 dark:text-blue-800" />
-                </div>
+                {/* 실제 건물 이미지 (블러 처리) */}
+                <Image
+                  src={buildingListingImages[listing.thumbnailIndex % buildingListingImages.length]}
+                  alt={listing.title}
+                  fill
+                  className="object-cover blur-md scale-110"
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                />
+                {/* 블러 오버레이 */}
+                <div className="absolute inset-0 bg-black/10" />
 
                 {/* Badge Stack - Top Left */}
                 <div className="absolute top-2 left-2 flex flex-col gap-1">

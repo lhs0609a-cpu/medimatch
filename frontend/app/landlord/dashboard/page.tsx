@@ -48,6 +48,9 @@ const mockListings = [
   },
 ]
 
+// 매칭 요청 만료 기한: 7일
+const MATCHING_EXPIRY_DAYS = 7
+
 const mockMatches = [
   {
     id: '1',
@@ -58,6 +61,8 @@ const mockMatches = [
     phone: '010-****-5678',
     status: 'accepted',  // 매칭 수락됨 - 연락처 공개
     matchedAt: '2024-01-24',
+    expiresAt: null,  // 수락된 매칭은 만료 없음
+    creditRestored: false,
   },
   {
     id: '2',
@@ -68,6 +73,8 @@ const mockMatches = [
     phone: null,  // 대기 중 - 연락처 비공개
     status: 'pending',
     matchedAt: '2024-01-22',
+    expiresAt: '2024-01-29',  // 7일 후 만료
+    creditRestored: false,
   },
   {
     id: '3',
@@ -78,8 +85,31 @@ const mockMatches = [
     phone: '010-****-9012',
     status: 'accepted',
     matchedAt: '2024-01-20',
+    expiresAt: null,
+    creditRestored: false,
+  },
+  {
+    id: '4',
+    type: 'doctor',
+    name: '최OO',
+    specialty: '피부과',
+    region: '서울 서초구',
+    phone: null,
+    status: 'expired',  // 만료됨
+    matchedAt: '2024-01-10',
+    expiresAt: '2024-01-17',
+    creditRestored: true,  // 크레딧 복원됨
   },
 ]
+
+// 남은 만료 시간 계산
+function getRemainingDays(expiresAt: string | null): number | null {
+  if (!expiresAt) return null
+  const now = new Date()
+  const expiry = new Date(expiresAt)
+  const diff = expiry.getTime() - now.getTime()
+  return Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24)))
+}
 
 const mockActivities = [
   { type: 'view', message: '강남역 메디컬빌딩 2층 매물을 내과 개원 준비 의사가 조회했습니다', time: '10분 전' },
@@ -389,62 +419,145 @@ export default function LandlordDashboardPage() {
               </Link>
             </div>
 
+            {/* 매칭 정책 안내 */}
             <div className="card p-4 mb-4 bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800">
-              <p className="text-sm text-blue-700 dark:text-blue-400">
-                <strong>양방향 동의 매칭:</strong> 내 매물에 관심 표시한 회원에게 매칭 요청을 보내면,
-                상대방이 수락해야만 연락처가 공개됩니다.
-              </p>
+              <h4 className="font-medium text-blue-800 dark:text-blue-300 mb-2">양방향 동의 매칭 정책</h4>
+              <ul className="text-sm text-blue-700 dark:text-blue-400 space-y-1">
+                <li>• 내 매물에 관심 표시한 회원에게 매칭 요청을 보내면, <strong>상대방이 수락해야만</strong> 연락처가 공개됩니다.</li>
+                <li>• 매칭 요청은 <strong>{MATCHING_EXPIRY_DAYS}일 후 자동 만료</strong>됩니다.</li>
+                <li>• 만료 시 <strong>매칭 요청권이 자동 복원</strong>됩니다.</li>
+              </ul>
             </div>
 
-            {mockMatches.map((match) => (
-              <div key={match.id} className="card p-5">
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                  <div className="flex items-center gap-4">
-                    <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
-                      match.type === 'doctor'
-                        ? 'bg-blue-100 dark:bg-blue-900/30'
-                        : 'bg-purple-100 dark:bg-purple-900/30'
-                    }`}>
-                      <Users className={`w-6 h-6 ${
-                        match.type === 'doctor' ? 'text-blue-600' : 'text-purple-600'
-                      }`} />
-                    </div>
-                    <div>
-                      <div className="flex items-center gap-2 mb-1">
-                        <h3 className="font-semibold text-foreground">{match.name}</h3>
-                        <span className={`px-2 py-0.5 text-xs rounded-full ${matchStatusLabels[match.status as keyof typeof matchStatusLabels].style}`}>
-                          {matchStatusLabels[match.status as keyof typeof matchStatusLabels].label}
-                        </span>
-                      </div>
-                      <p className="text-sm text-muted-foreground">
-                        {match.type === 'doctor' ? '의사' : '약사'} · {match.specialty} · {match.region}
-                      </p>
-                      <p className="text-xs text-muted-foreground mt-1">
-                        매칭 요청일: {match.matchedAt}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    {match.status === 'accepted' && match.phone ? (
-                      <a
-                        href={`tel:${match.phone}`}
-                        className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90"
-                      >
-                        <Phone className="w-4 h-4" />
-                        연락하기
-                      </a>
-                    ) : (
-                      <span className="px-4 py-2 bg-secondary text-muted-foreground rounded-lg text-sm">
-                        수락 대기 중
-                      </span>
-                    )}
-                    <button className="px-4 py-2 bg-secondary text-secondary-foreground rounded-lg hover:bg-secondary/80">
-                      메모
-                    </button>
+            {/* 크레딧 복원 알림 */}
+            {mockMatches.some(m => m.creditRestored) && (
+              <div className="card p-4 mb-4 bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800">
+                <div className="flex items-center gap-3">
+                  <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />
+                  <div>
+                    <p className="font-medium text-green-800 dark:text-green-300">요청권이 복원되었습니다</p>
+                    <p className="text-sm text-green-700 dark:text-green-400">
+                      응답 없이 만료된 매칭 요청 {mockMatches.filter(m => m.creditRestored).length}건의 요청권이 자동으로 복원되었습니다.
+                    </p>
                   </div>
                 </div>
               </div>
-            ))}
+            )}
+
+            {mockMatches.map((match) => {
+              const remainingDays = getRemainingDays(match.expiresAt)
+              const isExpiringSoon = remainingDays !== null && remainingDays <= 2
+
+              return (
+                <div key={match.id} className={`card p-5 ${match.status === 'expired' ? 'opacity-60' : ''}`}>
+                  <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div className="flex items-center gap-4">
+                      <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
+                        match.status === 'expired'
+                          ? 'bg-gray-100 dark:bg-gray-900/30'
+                          : match.type === 'doctor'
+                            ? 'bg-blue-100 dark:bg-blue-900/30'
+                            : 'bg-purple-100 dark:bg-purple-900/30'
+                      }`}>
+                        <Users className={`w-6 h-6 ${
+                          match.status === 'expired'
+                            ? 'text-gray-500'
+                            : match.type === 'doctor' ? 'text-blue-600' : 'text-purple-600'
+                        }`} />
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-2 mb-1 flex-wrap">
+                          <h3 className="font-semibold text-foreground">{match.name}</h3>
+                          <span className={`px-2 py-0.5 text-xs rounded-full ${matchStatusLabels[match.status as keyof typeof matchStatusLabels].style}`}>
+                            {matchStatusLabels[match.status as keyof typeof matchStatusLabels].label}
+                          </span>
+                          {match.creditRestored && (
+                            <span className="px-2 py-0.5 text-xs rounded-full bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400">
+                              요청권 복원됨
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-sm text-muted-foreground">
+                          {match.type === 'doctor' ? '의사' : '약사'} · {match.specialty} · {match.region}
+                        </p>
+                        <div className="flex items-center gap-3 mt-1">
+                          <p className="text-xs text-muted-foreground">
+                            매칭 요청일: {match.matchedAt}
+                          </p>
+                          {match.status === 'pending' && remainingDays !== null && (
+                            <p className={`text-xs flex items-center gap-1 ${
+                              isExpiringSoon ? 'text-red-600 font-medium' : 'text-muted-foreground'
+                            }`}>
+                              <Clock className="w-3 h-3" />
+                              {remainingDays === 0 ? '오늘 만료' : `${remainingDays}일 후 만료`}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      {match.status === 'accepted' && match.phone ? (
+                        <a
+                          href={`tel:${match.phone}`}
+                          className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90"
+                        >
+                          <Phone className="w-4 h-4" />
+                          연락하기
+                        </a>
+                      ) : match.status === 'pending' ? (
+                        <div className="flex items-center gap-2">
+                          <span className="px-4 py-2 bg-secondary text-muted-foreground rounded-lg text-sm flex items-center gap-2">
+                            <Clock className="w-4 h-4" />
+                            수락 대기 중
+                          </span>
+                          {isExpiringSoon && (
+                            <span className="px-3 py-1 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 text-xs rounded-full">
+                              만료 임박
+                            </span>
+                          )}
+                        </div>
+                      ) : match.status === 'expired' ? (
+                        <span className="px-4 py-2 bg-secondary text-muted-foreground rounded-lg text-sm">
+                          만료됨
+                        </span>
+                      ) : (
+                        <span className="px-4 py-2 bg-secondary text-muted-foreground rounded-lg text-sm">
+                          거절됨
+                        </span>
+                      )}
+                      <button className="px-4 py-2 bg-secondary text-secondary-foreground rounded-lg hover:bg-secondary/80">
+                        메모
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* 만료 경고 배너 */}
+                  {match.status === 'pending' && isExpiringSoon && (
+                    <div className="mt-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+                      <p className="text-sm text-red-700 dark:text-red-400">
+                        <AlertCircle className="w-4 h-4 inline mr-1" />
+                        이 매칭 요청은 <strong>{remainingDays === 0 ? '오늘' : `${remainingDays}일 후`}</strong> 만료됩니다.
+                        만료 시 요청권이 자동 복원됩니다.
+                      </p>
+                    </div>
+                  )}
+                </div>
+              )
+            })}
+
+            {/* 만료 정책 안내 */}
+            <div className="card p-4 bg-secondary/50">
+              <h4 className="font-medium text-foreground mb-2 flex items-center gap-2">
+                <AlertCircle className="w-4 h-4 text-primary" />
+                매칭 요청권 복원 정책
+              </h4>
+              <ul className="text-sm text-muted-foreground space-y-1">
+                <li>• 매칭 요청 후 {MATCHING_EXPIRY_DAYS}일간 응답이 없으면 자동으로 만료됩니다.</li>
+                <li>• 만료된 매칭 요청의 요청권은 <strong>자동으로 복원</strong>됩니다.</li>
+                <li>• 상대방이 거절한 경우에는 요청권이 복원되지 않습니다.</li>
+                <li>• 복원된 요청권은 마이페이지에서 확인 가능합니다.</li>
+              </ul>
+            </div>
           </div>
         )}
 

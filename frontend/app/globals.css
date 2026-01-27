@@ -477,3 +477,233 @@
 ::placeholder {
   @apply text-muted-foreground;
 }
+
+/* ===== PRINT STYLES ===== */
+@media print {
+  /* 기본 설정 */
+  *,
+  *::before,
+  *::after {
+    background: transparent !important;
+    color: #000 !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+
+  html {
+    font-size: 12pt;
+  }
+
+  body {
+    font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
+    line-height: 1.5;
+    color: #000;
+    background: #fff;
+  }
+
+  /* 페이지 여백 */
+  @page {
+    margin: 2cm;
+    size: A4;
+  }
+
+  /* 페이지 브레이크 */
+  h1, h2, h3, h4, h5, h6 {
+    page-break-after: avoid;
+    page-break-inside: avoid;
+  }
+
+  img, table, figure {
+    page-break-inside: avoid;
+  }
+
+  p, blockquote {
+    orphans: 3;
+    widows: 3;
+  }
+
+  /* 숨길 요소들 */
+  .no-print,
+  nav,
+  header:not(.print-header),
+  footer:not(.print-footer),
+  aside,
+  .fixed,
+  .sticky,
+  button:not(.print-button),
+  [role="navigation"],
+  [role="banner"]:not(.print-header),
+  [role="contentinfo"]:not(.print-footer),
+  .toast,
+  .modal,
+  .dialog,
+  .dropdown,
+  .tooltip,
+  .popover,
+  iframe,
+  video,
+  audio {
+    display: none !important;
+  }
+
+  /* 링크 스타일 */
+  a,
+  a:visited {
+    color: #000 !important;
+    text-decoration: underline;
+  }
+
+  a[href^="http"]::after {
+    content: " (" attr(href) ")";
+    font-size: 0.8em;
+    color: #666;
+  }
+
+  a[href^="#"]::after,
+  a[href^="javascript"]::after {
+    content: "";
+  }
+
+  /* 테이블 스타일 */
+  table {
+    border-collapse: collapse;
+    width: 100%;
+  }
+
+  th, td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+  }
+
+  th {
+    background-color: #f5f5f5 !important;
+    font-weight: 600;
+  }
+
+  tr {
+    page-break-inside: avoid;
+  }
+
+  /* 카드/박스 스타일 */
+  .card,
+  .feature-card,
+  [class*="bg-card"] {
+    border: 1px solid #ddd !important;
+    padding: 16px;
+    margin-bottom: 16px;
+  }
+
+  /* 이미지 */
+  img {
+    max-width: 100% !important;
+    height: auto !important;
+  }
+
+  /* 배지 */
+  .badge,
+  [class*="badge-"] {
+    border: 1px solid #999 !important;
+    padding: 2px 8px;
+  }
+
+  /* 폼 요소 */
+  input,
+  select,
+  textarea {
+    border: 1px solid #ddd !important;
+  }
+
+  /* 인쇄 전용 요소 */
+  .print-only {
+    display: block !important;
+  }
+
+  .print-header,
+  .print-footer {
+    display: block !important;
+  }
+
+  /* 시뮬레이션 결과 인쇄 최적화 */
+  .simulation-result {
+    page-break-before: always;
+  }
+
+  .simulation-chart {
+    max-height: 300px;
+    page-break-inside: avoid;
+  }
+
+  .stat-value {
+    font-size: 24pt;
+    font-weight: bold;
+  }
+
+  .stat-label {
+    font-size: 10pt;
+    color: #666 !important;
+  }
+
+  /* 매물 상세 인쇄 최적화 */
+  .building-detail {
+    page-break-before: always;
+  }
+
+  .building-images {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+
+  .building-images img {
+    max-height: 200px;
+    object-fit: cover;
+  }
+
+  .building-info-table th {
+    width: 30%;
+    background-color: #f9f9f9 !important;
+  }
+
+  /* 인쇄 시 그라디언트 텍스트 */
+  .text-gradient,
+  .text-gradient-blue,
+  .text-gradient-purple,
+  .text-gradient-green {
+    background: none !important;
+    -webkit-background-clip: unset !important;
+    background-clip: unset !important;
+    -webkit-text-fill-color: #000 !important;
+  }
+
+  /* 인쇄 시 컬러 유지할 요소 */
+  .print-color {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* 인쇄 전 페이지 안내 */
+  .print-page-number::after {
+    content: counter(page);
+  }
+}
+
+/* 인쇄 미리보기용 클래스 */
+.print-preview {
+  background: #fff;
+  color: #000;
+  max-width: 210mm;
+  margin: 0 auto;
+  padding: 20mm;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+/* 화면에서 숨기고 인쇄에서만 보이는 요소 */
+.print-only {
+  display: none !important;
+}
+
+/* 인쇄하지 않을 요소 */
+.no-print {
+  /* 기본 화면에서는 보임 - print 미디어에서 숨김 처리 */
+}

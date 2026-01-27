@@ -1,89 +1,439 @@
 'use client';
 
-import { Suspense } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { Suspense, useState } from 'react';
+import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
+import {
+  AlertTriangle,
+  CreditCard,
+  RefreshCw,
+  Home,
+  Phone,
+  HelpCircle,
+  Wallet,
+  Clock,
+  Shield,
+  Ban,
+  CheckCircle2,
+  Copy,
+  ExternalLink
+} from 'lucide-react';
+
+// 에러 유형 분류
+type ErrorCategory = 'user_action' | 'card_issue' | 'limit_exceeded' | 'technical' | 'canceled';
+
+interface ErrorInfo {
+  title: string;
+  description: string;
+  category: ErrorCategory;
+  solutions: string[];
+  canRetry: boolean;
+  suggestAlternative: boolean;
+}
+
+// Toss Payments 에러 코드 상세 매핑
+const ERROR_MAP: Record<string, ErrorInfo> = {
+  // 사용자 취소
+  'PAY_PROCESS_CANCELED': {
+    title: '결제가 취소되었습니다',
+    description: '결제 진행 중 취소 버튼을 누르셨습니다.',
+    category: 'canceled',
+    solutions: ['결제를 원하시면 다시 시도해주세요.'],
+    canRetry: true,
+    suggestAlternative: false,
+  },
+  'USER_CANCEL': {
+    title: '결제가 취소되었습니다',
+    description: '결제창을 닫으셨습니다.',
+    category: 'canceled',
+    solutions: ['결제를 원하시면 다시 시도해주세요.'],
+    canRetry: true,
+    suggestAlternative: false,
+  },
+
+  // 카드 문제
+  'REJECT_CARD_COMPANY': {
+    title: '카드사에서 거절되었습니다',
+    description: '카드사 정책에 의해 결제가 거절되었습니다.',
+    category: 'card_issue',
+    solutions: [
+      '카드 뒷면의 고객센터로 거절 사유를 문의해주세요.',
+      '다른 카드로 결제를 시도해주세요.',
+      '해외결제 차단이 설정되어 있다면 해제해주세요.',
+    ],
+    canRetry: true,
+    suggestAlternative: true,
+  },
+  'INVALID_CARD_EXPIRATION': {
+    title: '카드 유효기간 오류',
+    description: '카드 유효기간이 만료되었거나 잘못 입력되었습니다.',
+    category: 'card_issue',
+    solutions: [
+      '카드 앞면의 유효기간(MM/YY)을 확인해주세요.',
+      '유효기간이 지난 카드는 카드사에서 재발급 받으세요.',
+    ],
+    canRetry: true,
+    suggestAlternative: true,
+  },
+  'INVALID_CARD_NUMBER': {
+    title: '카드 번호 오류',
+    description: '카드 번호가 잘못 입력되었습니다.',
+    category: 'user_action',
+    solutions: [
+      '카드 번호 16자리를 정확히 입력해주세요.',
+      '카드 앞면의 번호를 다시 확인해주세요.',
+    ],
+    canRetry: true,
+    suggestAlternative: false,
+  },
+  'INVALID_CVV': {
+    title: 'CVV/CVC 오류',
+    description: '보안 코드가 잘못 입력되었습니다.',
+    category: 'user_action',
+    solutions: [
+      '카드 뒷면의 서명란 옆 3자리 숫자를 확인해주세요.',
+      'AMEX 카드는 앞면의 4자리 숫자입니다.',
+    ],
+    canRetry: true,
+    suggestAlternative: false,
+  },
+  'INVALID_CARD_PASSWORD': {
+    title: '카드 비밀번호 오류',
+    description: '카드 비밀번호가 일치하지 않습니다.',
+    category: 'user_action',
+    solutions: [
+      '카드 비밀번호 앞 2자리를 정확히 입력해주세요.',
+      '비밀번호가 기억나지 않으면 카드사에 문의해주세요.',
+    ],
+    canRetry: true,
+    suggestAlternative: false,
+  },
+  'INVALID_STOPPED_CARD': {
+    title: '사용 정지된 카드',
+    description: '이 카드는 현재 사용이 정지되어 있습니다.',
+    category: 'card_issue',
+    solutions: [
+      '카드사 고객센터에 정지 사유를 문의해주세요.',
+      '다른 카드를 사용해주세요.',
+    ],
+    canRetry: false,
+    suggestAlternative: true,
+  },
+  'INVALID_CARD_LOST_OR_STOLEN': {
+    title: '분실/도난 신고된 카드',
+    description: '분실 또는 도난 신고가 접수된 카드입니다.',
+    category: 'card_issue',
+    solutions: [
+      '카드사에서 새 카드를 발급받아 주세요.',
+      '다른 카드를 사용해주세요.',
+    ],
+    canRetry: false,
+    suggestAlternative: true,
+  },
+
+  // 한도 초과
+  'EXCEED_MAX_ONE_DAY_AMOUNT': {
+    title: '일일 결제 한도 초과',
+    description: '오늘 사용 가능한 결제 한도를 초과했습니다.',
+    category: 'limit_exceeded',
+    solutions: [
+      '내일 다시 시도해주세요.',
+      '카드사 앱에서 일시적으로 한도를 높일 수 있습니다.',
+      '다른 카드를 사용해주세요.',
+    ],
+    canRetry: false,
+    suggestAlternative: true,
+  },
+  'EXCEED_MAX_ONE_TIME_AMOUNT': {
+    title: '1회 결제 한도 초과',
+    description: '1회 결제 가능 금액을 초과했습니다.',
+    category: 'limit_exceeded',
+    solutions: [
+      '카드사 앱에서 온라인 결제 한도를 확인해주세요.',
+      '한도가 더 높은 카드를 사용해주세요.',
+    ],
+    canRetry: false,
+    suggestAlternative: true,
+  },
+  'EXCEED_MAX_MONTHLY_AMOUNT': {
+    title: '월간 결제 한도 초과',
+    description: '이번 달 사용 가능한 결제 한도를 초과했습니다.',
+    category: 'limit_exceeded',
+    solutions: [
+      '다음 달 1일 이후에 다시 시도해주세요.',
+      '카드사에 한도 증액을 요청해주세요.',
+      '다른 카드를 사용해주세요.',
+    ],
+    canRetry: false,
+    suggestAlternative: true,
+  },
+  'NOT_ENOUGH_BALANCE': {
+    title: '잔액 부족',
+    description: '체크카드/계좌 잔액이 부족합니다.',
+    category: 'limit_exceeded',
+    solutions: [
+      '계좌에 충분한 금액을 입금 후 다시 시도해주세요.',
+      '다른 결제 수단을 사용해주세요.',
+    ],
+    canRetry: true,
+    suggestAlternative: true,
+  },
+
+  // 기술적 오류
+  'PAY_PROCESS_ABORTED': {
+    title: '결제 처리 중 오류',
+    description: '결제 진행 중 예기치 않은 오류가 발생했습니다.',
+    category: 'technical',
+    solutions: [
+      '잠시 후 다시 시도해주세요.',
+      '문제가 지속되면 고객센터에 문의해주세요.',
+    ],
+    canRetry: true,
+    suggestAlternative: false,
+  },
+  'FAILED_INTERNAL_SERVER_ERROR': {
+    title: '서버 오류',
+    description: '일시적인 서버 오류가 발생했습니다.',
+    category: 'technical',
+    solutions: [
+      '잠시 후 다시 시도해주세요.',
+      '문제가 지속되면 고객센터에 문의해주세요.',
+    ],
+    canRetry: true,
+    suggestAlternative: false,
+  },
+  'TIMEOUT': {
+    title: '시간 초과',
+    description: '결제 처리 시간이 초과되었습니다.',
+    category: 'technical',
+    solutions: [
+      '네트워크 연결을 확인해주세요.',
+      '잠시 후 다시 시도해주세요.',
+    ],
+    canRetry: true,
+    suggestAlternative: false,
+  },
+};
+
+// 기본 에러 정보
+const DEFAULT_ERROR: ErrorInfo = {
+  title: '결제에 실패했습니다',
+  description: '결제 처리 중 오류가 발생했습니다.',
+  category: 'technical',
+  solutions: [
+    '잠시 후 다시 시도해주세요.',
+    '다른 결제 수단을 이용해보세요.',
+    '문제가 지속되면 고객센터에 문의해주세요.',
+  ],
+  canRetry: true,
+  suggestAlternative: true,
+};
+
+// 카테고리별 아이콘 및 색상
+const CATEGORY_STYLES: Record<ErrorCategory, { icon: React.ReactNode; bgColor: string; iconColor: string }> = {
+  user_action: {
+    icon: <HelpCircle className="w-10 h-10" />,
+    bgColor: 'bg-blue-100',
+    iconColor: 'text-blue-600'
+  },
+  card_issue: {
+    icon: <CreditCard className="w-10 h-10" />,
+    bgColor: 'bg-orange-100',
+    iconColor: 'text-orange-600'
+  },
+  limit_exceeded: {
+    icon: <Ban className="w-10 h-10" />,
+    bgColor: 'bg-amber-100',
+    iconColor: 'text-amber-600'
+  },
+  technical: {
+    icon: <AlertTriangle className="w-10 h-10" />,
+    bgColor: 'bg-red-100',
+    iconColor: 'text-red-600'
+  },
+  canceled: {
+    icon: <Clock className="w-10 h-10" />,
+    bgColor: 'bg-gray-100',
+    iconColor: 'text-gray-600'
+  },
+};
+
+// 대체 결제 수단
+const ALTERNATIVE_METHODS = [
+  { name: '다른 신용카드', description: '보유한 다른 카드 사용', icon: <CreditCard className="w-5 h-5" /> },
+  { name: '체크카드', description: '잔액 확인 후 결제', icon: <Wallet className="w-5 h-5" /> },
+  { name: '카카오페이', description: '간편결제 이용', icon: <Shield className="w-5 h-5" /> },
+];
 
 function PaymentFailContent() {
   const searchParams = useSearchParams();
+  const router = useRouter();
+  const [copied, setCopied] = useState(false);
 
-  const errorCode = searchParams.get('code');
-  const errorMessage = searchParams.get('message');
+  const errorCode = searchParams.get('code') || searchParams.get('errorCode');
+  const errorMessage = searchParams.get('message') || searchParams.get('errorMessage');
+  const orderId = searchParams.get('orderId');
+  const productId = searchParams.get('productId');
 
-  const getErrorDescription = (code: string | null) => {
-    switch (code) {
-      case 'PAY_PROCESS_CANCELED':
-        return '결제가 취소되었습니다.';
-      case 'PAY_PROCESS_ABORTED':
-        return '결제 진행 중 문제가 발생했습니다.';
-      case 'REJECT_CARD_COMPANY':
-        return '카드사에서 결제를 거절했습니다.';
-      case 'INVALID_CARD_EXPIRATION':
-        return '카드 유효기간이 만료되었습니다.';
-      case 'EXCEED_MAX_ONE_DAY_AMOUNT':
-        return '일일 결제 한도를 초과했습니다.';
-      default:
-        return errorMessage || '결제 처리 중 오류가 발생했습니다.';
+  // 에러 정보 가져오기
+  const errorInfo = errorCode ? (ERROR_MAP[errorCode] || DEFAULT_ERROR) : DEFAULT_ERROR;
+  const categoryStyle = CATEGORY_STYLES[errorInfo.category];
+
+  // 에러 메시지가 있으면 description 덮어쓰기
+  const displayDescription = errorMessage || errorInfo.description;
+
+  // 에러 코드 복사
+  const handleCopyError = () => {
+    const errorDetails = `에러 코드: ${errorCode || '없음'}\n주문 번호: ${orderId || '없음'}\n시간: ${new Date().toLocaleString('ko-KR')}`;
+    navigator.clipboard.writeText(errorDetails);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  // 다시 시도하기
+  const handleRetry = () => {
+    if (productId) {
+      router.push(`/payment?product=${productId}`);
+    } else {
+      router.push('/payment');
     }
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-      <div className="max-w-md mx-auto text-center p-8">
-        <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
-          <svg
-            className="w-10 h-10 text-red-600"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-            />
-          </svg>
+    <div className="min-h-screen bg-gray-50 py-12 px-4">
+      <div className="max-w-lg mx-auto">
+        {/* 메인 에러 카드 */}
+        <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
+          {/* 헤더 */}
+          <div className="p-6 text-center border-b border-gray-100">
+            <div className={`w-20 h-20 ${categoryStyle.bgColor} rounded-full flex items-center justify-center mx-auto mb-4`}>
+              <span className={categoryStyle.iconColor}>{categoryStyle.icon}</span>
+            </div>
+            <h1 className="text-2xl font-bold text-gray-900 mb-2">{errorInfo.title}</h1>
+            <p className="text-gray-600">{displayDescription}</p>
+
+            {errorCode && (
+              <button
+                onClick={handleCopyError}
+                className="inline-flex items-center gap-1 mt-3 text-sm text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                {copied ? (
+                  <>
+                    <CheckCircle2 className="w-4 h-4 text-green-500" />
+                    <span className="text-green-500">복사됨</span>
+                  </>
+                ) : (
+                  <>
+                    <Copy className="w-4 h-4" />
+                    <span>오류 코드: {errorCode}</span>
+                  </>
+                )}
+              </button>
+            )}
+          </div>
+
+          {/* 해결 방법 */}
+          <div className="p-6 bg-gray-50">
+            <h2 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
+              <CheckCircle2 className="w-5 h-5 text-green-500" />
+              해결 방법
+            </h2>
+            <ul className="space-y-2">
+              {errorInfo.solutions.map((solution, idx) => (
+                <li key={idx} className="flex items-start gap-2 text-sm text-gray-700">
+                  <span className="w-5 h-5 rounded-full bg-green-100 text-green-600 flex items-center justify-center flex-shrink-0 text-xs font-medium">
+                    {idx + 1}
+                  </span>
+                  {solution}
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* 액션 버튼 */}
+          <div className="p-6 space-y-3">
+            {errorInfo.canRetry && (
+              <button
+                onClick={handleRetry}
+                className="w-full py-3 bg-blue-600 text-white rounded-xl font-medium hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
+              >
+                <RefreshCw className="w-5 h-5" />
+                다시 시도하기
+              </button>
+            )}
+            <Link
+              href="/"
+              className="w-full py-3 bg-gray-100 text-gray-700 rounded-xl font-medium hover:bg-gray-200 transition-colors flex items-center justify-center gap-2"
+            >
+              <Home className="w-5 h-5" />
+              홈으로 돌아가기
+            </Link>
+          </div>
         </div>
 
-        <h1 className="text-2xl font-bold text-gray-900 mb-4">결제 실패</h1>
-        <p className="text-gray-600 mb-2">{getErrorDescription(errorCode)}</p>
-
-        {errorCode && (
-          <p className="text-sm text-gray-400 mb-8">오류 코드: {errorCode}</p>
+        {/* 대체 결제 수단 안내 */}
+        {errorInfo.suggestAlternative && (
+          <div className="mt-6 bg-white rounded-2xl shadow-lg p-6">
+            <h2 className="font-semibold text-gray-900 mb-4">다른 결제 수단 이용하기</h2>
+            <div className="space-y-3">
+              {ALTERNATIVE_METHODS.map((method, idx) => (
+                <button
+                  key={idx}
+                  onClick={handleRetry}
+                  className="w-full flex items-center gap-4 p-4 border border-gray-200 rounded-xl hover:border-blue-300 hover:bg-blue-50 transition-all text-left"
+                >
+                  <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center text-gray-600">
+                    {method.icon}
+                  </div>
+                  <div className="flex-1">
+                    <p className="font-medium text-gray-900">{method.name}</p>
+                    <p className="text-sm text-gray-500">{method.description}</p>
+                  </div>
+                </button>
+              ))}
+            </div>
+          </div>
         )}
 
-        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-8">
-          <p className="text-sm text-yellow-800">
-            <strong>해결 방법:</strong>
-          </p>
-          <ul className="text-sm text-yellow-700 mt-2 text-left list-disc list-inside">
-            <li>카드 정보를 다시 확인해주세요</li>
-            <li>다른 결제 수단을 이용해보세요</li>
-            <li>카드사 고객센터에 문의해주세요</li>
-          </ul>
+        {/* 고객센터 안내 */}
+        <div className="mt-6 bg-white rounded-2xl shadow-lg p-6">
+          <h2 className="font-semibold text-gray-900 mb-4">도움이 필요하신가요?</h2>
+          <div className="space-y-3">
+            <a
+              href="mailto:support@mediplatone.kr"
+              className="flex items-center gap-4 p-4 border border-gray-200 rounded-xl hover:border-blue-300 hover:bg-blue-50 transition-all"
+            >
+              <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center text-blue-600">
+                <Phone className="w-5 h-5" />
+              </div>
+              <div className="flex-1">
+                <p className="font-medium text-gray-900">고객센터 문의</p>
+                <p className="text-sm text-gray-500">support@mediplatone.kr</p>
+              </div>
+              <ExternalLink className="w-5 h-5 text-gray-400" />
+            </a>
+            <Link
+              href="/faq"
+              className="flex items-center gap-4 p-4 border border-gray-200 rounded-xl hover:border-blue-300 hover:bg-blue-50 transition-all"
+            >
+              <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center text-green-600">
+                <HelpCircle className="w-5 h-5" />
+              </div>
+              <div className="flex-1">
+                <p className="font-medium text-gray-900">자주 묻는 질문</p>
+                <p className="text-sm text-gray-500">결제 관련 FAQ 확인하기</p>
+              </div>
+              <ExternalLink className="w-5 h-5 text-gray-400" />
+            </Link>
+          </div>
         </div>
 
-        <div className="space-y-4">
-          <Link
-            href="/payment"
-            className="block w-full py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-          >
-            다시 시도하기
-          </Link>
-          <Link
-            href="/"
-            className="block w-full py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors"
-          >
-            홈으로 돌아가기
-          </Link>
-        </div>
-
-        <p className="mt-8 text-sm text-gray-500">
-          문제가 계속되면 고객센터로 문의해주세요.
-          <br />
-          support@medimatch.kr
-        </p>
+        {/* 디버그 정보 (개발 모드에서만 표시 가능) */}
+        {orderId && (
+          <div className="mt-6 text-center text-sm text-gray-400">
+            주문 번호: {orderId}
+          </div>
+        )}
       </div>
     </div>
   );

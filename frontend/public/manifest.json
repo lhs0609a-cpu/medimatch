@@ -1,0 +1,104 @@
+{
+  "name": "메디플라톤 - 의료 개원 통합 솔루션",
+  "short_name": "메디플라톤",
+  "description": "개원 시뮬레이션, 매물 탐색, 파트너 매칭을 한 곳에서",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#2563eb",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "lang": "ko",
+  "categories": ["business", "medical", "productivity"],
+  "icons": [
+    {
+      "src": "/icons/icon-72x72.png",
+      "sizes": "72x72",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/icons/icon-96x96.png",
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/icons/icon-128x128.png",
+      "sizes": "128x128",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/icons/icon-144x144.png",
+      "sizes": "144x144",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/icons/icon-152x152.png",
+      "sizes": "152x152",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/icons/icon-384x384.png",
+      "sizes": "384x384",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable any"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "개원 시뮬레이션",
+      "short_name": "시뮬레이션",
+      "description": "AI 기반 개원 분석",
+      "url": "/simulate",
+      "icons": [{ "src": "/icons/shortcut-simulate.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "매물 찾기",
+      "short_name": "매물",
+      "description": "입점 건물 검색",
+      "url": "/buildings",
+      "icons": [{ "src": "/icons/shortcut-buildings.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "파트너 찾기",
+      "short_name": "파트너",
+      "description": "개원 파트너 검색",
+      "url": "/partners",
+      "icons": [{ "src": "/icons/shortcut-partners.png", "sizes": "96x96" }]
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/screenshots/home.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "메디플라톤 홈"
+    },
+    {
+      "src": "/screenshots/simulate.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "개원 시뮬레이션"
+    }
+  ],
+  "related_applications": [],
+  "prefer_related_applications": false
+}

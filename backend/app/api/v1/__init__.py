@@ -22,6 +22,7 @@ from .admin import router as admin_router
 from .landlord import router as landlord_router
 from .banner import router as banner_router
 from .sales_match import router as sales_match_router
+from .dashboard import router as dashboard_router
 
 api_router = APIRouter()
 
@@ -48,3 +49,4 @@ api_router.include_router(admin_router, prefix="/admin", tags=["Admin - 관리�
 api_router.include_router(landlord_router, prefix="/landlord", tags=["Landlord - 건물주 셀프 등록"])
 api_router.include_router(banner_router, tags=["Banner - 배너 광고 CPM"])
 api_router.include_router(sales_match_router, tags=["Sales Match - 영업사원 매칭"])
+api_router.include_router(dashboard_router, tags=["Dashboard - 대시보드"])

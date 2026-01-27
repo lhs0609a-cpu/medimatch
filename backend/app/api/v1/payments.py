@@ -185,15 +185,18 @@ async def process_payment_completion(db: AsyncSession, payment: Payment, user_id
             )
             db.add(credit)
 
-    elif product_id in ["sales_scanner_monthly", "sales_scanner_yearly"]:
-        # 구독 생성/갱신
-        is_yearly = product_id == "sales_scanner_yearly"
+    elif product_id.startswith("sales_scanner_"):
+        # SalesScanner 구독 생성/갱신
+        is_yearly = "_yearly" in product_id
         duration = timedelta(days=365 if is_yearly else 30)
+
+        # 플랜 추출 (예: sales_scanner_basic -> BASIC)
+        plan_name = product_id.replace("sales_scanner_", "").replace("_yearly", "").upper()
 
         result = await db.execute(
             select(Subscription).where(
                 Subscription.user_id == user_id,
-                Subscription.product_id.in_(["sales_scanner_monthly", "sales_scanner_yearly"])
+                Subscription.product_id.like("sales_scanner_%")
             )
         )
         subscription = result.scalar_one_or_none()
@@ -201,16 +204,18 @@ async def process_payment_completion(db: AsyncSession, payment: Payment, user_id
         now = datetime.utcnow()
 
         if subscription:
-            # 기존 구독 연장
+            # 기존 구독 연장/업그레이드
             new_expires = max(subscription.expires_at, now) + duration
             subscription.expires_at = new_expires
             subscription.status = "ACTIVE"
+            subscription.plan = plan_name
+            subscription.product_id = product_id
             subscription.last_payment_id = payment.id
         else:
             # 새 구독 생성
             subscription = Subscription(
                 user_id=user_id,
-                plan="yearly" if is_yearly else "monthly",
+                plan=plan_name,
                 product_id=product_id,
                 status="ACTIVE",
                 started_at=now,

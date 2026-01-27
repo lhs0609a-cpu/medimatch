@@ -6,13 +6,44 @@ import {
   ArrowLeft, Pill, MapPin, Building2, Heart,
   ChevronRight, Search, Eye, Plus, Sparkles,
   Lock, Phone, TrendingUp, Users, CheckCircle,
-  Flame, Clock, Zap, AlertTriangle
+  Flame, Clock, Zap, AlertTriangle, SlidersHorizontal, X, RotateCcw
 } from 'lucide-react'
+import Image from 'next/image'
 import { generatePharmacyListings, generateActivityFeed, platformStats, recentSuccessStories, memberTestimonials, type PharmacyListing } from '@/lib/data/seedListings'
+import { pharmacyListingImages } from '@/components/BlurredListingImage'
 
 // 시드 데이터 생성
 const allListings = generatePharmacyListings(80)
 const activityFeed = generateActivityFeed(20)
+
+type SortOption = 'latest' | 'matchScore' | 'premiumAsc' | 'premiumDesc' | 'rentAsc' | 'rentDesc' | 'popular'
+
+const sortLabels: Record<SortOption, string> = {
+  latest: '최신순',
+  matchScore: '매칭률순',
+  premiumAsc: '권리금 낮은순',
+  premiumDesc: '권리금 높은순',
+  rentAsc: '월세 낮은순',
+  rentDesc: '월세 높은순',
+  popular: '인기순',
+}
+
+const premiumRanges = [
+  { label: '전체', min: 0, max: Infinity },
+  { label: '1억 미만', min: 0, max: 10000 },
+  { label: '1억~2억', min: 10000, max: 20000 },
+  { label: '2억~3억', min: 20000, max: 30000 },
+  { label: '3억~5억', min: 30000, max: 50000 },
+  { label: '5억 이상', min: 50000, max: Infinity },
+]
+
+const rentRanges = [
+  { label: '전체', min: 0, max: Infinity },
+  { label: '200만 미만', min: 0, max: 200 },
+  { label: '200~400만', min: 200, max: 400 },
+  { label: '400~600만', min: 400, max: 600 },
+  { label: '600만 이상', min: 600, max: Infinity },
+]
 
 const statusLabels: Record<string, { label: string; style: string }> = {
   ACTIVE: { label: '매칭중', style: 'badge-success' },
@@ -38,6 +69,12 @@ export default function PharmacyMatchPage() {
   const [currentActivityIndex, setCurrentActivityIndex] = useState(0)
   const [currentTestimonialIndex, setCurrentTestimonialIndex] = useState(0)
 
+  // 추가 필터 상태
+  const [sortOption, setSortOption] = useState<SortOption>('latest')
+  const [selectedPremiumRange, setSelectedPremiumRange] = useState(0) // 인덱스
+  const [selectedRentRange, setSelectedRentRange] = useState(0) // 인덱스
+  const [showFilters, setShowFilters] = useState(false)
+
   // 실시간 활동 피드 롤링
   useEffect(() => {
     const activityInterval = setInterval(() => {
@@ -52,18 +89,56 @@ export default function PharmacyMatchPage() {
     }
   }, [])
 
-  // 필터링된 매물
+  // 필터링 및 정렬된 매물
   const filteredListings = useMemo(() => {
-    return allListings.filter(listing => {
+    const premiumRange = premiumRanges[selectedPremiumRange]
+    const rentRange = rentRanges[selectedRentRange]
+
+    const filtered = allListings.filter(listing => {
+      // 지역 필터
       if (selectedRegion !== '전체' && !listing.region.includes(selectedRegion)) {
         return false
       }
+      // 검색어 필터
       if (searchQuery && !listing.region.includes(searchQuery) && !listing.pharmacyType.includes(searchQuery)) {
         return false
       }
+      // 권리금 범위 필터
+      if (premiumRange.max !== Infinity || premiumRange.min !== 0) {
+        if (listing.premiumMin < premiumRange.min || listing.premiumMin > premiumRange.max) {
+          return false
+        }
+      }
+      // 월세 범위 필터
+      if (rentRange.max !== Infinity || rentRange.min !== 0) {
+        if (listing.monthlyRent < rentRange.min || listing.monthlyRent > rentRange.max) {
+          return false
+        }
+      }
       return true
     })
-  }, [selectedRegion, searchQuery])
+
+    // 정렬
+    return filtered.sort((a, b) => {
+      switch (sortOption) {
+        case 'matchScore':
+          return (b.matchScore || 0) - (a.matchScore || 0)
+        case 'premiumAsc':
+          return a.premiumMin - b.premiumMin
+        case 'premiumDesc':
+          return b.premiumMin - a.premiumMin
+        case 'rentAsc':
+          return a.monthlyRent - b.monthlyRent
+        case 'rentDesc':
+          return b.monthlyRent - a.monthlyRent
+        case 'popular':
+          return b.viewCount - a.viewCount
+        case 'latest':
+        default:
+          return 0 // 기본 순서 유지
+      }
+    })
+  }, [selectedRegion, searchQuery, selectedPremiumRange, selectedRentRange, sortOption])
 
   // AI 추천 (상위 5개)
   const recommendations = useMemo(() => {
@@ -83,6 +158,41 @@ export default function PharmacyMatchPage() {
   const handleInquiry = (listing: PharmacyListing) => {
     setSelectedListing(listing)
     setShowInquiryModal(true)
+  }
+
+  // 활성 필터 확인
+  const hasActiveFilters = useMemo(() => {
+    return selectedRegion !== '전체' ||
+      searchQuery !== '' ||
+      selectedPremiumRange !== 0 ||
+      selectedRentRange !== 0
+  }, [selectedRegion, searchQuery, selectedPremiumRange, selectedRentRange])
+
+  // 필터 초기화
+  const resetFilters = () => {
+    setSelectedRegion('전체')
+    setSearchQuery('')
+    setSelectedPremiumRange(0)
+    setSelectedRentRange(0)
+    setSortOption('latest')
+  }
+
+  // 개별 필터 제거
+  const removeFilter = (filterType: string) => {
+    switch (filterType) {
+      case 'region':
+        setSelectedRegion('전체')
+        break
+      case 'search':
+        setSearchQuery('')
+        break
+      case 'premium':
+        setSelectedPremiumRange(0)
+        break
+      case 'rent':
+        setSelectedRentRange(0)
+        break
+    }
   }
 
   return (
@@ -250,17 +360,34 @@ export default function PharmacyMatchPage() {
 
         {/* Filters */}
         <div className="card p-4 mb-6">
-          <div className="flex flex-col md:flex-row gap-4">
-            {/* Search */}
-            <div className="flex-1 relative">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-              <input
-                type="text"
-                placeholder="지역 또는 조건으로 검색"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="input pl-12"
-              />
+          <div className="flex flex-col gap-4">
+            {/* Search + Filter Toggle */}
+            <div className="flex flex-col md:flex-row gap-4">
+              {/* Search */}
+              <div className="flex-1 relative">
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                <input
+                  type="text"
+                  placeholder="지역 또는 조건으로 검색"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="input pl-12"
+                />
+              </div>
+
+              {/* Filter Toggle Button */}
+              <button
+                onClick={() => setShowFilters(!showFilters)}
+                className={`btn-secondary flex items-center gap-2 ${showFilters ? 'bg-primary/10 border-primary' : ''}`}
+              >
+                <SlidersHorizontal className="w-4 h-4" />
+                상세 필터
+                {(selectedPremiumRange !== 0 || selectedRentRange !== 0) && (
+                  <span className="w-5 h-5 bg-primary text-primary-foreground text-xs rounded-full flex items-center justify-center">
+                    {(selectedPremiumRange !== 0 ? 1 : 0) + (selectedRentRange !== 0 ? 1 : 0)}
+                  </span>
+                )}
+              </button>
             </div>
 
             {/* Region Filter */}
@@ -279,17 +406,123 @@ export default function PharmacyMatchPage() {
                 </button>
               ))}
             </div>
+
+            {/* Expanded Filters */}
+            {showFilters && (
+              <div className="pt-4 border-t border-border space-y-4">
+                {/* Premium Range */}
+                <div>
+                  <p className="text-sm font-medium text-foreground mb-2">권리금 범위</p>
+                  <div className="flex gap-2 flex-wrap">
+                    {premiumRanges.map((range, idx) => (
+                      <button
+                        key={range.label}
+                        onClick={() => setSelectedPremiumRange(idx)}
+                        className={`px-3 py-1.5 rounded-lg text-sm transition-colors ${
+                          selectedPremiumRange === idx
+                            ? 'bg-primary text-primary-foreground'
+                            : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'
+                        }`}
+                      >
+                        {range.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Rent Range */}
+                <div>
+                  <p className="text-sm font-medium text-foreground mb-2">월세 범위</p>
+                  <div className="flex gap-2 flex-wrap">
+                    {rentRanges.map((range, idx) => (
+                      <button
+                        key={range.label}
+                        onClick={() => setSelectedRentRange(idx)}
+                        className={`px-3 py-1.5 rounded-lg text-sm transition-colors ${
+                          selectedRentRange === idx
+                            ? 'bg-primary text-primary-foreground'
+                            : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'
+                        }`}
+                      >
+                        {range.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
-        {/* Results Count */}
-        <div className="mb-4 flex items-center justify-between">
+        {/* Active Filter Chips */}
+        {hasActiveFilters && (
+          <div className="mb-4 flex flex-wrap items-center gap-2">
+            <span className="text-sm text-muted-foreground">적용된 필터:</span>
+            {selectedRegion !== '전체' && (
+              <button
+                onClick={() => removeFilter('region')}
+                className="inline-flex items-center gap-1 px-3 py-1 bg-primary/10 text-primary rounded-full text-sm hover:bg-primary/20 transition-colors"
+              >
+                지역: {selectedRegion}
+                <X className="w-3 h-3" />
+              </button>
+            )}
+            {searchQuery && (
+              <button
+                onClick={() => removeFilter('search')}
+                className="inline-flex items-center gap-1 px-3 py-1 bg-primary/10 text-primary rounded-full text-sm hover:bg-primary/20 transition-colors"
+              >
+                검색: {searchQuery}
+                <X className="w-3 h-3" />
+              </button>
+            )}
+            {selectedPremiumRange !== 0 && (
+              <button
+                onClick={() => removeFilter('premium')}
+                className="inline-flex items-center gap-1 px-3 py-1 bg-primary/10 text-primary rounded-full text-sm hover:bg-primary/20 transition-colors"
+              >
+                권리금: {premiumRanges[selectedPremiumRange].label}
+                <X className="w-3 h-3" />
+              </button>
+            )}
+            {selectedRentRange !== 0 && (
+              <button
+                onClick={() => removeFilter('rent')}
+                className="inline-flex items-center gap-1 px-3 py-1 bg-primary/10 text-primary rounded-full text-sm hover:bg-primary/20 transition-colors"
+              >
+                월세: {rentRanges[selectedRentRange].label}
+                <X className="w-3 h-3" />
+              </button>
+            )}
+            <button
+              onClick={resetFilters}
+              className="inline-flex items-center gap-1 px-3 py-1 text-muted-foreground hover:text-foreground rounded-full text-sm hover:bg-secondary transition-colors"
+            >
+              <RotateCcw className="w-3 h-3" />
+              전체 초기화
+            </button>
+          </div>
+        )}
+
+        {/* Results Count + Sort */}
+        <div className="mb-4 flex items-center justify-between flex-wrap gap-2">
           <p className="text-sm text-muted-foreground">
             총 <span className="font-semibold text-primary">{filteredListings.length}</span>개의 매물
           </p>
-          <p className="text-xs text-muted-foreground">
-            상세 정보는 상호 관심 표시 후 공개됩니다
-          </p>
+          <div className="flex items-center gap-4">
+            <p className="text-xs text-muted-foreground hidden sm:block">
+              상세 정보는 상호 관심 표시 후 공개됩니다
+            </p>
+            <select
+              value={sortOption}
+              onChange={(e) => setSortOption(e.target.value as SortOption)}
+              className="px-3 py-1.5 bg-secondary text-foreground rounded-lg text-sm border-0 focus:ring-2 focus:ring-primary cursor-pointer"
+            >
+              {Object.entries(sortLabels).map(([value, label]) => (
+                <option key={value} value={value}>{label}</option>
+              ))}
+            </select>
+          </div>
         </div>
 
         {/* Listings Grid */}
@@ -300,6 +533,30 @@ export default function PharmacyMatchPage() {
               className="card card-interactive overflow-hidden cursor-pointer"
               onClick={() => handleInquiry(listing)}
             >
+              {/* 블러 처리된 약국 이미지 */}
+              <div className="h-32 relative overflow-hidden bg-gradient-to-br from-green-100 to-emerald-100 dark:from-green-900/30 dark:to-emerald-900/30">
+                <Image
+                  src={pharmacyListingImages[parseInt(listing.id.replace('phm-', ''), 36) % pharmacyListingImages.length]}
+                  alt="약국 매물"
+                  fill
+                  className="object-cover blur-md scale-110"
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                />
+                <div className="absolute inset-0 bg-black/10" />
+                {/* 잠금 아이콘 오버레이 */}
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="bg-black/50 backdrop-blur-sm px-3 py-1.5 rounded-lg flex items-center gap-1.5 text-white text-xs">
+                    <Lock className="w-3 h-3" />
+                    <span>관심 표시 후 공개</span>
+                  </div>
+                </div>
+                {/* 조회수 */}
+                <div className="absolute bottom-2 right-2 px-2 py-1 bg-black/50 text-white text-xs rounded flex items-center gap-1">
+                  <Eye className="w-3 h-3" />
+                  {listing.viewCount}
+                </div>
+              </div>
+
               <div className="p-6">
                 {/* Header */}
                 <div className="flex items-center justify-between mb-4">
