@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { useState, useEffect } from 'react'
+import OnboardingModal, { useOnboarding } from '@/components/onboarding/OnboardingModal'
 import {
   ArrowRight,
   BarChart3,
@@ -23,7 +24,6 @@ import {
   ArrowUpRight,
   Sparkles,
   Play,
-  Star,
   Bell,
   Search,
   Globe,
@@ -71,8 +71,8 @@ const roleServices = {
     gradient: roleColors.pharmacist,
     services: [
       { name: '약국 자리 찾기', desc: '독점 약국 입지 매칭', href: '/pharmacy-match', icon: MapPin },
+      { name: '양도양수 컨설팅', desc: '전문가 매칭 지원', href: '/consulting', icon: Users },
       { name: '약국 매물 등록', desc: '양수/양도 매물 등록', href: '/pharmacy-match/listings/new', icon: Building2 },
-      { name: '매칭 관리', desc: '관심 표현 및 채팅', href: '/pharmacy-match/matches', icon: MessageSquare },
       { name: '개원 시뮬레이션', desc: 'AI 기반 상권 분석', href: '/simulate', icon: BarChart3 },
     ]
   },
@@ -116,32 +116,33 @@ const roleServices = {
 }
 
 // 주요 통계
+// NOTE: 실제 서비스 데이터로 대체 필요. 검증 불가능한 통계는 제외함.
 const stats = [
-  { value: '50,000+', label: '등록 의료기관', icon: Building2 },
-  { value: '1,200+', label: '매칭 성사', icon: Link2 },
-  { value: '85%', label: '예측 정확도', icon: Target },
+  { value: '전국', label: '의료기관 데이터', icon: Building2 },
+  { value: '실시간', label: '개원지 탐지', icon: Target },
   { value: '3분', label: '평균 분석 시간', icon: Clock },
 ]
 
-// 추천 후기
-const testimonials = [
+// 서비스 특징 (후기 대신 기능 소개로 대체)
+// NOTE: 실제 사용자 후기는 서비스 런칭 후 수집하여 교체 필요
+const serviceHighlights = [
   {
-    content: "OpenSim 덕분에 예상 매출을 정확히 파악하고 개원 결정을 내릴 수 있었습니다. 실제 매출이 예측치의 90% 이상이에요.",
-    author: "김OO 원장",
-    role: "성형외과 개원",
-    avatar: "K"
+    content: "주소와 진료과목만 입력하면 AI가 예상 매출, 비용, 경쟁 현황을 분석합니다.",
+    title: "OpenSim",
+    subtitle: "AI 기반 개원 시뮬레이션",
+    icon: "📊"
   },
   {
-    content: "SalesScanner로 폐업 병원 정보를 실시간으로 받아 경쟁사보다 빠르게 영업할 수 있었습니다.",
-    author: "이OO 과장",
-    role: "의료기기 영업",
-    avatar: "L"
+    content: "신축 건물, 폐업 병원, 공실 정보를 실시간으로 탐지하고 맞춤 알림을 받아보세요.",
+    title: "SalesScanner",
+    subtitle: "실시간 개원지 탐지",
+    icon: "🎯"
   },
   {
-    content: "PharmMatch에서 좋은 조건의 약국 자리를 찾았어요. 익명으로 협상할 수 있어서 좋았습니다.",
-    author: "박OO 약사",
-    role: "약국 개국",
-    avatar: "P"
+    content: "익명으로 약국 매물을 등록하고 관심 있는 약사와 안전하게 매칭됩니다.",
+    title: "PharmMatch",
+    subtitle: "익명 약국 매칭",
+    icon: "💊"
   },
 ]
 
@@ -149,8 +150,15 @@ export default function HomePage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [activeRole, setActiveRole] = useState<UserRole>('doctor')
   const [servicesOpen, setServicesOpen] = useState(false)
+  const { showOnboarding, setShowOnboarding } = useOnboarding()
 
   return (
+    <>
+      {/* 온보딩 모달 */}
+      <OnboardingModal
+        isOpen={showOnboarding}
+        onClose={() => setShowOnboarding(false)}
+      />
     <div className="min-h-screen bg-background">
       {/* ===== HEADER ===== */}
       <header className="fixed top-0 left-0 right-0 z-50 glass">
@@ -706,34 +714,23 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ===== TESTIMONIALS ===== */}
+      {/* ===== SERVICE HIGHLIGHTS ===== */}
       <section className="section">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-2xl mx-auto mb-12">
-            <p className="text-sm font-semibold text-blue-600 mb-3">고객 후기</p>
+            <p className="text-sm font-semibold text-blue-600 mb-3">서비스 특징</p>
             <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-4">
-              성공적인 개원의 파트너
+              데이터 기반 의료 개원 지원
             </h2>
           </div>
 
           <div className="grid md:grid-cols-3 gap-6">
-            {testimonials.map((item, i) => (
+            {serviceHighlights.map((item, i) => (
               <div key={i} className="p-6 md:p-8 bg-card rounded-2xl border border-border">
-                <div className="flex gap-1 mb-4">
-                  {[...Array(5)].map((_, j) => (
-                    <Star key={j} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                  ))}
-                </div>
-                <p className="text-foreground mb-6 leading-relaxed">"{item.content}"</p>
-                <div className="flex items-center gap-3">
-                  <div className="avatar avatar-md bg-gradient-to-br from-blue-500 to-purple-500 text-white">
-                    {item.avatar}
-                  </div>
-                  <div>
-                    <p className="font-medium text-foreground">{item.author}</p>
-                    <p className="text-sm text-muted-foreground">{item.role}</p>
-                  </div>
-                </div>
+                <div className="text-4xl mb-4">{item.icon}</div>
+                <h3 className="text-lg font-semibold text-foreground mb-1">{item.title}</h3>
+                <p className="text-sm text-blue-600 mb-4">{item.subtitle}</p>
+                <p className="text-muted-foreground leading-relaxed">{item.content}</p>
               </div>
             ))}
           </div>
@@ -800,8 +797,8 @@ export default function HomePage() {
                 <li><Link href="/simulate" className="hover:text-foreground transition-colors">OpenSim</Link></li>
                 <li><Link href="/prospects" className="hover:text-foreground transition-colors">SalesScanner</Link></li>
                 <li><Link href="/pharmacy-match" className="hover:text-foreground transition-colors">PharmMatch</Link></li>
+                <li><Link href="/consulting" className="hover:text-foreground transition-colors">양도양수 컨설팅</Link></li>
                 <li><Link href="/map" className="hover:text-foreground transition-colors">지도 탐색</Link></li>
-                <li><Link href="/partners" className="hover:text-foreground transition-colors">파트너 찾기</Link></li>
               </ul>
             </div>
 
@@ -831,11 +828,13 @@ export default function HomePage() {
           </div>
 
           <div className="pt-8 border-t border-border flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-muted-foreground">
-            <p>© 2025 메디플라톤. All rights reserved.</p>
+            {/* TODO: 법인 설립 후 실제 회사명으로 교체 */}
+            <p>© {new Date().getFullYear()} 메디플라톤. All rights reserved.</p>
             <p>의료 개원의 모든 것을 연결합니다</p>
           </div>
         </div>
       </footer>
     </div>
+    </>
   )
 }

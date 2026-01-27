@@ -8,6 +8,8 @@ import base64
 import logging
 import os
 
+from app.models.partner_subscription import SUBSCRIPTION_PLANS, SubscriptionPlan
+
 logger = logging.getLogger(__name__)
 
 TOSS_SECRET_KEY = os.getenv("TOSS_SECRET_KEY", "test_sk_xxx")
@@ -203,28 +205,125 @@ class PaymentService:
 
 
 # 결제 상품 정보
+# 주의: SalesScanner 구독 가격은 partner_subscription.py의 SUBSCRIPTION_PLANS와 동기화됨
 PRODUCTS = {
     "simulation_report": {
         "name": "개원 시뮬레이션 리포트",
         "price": 30000,
         "description": "AI 기반 개원 시뮬레이션 상세 리포트",
     },
-    "sales_scanner_monthly": {
-        "name": "SalesScanner 월 구독",
-        "price": 30000,
-        "description": "영업 입지 탐색 월간 구독",
+    "sales_scanner_basic": {
+        "name": "SalesScanner 베이직 (월)",
+        "price": SUBSCRIPTION_PLANS[SubscriptionPlan.BASIC]["monthly_fee"],  # 300,000원
+        "description": f"월 {SUBSCRIPTION_PLANS[SubscriptionPlan.BASIC]['leads_per_month']}건 리드 제공",
+        "plan": SubscriptionPlan.BASIC,
     },
-    "sales_scanner_yearly": {
-        "name": "SalesScanner 연 구독",
-        "price": 300000,
-        "description": "영업 입지 탐색 연간 구독 (2개월 무료)",
+    "sales_scanner_standard": {
+        "name": "SalesScanner 스탠다드 (월)",
+        "price": SUBSCRIPTION_PLANS[SubscriptionPlan.STANDARD]["monthly_fee"],  # 500,000원
+        "description": f"월 {SUBSCRIPTION_PLANS[SubscriptionPlan.STANDARD]['leads_per_month']}건 리드 + 우선 노출",
+        "plan": SubscriptionPlan.STANDARD,
     },
-    "pharmmatch_premium": {
-        "name": "PharmMatch 프리미엄",
+    "sales_scanner_premium": {
+        "name": "SalesScanner 프리미엄 (월)",
+        "price": SUBSCRIPTION_PLANS[SubscriptionPlan.PREMIUM]["monthly_fee"],  # 1,000,000원
+        "description": "무제한 리드 + 최상단 노출 + 프리미엄 배지",
+        "plan": SubscriptionPlan.PREMIUM,
+    },
+    "sales_scanner_basic_yearly": {
+        "name": "SalesScanner 베이직 (연)",
+        "price": SUBSCRIPTION_PLANS[SubscriptionPlan.BASIC]["monthly_fee"] * 10,  # 10개월분 (2개월 무료)
+        "description": "베이직 연간 구독 (2개월 무료)",
+        "plan": SubscriptionPlan.BASIC,
+    },
+    "pharmmatch_contact_partial": {
+        "name": "PharmMatch 부분 정보 공개",
         "price": 50000,
-        "description": "프리미엄 슬롯 매칭 서비스",
+        "description": "매물 재무 범위 정보 열람",
+    },
+    "pharmmatch_contact_full": {
+        "name": "PharmMatch 전체 정보 공개",
+        "price": 100000,
+        "description": "매물 상세 정보 및 연락처 열람",
+    },
+    "sales_match_request": {
+        "name": "의사 매칭 요청",
+        "price": 300000,
+        "description": "개원 준비중 의사에게 영업 요청 (수락 시 연락처 공개, 거절/무응답 시 환불)",
+    },
+    # ===== 약국 양도양수 컨설팅 서비스 =====
+    "pharmacy_consulting_basic": {
+        "name": "매칭 컨설팅 베이직",
+        "price": 500000,
+        "description": "3개 매물 연결 + 기본 상담",
+        "category": "consulting",
+        "features": [
+            "맞춤 매물 3건 추천",
+            "매물 상세 정보 열람",
+            "양도인 연락처 제공",
+            "기본 상담 1회",
+        ],
+    },
+    "pharmacy_consulting_premium": {
+        "name": "매칭 컨설팅 프리미엄",
+        "price": 1500000,
+        "description": "무제한 매물 + 협상 지원 + 계약 동행",
+        "category": "consulting",
+        "features": [
+            "무제한 매물 추천",
+            "전담 컨설턴트 배정",
+            "권리금 협상 지원",
+            "계약 동행 서비스",
+            "법률 검토 지원",
+            "3개월 사후 관리",
+        ],
+        "recommended": True,
+    },
+    "pharmacy_consulting_vip": {
+        "name": "VIP 토탈 케어",
+        "price": 3000000,
+        "description": "All-in-One 양도양수 대행",
+        "category": "consulting",
+        "features": [
+            "프리미엄 서비스 전체 포함",
+            "실사 대행",
+            "자금 조달 컨설팅",
+            "인허가 변경 대행",
+            "인테리어 연계",
+            "개국 후 6개월 운영 컨설팅",
+        ],
     },
 }
+
+# 성사 보수 요율
+SUCCESS_FEE_RATES = {
+    "default": 0.025,  # 기본 2.5%
+    "premium_member": 0.02,  # 프리미엄 회원 2%
+    "vip_member": 0.015,  # VIP 회원 1.5%
+    "min_fee": 1000000,  # 최소 100만원
+    "max_fee": 30000000,  # 최대 3000만원
+}
+
+
+def calculate_success_fee(premium_amount: int, member_tier: str = "default") -> int:
+    """
+    성사 보수 계산
+
+    Args:
+        premium_amount: 권리금 (원)
+        member_tier: 회원 등급 (default, premium_member, vip_member)
+
+    Returns:
+        성사 보수 금액 (원)
+    """
+    rate = SUCCESS_FEE_RATES.get(member_tier, SUCCESS_FEE_RATES["default"])
+    fee = int(premium_amount * rate)
+
+    # 최소/최대 금액 적용
+    fee = max(fee, SUCCESS_FEE_RATES["min_fee"])
+    fee = min(fee, SUCCESS_FEE_RATES["max_fee"])
+
+    return fee
 
 
 def get_product_info(product_id: str) -> Optional[Dict[str, Any]]:
