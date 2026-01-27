@@ -60,13 +60,21 @@ export default function LandlordDashboardPage() {
               <p className="text-sm text-gray-500">매물 등록 및 관리</p>
             </div>
           </div>
-          <Link
-            href="/landlord/register"
-            className="flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white rounded-lg font-medium hover:bg-emerald-700 transition-colors"
-          >
-            <Plus className="w-4 h-4" />
-            새 매물 등록
-          </Link>
+          <div className="flex items-center gap-3">
+            <Link
+              href="/landlord/pricing"
+              className="flex items-center gap-2 px-4 py-2 bg-amber-100 text-amber-700 rounded-lg font-medium hover:bg-amber-200 transition-colors"
+            >
+              프리미엄 서비스
+            </Link>
+            <Link
+              href="/landlord/register"
+              className="flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white rounded-lg font-medium hover:bg-emerald-700 transition-colors"
+            >
+              <Plus className="w-4 h-4" />
+              새 매물 등록
+            </Link>
+          </div>
         </div>
       </header>
 

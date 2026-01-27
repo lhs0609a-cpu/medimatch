@@ -293,7 +293,180 @@ PRODUCTS = {
             "개국 후 6개월 운영 컨설팅",
         ],
     },
+    # ===== 건물주 구독 서비스 =====
+    "landlord_starter": {
+        "name": "건물주 스타터 (월)",
+        "price": 99000,
+        "description": "매물 1개 등록, 기본 노출",
+        "category": "landlord_subscription",
+        "tier": "starter",
+        "features": [
+            "매물 1개 등록",
+            "기본 검색 노출",
+            "문의 알림",
+            "기본 통계",
+        ],
+    },
+    "landlord_pro": {
+        "name": "건물주 프로 (월)",
+        "price": 299000,
+        "description": "매물 3개, 상위 노출, 월 5건 리드",
+        "category": "landlord_subscription",
+        "tier": "pro",
+        "features": [
+            "매물 3개 등록",
+            "검색 상위 노출",
+            "월 5건 의사/약사 리드 제공",
+            "상세 통계 리포트",
+            "프로 배지 표시",
+        ],
+        "leads_per_month": 5,
+        "recommended": True,
+    },
+    "landlord_premium": {
+        "name": "건물주 프리미엄 (월)",
+        "price": 599000,
+        "description": "무제한 등록, 최상위 노출, 무제한 리드",
+        "category": "landlord_subscription",
+        "tier": "premium",
+        "features": [
+            "무제한 매물 등록",
+            "검색 최상위 노출",
+            "무제한 의사/약사 리드",
+            "전담 매니저 배정",
+            "프리미엄 배지",
+            "홈페이지 배너 노출 (월 1회)",
+        ],
+        "leads_per_month": -1,  # unlimited
+    },
+    "landlord_pro_yearly": {
+        "name": "건물주 프로 (연)",
+        "price": 2990000,  # 10개월분 (2개월 무료)
+        "description": "프로 연간 구독 (2개월 무료)",
+        "category": "landlord_subscription",
+        "tier": "pro",
+        "features": [
+            "프로 플랜 전체 혜택",
+            "연 60건 리드 제공",
+            "2개월 무료 혜택",
+        ],
+        "leads_per_month": 5,
+    },
+    # ===== 건물주 리드 구매 (건당) =====
+    "landlord_lead_doctor": {
+        "name": "개원 준비 의사 리드",
+        "price": 100000,
+        "description": "개원 준비 중인 의사 연락처 1건",
+        "category": "landlord_lead",
+        "lead_type": "doctor",
+    },
+    "landlord_lead_pharmacist": {
+        "name": "개국 준비 약사 리드",
+        "price": 100000,
+        "description": "개국 준비 중인 약사 연락처 1건",
+        "category": "landlord_lead",
+        "lead_type": "pharmacist",
+    },
+    "landlord_lead_interest": {
+        "name": "관심 회원 리드",
+        "price": 30000,
+        "description": "내 매물에 관심 표시한 회원 연락처",
+        "category": "landlord_lead",
+        "lead_type": "interest",
+    },
+    "landlord_lead_pack_10": {
+        "name": "리드 10건 패키지",
+        "price": 800000,  # 20% 할인
+        "description": "의사/약사 리드 10건 (20% 할인)",
+        "category": "landlord_lead",
+        "lead_count": 10,
+    },
+    "landlord_lead_pack_30": {
+        "name": "리드 30건 패키지",
+        "price": 2100000,  # 30% 할인
+        "description": "의사/약사 리드 30건 (30% 할인)",
+        "category": "landlord_lead",
+        "lead_count": 30,
+    },
+    # ===== 건물주 광고/부스팅 =====
+    "landlord_boost_top": {
+        "name": "검색 상위 노출 (1주)",
+        "price": 300000,
+        "description": "검색 결과 상위 3위 내 노출 보장",
+        "category": "landlord_ad",
+        "duration_days": 7,
+        "ad_type": "search_top",
+    },
+    "landlord_boost_featured": {
+        "name": "추천 매물 배지 (1주)",
+        "price": 200000,
+        "description": "추천 매물 배지 + 하이라이트 표시",
+        "category": "landlord_ad",
+        "duration_days": 7,
+        "ad_type": "featured",
+    },
+    "landlord_banner_home": {
+        "name": "홈 배너 광고 (1주)",
+        "price": 500000,
+        "description": "메인페이지 상단 배너 노출",
+        "category": "landlord_ad",
+        "duration_days": 7,
+        "ad_type": "home_banner",
+    },
+    "landlord_push_notification": {
+        "name": "타겟 푸시 알림",
+        "price": 100000,
+        "description": "관심 지역 의사/약사에게 푸시 발송 (최대 1000명)",
+        "category": "landlord_ad",
+        "ad_type": "push",
+        "max_recipients": 1000,
+    },
+    "landlord_email_campaign": {
+        "name": "이메일 마케팅",
+        "price": 200000,
+        "description": "뉴스레터에 매물 소개 포함",
+        "category": "landlord_ad",
+        "ad_type": "email",
+    },
+    "landlord_premium_package": {
+        "name": "프리미엄 광고 패키지 (1개월)",
+        "price": 1500000,
+        "description": "상위노출 + 배너 + 푸시 + 이메일 (30% 할인)",
+        "category": "landlord_ad",
+        "duration_days": 30,
+        "ad_type": "package",
+        "includes": ["search_top", "home_banner", "push", "email"],
+    },
 }
+
+# 건물주 입주 성사 수수료
+LANDLORD_SUCCESS_FEE = {
+    "monthly_rent_months": 1,  # 월세 1개월분
+    "deposit_rate": 0.01,  # 또는 보증금의 1%
+    "min_fee": 500000,  # 최소 50만원
+    "max_fee": 10000000,  # 최대 1000만원
+}
+
+
+def calculate_landlord_success_fee(monthly_rent: int, deposit: int) -> int:
+    """
+    건물주 입주 성사 수수료 계산
+
+    Args:
+        monthly_rent: 월세 (원)
+        deposit: 보증금 (원)
+
+    Returns:
+        성사 수수료 (원) - 월세 1개월분과 보증금 1% 중 큰 금액
+    """
+    fee_by_rent = monthly_rent
+    fee_by_deposit = int(deposit * LANDLORD_SUCCESS_FEE["deposit_rate"])
+
+    fee = max(fee_by_rent, fee_by_deposit)
+    fee = max(fee, LANDLORD_SUCCESS_FEE["min_fee"])
+    fee = min(fee, LANDLORD_SUCCESS_FEE["max_fee"])
+
+    return fee
 
 # 성사 보수 요율
 SUCCESS_FEE_RATES = {
