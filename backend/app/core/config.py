@@ -1,9 +1,10 @@
 from pydantic_settings import BaseSettings
 from pydantic import field_validator
 import warnings
-from typing import List, Optional
+from typing import List, Optional, Union
 from functools import lru_cache
 import os
+import json
 
 
 class Settings(BaseSettings):
@@ -93,6 +94,23 @@ class Settings(BaseSettings):
         "https://medimatch-sooty-two-82.vercel.app",
     ]
     FRONTEND_URL: str = "http://localhost:3000"
+
+    @field_validator("CORS_ORIGINS", mode="before")
+    @classmethod
+    def parse_cors_origins(cls, v: Union[str, List[str]]) -> List[str]:
+        """Parse CORS_ORIGINS from environment variable (JSON list or comma-separated string)"""
+        if isinstance(v, list):
+            return v
+        if isinstance(v, str):
+            # Try JSON list first
+            if v.startswith("["):
+                try:
+                    return json.loads(v)
+                except json.JSONDecodeError:
+                    pass
+            # Fall back to comma-separated string
+            return [origin.strip() for origin in v.split(",") if origin.strip()]
+        return v
 
     # Email (SMTP)
     SMTP_HOST: str = ""

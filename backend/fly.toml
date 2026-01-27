@@ -1,6 +1,6 @@
 # fly.toml - Fly.io Configuration for 메디플라톤 Backend
 
-app = "mediplaton-api"
+app = "medimatch-api"
 primary_region = "nrt"  # Tokyo (closest to Korea)
 
 [build]

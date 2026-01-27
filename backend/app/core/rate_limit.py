@@ -172,6 +172,10 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
         if not self.enabled:
             return await call_next(request)
 
+        # CORS preflight 요청(OPTIONS)은 제외
+        if request.method == "OPTIONS":
+            return await call_next(request)
+
         # 헬스체크, 문서 등은 제외
         path = request.url.path
         if path in ["/", "/health", "/docs", "/redoc", "/openapi.json"]:
