@@ -1,10 +1,7 @@
+'use client'
+
 import { WifiOff, RefreshCw, Home } from 'lucide-react'
 import Link from 'next/link'
-
-export const metadata = {
-  title: '오프라인',
-  description: '인터넷 연결이 필요합니다.',
-}
 
 export default function OfflinePage() {
   return (
