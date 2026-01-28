@@ -102,6 +102,9 @@ function PaymentContent() {
       const data = await response.json();
 
       // 토스페이먼츠 결제창 호출
+      if (!window.TossPayments) {
+        throw new Error('결제 모듈을 불러오지 못했습니다. 페이지를 새로고침해주세요.');
+      }
       const tossPayments = window.TossPayments(data.payment_data.clientKey);
       await tossPayments.requestPayment('카드', {
         amount: data.amount,
