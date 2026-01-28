@@ -4,7 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import {
   ArrowLeft, Check, Star, Shield, Users, Phone,
-  FileText, Handshake, Clock, Award, ChevronRight,
+  FileText, Link2, Clock, Award, ChevronRight,
   CreditCard, Sparkles, Building2, TrendingUp
 } from 'lucide-react'
 
@@ -101,7 +101,7 @@ export default function ConsultingPage() {
               </Link>
               <div className="flex items-center gap-2">
                 <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-                  <Handshake className="w-4 h-4 text-primary-foreground" />
+                  <Link2 className="w-4 h-4 text-primary-foreground" />
                 </div>
                 <span className="text-lg font-bold text-foreground">양도양수 컨설팅</span>
               </div>
