@@ -81,7 +81,8 @@ export default function EscrowPayPage() {
       })
 
       // Initialize Toss Payments
-      const tossPayments = new window.TossPayments(process.env.NEXT_PUBLIC_TOSS_CLIENT_KEY)
+      const TossPayments = window.TossPayments as any
+      const tossPayments = TossPayments(process.env.NEXT_PUBLIC_TOSS_CLIENT_KEY)
 
       // Request payment
       await tossPayments.requestPayment('카드', {
