@@ -14,11 +14,7 @@ interface Products {
   [key: string]: Product;
 }
 
-declare global {
-  interface Window {
-    TossPayments: any;
-  }
-}
+// TossPayments 타입은 types/global.d.ts에서 전역 선언됨
 
 function PaymentContent() {
   const searchParams = useSearchParams();

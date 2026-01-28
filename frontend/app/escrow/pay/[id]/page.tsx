@@ -14,11 +14,7 @@ import {
 } from 'lucide-react'
 import { escrowService } from '@/lib/api/services'
 
-declare global {
-  interface Window {
-    TossPayments: any
-  }
-}
+// TossPayments 타입은 payment/page.tsx에서 전역 선언됨
 
 export default function EscrowPayPage() {
   const params = useParams()
