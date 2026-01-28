@@ -228,11 +228,7 @@ export default function MyPage() {
             ) : (
               <Link
                 href="/subscribe"
-                className={`px-4 py-2 rounded-lg font-medium ${
-                  subscription.tier !== 'free'
-                    ? 'bg-white/20 hover:bg-white/30 text-white'
-                    : 'bg-primary/10 hover:bg-primary/20 text-primary'
-                } transition-colors`}
+                className="px-4 py-2 rounded-lg font-medium bg-white/20 hover:bg-white/30 text-white transition-colors"
               >
                 구독 관리
               </Link>
