@@ -26,15 +26,6 @@ interface UsePaymentReturn {
   confirmPayment: (paymentKey: string, orderId: string, amount: number) => Promise<any>
 }
 
-// 토스페이먼츠 SDK 타입
-declare global {
-  interface Window {
-    TossPayments?: (clientKey: string) => {
-      requestPayment: (method: string, options: any) => Promise<void>
-    }
-  }
-}
-
 export function usePayment(): UsePaymentReturn {
   const [isLoading, setIsLoading] = useState(false)
   const [isProcessing, setIsProcessing] = useState(false)
