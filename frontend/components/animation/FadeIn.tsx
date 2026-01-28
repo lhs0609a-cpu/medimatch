@@ -39,9 +39,11 @@ export function FadeIn({
     triggerOnce,
   })
 
+  const ElementComponent = Component as React.ElementType
+
   return (
-    <Component
-      ref={ref as React.RefObject<HTMLDivElement>}
+    <ElementComponent
+      ref={ref as React.Ref<unknown>}
       className={cn(
         'opacity-0',
         isIntersecting && directionClasses[direction],
@@ -53,7 +55,7 @@ export function FadeIn({
       }}
     >
       {children}
-    </Component>
+    </ElementComponent>
   )
 }
 
