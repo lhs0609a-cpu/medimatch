@@ -115,6 +115,17 @@ export default function PartnersPage() {
     return category?.name || code
   }
 
+  // 업체명 마스킹 함수 (예: "메디컬스페이스" → "메디컬○○○○")
+  const maskPartnerName = (name: string) => {
+    if (name.length <= 3) {
+      return name[0] + '○'.repeat(name.length - 1)
+    }
+    // 앞 2-3글자만 보여주고 나머지는 ○으로 마스킹
+    const visibleLength = name.length <= 6 ? 2 : 3
+    const maskedLength = Math.min(name.length - visibleLength, 4) // 최대 4개의 ○
+    return name.slice(0, visibleLength) + '○'.repeat(maskedLength)
+  }
+
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
@@ -282,7 +293,7 @@ export default function PartnersPage() {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
                         <h3 className="font-bold text-foreground truncate group-hover:text-primary transition-colors">
-                          {partner.name}
+                          {maskPartnerName(partner.name)}
                         </h3>
                         {partner.isPremium && <Crown className="w-4 h-4 text-amber-500 flex-shrink-0" />}
                         {partner.isVerified && <BadgeCheck className="w-4 h-4 text-blue-500 flex-shrink-0" />}
@@ -401,7 +412,7 @@ export default function PartnersPage() {
                 <MessageCircle className="w-8 h-8 text-primary" />
               </div>
               <h3 className="text-xl font-bold text-foreground mb-2">
-                {selectedPartner ? `${selectedPartner.name} 문의` : '파트너 등록 문의'}
+                {selectedPartner ? `${maskPartnerName(selectedPartner.name)} 문의` : '파트너 등록 문의'}
               </h3>
               <p className="text-muted-foreground text-sm">
                 {selectedPartner
@@ -422,7 +433,7 @@ export default function PartnersPage() {
                     )
                   })()}
                   <div>
-                    <div className="font-medium text-foreground">{selectedPartner.name}</div>
+                    <div className="font-medium text-foreground">{maskPartnerName(selectedPartner.name)}</div>
                     <div className="text-xs text-muted-foreground">
                       {getCategoryName(selectedPartner.category)} · {selectedPartner.region}
                     </div>
