@@ -177,14 +177,16 @@ export default function FavoritesPage() {
         ) : viewMode === 'grid' ? (
           /* Grid View */
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredFavorites.map((item, index) => (
+            {filteredFavorites.map((item) => {
+              const hashCode = item.id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0)
+              return (
               <div key={item.id} className="card overflow-hidden group">
-                {/* 블러 처리된 실제 이미지 - index 기반 순차 배정 */}
+                {/* 블러 처리된 실제 이미지 - ID 해시 기반 배정 */}
                 <div className="aspect-video bg-secondary relative overflow-hidden">
                   <Image
                     src={item.type === 'building'
-                      ? buildingListingImages[index % buildingListingImages.length]
-                      : pharmacyListingImages[index % pharmacyListingImages.length]
+                      ? buildingListingImages[hashCode % buildingListingImages.length]
+                      : pharmacyListingImages[hashCode % pharmacyListingImages.length]
                     }
                     alt={item.title}
                     fill
@@ -250,19 +252,21 @@ export default function FavoritesPage() {
                   </Link>
                 </div>
               </div>
-            ))}
+            )})}
           </div>
         ) : (
           /* List View */
           <div className="space-y-4">
-            {filteredFavorites.map((item, index) => (
+            {filteredFavorites.map((item) => {
+              const hashCode = item.id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0)
+              return (
               <div key={item.id} className="card p-4 flex gap-4">
-                {/* 블러 처리된 썸네일 - index 기반 순차 배정 */}
+                {/* 블러 처리된 썸네일 - ID 해시 기반 배정 */}
                 <div className="w-24 h-24 bg-secondary rounded-lg flex-shrink-0 relative overflow-hidden">
                   <Image
                     src={item.type === 'building'
-                      ? buildingListingImages[index % buildingListingImages.length]
-                      : pharmacyListingImages[index % pharmacyListingImages.length]
+                      ? buildingListingImages[hashCode % buildingListingImages.length]
+                      : pharmacyListingImages[hashCode % pharmacyListingImages.length]
                     }
                     alt={item.title}
                     fill
@@ -316,7 +320,7 @@ export default function FavoritesPage() {
                   </div>
                 </div>
               </div>
-            ))}
+            )})}
           </div>
         )}
 

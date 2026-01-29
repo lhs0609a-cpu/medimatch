@@ -382,9 +382,9 @@ export default function BuildingsPage() {
             >
               {/* Image - 블러 처리된 실제 건물 사진 */}
               <div className="h-40 bg-gradient-to-br from-blue-100 to-cyan-100 dark:from-blue-900/30 dark:to-cyan-900/30 relative overflow-hidden">
-                {/* 실제 건물 이미지 (블러 처리) - index 기반으로 순차 배정 */}
+                {/* 실제 건물 이미지 (블러 처리) - thumbnailIndex 기반 배정 */}
                 <Image
-                  src={buildingListingImages[index % buildingListingImages.length]}
+                  src={buildingListingImages[listing.thumbnailIndex % buildingListingImages.length]}
                   alt={listing.title}
                   fill
                   className="object-cover blur-md scale-110"
