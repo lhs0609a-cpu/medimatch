@@ -50,12 +50,14 @@ interface MarkerData {
   lat: number;
   lng: number;
   title: string;
-  type: 'hospital' | 'pharmacy' | 'building';
+  type: 'hospital' | 'prospect' | 'pharmacy' | 'default' | 'closed_hospital' | 'listing' | 'building';
   info?: {
     address?: string;
     subArea?: string;
     price?: string;
     area?: string;
+    score?: number;
+    specialty?: string;
   };
   originalData?: BuildingListing | PharmacyListing;
 }
