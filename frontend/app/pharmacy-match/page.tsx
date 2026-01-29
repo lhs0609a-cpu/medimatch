@@ -527,16 +527,16 @@ export default function PharmacyMatchPage() {
 
         {/* Listings Grid */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredListings.map((listing) => (
+          {filteredListings.map((listing, index) => (
             <div
               key={listing.id}
               className="card card-interactive overflow-hidden cursor-pointer"
               onClick={() => handleInquiry(listing)}
             >
-              {/* 블러 처리된 약국 이미지 */}
+              {/* 블러 처리된 약국 이미지 - index 기반 순차 배정 */}
               <div className="h-32 relative overflow-hidden bg-gradient-to-br from-green-100 to-emerald-100 dark:from-green-900/30 dark:to-emerald-900/30">
                 <Image
-                  src={pharmacyListingImages[parseInt(listing.id.replace('phm-', ''), 36) % pharmacyListingImages.length]}
+                  src={pharmacyListingImages[index % pharmacyListingImages.length]}
                   alt="약국 매물"
                   fill
                   className="object-cover blur-md scale-110"

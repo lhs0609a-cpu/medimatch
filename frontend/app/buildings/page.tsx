@@ -375,16 +375,16 @@ export default function BuildingsPage() {
 
         {/* Listings Grid */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filteredListings.map((listing) => (
+          {filteredListings.map((listing, index) => (
             <div
               key={listing.id}
               className="card card-interactive overflow-hidden"
             >
               {/* Image - 블러 처리된 실제 건물 사진 */}
               <div className="h-40 bg-gradient-to-br from-blue-100 to-cyan-100 dark:from-blue-900/30 dark:to-cyan-900/30 relative overflow-hidden">
-                {/* 실제 건물 이미지 (블러 처리) */}
+                {/* 실제 건물 이미지 (블러 처리) - index 기반으로 순차 배정 */}
                 <Image
-                  src={buildingListingImages[listing.thumbnailIndex % buildingListingImages.length]}
+                  src={buildingListingImages[index % buildingListingImages.length]}
                   alt={listing.title}
                   fill
                   className="object-cover blur-md scale-110"
