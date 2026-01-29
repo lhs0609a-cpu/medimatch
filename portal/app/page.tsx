@@ -1,6 +1,6 @@
 'use client'
 
-import { Building2, TrendingUp, Wallet, ArrowRight, Phone, Mail, Handshake, Award } from 'lucide-react'
+import { Building2, TrendingUp, Wallet, ArrowRight, Phone, Mail, Users, Award } from 'lucide-react'
 import Image from 'next/image'
 
 const services = [
@@ -245,7 +245,7 @@ export default function PortalPage() {
           {/* Section Header */}
           <div className="text-center mb-12">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-100 text-emerald-700 mb-4">
-              <Handshake className="w-4 h-4" />
+              <Users className="w-4 h-4" />
               <span className="text-sm font-medium">Partners</span>
             </div>
             <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-4">
