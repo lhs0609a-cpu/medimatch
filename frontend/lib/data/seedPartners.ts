@@ -62,7 +62,7 @@ function generateId(): string {
 const interiorPartners: Partner[] = [
   {
     id: 'int-001',
-    name: '메디OO인테리어',
+    name: '메디컬스페이스',
     category: 'interior',
     description: '병원/의원 전문 인테리어 18년 경력. 서울/경기 지역 600건 이상 시공 완료. 진료과별 맞춤 설계.',
     region: '서울',
@@ -77,7 +77,7 @@ const interiorPartners: Partner[] = [
   },
   {
     id: 'int-002',
-    name: '클리닉OO디자인',
+    name: '클린룸디자인',
     category: 'interior',
     description: '모던 감각의 병원 인테리어. 환자 동선 최적화 설계 전문. 3D 시뮬레이션 무료 제공.',
     region: '서울',
@@ -92,7 +92,7 @@ const interiorPartners: Partner[] = [
   },
   {
     id: 'int-003',
-    name: '헬스OO건설',
+    name: '한양메디컬건설',
     category: 'interior',
     description: '대형병원부터 소규모 의원까지. 의료시설 전문 시공업체. 인허가 대행 포함.',
     region: '경기',
@@ -107,7 +107,7 @@ const interiorPartners: Partner[] = [
   },
   {
     id: 'int-004',
-    name: '약국OO인테리어',
+    name: '팜스페이스인테리어',
     category: 'interior',
     subcategory: '약국전문',
     description: '약국 전문 인테리어. 조제실 동선 최적화. 진열대 맞춤 제작. 전국 출장 가능.',
@@ -123,7 +123,7 @@ const interiorPartners: Partner[] = [
   },
   {
     id: 'int-005',
-    name: '부산OO메디컬',
+    name: '동남인테리어',
     category: 'interior',
     description: '부산/경남 지역 병원 인테리어 전문. 합리적인 가격, 빠른 시공.',
     region: '부산',
@@ -138,7 +138,7 @@ const interiorPartners: Partner[] = [
   },
   {
     id: 'int-006',
-    name: '대구OO설계',
+    name: '청담메디컬디자인',
     category: 'interior',
     description: '대구/경북 지역 의원급 인테리어. 설계부터 시공까지 원스톱 서비스.',
     region: '대구',
@@ -153,7 +153,7 @@ const interiorPartners: Partner[] = [
   },
   {
     id: 'int-007',
-    name: '프리미엄OO메디',
+    name: '루체디자인그룹',
     category: 'interior',
     description: '프리미엄 병원 인테리어. 수입자재 사용, 고급스러운 마감. VIP 클리닉 다수 시공.',
     region: '서울',
@@ -172,7 +172,7 @@ const interiorPartners: Partner[] = [
 const equipmentPartners: Partner[] = [
   {
     id: 'eq-001',
-    name: '메디OO솔루션',
+    name: '바이오메드코리아',
     category: 'equipment',
     description: '종합 의료기기 판매/렌탈. 설치부터 AS까지 원스톱. 전국 당일 배송.',
     region: '서울',
@@ -187,7 +187,7 @@ const equipmentPartners: Partner[] = [
   },
   {
     id: 'eq-002',
-    name: '헬스OO테크',
+    name: '메디텍솔루션',
     category: 'equipment',
     description: '최신 의료장비 리스 전문. 초기 비용 부담 최소화. 정기 점검 서비스.',
     region: '경기',
@@ -202,7 +202,7 @@ const equipmentPartners: Partner[] = [
   },
   {
     id: 'eq-003',
-    name: '치과OO장비',
+    name: '덴탈프로시스템',
     category: 'equipment',
     subcategory: '치과전문',
     description: '치과 장비 전문. 유닛체어, 파노라마, 임플란트 장비 등. 설치/교육 포함.',
@@ -218,7 +218,7 @@ const equipmentPartners: Partner[] = [
   },
   {
     id: 'eq-004',
-    name: '약국OO시스템',
+    name: '팜텍코리아',
     category: 'equipment',
     subcategory: '약국전문',
     description: '자동조제기, POS 시스템, 조제대 등 약국 장비 전문. 전국 설치.',
@@ -234,7 +234,7 @@ const equipmentPartners: Partner[] = [
   },
   {
     id: 'eq-005',
-    name: '피부OO장비',
+    name: '에스테틱메드',
     category: 'equipment',
     subcategory: '피부과전문',
     description: '피부과/성형외과 레이저 장비 전문. 수입장비 직거래. A/S 보장.',
@@ -250,7 +250,7 @@ const equipmentPartners: Partner[] = [
   },
   {
     id: 'eq-006',
-    name: '중고OO메디',
+    name: '리메드장비거래소',
     category: 'equipment',
     description: '인증 중고 의료장비 전문. 품질 보증, 합리적 가격. 교환/반품 가능.',
     region: '경기',
@@ -269,7 +269,7 @@ const equipmentPartners: Partner[] = [
 const consultingPartners: Partner[] = [
   {
     id: 'con-001',
-    name: '메디OO컨설팅',
+    name: '메디플래닝그룹',
     category: 'consulting',
     description: '개원 토탈 컨설팅 25년. 입지분석, 사업계획, 인허가, 개원 후 경영까지.',
     region: '서울',
@@ -284,7 +284,7 @@ const consultingPartners: Partner[] = [
   },
   {
     id: 'con-002',
-    name: '개원OO그룹',
+    name: '닥터스타트컨설팅',
     category: 'consulting',
     description: '의사 출신 컨설턴트 다수. 실전 경험 기반 맞춤 컨설팅. 성공률 94%.',
     region: '서울',
@@ -299,7 +299,7 @@ const consultingPartners: Partner[] = [
   },
   {
     id: 'con-003',
-    name: '약국OO컨설팅',
+    name: '팜비즈니스파트너스',
     category: 'consulting',
     subcategory: '약국전문',
     description: '약국 개국 전문 컨설팅. 처방전 분석, 입지선정, 권리금 협상 대행.',
@@ -315,7 +315,7 @@ const consultingPartners: Partner[] = [
   },
   {
     id: 'con-004',
-    name: '부산OO개원',
+    name: '해운컨설팅',
     category: 'consulting',
     description: '부산/경남 지역 개원 전문. 지역 특화 데이터 기반 분석.',
     region: '부산',
@@ -330,7 +330,7 @@ const consultingPartners: Partner[] = [
   },
   {
     id: 'con-005',
-    name: '스타트OO메디',
+    name: '영메디컬어드바이저',
     category: 'consulting',
     description: '젊은 개원의를 위한 합리적 컨설팅. 온라인 상담, 단계별 패키지.',
     region: '경기',
@@ -349,7 +349,7 @@ const consultingPartners: Partner[] = [
 const financePartners: Partner[] = [
   {
     id: 'fin-001',
-    name: 'OO회계법인',
+    name: '정앤파트너스회계법인',
     category: 'finance',
     description: '의료기관 전문 회계법인. 개원 세무, 절세 전략, 기장 대행.',
     region: '서울',
@@ -364,7 +364,7 @@ const financePartners: Partner[] = [
   },
   {
     id: 'fin-002',
-    name: 'OO세무사사무소',
+    name: '세무법인 한빛',
     category: 'finance',
     description: '병의원/약국 세무 전문. 사업자등록부터 종합소득세까지.',
     region: '서울',
@@ -379,7 +379,7 @@ const financePartners: Partner[] = [
   },
   {
     id: 'fin-003',
-    name: '메디OO세무',
+    name: '메디택스세무회계',
     category: 'finance',
     description: '의료인 절세 전문. 법인전환, 공동개원, 가족합산 절세.',
     region: '경기',
@@ -394,7 +394,7 @@ const financePartners: Partner[] = [
   },
   {
     id: 'fin-004',
-    name: 'OO세무회계',
+    name: '팜세무회계사무소',
     category: 'finance',
     description: '약국 세무 전문. 재고관리, 약품비 처리, 세무조사 대응.',
     region: '서울',
@@ -409,7 +409,7 @@ const financePartners: Partner[] = [
   },
   {
     id: 'fin-005',
-    name: '부산OO세무',
+    name: '세무법인 동백',
     category: 'finance',
     description: '부산/경남 의료기관 세무. 합리적 수수료, 빠른 응대.',
     region: '부산',
@@ -424,7 +424,7 @@ const financePartners: Partner[] = [
   },
   {
     id: 'fin-006',
-    name: '대전OO회계',
+    name: '대전세무회계법인',
     category: 'finance',
     description: '대전/충청 지역 의료 세무. 친절한 상담, 꼼꼼한 처리.',
     region: '대전',
@@ -443,7 +443,7 @@ const financePartners: Partner[] = [
 const legalPartners: Partner[] = [
   {
     id: 'leg-001',
-    name: 'OO법무법인',
+    name: '법무법인 서원',
     category: 'legal',
     description: '의료분쟁 전문 법무법인. 개원계약, 의료소송, 행정심판.',
     region: '서울',
@@ -458,7 +458,7 @@ const legalPartners: Partner[] = [
   },
   {
     id: 'leg-002',
-    name: 'OO법무사사무소',
+    name: '법무사사무소 정의',
     category: 'legal',
     description: '부동산 등기, 법인설립, 각종 인허가 전문. 의료기관 다수 경험.',
     region: '서울',
@@ -473,7 +473,7 @@ const legalPartners: Partner[] = [
   },
   {
     id: 'leg-003',
-    name: '메디OO법률',
+    name: '메디컬로펌',
     category: 'legal',
     description: '의료인 전문 법률 자문. 임대차계약, 고용계약, 의료광고.',
     region: '서울',
@@ -488,7 +488,7 @@ const legalPartners: Partner[] = [
   },
   {
     id: 'leg-004',
-    name: 'OO합동법무',
+    name: '합동법무사무소 상생',
     category: 'legal',
     description: '공동개원 계약, 동업 분쟁, 권리금 분쟁 전문.',
     region: '경기',
@@ -503,7 +503,7 @@ const legalPartners: Partner[] = [
   },
   {
     id: 'leg-005',
-    name: '부산OO법무',
+    name: '법무법인 해동',
     category: 'legal',
     description: '부산/경남 지역 의료 법률. 부동산 계약, 인허가 대행.',
     region: '부산',
@@ -522,7 +522,7 @@ const legalPartners: Partner[] = [
 const itPartners: Partner[] = [
   {
     id: 'it-001',
-    name: 'OO소프트',
+    name: '유비케어',
     category: 'it',
     description: '의료기관 EMR 시장 점유율 1위. 클라우드/온프레미스 선택 가능.',
     region: '서울',
@@ -537,7 +537,7 @@ const itPartners: Partner[] = [
   },
   {
     id: 'it-002',
-    name: '메디OO테크',
+    name: '메디칼소프트',
     category: 'it',
     description: '통합 병원 솔루션. 예약, 접수, 차트, 수납까지 원스톱.',
     region: '경기',
@@ -552,7 +552,7 @@ const itPartners: Partner[] = [
   },
   {
     id: 'it-003',
-    name: '약국OO시스템',
+    name: '팜소프트',
     category: 'it',
     subcategory: '약국전문',
     description: '약국 조제/재고/청구 통합 시스템. 자동조제기 연동.',
@@ -568,7 +568,7 @@ const itPartners: Partner[] = [
   },
   {
     id: 'it-004',
-    name: '클라우드OO메디',
+    name: '클라우드닥터',
     category: 'it',
     description: '클라우드 기반 EMR. 초기 비용 없음, 월정액 서비스.',
     region: '서울',
@@ -583,7 +583,7 @@ const itPartners: Partner[] = [
   },
   {
     id: 'it-005',
-    name: '스마트OO헬스',
+    name: '케어랩',
     category: 'it',
     description: '병원 홈페이지, 온라인 예약, 챗봇 상담 구축.',
     region: '서울',
@@ -602,7 +602,7 @@ const itPartners: Partner[] = [
 const signagePartners: Partner[] = [
   {
     id: 'sig-001',
-    name: 'OO사인시스템',
+    name: '사인앤디자인',
     category: 'signage',
     description: '병원/약국 간판 전문. LED, 채널, 돌출 간판. 인허가 대행 포함.',
     region: '서울',
@@ -617,7 +617,7 @@ const signagePartners: Partner[] = [
   },
   {
     id: 'sig-002',
-    name: '메디OO간판',
+    name: '메디사인',
     category: 'signage',
     description: '의료기관 사인물 전문. 층별 안내, 진료과 표시, 픽토그램.',
     region: '경기',
@@ -632,7 +632,7 @@ const signagePartners: Partner[] = [
   },
   {
     id: 'sig-003',
-    name: '프리미엄OO사인',
+    name: '아트사인그룹',
     category: 'signage',
     description: '고급 사인물 전문. 대리석, 메탈, 아크릴 조합 디자인.',
     region: '서울',
@@ -647,7 +647,7 @@ const signagePartners: Partner[] = [
   },
   {
     id: 'sig-004',
-    name: '부산OO간판',
+    name: '해운사인',
     category: 'signage',
     description: '부산/경남 간판 시공. 합리적 가격, 빠른 시공.',
     region: '부산',
@@ -662,7 +662,7 @@ const signagePartners: Partner[] = [
   },
   {
     id: 'sig-005',
-    name: '약국OO사인',
+    name: '팜사인코리아',
     category: 'signage',
     subcategory: '약국전문',
     description: '약국 전용 간판. 십자 조명, 24시 표시, 약국 로고.',
@@ -682,7 +682,7 @@ const signagePartners: Partner[] = [
 const marketingPartners: Partner[] = [
   {
     id: 'mkt-001',
-    name: '메디OO마케팅',
+    name: '메디애드',
     category: 'marketing',
     description: '의료기관 전문 마케팅 에이전시. 블로그, SNS, 바이럴, 광고 대행.',
     region: '서울',
@@ -697,7 +697,7 @@ const marketingPartners: Partner[] = [
   },
   {
     id: 'mkt-002',
-    name: '헬스OO콘텐츠',
+    name: '헬스콘텐츠랩',
     category: 'marketing',
     description: '의료 콘텐츠 전문 제작. 유튜브, 인스타, 블로그 콘텐츠.',
     region: '서울',
@@ -712,7 +712,7 @@ const marketingPartners: Partner[] = [
   },
   {
     id: 'mkt-003',
-    name: '닥터OO광고',
+    name: '닥터마케팅',
     category: 'marketing',
     description: '의료광고 전문. 심의 대행, 네이버/구글 광고 최적화.',
     region: '경기',
@@ -727,7 +727,7 @@ const marketingPartners: Partner[] = [
   },
   {
     id: 'mkt-004',
-    name: 'OO커뮤니케이션',
+    name: '브랜드플러스',
     category: 'marketing',
     description: '병원 브랜딩 전문. CI/BI 제작, 홍보물, 인쇄물.',
     region: '서울',
@@ -742,7 +742,7 @@ const marketingPartners: Partner[] = [
   },
   {
     id: 'mkt-005',
-    name: '약국OO홍보',
+    name: '팜마케팅그룹',
     category: 'marketing',
     subcategory: '약국전문',
     description: '약국 마케팅 전문. 지역 타겟 광고, 건강정보 콘텐츠.',
@@ -758,7 +758,7 @@ const marketingPartners: Partner[] = [
   },
   {
     id: 'mkt-006',
-    name: '부산OO마케팅',
+    name: '로컬메디애드',
     category: 'marketing',
     description: '부산/경남 병의원 마케팅. 지역 밀착형 홍보 전략.',
     region: '부산',
@@ -777,7 +777,7 @@ const marketingPartners: Partner[] = [
 const pharmaPartners: Partner[] = [
   {
     id: 'pha-001',
-    name: 'OO약품',
+    name: '지오영',
     category: 'pharma',
     description: '전국 약품 도매 네트워크. 당일 배송, 합리적 마진.',
     region: '서울',
@@ -792,7 +792,7 @@ const pharmaPartners: Partner[] = [
   },
   {
     id: 'pha-002',
-    name: 'OO팜',
+    name: '백제약품',
     category: 'pharma',
     description: '온라인 약품 주문 시스템. 실시간 재고 확인, 자동 발주.',
     region: '경기',
@@ -807,7 +807,7 @@ const pharmaPartners: Partner[] = [
   },
   {
     id: 'pha-003',
-    name: '지역OO약품',
+    name: '동남약품',
     category: 'pharma',
     description: '지역 밀착형 약품 유통. 긴급 배송, 유동적 결제.',
     region: '부산',
@@ -822,7 +822,7 @@ const pharmaPartners: Partner[] = [
   },
   {
     id: 'pha-004',
-    name: '건강OO유통',
+    name: '헬스플러스유통',
     category: 'pharma',
     description: '건강기능식품, OTC 전문. 다양한 품목, 경쟁력 있는 가격.',
     region: '서울',
@@ -837,7 +837,7 @@ const pharmaPartners: Partner[] = [
   },
   {
     id: 'pha-005',
-    name: '메디OO유통',
+    name: '메디팜유통',
     category: 'pharma',
     description: '의료기관용 의약품 전문. 대형병원 납품 경험 다수.',
     region: '서울',
@@ -856,7 +856,7 @@ const pharmaPartners: Partner[] = [
 const realestatePartners: Partner[] = [
   {
     id: 're-001',
-    name: '메디OO부동산',
+    name: '메디프라퍼티',
     category: 'realestate',
     description: '의료상가 전문 중개. 메디컬빌딩, 역세권 상가 다수 보유.',
     region: '서울',
@@ -871,7 +871,7 @@ const realestatePartners: Partner[] = [
   },
   {
     id: 're-002',
-    name: '헬스OO공인',
+    name: '닥터랜드공인중개사',
     category: 'realestate',
     description: '병의원/약국 입지 전문. 상권 분석, 경쟁 현황 제공.',
     region: '서울',
@@ -886,7 +886,7 @@ const realestatePartners: Partner[] = [
   },
   {
     id: 're-003',
-    name: '경기OO부동산',
+    name: '신도시메디컬부동산',
     category: 'realestate',
     description: '경기 신도시 의료상가 전문. 분당, 판교, 광교 다수.',
     region: '경기',
@@ -901,7 +901,7 @@ const realestatePartners: Partner[] = [
   },
   {
     id: 're-004',
-    name: '부산OO공인',
+    name: '부산메디칼공인중개사',
     category: 'realestate',
     description: '부산/경남 의료상가. 해운대, 서면, 남천동 다수.',
     region: '부산',
@@ -916,7 +916,7 @@ const realestatePartners: Partner[] = [
   },
   {
     id: 're-005',
-    name: '약국OO중개',
+    name: '팜트랜스퍼',
     category: 'realestate',
     subcategory: '약국전문',
     description: '약국 양도양수 전문 중개. 권리금 협상, 계약 대행.',
@@ -932,7 +932,7 @@ const realestatePartners: Partner[] = [
   },
   {
     id: 're-006',
-    name: '대전OO부동산',
+    name: '중부메디컬부동산',
     category: 'realestate',
     description: '대전/충청 의료상가. 둔산동, 유성구 전문.',
     region: '대전',
