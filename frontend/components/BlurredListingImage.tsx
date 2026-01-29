@@ -76,34 +76,105 @@ export function BlurredListingImage({
 
 // 로컬 건물/병원 이미지 (실제 한국 메디컬빌딩 및 병원 인테리어)
 export const buildingListingImages = [
-  '/images/listings/building-01.jpg', // 병원 대기실 인테리어
-  '/images/listings/building-02.jpg', // 고급 로비 (샹들리에)
-  '/images/listings/building-03.jpg', // 모던 로비 인테리어
-  '/images/listings/building-04.jpg', // 병원 내부
-  '/images/listings/building-05.png', // 외과 접수대
-  '/images/listings/building-06.png', // 시술실/진료실
-  '/images/listings/building-07.png', // 건물 외관 (블루 글라스)
-  '/images/listings/building-08.png', // 건물 외관 (모던 상가)
-  '/images/listings/building-09.png', // 병원 인테리어
-  '/images/listings/building-10.png', // 병원 복도 (채혈실)
-  '/images/listings/building-11.png', // 병원 복도 (엘리베이터)
-  '/images/listings/building-12.png', // 인테리어 공사중
-  '/images/listings/building-13.png', // 공사 현장
-  '/images/listings/building-14.png', // 건물 외관 (상업빌딩)
-  '/images/listings/building-15.png', // 병원 인테리어
-  '/images/listings/building-16.png', // 접수대
+  // 기존 이미지
+  '/images/listings/building-01.jpg',
+  '/images/listings/building-02.jpg',
+  '/images/listings/building-03.jpg',
+  '/images/listings/building-04.jpg',
+  '/images/listings/building-05.png',
+  '/images/listings/building-06.png',
+  '/images/listings/building-07.png',
+  '/images/listings/building-08.png',
+  '/images/listings/building-09.png',
+  '/images/listings/building-10.png',
+  '/images/listings/building-11.png',
+  '/images/listings/building-12.png',
+  '/images/listings/building-13.png',
+  '/images/listings/building-14.png',
+  '/images/listings/building-15.png',
+  '/images/listings/building-16.png',
+  // 새로운 병원 이미지 (블러 처리됨)
+  '/images/listings/hospital-01.jpg',
+  '/images/listings/hospital-02.jpg',
+  '/images/listings/hospital-03.jpg',
+  '/images/listings/hospital-04.jpg',
+  '/images/listings/hospital-05.jpg',
+  '/images/listings/hospital-06.jpg',
+  '/images/listings/hospital-07.jpg',
+  '/images/listings/hospital-08.jpg',
+  '/images/listings/hospital-09.jpg',
+  '/images/listings/hospital-10.jpg',
+  '/images/listings/hospital-11.jpg',
+  '/images/listings/hospital-12.jpg',
+  '/images/listings/hospital-13.jpg',
+  '/images/listings/hospital-14.jpg',
+  '/images/listings/hospital-15.jpg',
+  '/images/listings/hospital-16.jpg',
+  '/images/listings/hospital-17.jpg',
+  '/images/listings/hospital-18.jpg',
+  '/images/listings/hospital-19.jpg',
+  '/images/listings/hospital-20.jpg',
+  '/images/listings/hospital-21.jpg',
+  '/images/listings/hospital-22.jpg',
+  '/images/listings/hospital-23.jpg',
+  '/images/listings/hospital-24.jpg',
+  '/images/listings/hospital-25.jpg',
+  '/images/listings/hospital-26.jpg',
+  '/images/listings/hospital-27.jpg',
+  '/images/listings/hospital-28.jpg',
+  '/images/listings/hospital-29.jpg',
+  '/images/listings/hospital-30.jpg',
+  '/images/listings/hospital-31.jpg',
+  '/images/listings/hospital-32.jpg',
+  '/images/listings/hospital-33.jpg',
+  '/images/listings/hospital-34.jpg',
+  '/images/listings/hospital-35.jpg',
+  '/images/listings/hospital-36.jpg',
+  '/images/listings/hospital-37.jpg',
+  '/images/listings/hospital-38.jpg',
 ]
 
-// 약국용 이미지 (병원 이미지 일부 재활용 + 상점 느낌)
+// 약국용 이미지 (블러 처리된 약국 전용 이미지)
 export const pharmacyListingImages = [
-  '/images/listings/building-05.png', // 접수대 (약국 카운터와 유사)
-  '/images/listings/building-09.png', // 내부 인테리어
-  '/images/listings/building-10.png', // 복도/공간
-  '/images/listings/building-06.png', // 진료/조제 공간
-  '/images/listings/building-08.png', // 상가 건물 외관
-  '/images/listings/building-14.png', // 상업 빌딩
-  '/images/listings/building-01.jpg', // 대기 공간
-  '/images/listings/building-03.jpg', // 로비
+  '/images/listings/pharmacy-01.jpg',
+  '/images/listings/pharmacy-02.jpg',
+  '/images/listings/pharmacy-03.jpg',
+  '/images/listings/pharmacy-04.jpg',
+  '/images/listings/pharmacy-05.jpg',
+  '/images/listings/pharmacy-06.jpg',
+  '/images/listings/pharmacy-07.jpg',
+  '/images/listings/pharmacy-08.jpg',
+  '/images/listings/pharmacy-09.jpg',
+  '/images/listings/pharmacy-10.jpg',
+  '/images/listings/pharmacy-11.jpg',
+  '/images/listings/pharmacy-12.jpg',
+  '/images/listings/pharmacy-13.jpg',
+  '/images/listings/pharmacy-14.jpg',
+  '/images/listings/pharmacy-15.jpg',
+  '/images/listings/pharmacy-16.jpg',
+  '/images/listings/pharmacy-17.jpg',
+  '/images/listings/pharmacy-18.jpg',
+  '/images/listings/pharmacy-19.jpg',
+  '/images/listings/pharmacy-20.jpg',
+  '/images/listings/pharmacy-21.jpg',
+  '/images/listings/pharmacy-22.jpg',
+  '/images/listings/pharmacy-23.jpg',
+  '/images/listings/pharmacy-24.jpg',
+  '/images/listings/pharmacy-25.jpg',
+  '/images/listings/pharmacy-26.jpg',
+  '/images/listings/pharmacy-27.jpg',
+  '/images/listings/pharmacy-28.jpg',
+  '/images/listings/pharmacy-29.jpg',
+  '/images/listings/pharmacy-30.jpg',
+  '/images/listings/pharmacy-31.jpg',
+  '/images/listings/pharmacy-32.jpg',
+  '/images/listings/pharmacy-33.jpg',
+  '/images/listings/pharmacy-34.jpg',
+  '/images/listings/pharmacy-35.jpg',
+  '/images/listings/pharmacy-36.jpg',
+  '/images/listings/pharmacy-37.jpg',
+  '/images/listings/pharmacy-38.jpg',
+  '/images/listings/pharmacy-39.jpg',
 ]
 
 // 기존 코드 호환성을 위한 별칭

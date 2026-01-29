@@ -91,7 +91,7 @@ export interface BuildingListing {
   urgencyTag?: string
 }
 
-export function generateBuildingListings(count: number = 120): BuildingListing[] {
+export function generateBuildingListings(count: number = 350): BuildingListing[] {
   const listings: BuildingListing[] = []
   const now = Date.now()
 
@@ -160,7 +160,7 @@ export function generateBuildingListings(count: number = 120): BuildingListing[]
       inquiryCount,
       createdAt: new Date(now - createdHoursAgo * 60 * 60 * 1000).toISOString(),
       isVerified: Math.random() > 0.45,
-      thumbnailIndex: randomInt(1, 8),
+      thumbnailIndex: randomInt(0, 53),
       isHot,
       isNew,
       currentViewers,
@@ -209,7 +209,7 @@ export interface PharmacyListing {
 
 const transferReasons = ['은퇴', '이주', '건강', '진로변경', '가족사정', '기타']
 
-export function generatePharmacyListings(count: number = 80): PharmacyListing[] {
+export function generatePharmacyListings(count: number = 48): PharmacyListing[] {
   const listings: PharmacyListing[] = []
   const now = Date.now()
 
@@ -472,21 +472,21 @@ function getRelativeTime(minutesAgo: number): string {
   return `${Math.floor(minutesAgo / 1440)}일 전`
 }
 
-// 통계 데이터 (더 인상적인 숫자들)
+// 통계 데이터 (현실적인 숫자들)
 export const platformStats = {
-  totalListings: 1247,
-  activePharmacyListings: 384,
-  activeBuildingListings: 863,
-  monthlyMatches: 127,
-  totalMembers: 18742,
-  todayNewListings: randomInt(12, 28),
-  weeklyInquiries: randomInt(380, 520),
-  successfulMatches: 2847,
-  averageMatchTime: '9.5일',
-  todayActiveUsers: randomInt(340, 580),
-  onlineNow: randomInt(45, 120),
-  todayPosts: randomInt(25, 45),
-  weeklyNewMembers: randomInt(120, 200),
+  totalListings: 398,
+  activePharmacyListings: 48,
+  activeBuildingListings: 350,
+  monthlyMatches: 47,
+  totalMembers: 8742,
+  todayNewListings: randomInt(3, 8),
+  weeklyInquiries: randomInt(120, 180),
+  successfulMatches: 847,
+  averageMatchTime: '12.5일',
+  todayActiveUsers: randomInt(120, 280),
+  onlineNow: randomInt(15, 45),
+  todayPosts: randomInt(8, 18),
+  weeklyNewMembers: randomInt(40, 80),
 }
 
 // 실시간 활동 피드
