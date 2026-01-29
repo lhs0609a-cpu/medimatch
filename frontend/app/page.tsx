@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { useState, useEffect, useRef } from 'react'
 import dynamic from 'next/dynamic'
 import OnboardingModal, { useOnboarding } from '@/components/onboarding/OnboardingModal'
-import { platformStats, generateActivityFeed, recentSuccessStories } from '@/lib/data/seedListings'
+import { platformStats, generateActivityFeed, recentSuccessStories, generateBuildingListings, generatePharmacyListings } from '@/lib/data/seedListings'
 import {
   ArrowRight,
   BarChart3,
@@ -156,15 +156,27 @@ export default function HomePage() {
   useEffect(() => {
     setLiveFeed(generateLiveFeed())
 
-    // 초기 마커 설정
-    const initialMarkers = [
-      { id: '1', lat: 37.5007, lng: 127.0365, title: '역삼동 메디컬빌딩', type: 'hospital' as const },
-      { id: '2', lat: 37.3825, lng: 127.1190, title: '분당 약국', type: 'pharmacy' as const },
-      { id: '3', lat: 37.5133, lng: 127.0846, title: '잠실 상가', type: 'hospital' as const },
-      { id: '4', lat: 37.5496, lng: 126.9138, title: '합정동 빌딩', type: 'hospital' as const },
-      { id: '5', lat: 37.5219, lng: 126.9245, title: '여의도 약국', type: 'pharmacy' as const },
-    ]
-    setMapMarkers(initialMarkers)
+    // 전국 매물 마커 설정
+    const buildings = generateBuildingListings()
+    const pharmacies = generatePharmacyListings()
+
+    const buildingMarkers = buildings.map((b) => ({
+      id: b.id,
+      lat: b.lat,
+      lng: b.lng,
+      title: b.title,
+      type: 'hospital' as const,
+    }))
+
+    const pharmacyMarkers = pharmacies.map((p) => ({
+      id: p.id,
+      lat: p.lat,
+      lng: p.lng,
+      title: `${p.subArea} 약국`,
+      type: 'pharmacy' as const,
+    }))
+
+    setMapMarkers([...buildingMarkers, ...pharmacyMarkers])
   }, [])
 
   // 피드 자동 슬라이드
@@ -724,8 +736,8 @@ export default function HomePage() {
             <div className="relative rounded-3xl overflow-hidden border border-border shadow-2xl">
               <div className="h-[500px]">
                 <KakaoMap
-                  center={{ lat: 37.5172, lng: 127.0473 }}
-                  level={9}
+                  center={{ lat: 36.5, lng: 127.5 }}
+                  level={12}
                   markers={mapMarkers}
                   className="w-full h-full"
                 />
