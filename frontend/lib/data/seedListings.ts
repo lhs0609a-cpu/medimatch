@@ -19,6 +19,7 @@ interface RegionData {
 }
 
 const regions: RegionData[] = [
+  // ===== 서울특별시 =====
   {
     code: 'seoul-gangnam', name: '서울 강남구', lat: 37.5172, lng: 127.0473,
     subAreas: [
@@ -102,6 +103,8 @@ const regions: RegionData[] = [
       { name: '회현동', lat: 37.5580, lng: 126.9815 },
     ]
   },
+
+  // ===== 경기도 =====
   {
     code: 'gyeonggi-seongnam', name: '경기 성남시', lat: 37.4200, lng: 127.1265,
     subAreas: [
@@ -136,6 +139,65 @@ const regions: RegionData[] = [
     ]
   },
   {
+    code: 'gyeonggi-bucheon', name: '경기 부천시', lat: 37.5034, lng: 126.7660,
+    subAreas: [
+      { name: '원미구', lat: 37.5052, lng: 126.7830 },
+      { name: '소사구', lat: 37.4783, lng: 126.7952 },
+      { name: '오정구', lat: 37.5234, lng: 126.7932 },
+    ]
+  },
+  {
+    code: 'gyeonggi-anyang', name: '경기 안양시', lat: 37.3943, lng: 126.9568,
+    subAreas: [
+      { name: '동안구', lat: 37.3943, lng: 126.9518 },
+      { name: '만안구', lat: 37.3866, lng: 126.9268 },
+    ]
+  },
+  {
+    code: 'gyeonggi-hwaseong', name: '경기 화성시', lat: 37.1996, lng: 126.8312,
+    subAreas: [
+      { name: '동탄', lat: 37.2006, lng: 127.0742 },
+      { name: '병점동', lat: 37.1896, lng: 127.0112 },
+      { name: '봉담읍', lat: 37.2196, lng: 126.9312 },
+    ]
+  },
+  {
+    code: 'gyeonggi-pyeongtaek', name: '경기 평택시', lat: 36.9921, lng: 127.1126,
+    subAreas: [
+      { name: '평택역', lat: 36.9921, lng: 127.0856 },
+      { name: '송탄', lat: 37.0821, lng: 127.0556 },
+      { name: '안중읍', lat: 36.9521, lng: 126.9156 },
+    ]
+  },
+
+  // ===== 인천광역시 =====
+  {
+    code: 'incheon-yeonsu', name: '인천 연수구', lat: 37.4103, lng: 126.6783,
+    subAreas: [
+      { name: '송도동', lat: 37.3833, lng: 126.6573 },
+      { name: '연수동', lat: 37.4103, lng: 126.6783 },
+      { name: '청학동', lat: 37.4256, lng: 126.6892 },
+    ]
+  },
+  {
+    code: 'incheon-namdong', name: '인천 남동구', lat: 37.4486, lng: 126.7309,
+    subAreas: [
+      { name: '구월동', lat: 37.4486, lng: 126.7239 },
+      { name: '간석동', lat: 37.4636, lng: 126.7109 },
+      { name: '논현동', lat: 37.4086, lng: 126.7409 },
+    ]
+  },
+  {
+    code: 'incheon-bupyeong', name: '인천 부평구', lat: 37.5074, lng: 126.7219,
+    subAreas: [
+      { name: '부평역', lat: 37.4897, lng: 126.7235 },
+      { name: '산곡동', lat: 37.5074, lng: 126.7019 },
+      { name: '십정동', lat: 37.4974, lng: 126.7319 },
+    ]
+  },
+
+  // ===== 부산광역시 =====
+  {
     code: 'busan-haeundae', name: '부산 해운대구', lat: 35.1631, lng: 129.1635,
     subAreas: [
       { name: '해운대동', lat: 35.1587, lng: 129.1603 },
@@ -153,6 +215,31 @@ const regions: RegionData[] = [
     ]
   },
   {
+    code: 'busan-busanjin', name: '부산 부산진구', lat: 35.1629, lng: 129.0532,
+    subAreas: [
+      { name: '서면', lat: 35.1579, lng: 129.0592 },
+      { name: '전포동', lat: 35.1529, lng: 129.0632 },
+      { name: '부전동', lat: 35.1629, lng: 129.0582 },
+    ]
+  },
+  {
+    code: 'busan-nam', name: '부산 남구', lat: 35.1368, lng: 129.0849,
+    subAreas: [
+      { name: '대연동', lat: 35.1368, lng: 129.0849 },
+      { name: '용호동', lat: 35.1168, lng: 129.1049 },
+      { name: '문현동', lat: 35.1268, lng: 129.0749 },
+    ]
+  },
+  {
+    code: 'busan-dong', name: '부산 동구', lat: 35.1294, lng: 129.0455,
+    subAreas: [
+      { name: '범일동', lat: 35.1394, lng: 129.0555 },
+      { name: '초량동', lat: 35.1194, lng: 129.0355 },
+    ]
+  },
+
+  // ===== 대구광역시 =====
+  {
     code: 'daegu-suseong', name: '대구 수성구', lat: 35.8583, lng: 128.6306,
     subAreas: [
       { name: '범어동', lat: 35.8591, lng: 128.6210 },
@@ -162,11 +249,281 @@ const regions: RegionData[] = [
     ]
   },
   {
-    code: 'incheon-yeonsu', name: '인천 연수구', lat: 37.4103, lng: 126.6783,
+    code: 'daegu-jung', name: '대구 중구', lat: 35.8694, lng: 128.6062,
     subAreas: [
-      { name: '송도동', lat: 37.3833, lng: 126.6573 },
-      { name: '연수동', lat: 37.4103, lng: 126.6783 },
-      { name: '청학동', lat: 37.4256, lng: 126.6892 },
+      { name: '동성로', lat: 35.8694, lng: 128.5962 },
+      { name: '삼덕동', lat: 35.8694, lng: 128.6162 },
+      { name: '대봉동', lat: 35.8594, lng: 128.6062 },
+    ]
+  },
+  {
+    code: 'daegu-dalseong', name: '대구 달서구', lat: 35.8299, lng: 128.5332,
+    subAreas: [
+      { name: '월성동', lat: 35.8299, lng: 128.5332 },
+      { name: '상인동', lat: 35.8099, lng: 128.5432 },
+      { name: '죽전동', lat: 35.8399, lng: 128.5232 },
+    ]
+  },
+
+  // ===== 광주광역시 =====
+  {
+    code: 'gwangju-seo', name: '광주 서구', lat: 35.1522, lng: 126.8895,
+    subAreas: [
+      { name: '상무지구', lat: 35.1522, lng: 126.8595 },
+      { name: '치평동', lat: 35.1422, lng: 126.8495 },
+      { name: '농성동', lat: 35.1622, lng: 126.8795 },
+    ]
+  },
+  {
+    code: 'gwangju-nam', name: '광주 남구', lat: 35.1326, lng: 126.9026,
+    subAreas: [
+      { name: '봉선동', lat: 35.1326, lng: 126.9126 },
+      { name: '주월동', lat: 35.1226, lng: 126.8926 },
+      { name: '진월동', lat: 35.1126, lng: 126.8826 },
+    ]
+  },
+  {
+    code: 'gwangju-buk', name: '광주 북구', lat: 35.1747, lng: 126.9120,
+    subAreas: [
+      { name: '운암동', lat: 35.1747, lng: 126.8920 },
+      { name: '문흥동', lat: 35.1847, lng: 126.9220 },
+      { name: '용봉동', lat: 35.1847, lng: 126.9020 },
+    ]
+  },
+
+  // ===== 대전광역시 =====
+  {
+    code: 'daejeon-seo', name: '대전 서구', lat: 36.3551, lng: 127.3837,
+    subAreas: [
+      { name: '둔산동', lat: 36.3551, lng: 127.3737 },
+      { name: '월평동', lat: 36.3651, lng: 127.3637 },
+      { name: '탄방동', lat: 36.3451, lng: 127.3837 },
+    ]
+  },
+  {
+    code: 'daejeon-yuseong', name: '대전 유성구', lat: 36.3623, lng: 127.3562,
+    subAreas: [
+      { name: '봉명동', lat: 36.3623, lng: 127.3462 },
+      { name: '노은동', lat: 36.3723, lng: 127.3262 },
+      { name: '궁동', lat: 36.3523, lng: 127.3362 },
+    ]
+  },
+  {
+    code: 'daejeon-jung', name: '대전 중구', lat: 36.3256, lng: 127.4217,
+    subAreas: [
+      { name: '대흥동', lat: 36.3256, lng: 127.4217 },
+      { name: '은행동', lat: 36.3306, lng: 127.4267 },
+      { name: '선화동', lat: 36.3206, lng: 127.4167 },
+    ]
+  },
+
+  // ===== 울산광역시 =====
+  {
+    code: 'ulsan-nam', name: '울산 남구', lat: 35.5444, lng: 129.3301,
+    subAreas: [
+      { name: '삼산동', lat: 35.5444, lng: 129.3301 },
+      { name: '달동', lat: 35.5344, lng: 129.3201 },
+      { name: '무거동', lat: 35.5544, lng: 129.3101 },
+    ]
+  },
+  {
+    code: 'ulsan-jung', name: '울산 중구', lat: 35.5697, lng: 129.3324,
+    subAreas: [
+      { name: '성남동', lat: 35.5697, lng: 129.3324 },
+      { name: '학성동', lat: 35.5597, lng: 129.3424 },
+      { name: '복산동', lat: 35.5797, lng: 129.3224 },
+    ]
+  },
+
+  // ===== 세종특별자치시 =====
+  {
+    code: 'sejong', name: '세종시', lat: 36.4801, lng: 127.2892,
+    subAreas: [
+      { name: '어진동', lat: 36.4801, lng: 127.2892 },
+      { name: '도담동', lat: 36.4901, lng: 127.2792 },
+      { name: '나성동', lat: 36.4701, lng: 127.2992 },
+      { name: '보람동', lat: 36.4851, lng: 127.2842 },
+    ]
+  },
+
+  // ===== 강원도 =====
+  {
+    code: 'gangwon-chuncheon', name: '강원 춘천시', lat: 37.8813, lng: 127.7298,
+    subAreas: [
+      { name: '효자동', lat: 37.8713, lng: 127.7198 },
+      { name: '석사동', lat: 37.8913, lng: 127.7398 },
+      { name: '퇴계동', lat: 37.8763, lng: 127.7248 },
+    ]
+  },
+  {
+    code: 'gangwon-wonju', name: '강원 원주시', lat: 37.3422, lng: 127.9202,
+    subAreas: [
+      { name: '단계동', lat: 37.3522, lng: 127.9302 },
+      { name: '무실동', lat: 37.3422, lng: 127.9102 },
+      { name: '중앙동', lat: 37.3372, lng: 127.9202 },
+    ]
+  },
+  {
+    code: 'gangwon-gangneung', name: '강원 강릉시', lat: 37.7519, lng: 128.8761,
+    subAreas: [
+      { name: '교동', lat: 37.7519, lng: 128.8761 },
+      { name: '포남동', lat: 37.7619, lng: 128.8861 },
+      { name: '입암동', lat: 37.7419, lng: 128.8661 },
+    ]
+  },
+
+  // ===== 충청북도 =====
+  {
+    code: 'chungbuk-cheongju', name: '충북 청주시', lat: 36.6424, lng: 127.4890,
+    subAreas: [
+      { name: '복대동', lat: 36.6324, lng: 127.4790 },
+      { name: '용암동', lat: 36.6524, lng: 127.4590 },
+      { name: '성화동', lat: 36.6424, lng: 127.4990 },
+      { name: '가경동', lat: 36.6224, lng: 127.4690 },
+    ]
+  },
+  {
+    code: 'chungbuk-chungju', name: '충북 충주시', lat: 36.9910, lng: 127.9259,
+    subAreas: [
+      { name: '성내동', lat: 36.9910, lng: 127.9259 },
+      { name: '연수동', lat: 36.9810, lng: 127.9159 },
+      { name: '호암동', lat: 37.0010, lng: 127.9359 },
+    ]
+  },
+
+  // ===== 충청남도 =====
+  {
+    code: 'chungnam-cheonan', name: '충남 천안시', lat: 36.8151, lng: 127.1139,
+    subAreas: [
+      { name: '두정동', lat: 36.8251, lng: 127.1239 },
+      { name: '신부동', lat: 36.8051, lng: 127.1339 },
+      { name: '불당동', lat: 36.8151, lng: 127.1039 },
+      { name: '쌍용동', lat: 36.7951, lng: 127.1139 },
+    ]
+  },
+  {
+    code: 'chungnam-asan', name: '충남 아산시', lat: 36.7898, lng: 127.0018,
+    subAreas: [
+      { name: '온양동', lat: 36.7898, lng: 127.0018 },
+      { name: '배방읍', lat: 36.7698, lng: 127.0218 },
+      { name: '탕정면', lat: 36.7798, lng: 126.9918 },
+    ]
+  },
+
+  // ===== 전라북도 =====
+  {
+    code: 'jeonbuk-jeonju', name: '전북 전주시', lat: 35.8242, lng: 127.1480,
+    subAreas: [
+      { name: '효자동', lat: 35.8242, lng: 127.1280 },
+      { name: '서신동', lat: 35.8142, lng: 127.1180 },
+      { name: '송천동', lat: 35.8342, lng: 127.1380 },
+      { name: '삼천동', lat: 35.8042, lng: 127.1580 },
+    ]
+  },
+  {
+    code: 'jeonbuk-iksan', name: '전북 익산시', lat: 35.9483, lng: 126.9576,
+    subAreas: [
+      { name: '영등동', lat: 35.9483, lng: 126.9476 },
+      { name: '어양동', lat: 35.9583, lng: 126.9576 },
+      { name: '부송동', lat: 35.9383, lng: 126.9676 },
+    ]
+  },
+
+  // ===== 전라남도 =====
+  {
+    code: 'jeonnam-yeosu', name: '전남 여수시', lat: 34.7604, lng: 127.6622,
+    subAreas: [
+      { name: '학동', lat: 34.7604, lng: 127.6522 },
+      { name: '문수동', lat: 34.7704, lng: 127.6622 },
+      { name: '여서동', lat: 34.7504, lng: 127.6722 },
+    ]
+  },
+  {
+    code: 'jeonnam-suncheon', name: '전남 순천시', lat: 34.9506, lng: 127.4872,
+    subAreas: [
+      { name: '연향동', lat: 34.9506, lng: 127.4772 },
+      { name: '조례동', lat: 34.9606, lng: 127.4972 },
+      { name: '왕조동', lat: 34.9406, lng: 127.4872 },
+    ]
+  },
+  {
+    code: 'jeonnam-mokpo', name: '전남 목포시', lat: 34.8118, lng: 126.3922,
+    subAreas: [
+      { name: '하당동', lat: 34.8018, lng: 126.4022 },
+      { name: '상동', lat: 34.8118, lng: 126.3822 },
+      { name: '옥암동', lat: 34.7918, lng: 126.4122 },
+    ]
+  },
+
+  // ===== 경상북도 =====
+  {
+    code: 'gyeongbuk-pohang', name: '경북 포항시', lat: 36.0190, lng: 129.3435,
+    subAreas: [
+      { name: '죽도동', lat: 36.0290, lng: 129.3535 },
+      { name: '양학동', lat: 36.0090, lng: 129.3635 },
+      { name: '장량동', lat: 36.0390, lng: 129.3335 },
+    ]
+  },
+  {
+    code: 'gyeongbuk-gumi', name: '경북 구미시', lat: 36.1195, lng: 128.3446,
+    subAreas: [
+      { name: '송정동', lat: 36.1195, lng: 128.3346 },
+      { name: '원평동', lat: 36.1095, lng: 128.3546 },
+      { name: '형곡동', lat: 36.1295, lng: 128.3246 },
+    ]
+  },
+  {
+    code: 'gyeongbuk-gyeongju', name: '경북 경주시', lat: 35.8562, lng: 129.2247,
+    subAreas: [
+      { name: '성건동', lat: 35.8562, lng: 129.2147 },
+      { name: '황성동', lat: 35.8462, lng: 129.2347 },
+      { name: '동천동', lat: 35.8662, lng: 129.2247 },
+    ]
+  },
+
+  // ===== 경상남도 =====
+  {
+    code: 'gyeongnam-changwon', name: '경남 창원시', lat: 35.2279, lng: 128.6811,
+    subAreas: [
+      { name: '상남동', lat: 35.2279, lng: 128.6811 },
+      { name: '용호동', lat: 35.2179, lng: 128.6911 },
+      { name: '중앙동', lat: 35.2379, lng: 128.6711 },
+      { name: '명서동', lat: 35.2079, lng: 128.6611 },
+    ]
+  },
+  {
+    code: 'gyeongnam-gimhae', name: '경남 김해시', lat: 35.2341, lng: 128.8896,
+    subAreas: [
+      { name: '내외동', lat: 35.2341, lng: 128.8796 },
+      { name: '삼계동', lat: 35.2241, lng: 128.8996 },
+      { name: '장유동', lat: 35.1941, lng: 128.8096 },
+    ]
+  },
+  {
+    code: 'gyeongnam-jinju', name: '경남 진주시', lat: 35.1798, lng: 128.1076,
+    subAreas: [
+      { name: '상대동', lat: 35.1798, lng: 128.0976 },
+      { name: '충무공동', lat: 35.1698, lng: 128.1176 },
+      { name: '상봉동', lat: 35.1898, lng: 128.1076 },
+    ]
+  },
+
+  // ===== 제주특별자치도 =====
+  {
+    code: 'jeju-jeju', name: '제주시', lat: 33.4996, lng: 126.5312,
+    subAreas: [
+      { name: '연동', lat: 33.4896, lng: 126.4912 },
+      { name: '노형동', lat: 33.4796, lng: 126.4712 },
+      { name: '이도동', lat: 33.4996, lng: 126.5312 },
+      { name: '삼도동', lat: 33.5096, lng: 126.5212 },
+    ]
+  },
+  {
+    code: 'jeju-seogwipo', name: '서귀포시', lat: 33.2541, lng: 126.5600,
+    subAreas: [
+      { name: '중문동', lat: 33.2541, lng: 126.4100 },
+      { name: '서귀동', lat: 33.2441, lng: 126.5600 },
+      { name: '대정읍', lat: 33.2241, lng: 126.2500 },
     ]
   },
 ]
@@ -370,7 +727,7 @@ export interface PharmacyListing {
 
 const transferReasons = ['은퇴', '이주', '건강', '진로변경', '가족사정', '기타']
 
-export function generatePharmacyListings(count: number = 48): PharmacyListing[] {
+export function generatePharmacyListings(count: number = 120): PharmacyListing[] {
   const listings: PharmacyListing[] = []
   const now = Date.now()
 
@@ -643,8 +1000,8 @@ function getRelativeTime(minutesAgo: number): string {
 
 // 통계 데이터 (현실적인 숫자들)
 export const platformStats = {
-  totalListings: 398,
-  activePharmacyListings: 48,
+  totalListings: 470,
+  activePharmacyListings: 120,
   activeBuildingListings: 350,
   monthlyMatches: 47,
   totalMembers: 8742,
