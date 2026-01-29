@@ -1,6 +1,7 @@
 'use client'
 
-import { Building2, TrendingUp, Wallet, ArrowRight, Phone, Mail } from 'lucide-react'
+import { Building2, TrendingUp, Wallet, ArrowRight, Phone, Mail, Handshake, Award } from 'lucide-react'
+import Image from 'next/image'
 
 const services = [
   {
@@ -42,6 +43,23 @@ const services = [
     iconColor: 'text-emerald-600',
     icon: Wallet,
   },
+]
+
+// 협력사 로고 (23개)
+const partnerLogos = [
+  '001.png', '002.png', '003.png', '004.png', '005.png', '006.png', '007.png',
+  '008.png', '009.png', '010.png', '011.png', '012.png', '013.png', '014.png',
+  '015.png', '016.png', '017.png', '018.png', '019.png', '021.png', '022.png', '023.png'
+]
+
+// 병원 포트폴리오 로고 (37개)
+const portfolioLogos = [
+  '024.png', '025.png', '026.png', '027.png', '028.png', '029.png', '030.png',
+  '031.png', '032.png', '033.png', '034.png', '035.png', '036.png', '037.png',
+  '038.png', '039.png', '040.png', '041.png', '042.png', '043.png', '044.png',
+  '045.png', '046.png', '047.png', '048.png', '049.png', '050.png', '051.png',
+  '052.png', '053.png', '054.png', '055.png', '056.png', '057.png', '058.png',
+  '059.png', '060.png'
 ]
 
 export default function PortalPage() {
@@ -161,6 +179,43 @@ export default function PortalPage() {
         </div>
       </section>
 
+      {/* Hospital Portfolio Section */}
+      <section className="py-20 bg-gradient-to-br from-slate-50 to-blue-50">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6">
+          {/* Section Header */}
+          <div className="text-center mb-12">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-100 text-blue-700 mb-4">
+              <Award className="w-4 h-4" />
+              <span className="text-sm font-medium">Portfolio</span>
+            </div>
+            <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-4">
+              메디플라톤과 함께한 병원
+            </h2>
+            <p className="text-lg text-slate-600">
+              성공적인 개원을 함께한 의료기관들입니다
+            </p>
+          </div>
+
+          {/* Portfolio Logo Grid */}
+          <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-8 gap-4">
+            {portfolioLogos.map((logo, idx) => (
+              <div
+                key={idx}
+                className="aspect-square bg-white rounded-xl p-3 shadow-sm hover:shadow-md transition-shadow flex items-center justify-center"
+              >
+                <Image
+                  src={`/logos/portfolio/${logo}`}
+                  alt={`병원 포트폴리오 ${idx + 1}`}
+                  width={80}
+                  height={80}
+                  className="object-contain w-full h-full"
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Stats Section */}
       <section className="py-16 bg-white border-y border-slate-100">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
@@ -180,6 +235,68 @@ export default function PortalPage() {
                 </div>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Partners Section */}
+      <section className="py-20 bg-white">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6">
+          {/* Section Header */}
+          <div className="text-center mb-12">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-100 text-emerald-700 mb-4">
+              <Handshake className="w-4 h-4" />
+              <span className="text-sm font-medium">Partners</span>
+            </div>
+            <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-4">
+              신뢰할 수 있는 협력사
+            </h2>
+            <p className="text-lg text-slate-600">
+              메디플라톤과 함께하는 전문 파트너사입니다
+            </p>
+          </div>
+
+          {/* Partner Logo Marquee */}
+          <div className="relative overflow-hidden">
+            {/* Gradient Overlays */}
+            <div className="absolute left-0 top-0 bottom-0 w-20 bg-gradient-to-r from-white to-transparent z-10" />
+            <div className="absolute right-0 top-0 bottom-0 w-20 bg-gradient-to-l from-white to-transparent z-10" />
+
+            {/* First Row - Left to Right */}
+            <div className="flex gap-8 mb-8 marquee-left">
+              {[...partnerLogos, ...partnerLogos].map((logo, idx) => (
+                <div
+                  key={idx}
+                  className="flex-shrink-0 w-24 h-24 bg-slate-50 rounded-xl p-4 flex items-center justify-center hover:bg-slate-100 transition-colors"
+                >
+                  <Image
+                    src={`/logos/partners/${logo}`}
+                    alt={`협력사 ${idx + 1}`}
+                    width={64}
+                    height={64}
+                    className="object-contain w-full h-full grayscale hover:grayscale-0 transition-all"
+                  />
+                </div>
+              ))}
+            </div>
+
+            {/* Second Row - Right to Left */}
+            <div className="flex gap-8 marquee-right">
+              {[...partnerLogos.slice().reverse(), ...partnerLogos.slice().reverse()].map((logo, idx) => (
+                <div
+                  key={idx}
+                  className="flex-shrink-0 w-24 h-24 bg-slate-50 rounded-xl p-4 flex items-center justify-center hover:bg-slate-100 transition-colors"
+                >
+                  <Image
+                    src={`/logos/partners/${logo}`}
+                    alt={`협력사 ${idx + 1}`}
+                    width={64}
+                    height={64}
+                    className="object-contain w-full h-full grayscale hover:grayscale-0 transition-all"
+                  />
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </section>
