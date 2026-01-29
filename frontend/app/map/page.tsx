@@ -288,7 +288,11 @@ export default function MapPage() {
                   {visibleMarkers.slice(0, 50).map((marker, index) => {
                     const isBuilding = marker.type === 'building';
                     const listing = marker.originalData as BuildingListing | PharmacyListing;
-                    const imageIndex = index;
+                    // ID 기반 해시로 이미지 인덱스 결정 (같은 ID는 항상 같은 이미지)
+                    const hashCode = marker.id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+                    const imageIndex = isBuilding
+                      ? (listing as BuildingListing).thumbnailIndex ?? hashCode
+                      : hashCode;
 
                     return (
                       <div

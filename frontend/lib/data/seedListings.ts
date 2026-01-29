@@ -675,7 +675,7 @@ export function generateBuildingListings(count: number = 350): BuildingListing[]
       inquiryCount,
       createdAt: new Date(now - createdHoursAgo * 60 * 60 * 1000).toISOString(),
       isVerified: Math.random() > 0.45,
-      thumbnailIndex: randomInt(0, 53),
+      thumbnailIndex: i % 54, // 54개 이미지를 순차적으로 분산
       isHot,
       isNew,
       currentViewers,
