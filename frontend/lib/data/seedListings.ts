@@ -3,24 +3,172 @@
  * 플랫폼이 활성화되어 보이도록 대량의 가짜 매물 데이터
  */
 
-// 지역 데이터
-const regions = [
-  { code: 'seoul-gangnam', name: '서울 강남구', subAreas: ['역삼동', '삼성동', '청담동', '논현동', '신사동', '압구정동', '대치동', '도곡동'] },
-  { code: 'seoul-seocho', name: '서울 서초구', subAreas: ['서초동', '방배동', '반포동', '잠원동', '양재동'] },
-  { code: 'seoul-songpa', name: '서울 송파구', subAreas: ['잠실동', '신천동', '삼전동', '석촌동', '송파동', '방이동', '오금동'] },
-  { code: 'seoul-mapo', name: '서울 마포구', subAreas: ['합정동', '상수동', '서교동', '연남동', '망원동', '공덕동'] },
-  { code: 'seoul-yeongdeungpo', name: '서울 영등포구', subAreas: ['여의도동', '당산동', '영등포동', '문래동'] },
-  { code: 'seoul-gangdong', name: '서울 강동구', subAreas: ['천호동', '길동', '명일동', '고덕동', '암사동'] },
-  { code: 'seoul-jongno', name: '서울 종로구', subAreas: ['종로동', '혜화동', '명륜동', '삼청동'] },
-  { code: 'seoul-jung', name: '서울 중구', subAreas: ['명동', '을지로', '충무로', '회현동'] },
-  { code: 'gyeonggi-seongnam', name: '경기 성남시', subAreas: ['분당구', '수정구', '중원구'] },
-  { code: 'gyeonggi-suwon', name: '경기 수원시', subAreas: ['영통구', '권선구', '장안구', '팔달구'] },
-  { code: 'gyeonggi-yongin', name: '경기 용인시', subAreas: ['수지구', '기흥구', '처인구'] },
-  { code: 'gyeonggi-goyang', name: '경기 고양시', subAreas: ['일산동구', '일산서구', '덕양구'] },
-  { code: 'busan-haeundae', name: '부산 해운대구', subAreas: ['해운대동', '우동', '중동', '좌동'] },
-  { code: 'busan-suyeong', name: '부산 수영구', subAreas: ['광안동', '수영동', '민락동'] },
-  { code: 'daegu-suseong', name: '대구 수성구', subAreas: ['범어동', '수성동', '황금동', '지산동'] },
-  { code: 'incheon-yeonsu', name: '인천 연수구', subAreas: ['송도동', '연수동', '청학동'] },
+// 지역 데이터 (좌표 포함)
+interface SubAreaCoord {
+  name: string
+  lat: number
+  lng: number
+}
+
+interface RegionData {
+  code: string
+  name: string
+  lat: number
+  lng: number
+  subAreas: SubAreaCoord[]
+}
+
+const regions: RegionData[] = [
+  {
+    code: 'seoul-gangnam', name: '서울 강남구', lat: 37.5172, lng: 127.0473,
+    subAreas: [
+      { name: '역삼동', lat: 37.5007, lng: 127.0365 },
+      { name: '삼성동', lat: 37.5145, lng: 127.0592 },
+      { name: '청담동', lat: 37.5247, lng: 127.0476 },
+      { name: '논현동', lat: 37.5112, lng: 127.0287 },
+      { name: '신사동', lat: 37.5238, lng: 127.0239 },
+      { name: '압구정동', lat: 37.5273, lng: 127.0283 },
+      { name: '대치동', lat: 37.4947, lng: 127.0635 },
+      { name: '도곡동', lat: 37.4883, lng: 127.0463 },
+    ]
+  },
+  {
+    code: 'seoul-seocho', name: '서울 서초구', lat: 37.4837, lng: 127.0324,
+    subAreas: [
+      { name: '서초동', lat: 37.4919, lng: 127.0076 },
+      { name: '방배동', lat: 37.4826, lng: 126.9882 },
+      { name: '반포동', lat: 37.5058, lng: 127.0011 },
+      { name: '잠원동', lat: 37.5168, lng: 127.0109 },
+      { name: '양재동', lat: 37.4685, lng: 127.0387 },
+    ]
+  },
+  {
+    code: 'seoul-songpa', name: '서울 송파구', lat: 37.5145, lng: 127.1050,
+    subAreas: [
+      { name: '잠실동', lat: 37.5133, lng: 127.0846 },
+      { name: '신천동', lat: 37.5144, lng: 127.0934 },
+      { name: '삼전동', lat: 37.5028, lng: 127.0893 },
+      { name: '석촌동', lat: 37.5048, lng: 127.1002 },
+      { name: '송파동', lat: 37.5031, lng: 127.1125 },
+      { name: '방이동', lat: 37.5133, lng: 127.1213 },
+      { name: '오금동', lat: 37.5023, lng: 127.1285 },
+    ]
+  },
+  {
+    code: 'seoul-mapo', name: '서울 마포구', lat: 37.5663, lng: 126.9014,
+    subAreas: [
+      { name: '합정동', lat: 37.5496, lng: 126.9138 },
+      { name: '상수동', lat: 37.5478, lng: 126.9225 },
+      { name: '서교동', lat: 37.5526, lng: 126.9182 },
+      { name: '연남동', lat: 37.5656, lng: 126.9247 },
+      { name: '망원동', lat: 37.5556, lng: 126.9047 },
+      { name: '공덕동', lat: 37.5436, lng: 126.9518 },
+    ]
+  },
+  {
+    code: 'seoul-yeongdeungpo', name: '서울 영등포구', lat: 37.5263, lng: 126.8963,
+    subAreas: [
+      { name: '여의도동', lat: 37.5219, lng: 126.9245 },
+      { name: '당산동', lat: 37.5349, lng: 126.9028 },
+      { name: '영등포동', lat: 37.5159, lng: 126.9074 },
+      { name: '문래동', lat: 37.5178, lng: 126.8966 },
+    ]
+  },
+  {
+    code: 'seoul-gangdong', name: '서울 강동구', lat: 37.5301, lng: 127.1238,
+    subAreas: [
+      { name: '천호동', lat: 37.5387, lng: 127.1234 },
+      { name: '길동', lat: 37.5336, lng: 127.1401 },
+      { name: '명일동', lat: 37.5517, lng: 127.1452 },
+      { name: '고덕동', lat: 37.5593, lng: 127.1543 },
+      { name: '암사동', lat: 37.5518, lng: 127.1303 },
+    ]
+  },
+  {
+    code: 'seoul-jongno', name: '서울 종로구', lat: 37.5735, lng: 126.9790,
+    subAreas: [
+      { name: '종로동', lat: 37.5705, lng: 126.9830 },
+      { name: '혜화동', lat: 37.5823, lng: 127.0015 },
+      { name: '명륜동', lat: 37.5883, lng: 126.9972 },
+      { name: '삼청동', lat: 37.5866, lng: 126.9816 },
+    ]
+  },
+  {
+    code: 'seoul-jung', name: '서울 중구', lat: 37.5636, lng: 126.9975,
+    subAreas: [
+      { name: '명동', lat: 37.5636, lng: 126.9850 },
+      { name: '을지로', lat: 37.5660, lng: 126.9910 },
+      { name: '충무로', lat: 37.5616, lng: 126.9943 },
+      { name: '회현동', lat: 37.5580, lng: 126.9815 },
+    ]
+  },
+  {
+    code: 'gyeonggi-seongnam', name: '경기 성남시', lat: 37.4200, lng: 127.1265,
+    subAreas: [
+      { name: '분당구', lat: 37.3825, lng: 127.1190 },
+      { name: '수정구', lat: 37.4503, lng: 127.1457 },
+      { name: '중원구', lat: 37.4313, lng: 127.1362 },
+    ]
+  },
+  {
+    code: 'gyeonggi-suwon', name: '경기 수원시', lat: 37.2636, lng: 127.0286,
+    subAreas: [
+      { name: '영통구', lat: 37.2591, lng: 127.0465 },
+      { name: '권선구', lat: 37.2575, lng: 126.9720 },
+      { name: '장안구', lat: 37.3036, lng: 127.0105 },
+      { name: '팔달구', lat: 37.2820, lng: 127.0185 },
+    ]
+  },
+  {
+    code: 'gyeonggi-yongin', name: '경기 용인시', lat: 37.2411, lng: 127.1776,
+    subAreas: [
+      { name: '수지구', lat: 37.3219, lng: 127.0987 },
+      { name: '기흥구', lat: 37.2747, lng: 127.1150 },
+      { name: '처인구', lat: 37.2340, lng: 127.2026 },
+    ]
+  },
+  {
+    code: 'gyeonggi-goyang', name: '경기 고양시', lat: 37.6584, lng: 126.8320,
+    subAreas: [
+      { name: '일산동구', lat: 37.6586, lng: 126.7742 },
+      { name: '일산서구', lat: 37.6753, lng: 126.7505 },
+      { name: '덕양구', lat: 37.6376, lng: 126.8320 },
+    ]
+  },
+  {
+    code: 'busan-haeundae', name: '부산 해운대구', lat: 35.1631, lng: 129.1635,
+    subAreas: [
+      { name: '해운대동', lat: 35.1587, lng: 129.1603 },
+      { name: '우동', lat: 35.1653, lng: 129.1315 },
+      { name: '중동', lat: 35.1575, lng: 129.1312 },
+      { name: '좌동', lat: 35.1695, lng: 129.1726 },
+    ]
+  },
+  {
+    code: 'busan-suyeong', name: '부산 수영구', lat: 35.1457, lng: 129.1130,
+    subAreas: [
+      { name: '광안동', lat: 35.1530, lng: 129.1185 },
+      { name: '수영동', lat: 35.1434, lng: 129.1130 },
+      { name: '민락동', lat: 35.1573, lng: 129.1275 },
+    ]
+  },
+  {
+    code: 'daegu-suseong', name: '대구 수성구', lat: 35.8583, lng: 128.6306,
+    subAreas: [
+      { name: '범어동', lat: 35.8591, lng: 128.6210 },
+      { name: '수성동', lat: 35.8530, lng: 128.6185 },
+      { name: '황금동', lat: 35.8472, lng: 128.6336 },
+      { name: '지산동', lat: 35.8362, lng: 128.6355 },
+    ]
+  },
+  {
+    code: 'incheon-yeonsu', name: '인천 연수구', lat: 37.4103, lng: 126.6783,
+    subAreas: [
+      { name: '송도동', lat: 37.3833, lng: 126.6573 },
+      { name: '연수동', lat: 37.4103, lng: 126.6783 },
+      { name: '청학동', lat: 37.4256, lng: 126.6892 },
+    ]
+  },
 ]
 
 const hospitalTypes = ['내과', '정형외과', '피부과', '치과', '한의원', '이비인후과', '안과', '산부인과', '소아청소년과', '비뇨기과', '신경외과', '재활의학과']
@@ -66,6 +214,9 @@ export interface BuildingListing {
   region: string
   regionCode: string
   address: string
+  subArea: string // 동 이름
+  lat: number // 위도
+  lng: number // 경도
   floor: string
   areaPyeong: number
   deposit: number // 만원
@@ -138,12 +289,19 @@ export function generateBuildingListings(count: number = 350): BuildingListing[]
       lastInquiryTime = getRelativeTime(minutesAgo)
     }
 
+    // 좌표에 약간의 랜덤 오프셋 추가 (같은 동에서도 다른 위치)
+    const latOffset = (Math.random() - 0.5) * 0.008
+    const lngOffset = (Math.random() - 0.5) * 0.008
+
     listings.push({
       id: `bld-${generateId()}`,
-      title: `${subArea} ${isGoodLocation ? '역세권 ' : ''}${randomChoice(['메디컬빌딩', '상가', '빌딩'])} ${randomInt(1, 8)}층`,
+      title: `${subArea.name} ${isGoodLocation ? '역세권 ' : ''}${randomChoice(['메디컬빌딩', '상가', '빌딩'])} ${randomInt(1, 8)}층`,
       region: region.name,
       regionCode: region.code,
-      address: `${region.name} ${subArea}`,
+      address: `${region.name} ${subArea.name}`,
+      subArea: subArea.name,
+      lat: subArea.lat + latOffset,
+      lng: subArea.lng + lngOffset,
       floor: `${randomInt(1, 12)}층`,
       areaPyeong,
       deposit: roundToRealistic(randomInt(5000, 25000), 1000),
@@ -179,6 +337,9 @@ export interface PharmacyListing {
   anonymousId: string
   region: string
   regionCode: string
+  subArea: string // 동 이름
+  lat: number // 위도
+  lng: number // 경도
   pharmacyType: string
   nearbyHospitals: string[]
   monthlyRevenueMin: number // 만원
@@ -215,6 +376,7 @@ export function generatePharmacyListings(count: number = 48): PharmacyListing[] 
 
   for (let i = 0; i < count; i++) {
     const region = randomChoice(regions)
+    const subArea = randomChoice(region.subAreas)
     // 현실적인 매출 (500만 단위로 라운드)
     const baseRevenue = roundToRealistic(randomInt(4000, 12000), 500)
     const createdHoursAgo = randomInt(0, 60 * 24) // 0~60일 전
@@ -268,11 +430,18 @@ export function generatePharmacyListings(count: number = 48): PharmacyListing[] 
     // 권리금도 1000만 단위로 라운드
     const premiumBase = roundToRealistic(randomInt(8000, 35000), 1000)
 
+    // 좌표에 약간의 랜덤 오프셋 추가
+    const latOffset = (Math.random() - 0.5) * 0.008
+    const lngOffset = (Math.random() - 0.5) * 0.008
+
     listings.push({
       id: `phm-${generateId()}`,
       anonymousId: generateAnonymousCode('PM'), // PM-A7X2K 형식
       region: region.name,
       regionCode: region.code,
+      subArea: subArea.name,
+      lat: subArea.lat + latOffset,
+      lng: subArea.lng + lngOffset,
       pharmacyType: randomChoice(pharmacyTypes),
       nearbyHospitals: randomChoices(hospitalTypes, randomInt(2, 4)),
       monthlyRevenueMin: baseRevenue,

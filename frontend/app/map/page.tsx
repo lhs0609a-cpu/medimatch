@@ -1,24 +1,33 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
-import { MapSearchBox, MapFilter } from '@/components/map';
-import { mapService } from '@/lib/api/services';
-import { MapMarker } from '@/lib/api/client';
+import Image from 'next/image';
+import { MapSearchBox } from '@/components/map';
+import {
+  generateBuildingListings,
+  generatePharmacyListings,
+  BuildingListing,
+  PharmacyListing,
+} from '@/lib/data/seedListings';
+import { buildingListingImages, pharmacyListingImages } from '@/components/BlurredListingImage';
 import {
   ChevronLeft,
   ChevronRight,
   MapPin,
   Building2,
   Pill,
-  Target,
-  Layers,
   Navigation,
   Search,
-  SlidersHorizontal,
   X,
-  Star
+  Phone,
+  MessageCircle,
+  Eye,
+  Clock,
+  Lock,
+  Flame,
+  Zap,
 } from 'lucide-react';
 
 // SSR 비활성화
@@ -37,118 +46,108 @@ const KakaoMap = dynamic(() => import('@/components/map/KakaoMap'), {
 });
 
 interface MarkerData {
-  id: string | number;
+  id: string;
   lat: number;
   lng: number;
   title: string;
-  type: 'hospital' | 'prospect' | 'pharmacy' | 'default' | 'closed_hospital' | 'listing';
+  type: 'hospital' | 'pharmacy' | 'building';
   info?: {
     address?: string;
-    score?: number;
-    specialty?: string;
+    subArea?: string;
+    price?: string;
+    area?: string;
   };
+  originalData?: BuildingListing | PharmacyListing;
 }
 
-interface FilterOptions {
-  types: string[];
-  minScore: number;
-  maxScore: number;
-  radius: number;
-}
+type ListingType = 'building' | 'pharmacy';
 
 export default function MapPage() {
-  const [center, setCenter] = useState({ lat: 37.5665, lng: 126.978 });
-  const [markers, setMarkers] = useState<MarkerData[]>([]);
-  const [filteredMarkers, setFilteredMarkers] = useState<MarkerData[]>([]);
+  const [center, setCenter] = useState({ lat: 37.5172, lng: 127.0473 }); // 강남 기본
   const [selectedMarker, setSelectedMarker] = useState<MarkerData | null>(null);
   const [isListOpen, setIsListOpen] = useState(true);
-  const [isLoading, setIsLoading] = useState(false);
-  const [showFilters, setShowFilters] = useState(false);
-  const [filters, setFilters] = useState<FilterOptions>({
-    types: ['hospital', 'prospect', 'pharmacy'],
-    minScore: 0,
-    maxScore: 100,
-    radius: 2000,
-  });
+  const [activeFilters, setActiveFilters] = useState<ListingType[]>(['building', 'pharmacy']);
+  const [searchQuery, setSearchQuery] = useState('');
 
-  const fetchTimerRef = useRef<NodeJS.Timeout | null>(null);
+  // 시드 데이터 생성 (메모이제이션)
+  const buildingListings = useMemo(() => generateBuildingListings(), []);
+  const pharmacyListings = useMemo(() => generatePharmacyListings(), []);
 
-  const fetchMarkers = useCallback(async () => {
-    setIsLoading(true);
-    const radiusKm = filters.radius / 1000;
-    const latRange = radiusKm / 111.0;
-    const lngRange = radiusKm / (111.0 * Math.cos(center.lat * Math.PI / 180));
+  // 매물 데이터를 마커 형태로 변환
+  const allMarkers = useMemo(() => {
+    const buildingMarkers: MarkerData[] = buildingListings.map((listing) => ({
+      id: listing.id,
+      lat: listing.lat,
+      lng: listing.lng,
+      title: listing.title,
+      type: 'building' as const,
+      info: {
+        address: listing.address,
+        subArea: listing.subArea,
+        price: `보증금 ${(listing.deposit / 10000).toFixed(1)}억 / 월세 ${listing.monthlyRent}만`,
+        area: `${listing.areaPyeong}평`,
+      },
+      originalData: listing,
+    }));
 
-    try {
-      const response = await mapService.getMarkers({
-        min_lat: center.lat - latRange,
-        max_lat: center.lat + latRange,
-        min_lng: center.lng - lngRange,
-        max_lng: center.lng + lngRange,
-        types: filters.types.join(','),
-        min_score: filters.minScore,
-        max_score: filters.maxScore,
-      });
+    const pharmacyMarkers: MarkerData[] = pharmacyListings.map((listing) => ({
+      id: listing.id,
+      lat: listing.lat,
+      lng: listing.lng,
+      title: `${listing.subArea} 약국 양도`,
+      type: 'pharmacy' as const,
+      info: {
+        address: listing.region,
+        subArea: listing.subArea,
+        price: `권리금 ${(listing.premiumMin / 10000).toFixed(1)}~${(listing.premiumMax / 10000).toFixed(1)}억`,
+        area: listing.floorInfo,
+      },
+      originalData: listing,
+    }));
 
-      const convertedMarkers: MarkerData[] = response.markers.map((marker: MapMarker) => ({
-        id: marker.id,
-        lat: marker.lat,
-        lng: marker.lng,
-        title: marker.title,
-        type: marker.type as 'hospital' | 'prospect' | 'pharmacy' | 'default',
-        info: {
-          address: marker.info?.address,
-          score: marker.info?.score,
-          specialty: marker.info?.specialty,
-        },
-      }));
+    return [...buildingMarkers, ...pharmacyMarkers];
+  }, [buildingListings, pharmacyListings]);
 
-      setMarkers(convertedMarkers);
-      setFilteredMarkers(convertedMarkers);
-    } catch (error) {
-      console.error('Failed to fetch markers:', error);
-      setMarkers([]);
-      setFilteredMarkers([]);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [center, filters]);
+  // 필터링된 마커
+  const filteredMarkers = useMemo(() => {
+    return allMarkers.filter((marker) => {
+      // 타입 필터
+      if (marker.type === 'building' && !activeFilters.includes('building')) return false;
+      if (marker.type === 'pharmacy' && !activeFilters.includes('pharmacy')) return false;
 
-  useEffect(() => {
-    if (fetchTimerRef.current) {
-      clearTimeout(fetchTimerRef.current);
-    }
-    fetchTimerRef.current = setTimeout(() => {
-      fetchMarkers();
-    }, 300);
-    return () => {
-      if (fetchTimerRef.current) {
-        clearTimeout(fetchTimerRef.current);
+      // 검색어 필터
+      if (searchQuery) {
+        const query = searchQuery.toLowerCase();
+        const matchTitle = marker.title.toLowerCase().includes(query);
+        const matchAddress = marker.info?.address?.toLowerCase().includes(query);
+        const matchSubArea = marker.info?.subArea?.toLowerCase().includes(query);
+        if (!matchTitle && !matchAddress && !matchSubArea) return false;
       }
-    };
-  }, [fetchMarkers]);
 
-  useEffect(() => {
-    const filtered = markers.filter((marker) => {
-      if (!filters.types.includes(marker.type)) return false;
-      if (marker.type === 'prospect') {
-        const score = marker.info?.score || 0;
-        if (score < filters.minScore || score > filters.maxScore) return false;
-      }
-      const distance = getDistance(center.lat, center.lng, marker.lat, marker.lng);
-      if (distance > filters.radius) return false;
       return true;
     });
-    setFilteredMarkers(filtered);
-  }, [markers, filters, center]);
+  }, [allMarkers, activeFilters, searchQuery]);
 
-  const getDistance = (lat1: number, lng1: number, lat2: number, lng2: number) => {
-    const R = 6371e3;
-    const φ1 = (lat1 * Math.PI) / 180;
-    const φ2 = (lat2 * Math.PI) / 180;
-    const Δφ = ((lat2 - lat1) * Math.PI) / 180;
-    const Δλ = ((lng2 - lng1) * Math.PI) / 180;
-    const a = Math.sin(Δφ / 2) * Math.sin(Δφ / 2) + Math.cos(φ1) * Math.cos(φ2) * Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
+  // 현재 지도 영역 내의 마커만 필터링 (옵션)
+  const visibleMarkers = useMemo(() => {
+    // 현재 중심에서 약 20km 반경 내 마커만 표시
+    const maxDistance = 50; // km
+    return filteredMarkers.filter((marker) => {
+      const distance = getDistanceKm(center.lat, center.lng, marker.lat, marker.lng);
+      return distance <= maxDistance;
+    });
+  }, [filteredMarkers, center]);
+
+  const getDistanceKm = (lat1: number, lng1: number, lat2: number, lng2: number) => {
+    const R = 6371;
+    const dLat = ((lat2 - lat1) * Math.PI) / 180;
+    const dLng = ((lng2 - lng1) * Math.PI) / 180;
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos((lat1 * Math.PI) / 180) *
+        Math.cos((lat2 * Math.PI) / 180) *
+        Math.sin(dLng / 2) *
+        Math.sin(dLng / 2);
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     return R * c;
   };
@@ -166,33 +165,27 @@ export default function MapPage() {
     setSelectedMarker(marker);
   };
 
-  const getTypeIcon = (type: string) => {
-    switch (type) {
-      case 'hospital': return <Building2 className="w-4 h-4" />;
-      case 'prospect': return <Target className="w-4 h-4" />;
-      case 'pharmacy': return <Pill className="w-4 h-4" />;
-      default: return <MapPin className="w-4 h-4" />;
-    }
+  const toggleFilter = (type: ListingType) => {
+    setActiveFilters((prev) =>
+      prev.includes(type) ? prev.filter((t) => t !== type) : [...prev, type]
+    );
   };
 
   const getTypeStyle = (type: string, active: boolean = true) => {
     if (!active) return 'bg-secondary text-muted-foreground border-border';
     switch (type) {
-      case 'hospital': return 'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900/20 dark:text-blue-400 dark:border-blue-800';
-      case 'prospect': return 'bg-green-50 text-green-700 border-green-200 dark:bg-green-900/20 dark:text-green-400 dark:border-green-800';
-      case 'pharmacy': return 'bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-900/20 dark:text-purple-400 dark:border-purple-800';
-      default: return 'bg-secondary text-secondary-foreground border-border';
+      case 'building':
+        return 'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900/20 dark:text-blue-400 dark:border-blue-800';
+      case 'pharmacy':
+        return 'bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-900/20 dark:text-purple-400 dark:border-purple-800';
+      default:
+        return 'bg-secondary text-secondary-foreground border-border';
     }
   };
 
-  const getTypeLabel = (type: string) => {
-    const labels: { [key: string]: string } = {
-      hospital: '병원',
-      prospect: '프로스펙트',
-      pharmacy: '약국',
-      default: '기타',
-    };
-    return labels[type] || type;
+  // 전화 상담 연결
+  const handleCallConsultation = () => {
+    window.location.href = 'tel:1588-0000';
   };
 
   return (
@@ -251,35 +244,20 @@ export default function MapPage() {
             {/* Quick Filters */}
             <div className="px-4 py-3 border-b border-border flex items-center gap-2 flex-wrap">
               <button
-                onClick={() => setShowFilters(!showFilters)}
-                className={`btn-sm ${showFilters ? 'btn-primary' : 'btn-secondary'}`}
+                onClick={() => toggleFilter('building')}
+                className={`btn-sm border ${getTypeStyle('building', activeFilters.includes('building'))}`}
               >
-                <SlidersHorizontal className="w-4 h-4" />
-                필터
+                <Building2 className="w-4 h-4" />
+                병원
               </button>
-              {['hospital', 'prospect', 'pharmacy'].map((type) => (
-                <button
-                  key={type}
-                  onClick={() => {
-                    const newTypes = filters.types.includes(type)
-                      ? filters.types.filter(t => t !== type)
-                      : [...filters.types, type];
-                    setFilters({ ...filters, types: newTypes });
-                  }}
-                  className={`btn-sm border ${getTypeStyle(type, filters.types.includes(type))}`}
-                >
-                  {getTypeIcon(type)}
-                  {getTypeLabel(type)}
-                </button>
-              ))}
+              <button
+                onClick={() => toggleFilter('pharmacy')}
+                className={`btn-sm border ${getTypeStyle('pharmacy', activeFilters.includes('pharmacy'))}`}
+              >
+                <Pill className="w-4 h-4" />
+                약국
+              </button>
             </div>
-
-            {/* Advanced Filters Panel */}
-            {showFilters && (
-              <div className="p-4 border-b border-border bg-secondary/30">
-                <MapFilter filters={filters} onFilterChange={setFilters} />
-              </div>
-            )}
 
             {/* Results List */}
             <div className="flex-1 overflow-y-auto custom-scrollbar">
@@ -287,68 +265,126 @@ export default function MapPage() {
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
                     검색 결과
-                    <span className="badge-default">
-                      {filteredMarkers.length}
-                    </span>
-                    {isLoading && (
-                      <span className="inline-block animate-spin rounded-full h-4 w-4 border-2 border-foreground border-t-transparent"></span>
-                    )}
+                    <span className="badge-default">{visibleMarkers.length}</span>
                   </h3>
                 </div>
 
-                {filteredMarkers.length === 0 && !isLoading && (
+                {visibleMarkers.length === 0 && (
                   <div className="text-center py-12">
                     <div className="w-12 h-12 rounded-xl bg-secondary flex items-center justify-center mx-auto mb-4">
                       <Search className="w-6 h-6 text-muted-foreground" />
                     </div>
                     <p className="text-foreground font-medium mb-1">검색 결과가 없습니다</p>
-                    <p className="text-sm text-muted-foreground">필터를 조정하거나 다른 지역을 검색해보세요.</p>
+                    <p className="text-sm text-muted-foreground">
+                      필터를 조정하거나 다른 지역을 검색해보세요.
+                    </p>
                   </div>
                 )}
 
                 <div className="space-y-3">
-                  {filteredMarkers.map((marker) => (
-                    <div
-                      key={marker.id}
-                      onClick={() => handleListItemClick(marker)}
-                      className={`p-4 rounded-xl border cursor-pointer transition-all duration-200 ${
-                        selectedMarker?.id === marker.id
-                          ? 'border-foreground bg-accent shadow-lg'
-                          : 'border-border bg-card hover:border-foreground/20 hover:shadow-md'
-                      }`}
-                    >
-                      <div className="flex items-start justify-between gap-3 mb-3">
-                        <div className="flex items-center gap-3">
-                          <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${getTypeStyle(marker.type)}`}>
-                            {getTypeIcon(marker.type)}
+                  {visibleMarkers.slice(0, 50).map((marker, index) => {
+                    const isBuilding = marker.type === 'building';
+                    const listing = marker.originalData as BuildingListing | PharmacyListing;
+                    const imageIndex = index;
+
+                    return (
+                      <div
+                        key={marker.id}
+                        onClick={() => handleListItemClick(marker)}
+                        className={`rounded-xl border cursor-pointer transition-all duration-200 overflow-hidden ${
+                          selectedMarker?.id === marker.id
+                            ? 'border-foreground bg-accent shadow-lg'
+                            : 'border-border bg-card hover:border-foreground/20 hover:shadow-md'
+                        }`}
+                      >
+                        {/* 이미지 */}
+                        <div className="h-28 relative overflow-hidden">
+                          <Image
+                            src={
+                              isBuilding
+                                ? buildingListingImages[imageIndex % buildingListingImages.length]
+                                : pharmacyListingImages[imageIndex % pharmacyListingImages.length]
+                            }
+                            alt={marker.title}
+                            fill
+                            className="object-cover blur-md scale-110"
+                            sizes="400px"
+                          />
+                          <div className="absolute inset-0 bg-black/20" />
+                          {/* 잠금 오버레이 */}
+                          <div className="absolute inset-0 flex items-center justify-center">
+                            <div className="bg-black/50 backdrop-blur-sm px-3 py-1.5 rounded-lg flex items-center gap-1.5 text-white text-xs">
+                              <Lock className="w-3 h-3" />
+                              <span>문의 후 공개</span>
+                            </div>
                           </div>
-                          <div>
-                            <h4 className="font-medium text-foreground line-clamp-1">{marker.title}</h4>
-                            <span className="text-xs text-muted-foreground">
-                              {getTypeLabel(marker.type)}
+                          {/* 배지 */}
+                          <div className="absolute top-2 left-2 flex gap-1">
+                            {isBuilding && (listing as BuildingListing).isNew && (
+                              <span className="px-2 py-0.5 bg-blue-500 text-white text-xs font-medium rounded flex items-center gap-1">
+                                <Zap className="w-3 h-3" />
+                                NEW
+                              </span>
+                            )}
+                            {isBuilding && (listing as BuildingListing).isHot && (
+                              <span className="px-2 py-0.5 bg-red-500 text-white text-xs font-medium rounded flex items-center gap-1">
+                                <Flame className="w-3 h-3" />
+                                인기
+                              </span>
+                            )}
+                          </div>
+                          {/* 타입 배지 */}
+                          <div className="absolute top-2 right-2">
+                            <span
+                              className={`px-2 py-0.5 rounded text-xs font-medium ${
+                                isBuilding
+                                  ? 'bg-blue-500 text-white'
+                                  : 'bg-purple-500 text-white'
+                              }`}
+                            >
+                              {isBuilding ? '병원' : '약국'}
                             </span>
                           </div>
-                        </div>
-                        {marker.info?.score && (
-                          <div className="flex items-center gap-1 px-2 py-1 rounded-md bg-amber-50 text-amber-700 dark:bg-amber-900/20 dark:text-amber-400">
-                            <Star className="w-3.5 h-3.5" />
-                            <span className="text-sm font-bold">{marker.info.score}</span>
+                          {/* 조회수 */}
+                          <div className="absolute bottom-2 right-2 px-2 py-1 bg-black/50 text-white text-xs rounded flex items-center gap-1">
+                            <Eye className="w-3 h-3" />
+                            {listing.viewCount}
                           </div>
-                        )}
+                        </div>
+
+                        {/* 정보 */}
+                        <div className="p-3">
+                          <h4 className="font-medium text-foreground line-clamp-1 mb-1">
+                            {marker.title}
+                          </h4>
+                          <p className="text-xs text-muted-foreground mb-2 flex items-center gap-1">
+                            <MapPin className="w-3 h-3" />
+                            {marker.info?.address}
+                          </p>
+                          <p className="text-sm font-semibold text-primary">{marker.info?.price}</p>
+
+                          {/* 전화 상담 버튼 */}
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleCallConsultation();
+                            }}
+                            className="mt-3 w-full btn-primary btn-sm flex items-center justify-center gap-2"
+                          >
+                            <Phone className="w-4 h-4" />
+                            전화 상담
+                          </button>
+                        </div>
                       </div>
-
-                      {marker.info?.address && (
-                        <p className="text-sm text-muted-foreground mb-2 line-clamp-1">{marker.info.address}</p>
-                      )}
-
-                      {marker.info?.specialty && (
-                        <span className="badge-default">
-                          {marker.info.specialty}
-                        </span>
-                      )}
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
+
+                {visibleMarkers.length > 50 && (
+                  <p className="text-center text-sm text-muted-foreground mt-4">
+                    외 {visibleMarkers.length - 50}개 매물이 더 있습니다
+                  </p>
+                )}
               </div>
             </div>
           </div>
@@ -371,21 +407,19 @@ export default function MapPage() {
         <div className="flex-1 relative">
           <KakaoMap
             center={center}
-            level={5}
-            markers={filteredMarkers}
+            level={7}
+            markers={visibleMarkers.map((m) => ({
+              ...m,
+              type: m.type === 'building' ? 'hospital' : 'pharmacy',
+            }))}
             onMarkerClick={handleMarkerClick}
-            onMapClick={(lat, lng) => console.log('Map clicked:', lat, lng)}
+            onMapClick={(lat, lng) => setCenter({ lat, lng })}
             showCurrentLocation
             className="w-full h-full"
           />
 
           {/* Map Controls */}
           <div className="absolute bottom-6 right-6 flex flex-col gap-2">
-            {/* Layers Button */}
-            <button className="w-11 h-11 bg-card rounded-lg shadow-lg flex items-center justify-center hover:bg-accent transition-colors border border-border">
-              <Layers className="w-5 h-5 text-foreground" />
-            </button>
-
             {/* Current Location Button */}
             <button
               onClick={() => {
@@ -415,37 +449,63 @@ export default function MapPage() {
               </button>
 
               <div className="flex items-start gap-4">
-                <div className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 ${getTypeStyle(selectedMarker.type)}`}>
-                  {getTypeIcon(selectedMarker.type)}
+                <div
+                  className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 ${getTypeStyle(selectedMarker.type)}`}
+                >
+                  {selectedMarker.type === 'building' ? (
+                    <Building2 className="w-5 h-5" />
+                  ) : (
+                    <Pill className="w-5 h-5" />
+                  )}
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
                     <h4 className="font-semibold text-foreground">{selectedMarker.title}</h4>
-                    {selectedMarker.info?.score && (
-                      <span className="flex items-center gap-1 px-2 py-0.5 rounded-md bg-amber-50 text-amber-700 dark:bg-amber-900/20 dark:text-amber-400 text-xs font-bold">
-                        <Star className="w-3 h-3" />
-                        {selectedMarker.info.score}
-                      </span>
-                    )}
-                  </div>
-                  {selectedMarker.info?.address && (
-                    <p className="text-sm text-muted-foreground mb-3">{selectedMarker.info.address}</p>
-                  )}
-                  <div className="flex gap-2">
-                    <Link
-                      href={`/simulate?lat=${selectedMarker.lat}&lng=${selectedMarker.lng}`}
-                      className="btn-primary btn-sm"
+                    <span
+                      className={`px-2 py-0.5 rounded text-xs font-medium ${
+                        selectedMarker.type === 'building'
+                          ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400'
+                          : 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400'
+                      }`}
                     >
-                      시뮬레이션
-                    </Link>
-                    <button className="btn-secondary btn-sm">
-                      상세보기
+                      {selectedMarker.type === 'building' ? '병원' : '약국'}
+                    </span>
+                  </div>
+                  <p className="text-sm text-muted-foreground mb-1">{selectedMarker.info?.address}</p>
+                  <p className="text-sm font-semibold text-primary mb-3">{selectedMarker.info?.price}</p>
+                  <div className="flex gap-2">
+                    <button onClick={handleCallConsultation} className="btn-primary btn-sm flex-1">
+                      <Phone className="w-4 h-4 mr-1" />
+                      전화 상담
+                    </button>
+                    <button className="btn-secondary btn-sm flex-1">
+                      <MessageCircle className="w-4 h-4 mr-1" />
+                      문의하기
                     </button>
                   </div>
                 </div>
               </div>
             </div>
           )}
+
+          {/* 매물 수 표시 */}
+          <div className="absolute top-4 left-4 bg-card/90 backdrop-blur-sm px-4 py-2 rounded-lg shadow-lg border border-border">
+            <div className="flex items-center gap-4 text-sm">
+              <div className="flex items-center gap-2">
+                <Building2 className="w-4 h-4 text-blue-500" />
+                <span className="font-medium">
+                  병원 {visibleMarkers.filter((m) => m.type === 'building').length}
+                </span>
+              </div>
+              <div className="w-px h-4 bg-border" />
+              <div className="flex items-center gap-2">
+                <Pill className="w-4 h-4 text-purple-500" />
+                <span className="font-medium">
+                  약국 {visibleMarkers.filter((m) => m.type === 'pharmacy').length}
+                </span>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
