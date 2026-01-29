@@ -187,28 +187,7 @@ export default function HomePage() {
     return () => clearInterval(interval)
   }, [liveFeed.length])
 
-  // 마커 애니메이션 (새 마커 추가)
-  useEffect(() => {
-    const interval = setInterval(() => {
-      const regions = [
-        { lat: 37.5172, lng: 127.0473 }, // 강남
-        { lat: 37.4919, lng: 127.0076 }, // 서초
-        { lat: 37.5656, lng: 126.9247 }, // 연남
-        { lat: 37.5387, lng: 127.1234 }, // 천호
-        { lat: 35.1587, lng: 129.1603 }, // 해운대
-      ]
-      const region = regions[Math.floor(Math.random() * regions.length)]
-      const newMarker = {
-        id: Date.now().toString(),
-        lat: region.lat + (Math.random() - 0.5) * 0.02,
-        lng: region.lng + (Math.random() - 0.5) * 0.02,
-        title: '새 매물',
-        type: Math.random() > 0.7 ? 'pharmacy' as const : 'hospital' as const,
-      }
-      setMapMarkers((prev) => [...prev.slice(-20), newMarker])
-    }, 4000)
-    return () => clearInterval(interval)
-  }, [])
+  // 마커 애니메이션 제거 - 전국 매물 470개 모두 표시
 
   // 데모 실행
   const runDemo = () => {
