@@ -10,8 +10,8 @@ const services = [
     description: '데이터 기반 마케팅 전략으로 병원의 가치를 극대화합니다',
     features: ['브랜드 전략', '온라인 마케팅', '콘텐츠 제작'],
     url: 'https://www.brandplaton.com/',
-    // 플라톤마케팅 - 전문 마케팅/브랜딩 이미지
-    image: 'https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=1920&q=80',
+    // 플라톤마케팅 실제 홈페이지 이미지
+    image: '/images/platon-marketing.jpg',
   },
   {
     id: 'hospital',
