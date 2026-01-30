@@ -10,7 +10,8 @@ const services = [
     description: '데이터 기반 마케팅 전략으로 병원의 가치를 극대화합니다',
     features: ['브랜드 전략', '온라인 마케팅', '콘텐츠 제작'],
     url: 'https://www.brandplaton.com/',
-    image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=1920&q=80',
+    // 플라톤마케팅 - 전문 마케팅/브랜딩 이미지
+    image: 'https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=1920&q=80',
   },
   {
     id: 'hospital',
@@ -19,7 +20,8 @@ const services = [
     description: '입지 분석부터 인테리어까지 원스톱 개원 솔루션',
     features: ['입지 분석', '인테리어', '인허가'],
     url: 'https://medimatch-sooty-two-82.vercel.app/',
-    image: 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&w=1920&q=80',
+    // 메디플라톤 실제 병원 인테리어 이미지
+    image: 'https://medimatch-sooty-two-82.vercel.app/images/listings/building-01.jpg',
   },
   {
     id: 'loan',
@@ -28,7 +30,8 @@ const services = [
     description: '개원 자금 조달부터 금융 컨설팅까지 맞춤 서비스',
     features: ['자금 대출', '금융 컨설팅', '맞춤 금리'],
     url: 'https://pgandplt.vercel.app/',
-    image: 'https://images.unsplash.com/photo-1554224155-6726b3ff858f?auto=format&fit=crop&w=1920&q=80',
+    // 메디플라톤PG 실제 서비스 이미지
+    image: 'https://pgandplt.vercel.app/images/strategy-i5.jpg',
   },
 ]
 
