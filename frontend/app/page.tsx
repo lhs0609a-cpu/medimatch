@@ -215,7 +215,7 @@ export default function HomePage() {
 
       <div className="min-h-screen bg-background">
         {/* ===== HEADER ===== */}
-        <header className="fixed top-0 left-0 right-0 z-50 glass">
+        <header className="fixed top-0 left-0 right-0 z-50 glass" role="banner">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex items-center justify-between h-16">
               <Link href="/" className="flex items-center gap-2.5">
@@ -289,6 +289,11 @@ export default function HomePage() {
                               <Link2 className="w-5 h-5 text-indigo-500" />
                               <span className="text-sm">파트너사</span>
                             </Link>
+                            <Link href="/group-buying" className="flex items-center gap-3 p-3 rounded-xl hover:bg-accent transition-colors">
+                              <Users className="w-5 h-5 text-orange-500" />
+                              <span className="text-sm">공동구매</span>
+                              <span className="px-1.5 py-0.5 text-[10px] font-bold bg-orange-100 text-orange-600 rounded">NEW</span>
+                            </Link>
                           </div>
                         </div>
                       </div>
@@ -297,6 +302,7 @@ export default function HomePage() {
                 </div>
 
                 <Link href="/buildings" className="nav-link">매물</Link>
+                <Link href="/group-buying" className="nav-link hidden xl:block">공동구매</Link>
                 <Link href="/map" className="nav-link">지도</Link>
               </nav>
 
@@ -312,15 +318,21 @@ export default function HomePage() {
                 </Link>
               </div>
 
-              <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="lg:hidden btn-icon">
-                {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+              <button
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                className="lg:hidden btn-icon"
+                aria-label={mobileMenuOpen ? '메뉴 닫기' : '메뉴 열기'}
+                aria-expanded={mobileMenuOpen}
+                aria-controls="mobile-menu"
+              >
+                {mobileMenuOpen ? <X className="w-5 h-5" aria-hidden="true" /> : <Menu className="w-5 h-5" aria-hidden="true" />}
               </button>
             </div>
           </div>
 
           {/* Mobile Menu */}
           {mobileMenuOpen && (
-            <div className="lg:hidden border-t border-border bg-background animate-fade-in-down">
+            <nav id="mobile-menu" className="lg:hidden border-t border-border bg-background animate-fade-in-down" aria-label="모바일 메뉴">
               <div className="px-4 py-4 space-y-2">
                 <Link href="/simulate" className="flex items-center gap-3 p-3 rounded-xl hover:bg-accent" onClick={() => setMobileMenuOpen(false)}>
                   <BarChart3 className="w-5 h-5 text-blue-500" />
@@ -338,6 +350,11 @@ export default function HomePage() {
                   <Globe className="w-5 h-5 text-cyan-500" />
                   <span>지도</span>
                 </Link>
+                <Link href="/group-buying" className="flex items-center gap-3 p-3 rounded-xl hover:bg-accent" onClick={() => setMobileMenuOpen(false)}>
+                  <Users className="w-5 h-5 text-orange-500" />
+                  <span>공동구매</span>
+                  <span className="px-1.5 py-0.5 text-[10px] font-bold bg-orange-100 text-orange-600 rounded">NEW</span>
+                </Link>
                 <div className="pt-4 border-t border-border space-y-2">
                   <Link href="/login" className="block w-full text-center py-3 text-foreground hover:bg-accent rounded-xl" onClick={() => setMobileMenuOpen(false)}>
                     로그인
@@ -347,12 +364,48 @@ export default function HomePage() {
                   </Link>
                 </div>
               </div>
-            </div>
+            </nav>
           )}
         </header>
 
+        {/* ===== 모바일 실시간 피드 롤링 배너 ===== */}
+        <div className="fixed top-16 left-0 right-0 z-40 lg:hidden">
+          <div className="bg-card/95 backdrop-blur-xl border-b border-border">
+            <div className="max-w-7xl mx-auto px-4">
+              <div className="flex items-center gap-3 py-2.5 overflow-hidden">
+                <div className="flex items-center gap-1.5 flex-shrink-0">
+                  <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+                  <span className="text-xs font-medium text-muted-foreground whitespace-nowrap">실시간</span>
+                </div>
+                <div className="relative flex-1 overflow-hidden h-6">
+                  {liveFeed.map((item, index) => {
+                    const Icon = item.icon
+                    return (
+                      <div
+                        key={item.id}
+                        className={`absolute inset-0 flex items-center gap-2 transition-all duration-500 ${
+                          index === currentFeedIndex % liveFeed.length
+                            ? 'opacity-100 translate-y-0'
+                            : 'opacity-0 translate-y-4'
+                        }`}
+                      >
+                        <Icon className={`w-4 h-4 flex-shrink-0 ${item.color}`} />
+                        <span className="text-sm truncate">
+                          <span className="font-medium">{item.message}</span>
+                          <span className="text-muted-foreground"> · {item.location}</span>
+                        </span>
+                      </div>
+                    )
+                  })}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* ===== HERO SECTION - 풀스크린 지도 배경 ===== */}
-        <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
+        <main id="main-content" role="main">
+        <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-10 lg:pt-0" aria-label="히어로 섹션">
           {/* 배경 지도 */}
           <div className="absolute inset-0 z-0">
             <div className="absolute inset-0 bg-gradient-to-b from-background/80 via-background/60 to-background z-10" />
@@ -364,7 +417,7 @@ export default function HomePage() {
             />
           </div>
 
-          {/* 실시간 활동 피드 - 좌측 */}
+          {/* 실시간 활동 피드 - 좌측 (데스크톱) */}
           <div className="absolute left-4 top-1/2 -translate-y-1/2 z-20 hidden lg:block">
             <div className="bg-card/90 backdrop-blur-xl border border-border rounded-2xl p-4 w-72 shadow-2xl">
               <div className="flex items-center gap-2 mb-4">
@@ -820,9 +873,10 @@ export default function HomePage() {
             </div>
           </div>
         </section>
+        </main>
 
         {/* ===== FOOTER ===== */}
-        <footer className="py-16 border-t border-border">
+        <footer className="py-16 border-t border-border" role="contentinfo">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
               <div className="lg:col-span-1">

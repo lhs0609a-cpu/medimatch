@@ -24,8 +24,8 @@ const services = [
     subtitle: 'OPENING',
     description: '입지 분석부터 인테리어까지 원스톱 개원 솔루션',
     features: ['입지 분석', '인테리어', '인허가'],
-    url: 'https://medimatch-sooty-two-82.vercel.app/',
-    image: 'https://medimatch-sooty-two-82.vercel.app/images/listings/building-01.jpg',
+    url: 'https://medi.brandplaton.com',
+    image: 'https://medi.brandplaton.com/images/listings/building-01.jpg',
     number: '02',
     icon: (
       <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -39,8 +39,8 @@ const services = [
     subtitle: 'LOAN',
     description: '개원 자금 조달부터 금융 컨설팅까지 맞춤 서비스',
     features: ['자금 대출', '금융 컨설팅', '맞춤 금리'],
-    url: 'https://pgandplt.vercel.app/',
-    image: 'https://pgandplt.vercel.app/images/strategy-i5.jpg',
+    url: 'https://loan.brandplaton.com',
+    image: 'https://loan.brandplaton.com/images/strategy-i5.jpg',
     number: '03',
     icon: (
       <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">

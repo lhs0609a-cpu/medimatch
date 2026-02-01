@@ -137,6 +137,9 @@ export interface SimulationResponse {
     total_regions: number
     rank_percentile: number | null
   }
+  // 결제/잠금 상태 (서버에서 관리)
+  is_unlocked: boolean
+  unlock_price: number
   created_at: string
 }
 
@@ -579,4 +582,148 @@ export interface ClinicTypeCode {
 export interface RegionCode {
   sido_code: string
   name: string
+}
+
+// ============================================================
+// Group Buying (공동구매) Types
+// ============================================================
+
+export type CohortStatus = 'recruiting' | 'closed' | 'in_progress' | 'completed' | 'cancelled'
+export type ParticipantStatus = 'active' | 'cancelled' | 'contracted'
+
+export interface GroupBuyingCategory {
+  id: string
+  name: string
+  description?: string
+  icon?: string
+  base_discount_rate: number
+  market_avg_price_per_pyeong?: number
+  display_order: number
+  is_active: boolean
+  current_discount_rate?: number
+}
+
+export interface GroupBuyingVendor {
+  id: string
+  name: string
+  description?: string
+  category_id: string
+  rating: number
+  review_count: number
+  is_verified: boolean
+  logo_url?: string
+  website_url?: string
+  features?: string[]
+}
+
+export interface CohortVendor {
+  id: string
+  vendor: GroupBuyingVendor
+  category_id: string
+  discount_rate?: number
+  is_selected: boolean
+  selection_rank?: number
+}
+
+export interface CohortSummary {
+  id: string
+  name: string
+  target_month: string
+  status: CohortStatus
+  participant_count: number
+  max_participants: number
+  deadline: string
+  categories: GroupBuyingCategory[]
+  estimated_avg_savings: number
+  days_remaining: number
+}
+
+export interface CohortDetail extends CohortSummary {
+  min_participants: number
+  description?: string
+  vendors_by_category: Record<string, CohortVendor[]>
+  created_at: string
+}
+
+export interface CohortStats {
+  participant_count: number
+  progress_percent: number
+  total_estimated_savings: number
+  avg_savings_per_participant: number
+  categories_breakdown: Array<{
+    category_id: string
+    category_name: string
+    participant_count: number
+  }>
+}
+
+export interface ParticipantJoinRequest {
+  opening_date: string
+  region: string
+  district: string
+  specialty: string
+  size_pyeong: number
+  category_ids: string[]
+}
+
+export interface CohortParticipant {
+  id: string
+  cohort_id: string
+  user_id: string
+  opening_date: string
+  region: string
+  district: string
+  specialty: string
+  size_pyeong: number
+  status: ParticipantStatus
+  estimated_savings?: number
+  categories: GroupBuyingCategory[]
+  created_at: string
+}
+
+export interface MyParticipation extends CohortParticipant {
+  cohort: CohortSummary
+}
+
+export interface JoinCohortResponse {
+  participation_id: string
+  cohort_id: string
+  status: ParticipantStatus
+  estimated_savings: number
+  message: string
+}
+
+export interface SavingsBreakdown {
+  category_id: string
+  category_name: string
+  original: number
+  discounted: number
+  savings: number
+  discount_rate: number
+}
+
+export interface SavingsCalculation {
+  original_estimate: number
+  discounted_estimate: number
+  total_savings: number
+  breakdown: SavingsBreakdown[]
+}
+
+export interface GroupBuyingTotalStats {
+  total_participants: number
+  total_savings: number
+  total_cohorts_completed: number
+  avg_savings_per_participant: number
+}
+
+export interface CohortListResponse {
+  cohorts: CohortSummary[]
+  total: number
+  page: number
+  limit: number
+}
+
+export interface MyParticipationsResponse {
+  participations: MyParticipation[]
+  total: number
 }

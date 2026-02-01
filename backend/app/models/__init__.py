@@ -26,6 +26,11 @@ from .notification import (
     UserDevice, UserNotification, NotificationPreference,
     DevicePlatform, NotificationType
 )
+from .group_buying import (
+    GroupBuyingCategory, Cohort, CohortParticipant, ParticipantCategory,
+    GroupBuyingVendor, CohortVendor, ParticipantContract, GroupBuyingStats,
+    CohortStatus, ParticipantStatus, ContractStatus as GBContractStatus
+)
 
 __all__ = [
     "User",
@@ -95,4 +100,16 @@ __all__ = [
     "NotificationPreference",
     "DevicePlatform",
     "NotificationType",
+    # 공동구매 시스템
+    "GroupBuyingCategory",
+    "Cohort",
+    "CohortParticipant",
+    "ParticipantCategory",
+    "GroupBuyingVendor",
+    "CohortVendor",
+    "ParticipantContract",
+    "GroupBuyingStats",
+    "CohortStatus",
+    "ParticipantStatus",
+    "GBContractStatus",
 ]

@@ -9,7 +9,12 @@ import {
   HospitalInfo, HospitalWithRevenue, HospitalBillingStats,
   PharmacyInfoHira, PharmacyWithStats, ClinicTypeStats,
   NearbyHospitalsResponse, NearbyPharmaciesResponse, RegionStatsResponse,
-  ClinicTypeCode, RegionCode
+  ClinicTypeCode, RegionCode,
+  // Group Buying Types
+  GroupBuyingCategory, CohortSummary, CohortDetail, CohortStats,
+  ParticipantResponse, MyParticipationResponse, JoinCohortResponse,
+  TotalStatsResponse, SavingsCalculatorResponse, CohortListResponse,
+  MyParticipationsResponse, CohortStatus
 } from './client'
 
 // Auth Services
@@ -1463,6 +1468,92 @@ export const notificationService = {
   // 테스트 알림 발송
   sendTestNotification: async (): Promise<{ message: string; devices_count: number }> => {
     const response = await apiClient.post('/notifications/test')
+    return response.data
+  },
+}
+
+// Group Buying Services (개원 공동구매)
+export const groupBuyingService = {
+  // 카테고리 목록
+  getCategories: async (): Promise<GroupBuyingCategory[]> => {
+    const response = await apiClient.get('/group-buying/categories')
+    return response.data
+  },
+
+  // 코호트 목록
+  getCohorts: async (params?: {
+    status?: CohortStatus
+    page?: number
+    limit?: number
+  }): Promise<CohortListResponse> => {
+    const response = await apiClient.get('/group-buying/cohorts', { params })
+    return response.data
+  },
+
+  // 코호트 상세
+  getCohort: async (id: string): Promise<CohortDetail> => {
+    const response = await apiClient.get(`/group-buying/cohorts/${id}`)
+    return response.data
+  },
+
+  // 코호트 통계
+  getCohortStats: async (id: string): Promise<CohortStats> => {
+    const response = await apiClient.get(`/group-buying/cohorts/${id}/stats`)
+    return response.data
+  },
+
+  // 참여 신청
+  joinCohort: async (cohortId: string, data: {
+    opening_date: string
+    region: string
+    district: string
+    specialty: string
+    size_pyeong: number
+    category_ids: string[]
+  }): Promise<JoinCohortResponse> => {
+    const response = await apiClient.post(`/group-buying/cohorts/${cohortId}/join`, data)
+    return response.data
+  },
+
+  // 참여 취소
+  leaveCohort: async (cohortId: string): Promise<{ message: string }> => {
+    const response = await apiClient.post(`/group-buying/cohorts/${cohortId}/leave`)
+    return response.data
+  },
+
+  // 내 참여 목록
+  getMyParticipations: async (): Promise<MyParticipationsResponse> => {
+    const response = await apiClient.get('/group-buying/my-participations')
+    return response.data
+  },
+
+  // 참여 정보 수정
+  updateParticipation: async (participationId: string, data: {
+    opening_date?: string
+    region?: string
+    district?: string
+    specialty?: string
+    size_pyeong?: number
+    category_ids?: string[]
+  }): Promise<ParticipantResponse> => {
+    const response = await apiClient.patch(`/group-buying/participations/${participationId}`, data)
+    return response.data
+  },
+
+  // 전체 통계
+  getTotalStats: async (): Promise<TotalStatsResponse> => {
+    const response = await apiClient.get('/group-buying/stats/total')
+    return response.data
+  },
+
+  // 절감액 계산기
+  calculateSavings: async (params: {
+    cohort_id?: string
+    specialty: string
+    size_pyeong: number
+    category_ids: string[]
+  }): Promise<SavingsCalculatorResponse> => {
+    const response = await apiClient.post('/group-buying/stats/calculator', params)
     return response.data
   },
 }
