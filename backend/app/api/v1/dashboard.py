@@ -13,7 +13,7 @@ from enum import Enum
 from app.core.database import get_db
 from app.models.user import User, UserRole
 from app.models.simulation import Simulation
-from app.models.prospect import Prospect
+from app.models.prospect import ProspectLocation
 from app.models.pharmacy_match import AnonymousListing, PharmacistProfile, Match, Interest
 from app.models.partner import PartnerInquiry
 from app.models.landlord import LandlordListing, LandlordInquiry
@@ -216,8 +216,8 @@ async def get_dashboard_stats(
     elif current_user.role == UserRole.SALES_REP:
         # 영업사원: 프로스펙트 알림
         alerts = await db.execute(
-            select(func.count(Prospect.id)).where(
-                Prospect.detected_at >= datetime.utcnow() - timedelta(days=7)
+            select(func.count(ProspectLocation.id)).where(
+                ProspectLocation.detected_at >= datetime.utcnow() - timedelta(days=7)
             )
         )
         stats["pending_alerts"] = alerts.scalar() or 0
@@ -291,9 +291,9 @@ async def get_dashboard_activities(
     elif current_user.role == UserRole.SALES_REP:
         # 프로스펙트 알림
         prospects = await db.execute(
-            select(Prospect).where(
-                Prospect.detected_at >= datetime.utcnow() - timedelta(days=7)
-            ).order_by(Prospect.detected_at.desc()).limit(5)
+            select(ProspectLocation).where(
+                ProspectLocation.detected_at >= datetime.utcnow() - timedelta(days=7)
+            ).order_by(ProspectLocation.detected_at.desc()).limit(5)
         )
         for prospect in prospects.scalars().all():
             activities.append({

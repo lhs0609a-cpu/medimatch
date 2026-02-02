@@ -92,6 +92,7 @@ class Settings(BaseSettings):
         "http://localhost:3000",
         "http://localhost:8000",
         "https://medimatch-sooty-two-82.vercel.app",
+        "https://medi.brandplaton.com",
     ]
     FRONTEND_URL: str = "http://localhost:3000"
 

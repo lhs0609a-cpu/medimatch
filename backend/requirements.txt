@@ -38,6 +38,7 @@ python-dateutil==2.8.2
 # PDF Generation
 reportlab==4.0.8
 weasyprint==60.2
+jinja2==3.1.2
 
 # Excel/CSV Export
 openpyxl==3.1.2
