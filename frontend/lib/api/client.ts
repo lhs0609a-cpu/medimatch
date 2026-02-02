@@ -84,6 +84,183 @@ export interface SimulationRequest {
   budget_million?: number
 }
 
+// 상세 매출 분석
+export interface RevenueDetail {
+  daily_patients_min: number
+  daily_patients_avg: number
+  daily_patients_max: number
+  avg_treatment_fee: number
+  insurance_ratio: number
+  non_insurance_ratio: number
+  new_patient_ratio: number
+  return_patient_ratio: number
+  avg_visits_per_patient: number
+  seasonal_factor: Record<string, number>
+}
+
+// 상세 비용 분석
+export interface CostDetail {
+  rent_deposit: number
+  rent_monthly: number
+  maintenance_fee: number
+  doctor_count: number
+  nurse_count: number
+  admin_count: number
+  avg_nurse_salary: number
+  avg_admin_salary: number
+  equipment_monthly: number
+  marketing_monthly: number
+  insurance_monthly: number
+  supplies_monthly: number
+  utilities_monthly: number
+  initial_equipment: number
+  initial_interior: number
+  initial_other: number
+}
+
+// 상세 수익성 분석
+export interface ProfitabilityDetail {
+  monthly_profit_min: number
+  monthly_profit_avg: number
+  monthly_profit_max: number
+  annual_profit_estimate: number
+  profit_margin_percent: number
+  operating_margin_percent: number
+  total_investment: number
+  payback_months: number
+  irr_percent: number
+  npv_3years: number
+}
+
+// 상세 경쟁 분석
+export interface CompetitionDetail {
+  radius_m: number
+  same_dept_count: number
+  similar_dept_count: number
+  total_clinic_count: number
+  hospital_count: number
+  competition_index: number
+  competition_level: string
+  market_saturation: number
+  estimated_market_share: number
+  potential_patients_monthly: number
+  nearest_same_dept_distance: number
+  avg_distance_same_dept: number
+}
+
+// 상세 인구통계
+export interface DemographicsDetail {
+  population_500m: number
+  population_1km: number
+  population_3km: number
+  age_0_9: number
+  age_10_19: number
+  age_20_29: number
+  age_30_39: number
+  age_40_49: number
+  age_50_59: number
+  age_60_plus: number
+  male_ratio: number
+  female_ratio: number
+  single_household_ratio: number
+  family_household_ratio: number
+  avg_household_income: number
+  floating_population_daily: number
+  floating_peak_hour: string
+  floating_weekday_avg: number
+  floating_weekend_avg: number
+  medical_utilization_rate: number
+  avg_annual_visits: number
+}
+
+// 입지 분석
+export interface LocationAnalysis {
+  subway_stations: Array<{ name: string; distance_m: number; lines: string[] }>
+  bus_stops_count: number
+  bus_routes_count: number
+  transit_score: number
+  parking_available: boolean
+  parking_spaces: number
+  nearby_parking_lots: number
+  parking_score: number
+  building_type: string
+  building_age: number
+  floor_info: string
+  elevator_available: boolean
+  nearby_facilities: Record<string, number>
+  commercial_district_type: string
+  commercial_score: number
+  foot_traffic_rank: string
+  visibility_score: number
+  main_road_facing: boolean
+}
+
+// 성장 전망
+export interface GrowthProjection {
+  revenue_projection: Record<string, number>
+  growth_rate_year1: number
+  growth_rate_year2: number
+  growth_rate_year3: number
+  avg_growth_rate: number
+  development_plans: string[]
+  population_growth_rate: number
+  commercial_growth_rate: number
+  year5_revenue_estimate: number
+  year5_profit_estimate: number
+  cumulative_profit_5years: number
+}
+
+// 리스크 분석
+export type RiskLevel = 'LOW' | 'MEDIUM' | 'HIGH'
+export interface RiskFactor {
+  factor: string
+  level: RiskLevel
+  description: string
+  mitigation: string
+}
+export interface RiskAnalysis {
+  overall_risk_level: RiskLevel
+  overall_risk_score: number
+  risk_factors: RiskFactor[]
+  competition_risk: RiskLevel
+  location_risk: RiskLevel
+  market_risk: RiskLevel
+  financial_risk: RiskLevel
+  opportunities: string[]
+}
+
+// AI 인사이트
+export interface AIInsights {
+  executive_summary: string
+  strengths: string[]
+  weaknesses: string[]
+  opportunities: string[]
+  threats: string[]
+  recommended_strategies: string[]
+  differentiation_points: string[]
+  target_patient_groups: string[]
+  recommended_opening_season: string
+  opening_timing_reason: string
+  marketing_suggestions: string[]
+  estimated_marketing_budget: number
+}
+
+// 상세 지역 통계
+export interface RegionStatsDetail {
+  region_name: string
+  region_rank: number | null
+  total_regions: number
+  rank_percentile: number | null
+  vs_national_percent: number
+  vs_region_avg_percent: number
+  national_avg_revenue: number
+  region_avg_revenue: number
+  district_rank: number | null
+  district_total: number
+  region_growth_trend: string
+  clinic_growth_rate: number
+}
+
 export interface SimulationResponse {
   simulation_id: string
   address: string
@@ -120,6 +297,9 @@ export interface SimulationResponse {
     years_open?: number
     clinic_type: string
     address?: string
+    specialty_detail?: string
+    rating?: number
+    review_count?: number
   }>
   demographics: {
     population_1km: number
@@ -137,6 +317,17 @@ export interface SimulationResponse {
     total_regions: number
     rank_percentile: number | null
   }
+  // 상세 분석 (새로 추가)
+  revenue_detail?: RevenueDetail
+  cost_detail?: CostDetail
+  profitability_detail?: ProfitabilityDetail
+  competition_detail?: CompetitionDetail
+  demographics_detail?: DemographicsDetail
+  location_analysis?: LocationAnalysis
+  growth_projection?: GrowthProjection
+  risk_analysis?: RiskAnalysis
+  ai_insights?: AIInsights
+  region_stats_detail?: RegionStatsDetail
   // 결제/잠금 상태 (서버에서 관리)
   is_unlocked: boolean
   unlock_price: number
