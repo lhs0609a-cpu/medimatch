@@ -9,7 +9,7 @@ import {
   CheckCircle, Sparkles, ArrowRight, RefreshCw
 } from 'lucide-react'
 import { groupBuyingService } from '@/lib/api/services'
-import { SavingsCalculatorResponse } from '@/lib/api/client'
+import { SavingsCalculation } from '@/lib/api/client'
 
 export default function SavingsCalculatorPage() {
   const [formData, setFormData] = useState({
@@ -18,7 +18,7 @@ export default function SavingsCalculatorPage() {
     category_ids: [] as string[],
   })
 
-  const [result, setResult] = useState<SavingsCalculatorResponse | null>(null)
+  const [result, setResult] = useState<SavingsCalculation | null>(null)
 
   // 카테고리 목록 조회
   const { data: categories, isLoading: categoriesLoading } = useQuery({
