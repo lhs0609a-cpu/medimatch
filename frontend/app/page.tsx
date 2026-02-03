@@ -540,6 +540,80 @@ export default function HomePage() {
           </div>
         </section>
 
+        {/* ===== 매물 바로가기 섹션 ===== */}
+        <section className="py-16 md:py-20">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-10">
+              <h2 className="text-2xl md:text-3xl font-bold tracking-tight mb-3">
+                매물 바로가기
+              </h2>
+              <p className="text-muted-foreground">원하는 매물 유형을 선택하세요</p>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+              {/* 병원 매물 카드 */}
+              <Link
+                href="/buildings"
+                className="group relative bg-card border border-border rounded-2xl p-6 md:p-8 hover:border-blue-500/50 hover:shadow-xl hover:shadow-blue-500/10 transition-all duration-300"
+              >
+                <div className="flex items-start gap-4">
+                  <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center flex-shrink-0 shadow-lg shadow-blue-500/25">
+                    <Building2 className="w-7 h-7 text-white" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-1">
+                      <h3 className="text-xl font-bold text-foreground group-hover:text-blue-600 transition-colors">
+                        병원 매물
+                      </h3>
+                      <span className="px-2 py-0.5 text-xs font-semibold bg-blue-100 dark:bg-blue-900/30 text-blue-600 rounded-full">
+                        {platformStats.activeBuildingListings}개
+                      </span>
+                    </div>
+                    <p className="text-sm text-muted-foreground mb-4">
+                      메디컬빌딩, 상가, 의원급 개원 공간
+                    </p>
+                    <div className="flex items-center gap-2 text-sm font-medium text-blue-600">
+                      <span>매물 보러가기</span>
+                      <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                    </div>
+                  </div>
+                </div>
+                <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-blue-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+              </Link>
+
+              {/* 약국 매물 카드 */}
+              <Link
+                href="/pharmacy-match"
+                className="group relative bg-card border border-border rounded-2xl p-6 md:p-8 hover:border-purple-500/50 hover:shadow-xl hover:shadow-purple-500/10 transition-all duration-300"
+              >
+                <div className="flex items-start gap-4">
+                  <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center flex-shrink-0 shadow-lg shadow-purple-500/25">
+                    <Pill className="w-7 h-7 text-white" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-1">
+                      <h3 className="text-xl font-bold text-foreground group-hover:text-purple-600 transition-colors">
+                        약국 매물
+                      </h3>
+                      <span className="px-2 py-0.5 text-xs font-semibold bg-purple-100 dark:bg-purple-900/30 text-purple-600 rounded-full">
+                        {platformStats.activePharmacyListings}개
+                      </span>
+                    </div>
+                    <p className="text-sm text-muted-foreground mb-4">
+                      약국 양도양수, 권리금 매물 정보
+                    </p>
+                    <div className="flex items-center gap-2 text-sm font-medium text-purple-600">
+                      <span>매물 보러가기</span>
+                      <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                    </div>
+                  </div>
+                </div>
+                <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-purple-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+              </Link>
+            </div>
+          </div>
+        </section>
+
         {/* ===== 인터랙티브 데모 섹션 ===== */}
         <section className="py-20 md:py-32">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
