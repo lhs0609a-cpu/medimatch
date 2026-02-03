@@ -190,57 +190,103 @@ export default function OnboardingModal({ isOpen, onClose, initialRole }: Onboar
   // Step 0: 역할 선택
   if (step === 0) {
     return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-        <div className="bg-background rounded-2xl shadow-2xl w-full max-w-lg mx-4 overflow-hidden">
-          {/* Header */}
-          <div className="px-6 py-4 border-b border-border flex items-center justify-between">
-            <h2 className="text-xl font-semibold">메디플라톤에 오신 것을 환영합니다</h2>
-            <button onClick={handleSkip} className="p-2 hover:bg-secondary rounded-full transition-colors">
-              <X className="w-5 h-5 text-muted-foreground" />
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+        <div className="bg-background rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden animate-in fade-in zoom-in-95 duration-300">
+          {/* Hero Header */}
+          <div className="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 px-6 py-8 text-white relative overflow-hidden">
+            <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4xIj48Y2lyY2xlIGN4PSIzMCIgY3k9IjMwIiByPSI0Ii8+PC9nPjwvZz48L3N2Zz4=')] opacity-30" />
+            <button
+              onClick={handleSkip}
+              className="absolute top-4 right-4 p-2 hover:bg-white/20 rounded-full transition-colors"
+            >
+              <X className="w-5 h-5" />
             </button>
+            <div className="relative">
+              <div className="w-14 h-14 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center mb-4">
+                <span className="text-2xl font-bold">M</span>
+              </div>
+              <h2 className="text-2xl font-bold mb-2">메디플라톤에 오신 것을 환영합니다</h2>
+              <p className="text-white/80 text-sm">
+                30초만 투자하시면 맞춤 가이드를 드려요
+              </p>
+            </div>
+          </div>
+
+          {/* 핵심 가치 제안 */}
+          <div className="px-6 py-4 bg-secondary/30 border-b border-border">
+            <div className="flex items-center justify-between text-sm">
+              <div className="flex items-center gap-2">
+                <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+                <span className="text-muted-foreground">지금 <strong className="text-foreground">127명</strong>이 이용중</span>
+              </div>
+              <div className="text-muted-foreground">
+                <strong className="text-foreground">470+</strong> 매물
+              </div>
+            </div>
           </div>
 
           {/* Content */}
           <div className="p-6">
-            <p className="text-muted-foreground mb-6">
-              어떤 역할로 메디플라톤을 이용하시나요?<br />
-              맞춤 가이드를 제공해드립니다.
+            <p className="text-muted-foreground mb-4 text-center">
+              어떤 역할로 이용하시나요?
             </p>
 
             <div className="grid grid-cols-1 gap-3">
-              {(Object.keys(roleInfo) as UserRole[]).map((role) => (
+              {(Object.keys(roleInfo) as UserRole[]).slice(0, 3).map((role) => (
                 <button
                   key={role}
                   onClick={() => handleRoleSelect(role)}
-                  className={`flex items-center gap-4 p-4 rounded-xl border border-border hover:border-primary/50 hover:bg-secondary/50 transition-all text-left group`}
+                  className={`flex items-center gap-4 p-4 rounded-xl border-2 border-border hover:border-primary hover:bg-primary/5 transition-all text-left group`}
                 >
-                  <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${roleInfo[role].color} flex items-center justify-center text-white`}>
+                  <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${roleInfo[role].color} flex items-center justify-center text-white shadow-lg`}>
                     {roleInfo[role].icon}
                   </div>
                   <div className="flex-1">
-                    <p className="font-medium text-foreground">{roleInfo[role].label}</p>
+                    <p className="font-semibold text-foreground">{roleInfo[role].label}</p>
                     <p className="text-sm text-muted-foreground">
                       {role === 'doctor' && '개원을 준비하고 계신 의사'}
                       {role === 'pharmacist' && '개국 또는 양수를 준비하는 약사'}
                       {role === 'sales' && '제약/의료기기 영업사원'}
-                      {role === 'landlord' && '의료시설 적합 공간 임대인'}
-                      {role === 'partner' && '인테리어/의료기기/컨설팅 업체'}
                     </p>
                   </div>
-                  <ArrowRight className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors" />
+                  <ArrowRight className="w-5 h-5 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all" />
                 </button>
               ))}
             </div>
+
+            {/* 더보기 (건물주, 파트너) */}
+            <details className="mt-4">
+              <summary className="text-sm text-muted-foreground cursor-pointer hover:text-foreground transition-colors">
+                건물주 또는 파트너사이신가요?
+              </summary>
+              <div className="mt-3 space-y-2">
+                {(Object.keys(roleInfo) as UserRole[]).slice(3).map((role) => (
+                  <button
+                    key={role}
+                    onClick={() => handleRoleSelect(role)}
+                    className="w-full flex items-center gap-3 p-3 rounded-lg border border-border hover:bg-secondary/50 transition-all text-left"
+                  >
+                    <div className={`w-8 h-8 rounded-lg bg-gradient-to-br ${roleInfo[role].color} flex items-center justify-center text-white text-sm`}>
+                      {roleInfo[role].icon}
+                    </div>
+                    <span className="text-sm font-medium">{roleInfo[role].label}</span>
+                  </button>
+                ))}
+              </div>
+            </details>
           </div>
 
           {/* Footer */}
-          <div className="px-6 py-4 border-t border-border">
+          <div className="px-6 py-4 border-t border-border flex items-center justify-between">
             <button
               onClick={handleSkip}
               className="text-sm text-muted-foreground hover:text-foreground transition-colors"
             >
-              나중에 할게요
+              건너뛰기
             </button>
+            <span className="text-xs text-muted-foreground">
+              나중에 설정에서 변경 가능
+            </span>
           </div>
         </div>
       </div>

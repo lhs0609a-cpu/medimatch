@@ -123,15 +123,29 @@ export function usePayment(): UsePaymentReturn {
 
       // 결제창이 열리면 여기서 리턴 (성공/실패는 콜백 URL에서 처리)
     } catch (err: any) {
+      const errorCode = err.code || ''
       const errorMessage = err.message || '결제 처리 중 오류가 발생했습니다.'
-      setError(new Error(errorMessage))
-      onError?.(err)
 
-      // 사용자 취소
-      if (err.code === 'USER_CANCEL' || err.message?.includes('취소')) {
+      // 결제 취소 관련 에러 코드들
+      const cancelCodes = ['USER_CANCEL', 'PAY_PROCESS_CANCELED', 'PAY_PROCESS_ABORTED']
+
+      if (cancelCodes.includes(errorCode) || errorMessage.includes('취소')) {
+        // 사용자 의도적 취소 - 에러로 처리하지 않음
         onCancel?.()
-        toast.info('결제가 취소되었습니다.')
+
+        if (errorCode === 'PAY_PROCESS_ABORTED') {
+          toast.warning('결제가 중단되었습니다. 문제가 지속되면 다른 결제 수단을 이용해주세요.', {
+            duration: 5000,
+          })
+        } else {
+          toast.info('결제가 취소되었습니다. 언제든지 다시 시도할 수 있습니다.', {
+            duration: 4000,
+          })
+        }
       } else {
+        // 실제 에러
+        setError(new Error(errorMessage))
+        onError?.(err)
         toast.error(errorMessage)
       }
     } finally {
@@ -181,15 +195,19 @@ export function useSimulationUnlock() {
 
   const unlockSimulation = useCallback(async (
     simulationId: string,
-    onSuccess?: () => void
+    onSuccess?: () => void,
+    amount: number = 9900  // 기본값, 서버에서 받은 unlock_price 사용 권장
   ) => {
     await initiatePayment({
       productType: 'simulation_unlock',
       productName: 'AI 상권분석 시뮬레이션 잠금해제',
-      amount: 30000,
+      amount,
       referenceId: simulationId,
       onSuccess: () => {
         onSuccess?.()
+      },
+      onCancel: () => {
+        // 취소 시 추가 처리 (필요한 경우)
       },
     })
   }, [initiatePayment])

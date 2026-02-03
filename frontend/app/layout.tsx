@@ -6,6 +6,7 @@ import { Toaster } from 'sonner'
 import { SkipLink } from '@/components/common/SkipLink'
 import { GoogleAnalytics, WebVitalsReporter } from '@/components/analytics'
 import { InstallPrompt, UpdatePrompt, OfflineIndicator } from '@/components/pwa'
+import { jsonLd } from '@/lib/seo'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -106,6 +107,27 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ko">
+      <head>
+        {/* JSON-LD 구조화 데이터 */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(jsonLd.organization),
+          }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(jsonLd.website),
+          }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(jsonLd.softwareApp),
+          }}
+        />
+      </head>
       <body className={inter.className}>
         <GoogleAnalytics />
         <WebVitalsReporter />

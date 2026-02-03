@@ -3,6 +3,7 @@
 import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { toast } from 'sonner';
 
 interface Product {
   name: string;
@@ -26,6 +27,7 @@ function PaymentContent() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [retryCount, setRetryCount] = useState(0);
+  const [agreedToTerms, setAgreedToTerms] = useState(false);
   const MAX_RETRIES = 3;
 
   useEffect(() => {
@@ -122,9 +124,30 @@ function PaymentContent() {
         return processPaymentWithRetry(productId, attempt + 1);
       }
 
-      // 토스페이먼츠 결제창 취소는 에러 메시지 표시하지 않음
+      // 토스페이먼츠 결제창 취소
       if (err.code === 'USER_CANCEL') {
         setRetryCount(0);
+        toast.info('결제가 취소되었습니다. 언제든지 다시 시도할 수 있습니다.', {
+          duration: 4000,
+        });
+        return;
+      }
+
+      // PAY_PROCESS_CANCELED (결제창에서 X 버튼 클릭)
+      if (err.code === 'PAY_PROCESS_CANCELED') {
+        setRetryCount(0);
+        toast.info('결제 진행이 취소되었습니다.', {
+          duration: 3000,
+        });
+        return;
+      }
+
+      // PAY_PROCESS_ABORTED (결제창 강제 종료)
+      if (err.code === 'PAY_PROCESS_ABORTED') {
+        setRetryCount(0);
+        toast.warning('결제가 중단되었습니다. 문제가 지속되면 다른 결제 수단을 이용해주세요.', {
+          duration: 5000,
+        });
         return;
       }
 
@@ -217,6 +240,34 @@ function PaymentContent() {
           </div>
         )}
 
+        {/* 약관 동의 */}
+        <div className="bg-white rounded-xl shadow-lg p-6 mb-8">
+          <h2 className="text-xl font-semibold mb-4">약관 동의</h2>
+          <label className="flex items-start gap-3 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={agreedToTerms}
+              onChange={(e) => setAgreedToTerms(e.target.checked)}
+              className="w-5 h-5 mt-0.5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+            />
+            <span className="text-gray-700">
+              <Link href="/terms" className="text-blue-600 hover:underline" target="_blank">
+                이용약관
+              </Link>
+              {' '}및{' '}
+              <Link href="/privacy" className="text-blue-600 hover:underline" target="_blank">
+                개인정보처리방침
+              </Link>
+              에 동의합니다. (필수)
+            </span>
+          </label>
+          {!agreedToTerms && selectedProduct && (
+            <p className="text-sm text-amber-600 mt-2">
+              결제를 진행하려면 약관에 동의해주세요.
+            </p>
+          )}
+        </div>
+
         {/* 에러 메시지 */}
         {error && (
           <div className="bg-red-50 text-red-600 p-4 rounded-lg mb-6">
@@ -227,9 +278,9 @@ function PaymentContent() {
         {/* 결제 버튼 */}
         <button
           onClick={handlePayment}
-          disabled={!selectedProduct || loading}
+          disabled={!selectedProduct || loading || !agreedToTerms}
           className={`w-full py-4 rounded-xl text-lg font-semibold transition-colors ${
-            selectedProduct && !loading
+            selectedProduct && !loading && agreedToTerms
               ? 'bg-blue-600 text-white hover:bg-blue-700'
               : 'bg-gray-300 text-gray-500 cursor-not-allowed'
           }`}
@@ -268,8 +319,8 @@ function PaymentContent() {
 
         {/* 안내 문구 */}
         <div className="mt-6 text-center text-sm text-gray-500">
-          <p>결제 진행 시 이용약관 및 개인정보처리방침에 동의하는 것으로 간주됩니다.</p>
-          <p className="mt-2">결제 관련 문의: support@medimatch.kr</p>
+          <p>결제 관련 문의: support@medimatch.kr</p>
+          <p className="mt-2">결제 후 7일 이내 미사용 시 전액 환불이 가능합니다.</p>
         </div>
       </div>
     </div>

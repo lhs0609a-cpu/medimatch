@@ -81,6 +81,29 @@ class Simulation(Base):
         return f"<Simulation {self.address} - {self.clinic_type}>"
 
 
+class FreeTrialUsage(Base):
+    """무료 체험 이력 테이블 - IP 및 사용자 기반 제한"""
+    __tablename__ = "free_trial_usage"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    user_id = Column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=True)
+
+    # 식별 정보
+    ip_address = Column(String(45), nullable=True, index=True)  # IPv6 대응
+    fingerprint = Column(String(64), nullable=True, index=True)  # 클라이언트 핑거프린트 해시
+    user_agent = Column(String(500), nullable=True)
+
+    # 체험 대상
+    feature_type = Column(String(50), nullable=False, default="simulation")  # simulation, report 등
+    simulation_id = Column(UUID(as_uuid=True), ForeignKey("simulations.id"), nullable=True)
+
+    # 메타
+    created_at = Column(DateTime, default=datetime.utcnow, index=True)
+
+    def __repr__(self):
+        return f"<FreeTrialUsage {self.ip_address} - {self.feature_type}>"
+
+
 class SimulationReport(Base):
     """유료 리포트 테이블 (OpenSim)"""
     __tablename__ = "simulation_reports"

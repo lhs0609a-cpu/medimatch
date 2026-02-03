@@ -12,8 +12,8 @@ import {
   ClinicTypeCode, RegionCode,
   // Group Buying Types
   GroupBuyingCategory, CohortSummary, CohortDetail, CohortStats,
-  ParticipantResponse, MyParticipationResponse, JoinCohortResponse,
-  TotalStatsResponse, SavingsCalculatorResponse, CohortListResponse,
+  CohortParticipant, JoinCohortResponse,
+  GroupBuyingTotalStats, SavingsCalculation, CohortListResponse,
   MyParticipationsResponse, CohortStatus
 } from './client'
 
@@ -1535,13 +1535,13 @@ export const groupBuyingService = {
     specialty?: string
     size_pyeong?: number
     category_ids?: string[]
-  }): Promise<ParticipantResponse> => {
+  }): Promise<CohortParticipant> => {
     const response = await apiClient.patch(`/group-buying/participations/${participationId}`, data)
     return response.data
   },
 
   // 전체 통계
-  getTotalStats: async (): Promise<TotalStatsResponse> => {
+  getTotalStats: async (): Promise<GroupBuyingTotalStats> => {
     const response = await apiClient.get('/group-buying/stats/total')
     return response.data
   },
@@ -1552,7 +1552,7 @@ export const groupBuyingService = {
     specialty: string
     size_pyeong: number
     category_ids: string[]
-  }): Promise<SavingsCalculatorResponse> => {
+  }): Promise<SavingsCalculation> => {
     const response = await apiClient.post('/group-buying/stats/calculator', params)
     return response.data
   },

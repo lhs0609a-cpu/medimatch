@@ -1,30 +1,60 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Request
 from fastapi.responses import StreamingResponse
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
+from sqlalchemy import select, func
 from typing import Optional
 from uuid import UUID
-from datetime import datetime
+from datetime import datetime, timedelta
 from io import BytesIO
+import hashlib
+import logging
 
 from ...schemas.simulation import (
     SimulationRequest, SimulationResponse, SimulationListResponse,
-    CompetitorInfo, ReportPurchaseRequest, ReportResponse
+    CompetitorInfo, ReportPurchaseRequest, ReportResponse,
+    mask_sensitive_data
 )
 from ...services.simulation import simulation_service
 from ...services.ai_analysis import ai_analysis_service
 from ...services.pdf_generator import pdf_generator_service
 from ...models.user import User
-from ...models.simulation import Simulation, SimulationReport
+from ...models.simulation import Simulation, SimulationReport, FreeTrialUsage
 from ..deps import get_db, get_current_active_user
 from ...core.security import get_current_user, TokenData
 
 router = APIRouter()
+logger = logging.getLogger(__name__)
+
+# 무료 체험 설정
+FREE_TRIAL_LIMIT_PER_IP = 1  # IP당 무료 체험 횟수
+FREE_TRIAL_LIMIT_PER_USER = 1  # 사용자당 무료 체험 횟수
+FREE_TRIAL_WINDOW_DAYS = 30  # 무료 체험 제한 기간 (일)
+
+
+def get_client_ip(request: Request) -> str:
+    """클라이언트 IP 추출 (프록시 헤더 고려)"""
+    forwarded = request.headers.get("X-Forwarded-For")
+    if forwarded:
+        return forwarded.split(",")[0].strip()
+    real_ip = request.headers.get("X-Real-IP")
+    if real_ip:
+        return real_ip
+    return request.client.host if request.client else "unknown"
+
+
+def get_fingerprint_hash(request: Request) -> str:
+    """클라이언트 핑거프린트 해시 생성"""
+    user_agent = request.headers.get("User-Agent", "")
+    accept_lang = request.headers.get("Accept-Language", "")
+    # 간단한 핑거프린트 (실제로는 클라이언트에서 더 정교한 값을 보내야 함)
+    fingerprint_data = f"{user_agent}|{accept_lang}"
+    return hashlib.sha256(fingerprint_data.encode()).hexdigest()[:32]
 
 
 @router.post("", response_model=SimulationResponse)
 async def create_simulation(
-    request: SimulationRequest,
+    simulation_request: SimulationRequest,
+    request: Request,
     db: AsyncSession = Depends(get_db),
     current_user: Optional[TokenData] = Depends(get_current_user)
 ):
@@ -37,34 +67,222 @@ async def create_simulation(
     - **clinic_type**: 진료과목 (내과, 정형외과, 피부과 등)
     - **size_pyeong**: 면적 (평, 선택)
     - **budget_million**: 예산 (백만원, 선택)
+
+    결과는 기본적으로 마스킹되어 반환됩니다. 전체 데이터를 보려면 결제가 필요합니다.
+    첫 번째 시뮬레이션은 무료 체험으로 제공됩니다 (IP 및 사용자 기준 1회).
     """
     try:
         user_id = UUID(current_user.user_id) if current_user else None
+        client_ip = get_client_ip(request)
+        fingerprint = get_fingerprint_hash(request)
+        user_agent = request.headers.get("User-Agent", "")
+
         result = await simulation_service.create_simulation(
             db=db,
-            request=request,
+            request=simulation_request,
             user_id=user_id
         )
+
+        # 잠금해제 상태 확인 (무료 체험 또는 결제)
+        is_unlocked = await check_simulation_unlock_status(
+            db=db,
+            user_id=user_id,
+            simulation_id=result.simulation_id,
+            client_ip=client_ip,
+            fingerprint=fingerprint,
+            user_agent=user_agent
+        )
+
+        result.is_unlocked = is_unlocked
+
+        # 미결제 사용자에게는 마스킹된 데이터 반환
+        if not is_unlocked:
+            result = mask_sensitive_data(result)
+
         return result
     except Exception as e:
+        logger.error(f"시뮬레이션 생성 오류: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=str(e)
         )
 
 
+async def check_simulation_unlock_status(
+    db: AsyncSession,
+    user_id: Optional[UUID],
+    simulation_id: UUID,
+    client_ip: str = None,
+    fingerprint: str = None,
+    user_agent: str = None
+) -> bool:
+    """
+    시뮬레이션 잠금해제 상태 확인
+
+    우선순위:
+    1. 구독 상태 (Pro/Enterprise는 무제한)
+    2. 해당 시뮬레이션에 대한 결제 완료 여부
+    3. 크레딧 잔액 확인
+    4. 무료 체험 (사용자당 또는 IP당 1회, 30일 기준)
+    """
+    from ...models.payment import Subscription, UsageCredit
+
+    cutoff_date = datetime.utcnow() - timedelta(days=FREE_TRIAL_WINDOW_DAYS)
+
+    # === 1. 구독 상태 확인 (로그인 사용자만) ===
+    if user_id:
+        sub_result = await db.execute(
+            select(Subscription).where(
+                Subscription.user_id == user_id,
+                Subscription.status == "ACTIVE"
+            )
+        )
+        subscription = sub_result.scalar_one_or_none()
+
+        if subscription and subscription.plan in ["pro", "enterprise"]:
+            if subscription.expires_at > datetime.utcnow():
+                logger.info(f"구독으로 잠금해제: user={user_id}, plan={subscription.plan}")
+                return True
+
+    # === 2. 해당 시뮬레이션에 대한 결제 확인 ===
+    sim_result = await db.execute(
+        select(Simulation).where(Simulation.id == simulation_id)
+    )
+    simulation = sim_result.scalar_one_or_none()
+
+    if simulation and simulation.is_paid:
+        logger.info(f"결제로 잠금해제: simulation={simulation_id}")
+        return True
+
+    # === 3. 크레딧 잔액 확인 (로그인 사용자만) ===
+    if user_id:
+        credit_result = await db.execute(
+            select(UsageCredit).where(
+                UsageCredit.user_id == user_id,
+                UsageCredit.credit_type == "simulation_report"
+            )
+        )
+        credit = credit_result.scalar_one_or_none()
+
+        if credit:
+            if credit.total_credits == -1:  # 무제한
+                logger.info(f"무제한 크레딧으로 잠금해제: user={user_id}")
+                return True
+            if credit.total_credits > credit.used_credits:
+                # 크레딧 차감 및 무료 체험 이력 기록
+                credit.used_credits += 1
+                await record_free_trial_usage(
+                    db, user_id, simulation_id, client_ip, fingerprint, user_agent
+                )
+                await db.commit()
+                logger.info(f"크레딧 사용으로 잠금해제: user={user_id}, remaining={credit.total_credits - credit.used_credits}")
+                return True
+
+    # === 4. 무료 체험 확인 ===
+
+    # 4-1. 로그인 사용자: 사용자 기준 체험 이력 확인
+    if user_id:
+        user_trial_result = await db.execute(
+            select(func.count(FreeTrialUsage.id)).where(
+                FreeTrialUsage.user_id == user_id,
+                FreeTrialUsage.feature_type == "simulation",
+                FreeTrialUsage.created_at > cutoff_date
+            )
+        )
+        user_trial_count = user_trial_result.scalar()
+
+        if user_trial_count < FREE_TRIAL_LIMIT_PER_USER:
+            # 무료 체험 사용 가능 - 이력 기록
+            await record_free_trial_usage(
+                db, user_id, simulation_id, client_ip, fingerprint, user_agent
+            )
+            await db.commit()
+            logger.info(f"사용자 무료 체험 사용: user={user_id}")
+            return True
+
+    # 4-2. IP 기준 체험 이력 확인 (비로그인 포함)
+    if client_ip and client_ip != "unknown":
+        ip_trial_result = await db.execute(
+            select(func.count(FreeTrialUsage.id)).where(
+                FreeTrialUsage.ip_address == client_ip,
+                FreeTrialUsage.feature_type == "simulation",
+                FreeTrialUsage.created_at > cutoff_date
+            )
+        )
+        ip_trial_count = ip_trial_result.scalar()
+
+        if ip_trial_count < FREE_TRIAL_LIMIT_PER_IP:
+            # 무료 체험 사용 가능 - 이력 기록
+            await record_free_trial_usage(
+                db, user_id, simulation_id, client_ip, fingerprint, user_agent
+            )
+            await db.commit()
+            logger.info(f"IP 무료 체험 사용: ip={client_ip}")
+            return True
+
+    logger.info(f"잠금 유지: user={user_id}, ip={client_ip}")
+    return False
+
+
+async def record_free_trial_usage(
+    db: AsyncSession,
+    user_id: Optional[UUID],
+    simulation_id: UUID,
+    client_ip: str,
+    fingerprint: str,
+    user_agent: str
+):
+    """무료 체험 이력 기록"""
+    trial = FreeTrialUsage(
+        user_id=user_id,
+        ip_address=client_ip,
+        fingerprint=fingerprint,
+        user_agent=user_agent[:500] if user_agent else None,
+        feature_type="simulation",
+        simulation_id=simulation_id
+    )
+    db.add(trial)
+
+
 @router.get("/{simulation_id}", response_model=SimulationResponse)
 async def get_simulation(
     simulation_id: UUID,
-    db: AsyncSession = Depends(get_db)
+    request: Request,
+    db: AsyncSession = Depends(get_db),
+    current_user: Optional[TokenData] = Depends(get_current_user)
 ):
-    """시뮬레이션 결과 조회"""
+    """
+    시뮬레이션 결과 조회
+
+    결제하지 않은 사용자에게는 민감 데이터가 마스킹되어 반환됩니다.
+    """
     result = await simulation_service.get_simulation(db, simulation_id)
     if not result:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Simulation not found"
         )
+
+    # IP 및 사용자 정보 추출
+    user_id = UUID(current_user.user_id) if current_user else None
+    client_ip = get_client_ip(request)
+    fingerprint = get_fingerprint_hash(request)
+
+    # 결제/무료체험 상태 확인
+    is_unlocked = await check_simulation_unlock_status(
+        db=db,
+        user_id=user_id,
+        simulation_id=simulation_id,
+        client_ip=client_ip,
+        fingerprint=fingerprint
+    )
+
+    result.is_unlocked = is_unlocked
+
+    # 미결제 사용자에게는 마스킹된 데이터 반환
+    if not is_unlocked:
+        result = mask_sensitive_data(result)
+
     return result
 
 

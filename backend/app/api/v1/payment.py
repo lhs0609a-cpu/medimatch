@@ -11,6 +11,11 @@ import httpx
 import base64
 import uuid
 import os
+import hmac
+import hashlib
+import logging
+
+logger = logging.getLogger(__name__)
 
 from app.core.database import get_db
 from app.models.payment import Payment, Subscription, UsageCredit, PaymentStatus, PaymentMethod
@@ -22,7 +27,36 @@ router = APIRouter(prefix="/payments", tags=["payments"])
 # 토스 페이먼츠 설정
 TOSS_CLIENT_KEY = os.getenv("TOSS_CLIENT_KEY", "test_ck_D5GePWvyJnrK0W0k6q8gLzN97Eoq")
 TOSS_SECRET_KEY = os.getenv("TOSS_SECRET_KEY", "test_sk_zXLkKEypNArWmo50nX3lmeaxYG5R")
+TOSS_WEBHOOK_SECRET = os.getenv("TOSS_WEBHOOK_SECRET", "")  # 프로덕션에서 반드시 설정 필요
 TOSS_API_URL = "https://api.tosspayments.com/v1"
+
+
+def verify_webhook_signature(secret: str, payload: bytes, signature: str) -> bool:
+    """
+    토스페이먼츠 웹훅 서명 검증
+    - secret: TOSS_WEBHOOK_SECRET
+    - payload: request body (raw bytes)
+    - signature: Toss-Signature 헤더 값
+    """
+    if not secret:
+        logger.warning("TOSS_WEBHOOK_SECRET이 설정되지 않음 - 개발 환경에서만 허용")
+        return True  # 개발 환경에서는 서명 검증 스킵 (프로덕션에서는 False 반환 권장)
+
+    if not signature:
+        logger.error("웹훅 서명 헤더 없음")
+        return False
+
+    try:
+        expected_signature = hmac.new(
+            secret.encode('utf-8'),
+            payload,
+            hashlib.sha256
+        ).hexdigest()
+
+        return hmac.compare_digest(expected_signature, signature)
+    except Exception as e:
+        logger.error(f"웹훅 서명 검증 실패: {e}")
+        return False
 
 
 # ============ Schemas ============
@@ -453,11 +487,24 @@ async def toss_webhook(
     request: Request,
     db: AsyncSession = Depends(get_db)
 ):
-    """토스 페이먼츠 웹훅 처리"""
+    """토스 페이먼츠 웹훅 처리 (서명 검증 포함)"""
     try:
-        data = await request.json()
+        # 1. Raw body 읽기 (서명 검증용)
+        body = await request.body()
+
+        # 2. 서명 검증
+        signature = request.headers.get("Toss-Signature", "")
+        if not verify_webhook_signature(TOSS_WEBHOOK_SECRET, body, signature):
+            logger.warning(f"웹훅 서명 검증 실패 - IP: {request.client.host}")
+            raise HTTPException(status_code=401, detail="Invalid webhook signature")
+
+        # 3. JSON 파싱
+        import json
+        data = json.loads(body)
         event_type = data.get("eventType")
         payment_key = data.get("data", {}).get("paymentKey")
+
+        logger.info(f"웹훅 수신: event={event_type}, payment_key={payment_key}")
 
         if event_type == "PAYMENT_STATUS_CHANGED":
             status = data.get("data", {}).get("status")
@@ -476,8 +523,14 @@ async def toss_webhook(
                     payment.status = PaymentStatus.REFUNDED
 
                 await db.commit()
+                logger.info(f"결제 상태 업데이트: {payment_key} -> {status}")
+            else:
+                logger.warning(f"결제 정보 없음: {payment_key}")
 
         return {"status": "ok"}
 
+    except HTTPException:
+        raise
     except Exception as e:
+        logger.error(f"웹훅 처리 오류: {e}")
         return {"status": "error", "message": str(e)}

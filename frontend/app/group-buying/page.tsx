@@ -10,7 +10,7 @@ import {
   Calculator, ChevronRight, Sparkles, ShieldCheck
 } from 'lucide-react'
 import { groupBuyingService } from '@/lib/api/services'
-import { CohortStatus, CohortSummary, GroupBuyingCategory, TotalStatsResponse } from '@/lib/api/client'
+import { CohortStatus, CohortSummary, GroupBuyingCategory } from '@/lib/api/client'
 
 // 상태 뱃지 컴포넌트
 function StatusBadge({ status }: { status: CohortStatus }) {

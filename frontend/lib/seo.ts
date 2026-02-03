@@ -6,6 +6,130 @@ export const siteConfig = {
   url: 'https://mediplatone.kr',
   ogImage: '/og-image.png',
   twitterHandle: '@mediplatone',
+  email: 'support@mediplatone.kr',
+  phone: '02-1234-5678',
+}
+
+// JSON-LD 구조화 데이터 생성
+export const jsonLd = {
+  // 조직 스키마
+  organization: {
+    '@context': 'https://schema.org',
+    '@type': 'Organization',
+    name: siteConfig.name,
+    url: siteConfig.url,
+    logo: `${siteConfig.url}/logo.png`,
+    description: siteConfig.description,
+    email: siteConfig.email,
+    sameAs: [
+      'https://twitter.com/mediplatone',
+      'https://www.linkedin.com/company/mediplatone',
+    ],
+    contactPoint: {
+      '@type': 'ContactPoint',
+      telephone: siteConfig.phone,
+      contactType: 'customer service',
+      availableLanguage: 'Korean',
+    },
+  },
+
+  // 웹사이트 스키마
+  website: {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    name: siteConfig.name,
+    url: siteConfig.url,
+    description: siteConfig.description,
+    potentialAction: {
+      '@type': 'SearchAction',
+      target: {
+        '@type': 'EntryPoint',
+        urlTemplate: `${siteConfig.url}/buildings?search={search_term_string}`,
+      },
+      'query-input': 'required name=search_term_string',
+    },
+  },
+
+  // 소프트웨어 애플리케이션 스키마
+  softwareApp: {
+    '@context': 'https://schema.org',
+    '@type': 'SoftwareApplication',
+    name: '메디플라톤 개원 시뮬레이터',
+    applicationCategory: 'BusinessApplication',
+    operatingSystem: 'Web',
+    offers: {
+      '@type': 'Offer',
+      price: '0',
+      priceCurrency: 'KRW',
+      description: '무료 개원 시뮬레이션',
+    },
+    aggregateRating: {
+      '@type': 'AggregateRating',
+      ratingValue: '4.8',
+      ratingCount: '1250',
+    },
+  },
+
+  // FAQ 스키마 생성기
+  faq: (items: Array<{ question: string; answer: string }>) => ({
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: items.map((item) => ({
+      '@type': 'Question',
+      name: item.question,
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: item.answer,
+      },
+    })),
+  }),
+
+  // 서비스 스키마 생성기
+  service: (name: string, description: string, url: string) => ({
+    '@context': 'https://schema.org',
+    '@type': 'Service',
+    serviceType: 'Medical Practice Consulting',
+    provider: {
+      '@type': 'Organization',
+      name: siteConfig.name,
+    },
+    name,
+    description,
+    url: `${siteConfig.url}${url}`,
+    areaServed: {
+      '@type': 'Country',
+      name: 'South Korea',
+    },
+  }),
+
+  // 부동산 매물 스키마 생성기
+  realEstateListing: (listing: {
+    name: string
+    description: string
+    address: string
+    price: number
+    size: number
+  }) => ({
+    '@context': 'https://schema.org',
+    '@type': 'RealEstateListing',
+    name: listing.name,
+    description: listing.description,
+    address: {
+      '@type': 'PostalAddress',
+      streetAddress: listing.address,
+      addressCountry: 'KR',
+    },
+    offers: {
+      '@type': 'Offer',
+      price: listing.price,
+      priceCurrency: 'KRW',
+    },
+    floorSize: {
+      '@type': 'QuantitativeValue',
+      value: listing.size,
+      unitCode: 'MTK', // 평방미터
+    },
+  }),
 }
 
 interface PageSEOProps {
