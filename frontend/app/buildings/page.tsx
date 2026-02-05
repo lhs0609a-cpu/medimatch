@@ -583,11 +583,15 @@ export default function BuildingsPage() {
 
             <div className="space-y-3">
               <a
-                href="tel:1588-0000"
-                className="btn-primary w-full py-3"
+                href="https://open.kakao.com/o/sMLX4Zei"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn-primary w-full py-3 bg-[#FEE500] hover:bg-[#FDD835] text-[#3C1E1E]"
               >
-                <Phone className="w-5 h-5" />
-                전화 문의 (1588-0000)
+                <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 3C6.48 3 2 6.58 2 11c0 2.83 1.87 5.32 4.68 6.73l-.95 3.52c-.08.3.26.55.52.38l4.23-2.82c.5.05 1 .09 1.52.09 5.52 0 10-3.58 10-8S17.52 3 12 3z"/>
+                </svg>
+                카카오톡 오픈채팅 문의
               </a>
               <button
                 onClick={() => setShowInquiryModal(false)}
@@ -598,7 +602,7 @@ export default function BuildingsPage() {
             </div>
 
             <p className="text-center text-xs text-muted-foreground mt-4">
-              평일 09:00 - 18:00 상담 가능
+              실시간 상담 가능 (평일 09:00 - 18:00)
             </p>
           </div>
         </div>
