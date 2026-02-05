@@ -11,7 +11,8 @@ import {
   ChevronRight, Download, AlertCircle, CheckCircle2, MinusCircle, Lock, LogIn, Award,
   Sparkles, Eye, EyeOff, Train, Car, Calendar, Shield, Lightbulb, BarChart3,
   PieChart, Activity, Clock, DollarSign, Briefcase, Heart, Star, Zap, TrendingDown,
-  MapPinned, Building, Home, CircleDollarSign, Search
+  MapPinned, Building, Home, CircleDollarSign, Search, FileText, MessageCircle,
+  Monitor, Smartphone, Plus, GraduationCap, AlertTriangle, Package, CreditCard, Globe
 } from 'lucide-react'
 import { simulationService } from '@/lib/api/services'
 import { SimulationResponse } from '@/lib/api/client'
@@ -4927,6 +4928,1264 @@ export default function SimulatePage() {
                   </div>
                 </div>
 
+                {/* 킬러 #26: 손익분기점 민감도 분석 */}
+                <div className="card p-6 border-2 border-red-200 dark:border-red-800">
+                  <div className="flex items-center gap-2 mb-4">
+                    <span className="px-2 py-1 bg-red-500 text-white text-xs font-bold rounded">SENSITIVITY</span>
+                    <h3 className="font-semibold text-foreground flex items-center gap-2">
+                      <TrendingUp className="w-5 h-5 text-red-600" />
+                      손익분기점 민감도 분석
+                    </h3>
+                  </div>
+                  <p className="text-sm text-muted-foreground mb-4">매출/비용 변동에 따른 손익분기점 변화를 시뮬레이션합니다</p>
+                  <div className="space-y-4">
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-sm">
+                        <thead className="bg-red-50 dark:bg-red-950/30">
+                          <tr>
+                            <th className="p-3 text-left">시나리오</th>
+                            <th className="p-3 text-right">매출 변동</th>
+                            <th className="p-3 text-right">비용 변동</th>
+                            <th className="p-3 text-right">BEP 도달</th>
+                            <th className="p-3 text-center">리스크</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y">
+                          {[
+                            { scenario: '최악의 경우', revenue: -20, cost: +10, bep: '18개월', risk: '높음', color: 'red' },
+                            { scenario: '비관적', revenue: -10, cost: +5, bep: '14개월', risk: '중상', color: 'orange' },
+                            { scenario: '기본 예측', revenue: 0, cost: 0, bep: '10개월', risk: '중', color: 'yellow' },
+                            { scenario: '낙관적', revenue: +10, cost: -5, bep: '7개월', risk: '중하', color: 'lime' },
+                            { scenario: '최상의 경우', revenue: +20, cost: -10, bep: '5개월', risk: '낮음', color: 'green' },
+                          ].map((s, i) => (
+                            <tr key={i} className="hover:bg-muted/50">
+                              <td className="p-3 font-medium">{s.scenario}</td>
+                              <td className={`p-3 text-right ${s.revenue >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                                {s.revenue >= 0 ? '+' : ''}{s.revenue}%
+                              </td>
+                              <td className={`p-3 text-right ${s.cost <= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                                {s.cost >= 0 ? '+' : ''}{s.cost}%
+                              </td>
+                              <td className="p-3 text-right font-bold">{s.bep}</td>
+                              <td className="p-3 text-center">
+                                <span className={`px-2 py-1 rounded text-xs bg-${s.color}-100 text-${s.color}-700`}>
+                                  {s.risk}
+                                </span>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                    <div className="grid md:grid-cols-2 gap-4">
+                      <div className="p-4 bg-red-50 dark:bg-red-950/20 rounded-lg">
+                        <div className="font-bold text-red-700 mb-2">⚠️ 주요 리스크 요인</div>
+                        <ul className="text-sm space-y-1">
+                          <li>• 경쟁병원 신규 개원 시 매출 -15% 예상</li>
+                          <li>• 인건비 상승률 연 5% 반영 필요</li>
+                          <li>• 임대료 인상 (2년 후 +10% 예상)</li>
+                        </ul>
+                      </div>
+                      <div className="p-4 bg-blue-50 dark:bg-blue-950/20 rounded-lg">
+                        <div className="font-bold text-blue-700 mb-2">💡 리스크 완화 전략</div>
+                        <ul className="text-sm space-y-1">
+                          <li>• 운영자금 6개월분 확보 권장</li>
+                          <li>• 고정비 비중 40% 이하 유지</li>
+                          <li>• 비급여 매출 비중 30% 목표</li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 킬러 #27: 투자자/은행 피칭 자료 */}
+                <div className="card p-6 border-2 border-emerald-200 dark:border-emerald-800">
+                  <div className="flex items-center gap-2 mb-4">
+                    <span className="px-2 py-1 bg-emerald-500 text-white text-xs font-bold rounded">PITCH DECK</span>
+                    <h3 className="font-semibold text-foreground flex items-center gap-2">
+                      <FileText className="w-5 h-5 text-emerald-600" />
+                      투자자/은행 피칭 자료 핵심 포인트
+                    </h3>
+                  </div>
+                  <div className="space-y-4">
+                    <div className="grid md:grid-cols-2 gap-4">
+                      {[
+                        {
+                          title: '1. 시장 기회',
+                          points: ['해당 지역 의료 수요 데이터', '경쟁 현황 및 차별화 포인트', '타겟 환자층 규모'],
+                          icon: '📊'
+                        },
+                        {
+                          title: '2. 사업 모델',
+                          points: ['주요 수익원 및 비중', '환자당 평균 매출', '재방문율 목표'],
+                          icon: '💼'
+                        },
+                        {
+                          title: '3. 재무 계획',
+                          points: ['초기 투자금 및 용도', '월별 예상 매출/비용', '손익분기점 도달 시점'],
+                          icon: '💰'
+                        },
+                        {
+                          title: '4. 경영진',
+                          points: ['의료진 경력 및 전문성', '경영 지원 인력', '자문단 구성'],
+                          icon: '👥'
+                        },
+                      ].map((section, i) => (
+                        <div key={i} className="p-4 bg-emerald-50 dark:bg-emerald-950/20 rounded-lg">
+                          <div className="font-bold text-emerald-700 mb-2">{section.icon} {section.title}</div>
+                          <ul className="text-sm space-y-1">
+                            {section.points.map((p, j) => (
+                              <li key={j}>✓ {p}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      ))}
+                    </div>
+                    <div className="p-4 bg-yellow-50 dark:bg-yellow-950/20 rounded-lg border border-yellow-300">
+                      <div className="font-bold text-yellow-700 mb-2">💡 대출 심사 통과 TIP</div>
+                      <div className="grid md:grid-cols-3 gap-3 text-sm">
+                        <div className="text-center p-2 bg-white dark:bg-yellow-950/30 rounded">
+                          <div className="font-medium">자기자본 비율</div>
+                          <div className="text-yellow-600 font-bold">30% 이상</div>
+                        </div>
+                        <div className="text-center p-2 bg-white dark:bg-yellow-950/30 rounded">
+                          <div className="font-medium">신용등급</div>
+                          <div className="text-yellow-600 font-bold">1-3등급</div>
+                        </div>
+                        <div className="text-center p-2 bg-white dark:bg-yellow-950/30 rounded">
+                          <div className="font-medium">담보 확보</div>
+                          <div className="text-yellow-600 font-bold">보증보험 활용</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 킬러 #28: 세무조사 대비 체크리스트 */}
+                <div className="card p-6 border-2 border-slate-200 dark:border-slate-700">
+                  <div className="flex items-center gap-2 mb-4">
+                    <span className="px-2 py-1 bg-slate-600 text-white text-xs font-bold rounded">TAX AUDIT</span>
+                    <h3 className="font-semibold text-foreground flex items-center gap-2">
+                      <Shield className="w-5 h-5 text-slate-600" />
+                      세무조사 대비 체크리스트
+                    </h3>
+                  </div>
+                  <div className="space-y-4">
+                    <div className="grid md:grid-cols-2 gap-4">
+                      <div>
+                        <div className="font-bold text-slate-700 mb-3">📋 필수 준비 서류</div>
+                        <div className="space-y-2">
+                          {[
+                            { item: '진료기록부 (최근 5년)', status: true },
+                            { item: '세금계산서/현금영수증', status: true },
+                            { item: '인건비 지급내역', status: true },
+                            { item: '임대차 계약서', status: true },
+                            { item: '카드매출 내역', status: true },
+                            { item: '현금매출 일지', status: false },
+                          ].map((doc, i) => (
+                            <div key={i} className="flex items-center gap-2 text-sm p-2 bg-slate-50 dark:bg-slate-900/30 rounded">
+                              <span className={doc.status ? 'text-green-500' : 'text-red-500'}>
+                                {doc.status ? '✅' : '⚠️'}
+                              </span>
+                              <span>{doc.item}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                      <div>
+                        <div className="font-bold text-red-700 mb-3">⚠️ 세무조사 주요 체크 항목</div>
+                        <div className="space-y-2">
+                          {[
+                            '현금매출 누락 여부',
+                            '가공 인건비 계상',
+                            '개인경비 비용처리',
+                            '접대비 한도 초과',
+                            '비급여 매출 신고 누락',
+                          ].map((item, i) => (
+                            <div key={i} className="text-sm p-2 bg-red-50 dark:bg-red-950/20 rounded">
+                              {i + 1}. {item}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                    <div className="p-4 bg-blue-50 dark:bg-blue-950/20 rounded-lg">
+                      <div className="font-bold text-blue-700 mb-2">💼 세무 리스크 최소화 전략</div>
+                      <ul className="text-sm space-y-1 text-muted-foreground">
+                        <li>• <strong>의료 전문 세무사</strong> 선임 필수 (월 30-50만원)</li>
+                        <li>• 모든 거래 <strong>카드/계좌이체</strong>로 증빙 확보</li>
+                        <li>• 분기별 자체 세무 점검 실시</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 킬러 #29: 환자 동선 최적화 설계 */}
+                <div className="card p-6 border-2 border-blue-200 dark:border-blue-800">
+                  <div className="flex items-center gap-2 mb-4">
+                    <span className="px-2 py-1 bg-blue-500 text-white text-xs font-bold rounded">LAYOUT</span>
+                    <h3 className="font-semibold text-foreground flex items-center gap-2">
+                      <MapPin className="w-5 h-5 text-blue-600" />
+                      환자 동선 최적화 설계
+                    </h3>
+                  </div>
+                  <div className="space-y-4">
+                    <div className="p-4 bg-blue-50 dark:bg-blue-950/20 rounded-lg">
+                      <div className="font-bold text-blue-700 mb-3">🚶 최적 환자 동선</div>
+                      <div className="flex flex-wrap items-center gap-2 text-sm">
+                        <span className="px-3 py-2 bg-blue-500 text-white rounded-lg">입구</span>
+                        <span className="text-blue-400">→</span>
+                        <span className="px-3 py-2 bg-blue-400 text-white rounded-lg">접수/수납</span>
+                        <span className="text-blue-400">→</span>
+                        <span className="px-3 py-2 bg-blue-300 text-blue-900 rounded-lg">대기실</span>
+                        <span className="text-blue-400">→</span>
+                        <span className="px-3 py-2 bg-blue-200 text-blue-900 rounded-lg">진료실</span>
+                        <span className="text-blue-400">→</span>
+                        <span className="px-3 py-2 bg-blue-100 text-blue-900 rounded-lg">처치실</span>
+                        <span className="text-blue-400">→</span>
+                        <span className="px-3 py-2 bg-gray-200 text-gray-700 rounded-lg">수납/출구</span>
+                      </div>
+                    </div>
+                    <div className="grid md:grid-cols-3 gap-4">
+                      {[
+                        {
+                          area: '대기실',
+                          tips: ['좌석 간격 1.2m 이상', '자연광 활용', 'TV/잡지 배치'],
+                          size: '15-20평'
+                        },
+                        {
+                          area: '진료실',
+                          tips: ['환자-의사 90도 배치', '프라이버시 확보', '손씻기 동선'],
+                          size: '4-5평'
+                        },
+                        {
+                          area: '접수대',
+                          tips: ['입구 정면 배치', '높이 110cm', '뒤편 사무공간'],
+                          size: '3-4평'
+                        },
+                      ].map((area, i) => (
+                        <div key={i} className="p-4 bg-white dark:bg-blue-950/30 rounded-lg border">
+                          <div className="font-bold mb-2">{area.area}</div>
+                          <div className="text-xs text-muted-foreground mb-2">권장 면적: {area.size}</div>
+                          <ul className="text-sm space-y-1">
+                            {area.tips.map((tip, j) => (
+                              <li key={j}>• {tip}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      ))}
+                    </div>
+                    <div className="p-4 bg-yellow-50 dark:bg-yellow-950/20 rounded-lg">
+                      <div className="font-bold text-yellow-700 mb-2">⏱️ 동선 최적화 효과</div>
+                      <div className="grid grid-cols-3 gap-4 text-center text-sm">
+                        <div>
+                          <div className="text-2xl font-bold text-yellow-600">-30%</div>
+                          <div className="text-muted-foreground">평균 대기시간</div>
+                        </div>
+                        <div>
+                          <div className="text-2xl font-bold text-yellow-600">+20%</div>
+                          <div className="text-muted-foreground">시간당 진료 환자</div>
+                        </div>
+                        <div>
+                          <div className="text-2xl font-bold text-yellow-600">+15%</div>
+                          <div className="text-muted-foreground">환자 만족도</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 킬러 #30: 불만 환자 응대 스크립트 */}
+                <div className="card p-6 border-2 border-orange-200 dark:border-orange-800">
+                  <div className="flex items-center gap-2 mb-4">
+                    <span className="px-2 py-1 bg-orange-500 text-white text-xs font-bold rounded">SCRIPT</span>
+                    <h3 className="font-semibold text-foreground flex items-center gap-2">
+                      <MessageCircle className="w-5 h-5 text-orange-600" />
+                      불만 환자 응대 스크립트
+                    </h3>
+                  </div>
+                  <div className="space-y-4">
+                    {[
+                      {
+                        situation: '대기시간 불만',
+                        wrong: '"오늘 환자가 많아서요..."',
+                        right: '"오래 기다리시게 해서 죄송합니다. 약 10분 후 진료 가능하십니다. 음료 한 잔 드릴까요?"',
+                        tip: '구체적 시간 안내 + 보상 제안'
+                      },
+                      {
+                        situation: '비용 불만',
+                        wrong: '"원래 이 가격이에요"',
+                        right: '"비용이 부담되실 수 있으시죠. 각 항목별로 설명드릴까요? 꼭 필요한 항목 위주로 조정도 가능합니다."',
+                        tip: '공감 + 투명한 설명 + 대안 제시'
+                      },
+                      {
+                        situation: '치료 결과 불만',
+                        wrong: '"원래 그럴 수 있어요"',
+                        right: '"불편하셨겠습니다. 원장님께서 다시 확인해 드리겠습니다. 추가 비용 없이 재진료 도와드릴게요."',
+                        tip: '경청 + 즉각 대응 + 무료 재진료'
+                      },
+                    ].map((script, i) => (
+                      <div key={i} className="p-4 bg-orange-50 dark:bg-orange-950/20 rounded-lg">
+                        <div className="font-bold text-orange-700 mb-3">😤 상황: {script.situation}</div>
+                        <div className="grid md:grid-cols-2 gap-3 mb-2">
+                          <div className="p-3 bg-red-100 dark:bg-red-950/30 rounded">
+                            <div className="text-xs text-red-600 mb-1">❌ 잘못된 응대</div>
+                            <div className="text-sm">{script.wrong}</div>
+                          </div>
+                          <div className="p-3 bg-green-100 dark:bg-green-950/30 rounded">
+                            <div className="text-xs text-green-600 mb-1">✅ 권장 응대</div>
+                            <div className="text-sm">{script.right}</div>
+                          </div>
+                        </div>
+                        <div className="text-xs text-orange-600">💡 포인트: {script.tip}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* 킬러 #31: 재방문율 높이는 CRM 전략 */}
+                <div className="card p-6 border-2 border-pink-200 dark:border-pink-800">
+                  <div className="flex items-center gap-2 mb-4">
+                    <span className="px-2 py-1 bg-pink-500 text-white text-xs font-bold rounded">CRM</span>
+                    <h3 className="font-semibold text-foreground flex items-center gap-2">
+                      <Heart className="w-5 h-5 text-pink-600" />
+                      재방문율 높이는 CRM 전략
+                    </h3>
+                  </div>
+                  <div className="space-y-4">
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-sm">
+                        <thead className="bg-pink-50 dark:bg-pink-950/30">
+                          <tr>
+                            <th className="p-3 text-left">시점</th>
+                            <th className="p-3 text-left">메시지 유형</th>
+                            <th className="p-3 text-center">발송 채널</th>
+                            <th className="p-3 text-center">전환율</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y">
+                          {[
+                            { timing: '진료 당일', type: '감사 인사 + 주의사항', channel: '알림톡', rate: '열람 95%' },
+                            { timing: '진료 3일 후', type: '경과 확인 + 재진 안내', channel: '알림톡', rate: '재방문 35%' },
+                            { timing: '진료 1개월 후', type: '건강 체크 리마인드', channel: 'LMS', rate: '재방문 15%' },
+                            { timing: '진료 3개월 후', type: '정기검진 안내', channel: '알림톡', rate: '재방문 20%' },
+                            { timing: '생일', type: '생일 축하 + 할인 쿠폰', channel: '알림톡', rate: '재방문 25%' },
+                          ].map((crm, i) => (
+                            <tr key={i} className="hover:bg-muted/50">
+                              <td className="p-3 font-medium">{crm.timing}</td>
+                              <td className="p-3">{crm.type}</td>
+                              <td className="p-3 text-center">{crm.channel}</td>
+                              <td className="p-3 text-center text-pink-600 font-medium">{crm.rate}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                    <div className="grid md:grid-cols-2 gap-4">
+                      <div className="p-4 bg-pink-50 dark:bg-pink-950/20 rounded-lg">
+                        <div className="font-bold text-pink-700 mb-2">📱 추천 CRM 솔루션</div>
+                        <ul className="text-sm space-y-1">
+                          <li>• <strong>캐어랩</strong> - 월 5만원, 의원 특화</li>
+                          <li>• <strong>똑닥 CRM</strong> - 예약 연동 강점</li>
+                          <li>• <strong>EMR 내장 기능</strong> - 추가비용 없음</li>
+                        </ul>
+                      </div>
+                      <div className="p-4 bg-green-50 dark:bg-green-950/20 rounded-lg">
+                        <div className="font-bold text-green-700 mb-2">📈 CRM 도입 효과</div>
+                        <ul className="text-sm space-y-1">
+                          <li>• 재방문율 <strong>+25%</strong> 상승</li>
+                          <li>• 환자당 연간 매출 <strong>+40%</strong></li>
+                          <li>• 신환 유치비용 대비 <strong>1/5</strong></li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 킬러 #32: AI 챗봇 도입 ROI */}
+                <div className="card p-6 border-2 border-cyan-200 dark:border-cyan-800">
+                  <div className="flex items-center gap-2 mb-4">
+                    <span className="px-2 py-1 bg-cyan-500 text-white text-xs font-bold rounded">AI</span>
+                    <h3 className="font-semibold text-foreground flex items-center gap-2">
+                      <Zap className="w-5 h-5 text-cyan-600" />
+                      AI 챗봇 도입 ROI 분석
+                    </h3>
+                  </div>
+                  <div className="space-y-4">
+                    <div className="grid md:grid-cols-2 gap-4">
+                      <div className="p-4 bg-cyan-50 dark:bg-cyan-950/20 rounded-lg">
+                        <div className="font-bold text-cyan-700 mb-3">🤖 챗봇 자동화 가능 업무</div>
+                        <div className="space-y-2">
+                          {[
+                            { task: '진료 예약/변경/취소', auto: 90 },
+                            { task: '진료시간/위치 안내', auto: 100 },
+                            { task: '비용 문의', auto: 70 },
+                            { task: '증상 사전 문진', auto: 80 },
+                            { task: '검사결과 안내', auto: 60 },
+                          ].map((item, i) => (
+                            <div key={i} className="text-sm">
+                              <div className="flex justify-between mb-1">
+                                <span>{item.task}</span>
+                                <span className="text-cyan-600">{item.auto}%</span>
+                              </div>
+                              <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+                                <div className="h-full bg-cyan-500 rounded-full" style={{ width: `${item.auto}%` }} />
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                      <div className="p-4 bg-white dark:bg-cyan-950/30 rounded-lg border">
+                        <div className="font-bold text-cyan-700 mb-3">💰 비용 대비 효과</div>
+                        <div className="space-y-3 text-sm">
+                          <div className="flex justify-between">
+                            <span>월 도입 비용</span>
+                            <span className="font-medium">10-30만원</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span>전화 응대 감소</span>
+                            <span className="text-cyan-600 font-medium">-60%</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span>데스크 업무 절감</span>
+                            <span className="text-cyan-600 font-medium">-40%</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span>24시간 예약 접수</span>
+                            <span className="text-cyan-600 font-medium">+30% 예약</span>
+                          </div>
+                          <div className="flex justify-between border-t pt-2 font-bold">
+                            <span>월 순효과</span>
+                            <span className="text-green-600">+80만원</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="p-4 bg-yellow-50 dark:bg-yellow-950/20 rounded-lg">
+                      <div className="font-bold text-yellow-700 mb-2">📱 추천 의료 챗봇 서비스</div>
+                      <div className="grid md:grid-cols-3 gap-3 text-sm">
+                        <div className="text-center p-2 bg-white dark:bg-yellow-950/30 rounded">
+                          <div className="font-medium">닥터봇</div>
+                          <div className="text-muted-foreground">월 15만원</div>
+                        </div>
+                        <div className="text-center p-2 bg-white dark:bg-yellow-950/30 rounded">
+                          <div className="font-medium">메디챗</div>
+                          <div className="text-muted-foreground">월 20만원</div>
+                        </div>
+                        <div className="text-center p-2 bg-white dark:bg-yellow-950/30 rounded">
+                          <div className="font-medium">카카오 챗봇</div>
+                          <div className="text-muted-foreground">월 10만원</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 킬러 #33: 키오스크 vs 데스크 비용 비교 */}
+                <div className="card p-6 border-2 border-violet-200 dark:border-violet-800">
+                  <div className="flex items-center gap-2 mb-4">
+                    <span className="px-2 py-1 bg-violet-500 text-white text-xs font-bold rounded">KIOSK</span>
+                    <h3 className="font-semibold text-foreground flex items-center gap-2">
+                      <Monitor className="w-5 h-5 text-violet-600" />
+                      키오스크 vs 데스크 비용 비교
+                    </h3>
+                  </div>
+                  <div className="space-y-4">
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-sm">
+                        <thead className="bg-violet-50 dark:bg-violet-950/30">
+                          <tr>
+                            <th className="p-3 text-left">항목</th>
+                            <th className="p-3 text-right">데스크 직원</th>
+                            <th className="p-3 text-right">키오스크</th>
+                            <th className="p-3 text-right">절감액</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y">
+                          {[
+                            { item: '초기 비용', desk: 0, kiosk: 300, save: -300 },
+                            { item: '월 인건비/유지비', desk: 280, kiosk: 10, save: 270 },
+                            { item: '연간 비용', desk: 3360, kiosk: 420, save: 2940 },
+                            { item: '3년 총비용', desk: 10080, kiosk: 660, save: 9420 },
+                          ].map((row, i) => (
+                            <tr key={i} className="hover:bg-muted/50">
+                              <td className="p-3 font-medium">{row.item}</td>
+                              <td className="p-3 text-right">{row.desk.toLocaleString()}만원</td>
+                              <td className="p-3 text-right">{row.kiosk.toLocaleString()}만원</td>
+                              <td className={`p-3 text-right font-bold ${row.save > 0 ? 'text-green-600' : 'text-red-600'}`}>
+                                {row.save > 0 ? '+' : ''}{row.save.toLocaleString()}만원
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                    <div className="grid md:grid-cols-2 gap-4">
+                      <div className="p-4 bg-green-50 dark:bg-green-950/20 rounded-lg">
+                        <div className="font-bold text-green-700 mb-2">✅ 키오스크 장점</div>
+                        <ul className="text-sm space-y-1">
+                          <li>• 24시간 무인 접수 가능</li>
+                          <li>• 대기시간 단축</li>
+                          <li>• 인건비 절감</li>
+                          <li>• 비대면 선호 환자 만족</li>
+                        </ul>
+                      </div>
+                      <div className="p-4 bg-red-50 dark:bg-red-950/20 rounded-lg">
+                        <div className="font-bold text-red-700 mb-2">⚠️ 키오스크 한계</div>
+                        <ul className="text-sm space-y-1">
+                          <li>• 고령 환자 불편</li>
+                          <li>• 복잡한 문의 대응 불가</li>
+                          <li>• 초기 투자비용</li>
+                          <li>• 고장 시 대응 필요</li>
+                        </ul>
+                      </div>
+                    </div>
+                    <div className="p-4 bg-violet-50 dark:bg-violet-950/20 rounded-lg">
+                      <div className="font-bold text-violet-700 mb-2">💡 권장: 하이브리드 운영</div>
+                      <p className="text-sm text-muted-foreground">
+                        키오스크 1대 + 데스크 직원 1명 조합으로 <strong>효율성</strong>과 <strong>서비스 품질</strong> 모두 확보
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 킬러 #34: 의원 전용 앱 개발 가이드 */}
+                <div className="card p-6 border-2 border-teal-200 dark:border-teal-800">
+                  <div className="flex items-center gap-2 mb-4">
+                    <span className="px-2 py-1 bg-teal-500 text-white text-xs font-bold rounded">APP</span>
+                    <h3 className="font-semibold text-foreground flex items-center gap-2">
+                      <Smartphone className="w-5 h-5 text-teal-600" />
+                      의원 전용 앱 개발 vs 플랫폼 입점
+                    </h3>
+                  </div>
+                  <div className="space-y-4">
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-sm">
+                        <thead className="bg-teal-50 dark:bg-teal-950/30">
+                          <tr>
+                            <th className="p-3 text-left">비교 항목</th>
+                            <th className="p-3 text-center">자체 앱 개발</th>
+                            <th className="p-3 text-center">플랫폼 입점</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y">
+                          {[
+                            { item: '초기 비용', own: '1,500-3,000만원', platform: '무료-100만원' },
+                            { item: '월 유지비', own: '30-50만원', platform: '수수료 10-15%' },
+                            { item: '브랜딩', own: '완전 커스텀', platform: '플랫폼 종속' },
+                            { item: '환자 데이터', own: '100% 소유', platform: '제한적 접근' },
+                            { item: '기능 확장', own: '자유로움', platform: '제한적' },
+                            { item: '개발 기간', own: '3-6개월', platform: '즉시' },
+                          ].map((row, i) => (
+                            <tr key={i} className="hover:bg-muted/50">
+                              <td className="p-3 font-medium">{row.item}</td>
+                              <td className="p-3 text-center">{row.own}</td>
+                              <td className="p-3 text-center">{row.platform}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                    <div className="grid md:grid-cols-2 gap-4">
+                      <div className="p-4 bg-teal-50 dark:bg-teal-950/20 rounded-lg">
+                        <div className="font-bold text-teal-700 mb-2">📱 자체 앱 추천 상황</div>
+                        <ul className="text-sm space-y-1">
+                          <li>• 월 환자 500명 이상</li>
+                          <li>• VIP 멤버십 운영 계획</li>
+                          <li>• 장기 브랜드 구축 목표</li>
+                          <li>• 비급여 비중 높은 진료</li>
+                        </ul>
+                      </div>
+                      <div className="p-4 bg-blue-50 dark:bg-blue-950/20 rounded-lg">
+                        <div className="font-bold text-blue-700 mb-2">🌐 플랫폼 추천 상황</div>
+                        <ul className="text-sm space-y-1">
+                          <li>• 개원 초기 (환자 확보 우선)</li>
+                          <li>• 예산 제한적</li>
+                          <li>• IT 인력 부재</li>
+                          <li>• 빠른 시작 필요</li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 킬러 #35: 의료분쟁 보험 상품 비교 */}
+                <div className="card p-6 border-2 border-rose-200 dark:border-rose-800">
+                  <div className="flex items-center gap-2 mb-4">
+                    <span className="px-2 py-1 bg-rose-500 text-white text-xs font-bold rounded">INSURANCE</span>
+                    <h3 className="font-semibold text-foreground flex items-center gap-2">
+                      <Shield className="w-5 h-5 text-rose-600" />
+                      의료분쟁 보험 상품 비교
+                    </h3>
+                  </div>
+                  <div className="space-y-4">
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-sm">
+                        <thead className="bg-rose-50 dark:bg-rose-950/30">
+                          <tr>
+                            <th className="p-3 text-left">보험사</th>
+                            <th className="p-3 text-center">연 보험료</th>
+                            <th className="p-3 text-center">보상한도</th>
+                            <th className="p-3 text-center">특약</th>
+                            <th className="p-3 text-center">추천</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y">
+                          {[
+                            { company: '의사협회 단체보험', fee: '180만원', limit: '1억/3억', feature: '소송비용 포함', recommend: true },
+                            { company: '삼성화재', fee: '200만원', limit: '2억/5억', feature: '형사방어비', recommend: true },
+                            { company: '현대해상', fee: '170만원', limit: '1억/3억', feature: '조정비용', recommend: false },
+                            { company: 'DB손해보험', fee: '160만원', limit: '1억/2억', feature: '기본형', recommend: false },
+                          ].map((ins, i) => (
+                            <tr key={i} className="hover:bg-muted/50">
+                              <td className="p-3 font-medium">{ins.company}</td>
+                              <td className="p-3 text-center">{ins.fee}</td>
+                              <td className="p-3 text-center">{ins.limit}</td>
+                              <td className="p-3 text-center text-rose-600">{ins.feature}</td>
+                              <td className="p-3 text-center">
+                                {ins.recommend && <span className="px-2 py-1 bg-rose-100 text-rose-700 rounded text-xs">추천</span>}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                    <div className="p-4 bg-rose-50 dark:bg-rose-950/20 rounded-lg">
+                      <div className="font-bold text-rose-700 mb-2">⚠️ 필수 체크 포인트</div>
+                      <ul className="text-sm space-y-1 text-muted-foreground">
+                        <li>• <strong>소급담보</strong> 여부 확인 (과거 진료 보장)</li>
+                        <li>• <strong>미용/성형</strong> 시술은 별도 특약 필요</li>
+                        <li>• <strong>형사소송</strong> 방어비용 포함 여부</li>
+                        <li>• 보험료는 <strong>전액 경비처리</strong> 가능</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 킬러 #36: 핵심 직원 퇴사 리스크 관리 */}
+                <div className="card p-6 border-2 border-amber-200 dark:border-amber-800">
+                  <div className="flex items-center gap-2 mb-4">
+                    <span className="px-2 py-1 bg-amber-500 text-white text-xs font-bold rounded">HR RISK</span>
+                    <h3 className="font-semibold text-foreground flex items-center gap-2">
+                      <Users className="w-5 h-5 text-amber-600" />
+                      핵심 직원 퇴사 리스크 관리
+                    </h3>
+                  </div>
+                  <div className="space-y-4">
+                    <div className="grid md:grid-cols-2 gap-4">
+                      <div>
+                        <div className="font-bold text-amber-700 mb-3">⚠️ 퇴사 징후 감지</div>
+                        <div className="space-y-2">
+                          {[
+                            { sign: '갑작스런 휴가/반차 증가', level: 'high' },
+                            { sign: '업무 참여도 저하', level: 'high' },
+                            { sign: '동료와의 교류 감소', level: 'medium' },
+                            { sign: '이직 사이트 접속 흔적', level: 'high' },
+                            { sign: '복장/외모 변화', level: 'low' },
+                          ].map((item, i) => (
+                            <div key={i} className="flex justify-between items-center p-2 bg-amber-50 dark:bg-amber-950/20 rounded text-sm">
+                              <span>{item.sign}</span>
+                              <span className={`px-2 py-1 rounded text-xs ${
+                                item.level === 'high' ? 'bg-red-100 text-red-700' :
+                                item.level === 'medium' ? 'bg-yellow-100 text-yellow-700' :
+                                'bg-green-100 text-green-700'
+                              }`}>
+                                {item.level === 'high' ? '주의' : item.level === 'medium' ? '관심' : '참고'}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                      <div>
+                        <div className="font-bold text-green-700 mb-3">✅ 리텐션 전략</div>
+                        <div className="space-y-2">
+                          {[
+                            '정기 1:1 면담 (월 1회)',
+                            '성과 기반 인센티브',
+                            '교육/자격증 지원',
+                            '근무 환경 개선',
+                            '장기근속 보너스',
+                          ].map((strategy, i) => (
+                            <div key={i} className="p-2 bg-green-50 dark:bg-green-950/20 rounded text-sm">
+                              ✓ {strategy}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                    <div className="p-4 bg-blue-50 dark:bg-blue-950/20 rounded-lg">
+                      <div className="font-bold text-blue-700 mb-2">📋 인수인계 체계 구축</div>
+                      <div className="grid md:grid-cols-3 gap-3 text-sm">
+                        <div className="text-center p-2 bg-white dark:bg-blue-950/30 rounded">
+                          <div className="font-medium">업무 매뉴얼</div>
+                          <div className="text-muted-foreground">문서화 필수</div>
+                        </div>
+                        <div className="text-center p-2 bg-white dark:bg-blue-950/30 rounded">
+                          <div className="font-medium">크로스 트레이닝</div>
+                          <div className="text-muted-foreground">상호 업무 습득</div>
+                        </div>
+                        <div className="text-center p-2 bg-white dark:bg-blue-950/30 rounded">
+                          <div className="font-medium">인수인계 기간</div>
+                          <div className="text-muted-foreground">최소 2주 확보</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 킬러 #37: 감염병/재난 대응 매뉴얼 */}
+                <div className="card p-6 border-2 border-red-200 dark:border-red-800">
+                  <div className="flex items-center gap-2 mb-4">
+                    <span className="px-2 py-1 bg-red-500 text-white text-xs font-bold rounded">EMERGENCY</span>
+                    <h3 className="font-semibold text-foreground flex items-center gap-2">
+                      <AlertTriangle className="w-5 h-5 text-red-600" />
+                      감염병/재난 대응 매뉴얼
+                    </h3>
+                  </div>
+                  <div className="space-y-4">
+                    <div className="grid md:grid-cols-3 gap-4">
+                      {[
+                        {
+                          phase: '1단계: 준비',
+                          color: 'yellow',
+                          items: ['비축 물품 확보', '비대면 진료 시스템', '직원 교육', '비상연락망']
+                        },
+                        {
+                          phase: '2단계: 대응',
+                          color: 'orange',
+                          items: ['환자 분류 체계', '동선 분리', '보호구 착용', '소독 강화']
+                        },
+                        {
+                          phase: '3단계: 회복',
+                          color: 'green',
+                          items: ['정상화 계획', '심리 지원', '시설 점검', '재발 방지']
+                        },
+                      ].map((phase, i) => (
+                        <div key={i} className={`p-4 bg-${phase.color}-50 dark:bg-${phase.color}-950/20 rounded-lg`}>
+                          <div className={`font-bold text-${phase.color}-700 mb-3`}>{phase.phase}</div>
+                          <ul className="text-sm space-y-2">
+                            {phase.items.map((item, j) => (
+                              <li key={j} className="flex items-center gap-2">
+                                <span className={`w-2 h-2 rounded-full bg-${phase.color}-500`} />
+                                {item}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      ))}
+                    </div>
+                    <div className="p-4 bg-red-50 dark:bg-red-950/20 rounded-lg">
+                      <div className="font-bold text-red-700 mb-2">🏥 필수 비축 물품</div>
+                      <div className="grid md:grid-cols-4 gap-3 text-sm">
+                        {['마스크 (N95/수술용)', '손소독제', '보호복/가운', '체온계', '산소포화도계', '소독제', '격리용 파티션', '비상 연락처'].map((item, i) => (
+                          <div key={i} className="p-2 bg-white dark:bg-red-950/30 rounded text-center">
+                            {item}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 킬러 #38: 분원 개설 타이밍 분석 */}
+                <div className="card p-6 border-2 border-purple-200 dark:border-purple-800">
+                  <div className="flex items-center gap-2 mb-4">
+                    <span className="px-2 py-1 bg-purple-500 text-white text-xs font-bold rounded">EXPANSION</span>
+                    <h3 className="font-semibold text-foreground flex items-center gap-2">
+                      <Building className="w-5 h-5 text-purple-600" />
+                      분원 개설 타이밍 분석
+                    </h3>
+                  </div>
+                  <div className="space-y-4">
+                    <div className="p-4 bg-purple-50 dark:bg-purple-950/20 rounded-lg">
+                      <div className="font-bold text-purple-700 mb-3">✅ 분원 개설 적정 조건</div>
+                      <div className="grid md:grid-cols-2 gap-4">
+                        {[
+                          { condition: '본원 월 매출', target: '1억원 이상', current: '안정적 달성', met: true },
+                          { condition: '순이익률', target: '25% 이상', current: '본원 기준', met: true },
+                          { condition: '운영 기간', target: '3년 이상', current: '노하우 축적', met: true },
+                          { condition: '핵심 인력', target: '분원장 확보', current: '위임 가능', met: false },
+                          { condition: '자본금', target: '5억원 이상', current: '투자 여력', met: true },
+                          { condition: '시스템화', target: '매뉴얼 완비', current: '복제 가능', met: false },
+                        ].map((item, i) => (
+                          <div key={i} className="flex justify-between items-center p-3 bg-white dark:bg-purple-950/30 rounded">
+                            <div>
+                              <div className="font-medium">{item.condition}</div>
+                              <div className="text-xs text-muted-foreground">{item.current}</div>
+                            </div>
+                            <div className="text-right">
+                              <div className="text-purple-600 font-medium">{item.target}</div>
+                              <span className={item.met ? 'text-green-500' : 'text-red-500'}>
+                                {item.met ? '✓ 충족' : '✗ 미충족'}
+                              </span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                    <div className="grid md:grid-cols-2 gap-4">
+                      <div className="p-4 bg-green-50 dark:bg-green-950/20 rounded-lg">
+                        <div className="font-bold text-green-700 mb-2">📈 분원 성공 요인</div>
+                        <ul className="text-sm space-y-1">
+                          <li>• 본원과 30분 이내 거리</li>
+                          <li>• 동일 브랜드 시너지</li>
+                          <li>• 중앙 관리 시스템</li>
+                          <li>• 신뢰할 수 있는 분원장</li>
+                        </ul>
+                      </div>
+                      <div className="p-4 bg-red-50 dark:bg-red-950/20 rounded-lg">
+                        <div className="font-bold text-red-700 mb-2">⚠️ 분원 실패 요인</div>
+                        <ul className="text-sm space-y-1">
+                          <li>• 본원 안정화 전 성급한 확장</li>
+                          <li>• 인력/시스템 부족</li>
+                          <li>• 상권 분석 미흡</li>
+                          <li>• 자금 계획 부실</li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 킬러 #39: 진료과목 추가 ROI */}
+                <div className="card p-6 border-2 border-lime-200 dark:border-lime-800">
+                  <div className="flex items-center gap-2 mb-4">
+                    <span className="px-2 py-1 bg-lime-500 text-white text-xs font-bold rounded">ADD-ON</span>
+                    <h3 className="font-semibold text-foreground flex items-center gap-2">
+                      <Plus className="w-5 h-5 text-lime-600" />
+                      진료과목 추가 ROI 분석
+                    </h3>
+                  </div>
+                  <div className="space-y-4">
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-sm">
+                        <thead className="bg-lime-50 dark:bg-lime-950/30">
+                          <tr>
+                            <th className="p-3 text-left">추가 과목</th>
+                            <th className="p-3 text-right">투자비용</th>
+                            <th className="p-3 text-right">월 추가매출</th>
+                            <th className="p-3 text-right">회수기간</th>
+                            <th className="p-3 text-center">추천도</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y">
+                          {[
+                            { dept: '피부/미용', invest: 3000, revenue: 800, payback: '4개월', rating: 5 },
+                            { dept: '도수치료', invest: 1500, revenue: 400, payback: '4개월', rating: 5 },
+                            { dept: '건강검진', invest: 5000, revenue: 600, payback: '8개월', rating: 4 },
+                            { dept: '비만클리닉', invest: 1000, revenue: 300, payback: '3개월', rating: 4 },
+                            { dept: '통증의학', invest: 2000, revenue: 350, payback: '6개월', rating: 3 },
+                          ].map((row, i) => (
+                            <tr key={i} className="hover:bg-muted/50">
+                              <td className="p-3 font-medium">{row.dept}</td>
+                              <td className="p-3 text-right">{row.invest.toLocaleString()}만원</td>
+                              <td className="p-3 text-right text-lime-600">+{row.revenue}만원</td>
+                              <td className="p-3 text-right">{row.payback}</td>
+                              <td className="p-3 text-center text-yellow-500">
+                                {'★'.repeat(row.rating)}{'☆'.repeat(5-row.rating)}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                    <div className="p-4 bg-lime-50 dark:bg-lime-950/20 rounded-lg">
+                      <div className="font-bold text-lime-700 mb-2">💡 과목 추가 시 체크포인트</div>
+                      <ul className="text-sm space-y-1 text-muted-foreground">
+                        <li>• 기존 환자와의 <strong>시너지</strong> 고려 (내과+건강검진, 정형+도수치료)</li>
+                        <li>• <strong>추가 인력</strong> 필요 여부 확인 (물리치료사, 피부관리사 등)</li>
+                        <li>• <strong>공간/장비</strong> 확보 가능 여부</li>
+                        <li>• <strong>광고 규제</strong> 확인 (미용 시술 광고 제한)</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 킬러 #40: 의원 브랜드화/프랜차이즈 전략 */}
+                <div className="card p-6 border-2 border-indigo-200 dark:border-indigo-800">
+                  <div className="flex items-center gap-2 mb-4">
+                    <span className="px-2 py-1 bg-indigo-500 text-white text-xs font-bold rounded">FRANCHISE</span>
+                    <h3 className="font-semibold text-foreground flex items-center gap-2">
+                      <Star className="w-5 h-5 text-indigo-600" />
+                      의원 브랜드화/프랜차이즈 전략
+                    </h3>
+                  </div>
+                  <div className="space-y-4">
+                    <div className="grid md:grid-cols-3 gap-4">
+                      {[
+                        {
+                          stage: '1단계: 브랜드 구축',
+                          period: '1-2년차',
+                          tasks: ['BI/CI 개발', '표준 매뉴얼', '특화 진료 개발', '온라인 브랜딩']
+                        },
+                        {
+                          stage: '2단계: 직영 확장',
+                          period: '3-4년차',
+                          tasks: ['분원 2-3개 운영', '중앙 관리 시스템', '인력 양성 체계', '수익 모델 검증']
+                        },
+                        {
+                          stage: '3단계: 프랜차이즈',
+                          period: '5년차 이후',
+                          tasks: ['가맹 사업 등록', '가맹점 모집', '교육/지원 체계', '로열티 수익']
+                        },
+                      ].map((stage, i) => (
+                        <div key={i} className="p-4 bg-indigo-50 dark:bg-indigo-950/20 rounded-lg">
+                          <div className="font-bold text-indigo-700">{stage.stage}</div>
+                          <div className="text-xs text-muted-foreground mb-3">{stage.period}</div>
+                          <ul className="text-sm space-y-1">
+                            {stage.tasks.map((task, j) => (
+                              <li key={j}>• {task}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      ))}
+                    </div>
+                    <div className="p-4 bg-yellow-50 dark:bg-yellow-950/20 rounded-lg border border-yellow-300">
+                      <div className="font-bold text-yellow-700 mb-2">💰 프랜차이즈 수익 구조</div>
+                      <div className="grid md:grid-cols-4 gap-3 text-sm">
+                        <div className="text-center p-2 bg-white dark:bg-yellow-950/30 rounded">
+                          <div className="font-medium">가맹비</div>
+                          <div className="text-yellow-600 font-bold">3,000만원</div>
+                        </div>
+                        <div className="text-center p-2 bg-white dark:bg-yellow-950/30 rounded">
+                          <div className="font-medium">교육비</div>
+                          <div className="text-yellow-600 font-bold">500만원</div>
+                        </div>
+                        <div className="text-center p-2 bg-white dark:bg-yellow-950/30 rounded">
+                          <div className="font-medium">월 로열티</div>
+                          <div className="text-yellow-600 font-bold">매출 3-5%</div>
+                        </div>
+                        <div className="text-center p-2 bg-white dark:bg-yellow-950/30 rounded">
+                          <div className="font-medium">물품 마진</div>
+                          <div className="text-yellow-600 font-bold">10-15%</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 킬러 #41: 상권 변화 5년 예측 */}
+                <div className="card p-6 border-2 border-sky-200 dark:border-sky-800">
+                  <div className="flex items-center gap-2 mb-4">
+                    <span className="px-2 py-1 bg-sky-500 text-white text-xs font-bold rounded">FORECAST</span>
+                    <h3 className="font-semibold text-foreground flex items-center gap-2">
+                      <TrendingUp className="w-5 h-5 text-sky-600" />
+                      상권 변화 5년 예측
+                    </h3>
+                  </div>
+                  <div className="space-y-4">
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-sm">
+                        <thead className="bg-sky-50 dark:bg-sky-950/30">
+                          <tr>
+                            <th className="p-3 text-left">지표</th>
+                            <th className="p-3 text-center">현재</th>
+                            <th className="p-3 text-center">2년 후</th>
+                            <th className="p-3 text-center">5년 후</th>
+                            <th className="p-3 text-center">추세</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y">
+                          {[
+                            { metric: '인구 (반경 1km)', now: '15,200명', y2: '16,500명', y5: '18,000명', trend: 'up' },
+                            { metric: '유동인구', now: '일 8,500명', y2: '일 9,200명', y5: '일 10,500명', trend: 'up' },
+                            { metric: '상가 공실률', now: '8%', y2: '6%', y5: '5%', trend: 'up' },
+                            { metric: '평균 임대료', now: '평당 12만원', y2: '평당 14만원', y5: '평당 17만원', trend: 'caution' },
+                            { metric: '의료기관 수', now: '12개', y2: '15개', y5: '18개', trend: 'caution' },
+                          ].map((row, i) => (
+                            <tr key={i} className="hover:bg-muted/50">
+                              <td className="p-3 font-medium">{row.metric}</td>
+                              <td className="p-3 text-center">{row.now}</td>
+                              <td className="p-3 text-center">{row.y2}</td>
+                              <td className="p-3 text-center">{row.y5}</td>
+                              <td className="p-3 text-center">
+                                {row.trend === 'up' ? (
+                                  <span className="text-green-500">📈 호재</span>
+                                ) : (
+                                  <span className="text-yellow-500">⚠️ 주의</span>
+                                )}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                    <div className="p-4 bg-sky-50 dark:bg-sky-950/20 rounded-lg">
+                      <div className="font-bold text-sky-700 mb-2">📊 종합 상권 전망</div>
+                      <p className="text-sm text-muted-foreground">
+                        해당 상권은 <strong>인구 증가</strong>와 <strong>개발 호재</strong>로 향후 5년간 성장이 예상됩니다.
+                        다만 <strong>임대료 상승</strong>과 <strong>경쟁 심화</strong>에 대비한 차별화 전략이 필요합니다.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 킬러 #42: 인근 개발 호재/악재 분석 */}
+                <div className="card p-6 border-2 border-emerald-200 dark:border-emerald-800">
+                  <div className="flex items-center gap-2 mb-4">
+                    <span className="px-2 py-1 bg-emerald-500 text-white text-xs font-bold rounded">DEVELOPMENT</span>
+                    <h3 className="font-semibold text-foreground flex items-center gap-2">
+                      <Building className="w-5 h-5 text-emerald-600" />
+                      인근 개발 호재/악재 분석
+                    </h3>
+                  </div>
+                  <div className="space-y-4">
+                    <div className="grid md:grid-cols-2 gap-4">
+                      <div>
+                        <div className="font-bold text-green-700 mb-3">📈 호재 요인</div>
+                        <div className="space-y-2">
+                          {[
+                            { factor: '신규 아파트 단지 (2,500세대)', impact: '+25%', year: '2027년' },
+                            { factor: '지하철 연장선 개통', impact: '+20%', year: '2028년' },
+                            { factor: '대형 쇼핑몰 입점', impact: '+15%', year: '2026년' },
+                          ].map((item, i) => (
+                            <div key={i} className="p-3 bg-green-50 dark:bg-green-950/20 rounded-lg">
+                              <div className="flex justify-between items-start">
+                                <div>
+                                  <div className="font-medium">{item.factor}</div>
+                                  <div className="text-xs text-muted-foreground">예정: {item.year}</div>
+                                </div>
+                                <span className="text-green-600 font-bold">{item.impact}</span>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                      <div>
+                        <div className="font-bold text-red-700 mb-3">📉 악재 요인</div>
+                        <div className="space-y-2">
+                          {[
+                            { factor: '대형 병원 분원 개설 계획', impact: '-15%', year: '2027년' },
+                            { factor: '주요 도로 공사 (2년)', impact: '-10%', year: '2026-2028년' },
+                            { factor: '인근 학교 폐교 예정', impact: '-5%', year: '2028년' },
+                          ].map((item, i) => (
+                            <div key={i} className="p-3 bg-red-50 dark:bg-red-950/20 rounded-lg">
+                              <div className="flex justify-between items-start">
+                                <div>
+                                  <div className="font-medium">{item.factor}</div>
+                                  <div className="text-xs text-muted-foreground">예정: {item.year}</div>
+                                </div>
+                                <span className="text-red-600 font-bold">{item.impact}</span>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                    <div className="p-4 bg-blue-50 dark:bg-blue-950/20 rounded-lg">
+                      <div className="font-bold text-blue-700 mb-2">💡 종합 영향도</div>
+                      <div className="flex items-center gap-4">
+                        <div className="flex-1">
+                          <div className="flex justify-between text-sm mb-1">
+                            <span>순 영향</span>
+                            <span className="text-green-600 font-bold">+30%</span>
+                          </div>
+                          <div className="h-3 bg-gray-200 rounded-full overflow-hidden">
+                            <div className="h-full bg-green-500 rounded-full" style={{ width: '65%' }} />
+                          </div>
+                        </div>
+                        <div className="text-sm text-muted-foreground">
+                          호재 우세, 장기 투자 적합
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 킬러 #43: 지역 주민 생활패턴 분석 */}
+                <div className="card p-6 border-2 border-violet-200 dark:border-violet-800">
+                  <div className="flex items-center gap-2 mb-4">
+                    <span className="px-2 py-1 bg-violet-500 text-white text-xs font-bold rounded">LIFESTYLE</span>
+                    <h3 className="font-semibold text-foreground flex items-center gap-2">
+                      <Clock className="w-5 h-5 text-violet-600" />
+                      지역 주민 생활패턴 분석
+                    </h3>
+                  </div>
+                  <div className="space-y-4">
+                    <div className="p-4 bg-violet-50 dark:bg-violet-950/20 rounded-lg">
+                      <div className="font-bold text-violet-700 mb-3">⏰ 시간대별 유동인구 패턴</div>
+                      <div className="grid grid-cols-6 gap-2 text-center text-xs">
+                        {[
+                          { time: '06-09시', density: 40, label: '출근' },
+                          { time: '09-12시', density: 70, label: '오전' },
+                          { time: '12-14시', density: 85, label: '점심' },
+                          { time: '14-18시', density: 65, label: '오후' },
+                          { time: '18-21시', density: 90, label: '퇴근' },
+                          { time: '21-24시', density: 30, label: '야간' },
+                        ].map((slot, i) => (
+                          <div key={i}>
+                            <div className="h-20 bg-gray-200 rounded relative mb-1">
+                              <div
+                                className="absolute bottom-0 w-full bg-violet-500 rounded-b"
+                                style={{ height: `${slot.density}%` }}
+                              />
+                            </div>
+                            <div className="font-medium">{slot.time}</div>
+                            <div className="text-muted-foreground">{slot.label}</div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                    <div className="grid md:grid-cols-2 gap-4">
+                      <div className="p-4 bg-white dark:bg-violet-950/30 rounded-lg border">
+                        <div className="font-bold text-violet-700 mb-2">👥 주요 고객층 특성</div>
+                        <ul className="text-sm space-y-2">
+                          <li>• <strong>30-40대 직장인</strong> (45%) - 점심/퇴근 후</li>
+                          <li>• <strong>주부/육아맘</strong> (25%) - 오전 10-12시</li>
+                          <li>• <strong>60대 이상</strong> (20%) - 오전 시간대</li>
+                          <li>• <strong>학생</strong> (10%) - 방과 후/주말</li>
+                        </ul>
+                      </div>
+                      <div className="p-4 bg-white dark:bg-violet-950/30 rounded-lg border">
+                        <div className="font-bold text-violet-700 mb-2">📅 추천 진료시간</div>
+                        <ul className="text-sm space-y-2">
+                          <li>• <strong>평일</strong>: 09:00-19:00 (점심 13-14시)</li>
+                          <li>• <strong>야간</strong>: 화/목 21시까지 (직장인 대응)</li>
+                          <li>• <strong>토요일</strong>: 09:00-14:00</li>
+                          <li>• <strong>일/공휴일</strong>: 휴진 (선택)</li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 킬러 #44: 직원 성과급 체계 설계 */}
+                <div className="card p-6 border-2 border-teal-200 dark:border-teal-800">
+                  <div className="flex items-center gap-2 mb-4">
+                    <span className="px-2 py-1 bg-teal-500 text-white text-xs font-bold rounded">INCENTIVE</span>
+                    <h3 className="font-semibold text-foreground flex items-center gap-2">
+                      <Award className="w-5 h-5 text-teal-600" />
+                      직원 성과급 체계 설계
+                    </h3>
+                  </div>
+                  <div className="space-y-4">
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-sm">
+                        <thead className="bg-teal-50 dark:bg-teal-950/30">
+                          <tr>
+                            <th className="p-3 text-left">직종</th>
+                            <th className="p-3 text-left">성과 지표</th>
+                            <th className="p-3 text-center">목표</th>
+                            <th className="p-3 text-right">인센티브</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y">
+                          {[
+                            { role: '전 직원', metric: '월 매출 목표 달성', target: '100% 달성', incentive: '기본급 10%' },
+                            { role: '간호사', metric: '환자 만족도', target: '4.5점 이상', incentive: '20만원' },
+                            { role: '데스크', metric: '예약 전환율', target: '80% 이상', incentive: '15만원' },
+                            { role: '코디네이터', metric: '비급여 상담 성과', target: '월 500만원', incentive: '3%' },
+                            { role: '전 직원', metric: '장기근속', target: '1년/3년/5년', incentive: '50/100/200만원' },
+                          ].map((row, i) => (
+                            <tr key={i} className="hover:bg-muted/50">
+                              <td className="p-3 font-medium">{row.role}</td>
+                              <td className="p-3">{row.metric}</td>
+                              <td className="p-3 text-center">{row.target}</td>
+                              <td className="p-3 text-right text-teal-600 font-medium">{row.incentive}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                    <div className="grid md:grid-cols-2 gap-4">
+                      <div className="p-4 bg-teal-50 dark:bg-teal-950/20 rounded-lg">
+                        <div className="font-bold text-teal-700 mb-2">✅ 효과적인 인센티브 원칙</div>
+                        <ul className="text-sm space-y-1">
+                          <li>• <strong>측정 가능</strong>한 목표 설정</li>
+                          <li>• <strong>즉시 지급</strong> (다음 달 급여에 반영)</li>
+                          <li>• <strong>공정한 기준</strong> 공개</li>
+                          <li>• 팀 성과 + 개인 성과 조합</li>
+                        </ul>
+                      </div>
+                      <div className="p-4 bg-yellow-50 dark:bg-yellow-950/20 rounded-lg">
+                        <div className="font-bold text-yellow-700 mb-2">💰 인센티브 예산 가이드</div>
+                        <ul className="text-sm space-y-1">
+                          <li>• 총 인건비의 <strong>10-15%</strong> 범위</li>
+                          <li>• 성과급 재원: 매출 증가분의 20%</li>
+                          <li>• 분기별 조정 권장</li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 킬러 #45: 서비스 교육 커리큘럼 */}
+                <div className="card p-6 border-2 border-pink-200 dark:border-pink-800">
+                  <div className="flex items-center gap-2 mb-4">
+                    <span className="px-2 py-1 bg-pink-500 text-white text-xs font-bold rounded">TRAINING</span>
+                    <h3 className="font-semibold text-foreground flex items-center gap-2">
+                      <GraduationCap className="w-5 h-5 text-pink-600" />
+                      신입 직원 서비스 교육 커리큘럼
+                    </h3>
+                  </div>
+                  <div className="space-y-4">
+                    <div className="grid md:grid-cols-4 gap-4">
+                      {[
+                        {
+                          week: '1주차',
+                          title: '기본 교육',
+                          items: ['의원 소개/철학', '근무 규정', '시스템 사용법', '개인정보보호'],
+                          color: 'blue'
+                        },
+                        {
+                          week: '2주차',
+                          title: '업무 교육',
+                          items: ['담당 업무 실습', '선배 동행 근무', '주요 상황 대응', '의료 용어'],
+                          color: 'green'
+                        },
+                        {
+                          week: '3주차',
+                          title: '서비스 교육',
+                          items: ['환자 응대 화법', '불만 처리', '전화 응대', '표정/자세'],
+                          color: 'purple'
+                        },
+                        {
+                          week: '4주차',
+                          title: '실전 투입',
+                          items: ['독립 업무 시작', '일일 피드백', '문제 해결 훈련', '수료 평가'],
+                          color: 'orange'
+                        },
+                      ].map((week, i) => (
+                        <div key={i} className={`p-4 bg-${week.color}-50 dark:bg-${week.color}-950/20 rounded-lg`}>
+                          <div className={`font-bold text-${week.color}-700 mb-1`}>{week.week}</div>
+                          <div className="text-sm font-medium mb-2">{week.title}</div>
+                          <ul className="text-xs space-y-1">
+                            {week.items.map((item, j) => (
+                              <li key={j}>• {item}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      ))}
+                    </div>
+                    <div className="p-4 bg-pink-50 dark:bg-pink-950/20 rounded-lg">
+                      <div className="font-bold text-pink-700 mb-2">📚 필수 교육 자료</div>
+                      <div className="grid md:grid-cols-4 gap-3 text-sm">
+                        {['업무 매뉴얼', '서비스 스크립트', '비상 대응 지침', '개인정보 규정'].map((doc, i) => (
+                          <div key={i} className="p-2 bg-white dark:bg-pink-950/30 rounded text-center">
+                            📄 {doc}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                    <div className="p-4 bg-green-50 dark:bg-green-950/20 rounded-lg">
+                      <div className="font-bold text-green-700 mb-2">📈 교육 효과 측정</div>
+                      <div className="grid md:grid-cols-3 gap-4 text-center text-sm">
+                        <div>
+                          <div className="text-2xl font-bold text-green-600">85%</div>
+                          <div className="text-muted-foreground">수료 평가 통과율</div>
+                        </div>
+                        <div>
+                          <div className="text-2xl font-bold text-green-600">+40%</div>
+                          <div className="text-muted-foreground">환자 만족도 향상</div>
+                        </div>
+                        <div>
+                          <div className="text-2xl font-bold text-green-600">-50%</div>
+                          <div className="text-muted-foreground">초기 이직률 감소</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
                 {/* 최종 종합 점수 */}
                 <div className="card p-8 bg-gradient-to-r from-indigo-600 to-purple-600 text-white">
                   <div className="text-center mb-6">
@@ -4980,11 +6239,11 @@ export default function SimulatePage() {
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
                     <div className="text-center p-3 bg-card rounded-lg">
                       <div className="text-xs text-muted-foreground">총 분석 항목</div>
-                      <div className="text-2xl font-bold text-foreground">85+</div>
+                      <div className="text-2xl font-bold text-foreground">105+</div>
                     </div>
                     <div className="text-center p-3 bg-card rounded-lg">
                       <div className="text-xs text-muted-foreground">데이터 소스</div>
-                      <div className="text-2xl font-bold text-foreground">20개</div>
+                      <div className="text-2xl font-bold text-foreground">25개</div>
                     </div>
                     <div className="text-center p-3 bg-card rounded-lg">
                       <div className="text-xs text-muted-foreground">경쟁 병원 분석</div>
