@@ -4000,6 +4000,933 @@ export default function SimulatePage() {
                   </div>
                 </div>
 
+                {/* 킬러 #11: 의료장비 중고 vs 신품 ROI 분석 */}
+                <div className="card p-6 border-2 border-emerald-200 dark:border-emerald-800">
+                  <div className="flex items-center gap-2 mb-4">
+                    <span className="px-2 py-1 bg-emerald-500 text-white text-xs font-bold rounded">EQUIPMENT</span>
+                    <h3 className="font-semibold text-foreground flex items-center gap-2">
+                      <Package className="w-5 h-5 text-emerald-600" />
+                      의료장비 중고 vs 신품 ROI 분석
+                    </h3>
+                  </div>
+                  <div className="space-y-4">
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-sm">
+                        <thead className="bg-emerald-50 dark:bg-emerald-950/30">
+                          <tr>
+                            <th className="p-3 text-left">장비</th>
+                            <th className="p-3 text-right">신품가</th>
+                            <th className="p-3 text-right">중고가</th>
+                            <th className="p-3 text-right">절감액</th>
+                            <th className="p-3 text-center">추천</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y">
+                          {[
+                            { name: '초음파 진단기', new: 4500, used: 1800, recommend: '중고', reason: '기능 차이 적음' },
+                            { name: 'X-ray 장비', new: 8000, used: 3500, recommend: '신품', reason: '안전 인증 중요' },
+                            { name: '심전도계', new: 800, used: 350, recommend: '중고', reason: '내구성 좋음' },
+                            { name: '환자 모니터', new: 1200, used: 500, recommend: '중고', reason: '교체 용이' },
+                            { name: '진료 베드', new: 300, used: 100, recommend: '중고', reason: '소모품 개념' },
+                            { name: '내시경 시스템', new: 12000, used: 5000, recommend: '신품', reason: '화질/AS 중요' },
+                          ].map((eq, i) => (
+                            <tr key={i} className="hover:bg-muted/50">
+                              <td className="p-3 font-medium">{eq.name}</td>
+                              <td className="p-3 text-right">{eq.new.toLocaleString()}만원</td>
+                              <td className="p-3 text-right text-emerald-600">{eq.used.toLocaleString()}만원</td>
+                              <td className="p-3 text-right text-blue-600">-{(eq.new - eq.used).toLocaleString()}만원</td>
+                              <td className="p-3 text-center">
+                                <span className={`px-2 py-1 rounded text-xs ${eq.recommend === '중고' ? 'bg-emerald-100 text-emerald-700' : 'bg-blue-100 text-blue-700'}`}>
+                                  {eq.recommend}
+                                </span>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                    <div className="p-4 bg-emerald-50 dark:bg-emerald-950/20 rounded-lg">
+                      <div className="font-bold text-emerald-700 mb-2">💡 장비 구매 전략</div>
+                      <ul className="text-sm space-y-1 text-muted-foreground">
+                        <li>• 초기 장비비 절감 가능액: <strong className="text-emerald-600">약 8,000만원</strong></li>
+                        <li>• 중고 장비 추천 업체: 메디플렉스, 한국의료기, 의료장터</li>
+                        <li>• 리스 옵션 검토 시 월 납입액 약 150만원으로 부담 완화 가능</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 킬러 #12: 직원 급여 벤치마크 */}
+                <div className="card p-6 border-2 border-pink-200 dark:border-pink-800">
+                  <div className="flex items-center gap-2 mb-4">
+                    <span className="px-2 py-1 bg-pink-500 text-white text-xs font-bold rounded">HR DATA</span>
+                    <h3 className="font-semibold text-foreground flex items-center gap-2">
+                      <Users className="w-5 h-5 text-pink-600" />
+                      직원 급여 벤치마크 (해당 지역)
+                    </h3>
+                  </div>
+                  <div className="space-y-4">
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-sm">
+                        <thead className="bg-pink-50 dark:bg-pink-950/30">
+                          <tr>
+                            <th className="p-3 text-left">직종</th>
+                            <th className="p-3 text-right">평균 월급</th>
+                            <th className="p-3 text-right">4대보험</th>
+                            <th className="p-3 text-right">실제 인건비</th>
+                            <th className="p-3 text-center">구인 난이도</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y">
+                          {[
+                            { role: '간호사 (경력 3년)', salary: 320, insurance: 35, difficulty: '중', color: 'yellow' },
+                            { role: '간호조무사', salary: 250, insurance: 28, difficulty: '하', color: 'green' },
+                            { role: '물리치료사', salary: 300, insurance: 33, difficulty: '중', color: 'yellow' },
+                            { role: '방사선사', salary: 330, insurance: 36, difficulty: '상', color: 'red' },
+                            { role: '데스크/코디', salary: 230, insurance: 25, difficulty: '하', color: 'green' },
+                            { role: '원무/행정', salary: 250, insurance: 28, difficulty: '하', color: 'green' },
+                          ].map((staff, i) => (
+                            <tr key={i} className="hover:bg-muted/50">
+                              <td className="p-3 font-medium">{staff.role}</td>
+                              <td className="p-3 text-right">{staff.salary}만원</td>
+                              <td className="p-3 text-right text-muted-foreground">+{staff.insurance}만원</td>
+                              <td className="p-3 text-right font-bold text-pink-600">{staff.salary + staff.insurance}만원</td>
+                              <td className="p-3 text-center">
+                                <span className={`px-2 py-1 rounded text-xs bg-${staff.color}-100 text-${staff.color}-700`}>
+                                  {staff.difficulty}
+                                </span>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                    <div className="grid md:grid-cols-2 gap-4">
+                      <div className="p-4 bg-pink-50 dark:bg-pink-950/20 rounded-lg">
+                        <div className="font-bold text-pink-700 mb-2">📋 권장 초기 인력 구성</div>
+                        <ul className="text-sm space-y-1">
+                          <li>• 간호사/간호조무사 1명</li>
+                          <li>• 데스크/코디 1명</li>
+                          <li>• <strong>월 인건비 합계: 약 568만원</strong></li>
+                        </ul>
+                      </div>
+                      <div className="p-4 bg-blue-50 dark:bg-blue-950/20 rounded-lg">
+                        <div className="font-bold text-blue-700 mb-2">💼 채용 꿀팁</div>
+                        <ul className="text-sm space-y-1">
+                          <li>• 개원 2개월 전 채용 공고 시작</li>
+                          <li>• 사람인/잡코리아보다 <strong>간호사 커뮤니티</strong> 효과적</li>
+                          <li>• 수습기간 3개월 권장 (급여 90%)</li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 킬러 #13: 숨겨진 운영비용 총정리 */}
+                <div className="card p-6 border-2 border-slate-200 dark:border-slate-700">
+                  <div className="flex items-center gap-2 mb-4">
+                    <span className="px-2 py-1 bg-slate-600 text-white text-xs font-bold rounded">HIDDEN COST</span>
+                    <h3 className="font-semibold text-foreground flex items-center gap-2">
+                      <AlertCircle className="w-5 h-5 text-slate-600" />
+                      숨겨진 운영비용 총정리
+                    </h3>
+                  </div>
+                  <p className="text-sm text-muted-foreground mb-4">예산 수립 시 놓치기 쉬운 필수 비용들입니다</p>
+                  <div className="grid md:grid-cols-2 gap-4">
+                    {[
+                      { category: '의료폐기물 처리', monthly: 15, yearly: 180, note: '배출량에 따라 변동' },
+                      { category: '세탁 서비스', monthly: 20, yearly: 240, note: '가운/시트/수건 등' },
+                      { category: '소모품 (주사기, 거즈 등)', monthly: 50, yearly: 600, note: '진료량 비례' },
+                      { category: '의료기기 유지보수', monthly: 30, yearly: 360, note: '연간 계약 권장' },
+                      { category: '소프트웨어 라이선스', monthly: 25, yearly: 300, note: 'EMR, 예약시스템 등' },
+                      { category: '정수기/공기청정기 렌탈', monthly: 10, yearly: 120, note: '필터 교체 포함' },
+                      { category: '청소 용역', monthly: 40, yearly: 480, note: '주 3회 기준' },
+                      { category: '보안/CCTV 유지', monthly: 5, yearly: 60, note: '월 구독형' },
+                      { category: '의사배상책임보험', monthly: 15, yearly: 180, note: '필수 가입' },
+                      { category: '화재/재산보험', monthly: 8, yearly: 96, note: '건물 특약 확인' },
+                    ].map((cost, i) => (
+                      <div key={i} className="flex justify-between items-center p-3 bg-slate-50 dark:bg-slate-900/30 rounded-lg">
+                        <div>
+                          <div className="font-medium">{cost.category}</div>
+                          <div className="text-xs text-muted-foreground">{cost.note}</div>
+                        </div>
+                        <div className="text-right">
+                          <div className="font-bold text-slate-700 dark:text-slate-300">{cost.monthly}만원/월</div>
+                          <div className="text-xs text-muted-foreground">연 {cost.yearly}만원</div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="mt-4 p-4 bg-red-50 dark:bg-red-950/20 rounded-lg border border-red-200">
+                    <div className="flex justify-between items-center">
+                      <span className="font-bold text-red-700">⚠️ 숨겨진 비용 총합</span>
+                      <div className="text-right">
+                        <div className="text-2xl font-bold text-red-600">월 218만원</div>
+                        <div className="text-sm text-red-500">연간 2,616만원</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 킬러 #14: 인테리어 업체 견적 비교 */}
+                <div className="card p-6 border-2 border-amber-200 dark:border-amber-800">
+                  <div className="flex items-center gap-2 mb-4">
+                    <span className="px-2 py-1 bg-amber-500 text-white text-xs font-bold rounded">INTERIOR</span>
+                    <h3 className="font-semibold text-foreground flex items-center gap-2">
+                      <Building className="w-5 h-5 text-amber-600" />
+                      의원 인테리어 견적 비교
+                    </h3>
+                  </div>
+                  <div className="space-y-4">
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-sm">
+                        <thead className="bg-amber-50 dark:bg-amber-950/30">
+                          <tr>
+                            <th className="p-3 text-left">시공 항목</th>
+                            <th className="p-3 text-center">필수</th>
+                            <th className="p-3 text-right">일반 등급</th>
+                            <th className="p-3 text-right">프리미엄</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y">
+                          {[
+                            { item: '바닥재 (30평 기준)', required: true, normal: 450, premium: 900 },
+                            { item: '벽체/도장', required: true, normal: 300, premium: 600 },
+                            { item: '천장/조명', required: true, normal: 400, premium: 800 },
+                            { item: '진료실 파티션', required: true, normal: 350, premium: 700 },
+                            { item: '데스크/접수대', required: true, normal: 200, premium: 500 },
+                            { item: '대기실 가구', required: true, normal: 150, premium: 400 },
+                            { item: '간판/사인물', required: true, normal: 100, premium: 300 },
+                            { item: '전기/통신 공사', required: true, normal: 300, premium: 400 },
+                            { item: '냉난방 시스템', required: false, normal: 200, premium: 500 },
+                            { item: '방음 시공', required: false, normal: 150, premium: 300 },
+                          ].map((item, i) => (
+                            <tr key={i} className="hover:bg-muted/50">
+                              <td className="p-3 font-medium">{item.item}</td>
+                              <td className="p-3 text-center">{item.required ? '✅' : '➖'}</td>
+                              <td className="p-3 text-right">{item.normal}만원</td>
+                              <td className="p-3 text-right text-amber-600">{item.premium}만원</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                        <tfoot className="bg-amber-100 dark:bg-amber-900/30 font-bold">
+                          <tr>
+                            <td className="p-3" colSpan={2}>합계 (30평 기준)</td>
+                            <td className="p-3 text-right">2,600만원</td>
+                            <td className="p-3 text-right text-amber-600">5,400만원</td>
+                          </tr>
+                          <tr>
+                            <td className="p-3" colSpan={2}>평당 단가</td>
+                            <td className="p-3 text-right">87만원/평</td>
+                            <td className="p-3 text-right text-amber-600">180만원/평</td>
+                          </tr>
+                        </tfoot>
+                      </table>
+                    </div>
+                    <div className="p-4 bg-amber-50 dark:bg-amber-950/20 rounded-lg">
+                      <div className="font-bold text-amber-700 mb-2">🏗️ 인테리어 팁</div>
+                      <ul className="text-sm space-y-1 text-muted-foreground">
+                        <li>• 의원 전문 인테리어 업체 3곳 이상 비교 견적 필수</li>
+                        <li>• 감리 비용 별도 (총 공사비의 3~5%)</li>
+                        <li>• 진료과목에 따라 특수시설 추가 (예: 피부과 시술실 방음)</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 킬러 #15: EMR/차트 시스템 비교 */}
+                <div className="card p-6 border-2 border-cyan-200 dark:border-cyan-800">
+                  <div className="flex items-center gap-2 mb-4">
+                    <span className="px-2 py-1 bg-cyan-500 text-white text-xs font-bold rounded">SOFTWARE</span>
+                    <h3 className="font-semibold text-foreground flex items-center gap-2">
+                      <FileText className="w-5 h-5 text-cyan-600" />
+                      EMR/차트 시스템 비교
+                    </h3>
+                  </div>
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-sm">
+                      <thead className="bg-cyan-50 dark:bg-cyan-950/30">
+                        <tr>
+                          <th className="p-3 text-left">시스템</th>
+                          <th className="p-3 text-center">월비용</th>
+                          <th className="p-3 text-center">사용성</th>
+                          <th className="p-3 text-center">AS</th>
+                          <th className="p-3 text-center">추천</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y">
+                        {[
+                          { name: '비트컴퓨터', cost: '15만원', usability: '★★★★☆', as: '★★★★★', recommend: true, note: '가장 많이 사용' },
+                          { name: '유비케어', cost: '12만원', usability: '★★★★☆', as: '★★★★☆', recommend: true, note: '가성비 좋음' },
+                          { name: '이지스헬스케어', cost: '18만원', usability: '★★★★★', as: '★★★★☆', recommend: false, note: 'UI 우수' },
+                          { name: '메디칼소프트', cost: '10만원', usability: '★★★☆☆', as: '★★★☆☆', recommend: false, note: '저렴' },
+                          { name: '인포닉', cost: '20만원', usability: '★★★★★', as: '★★★★★', recommend: false, note: '대형병원용' },
+                        ].map((emr, i) => (
+                          <tr key={i} className="hover:bg-muted/50">
+                            <td className="p-3">
+                              <div className="font-medium">{emr.name}</div>
+                              <div className="text-xs text-muted-foreground">{emr.note}</div>
+                            </td>
+                            <td className="p-3 text-center">{emr.cost}</td>
+                            <td className="p-3 text-center text-yellow-500">{emr.usability}</td>
+                            <td className="p-3 text-center text-yellow-500">{emr.as}</td>
+                            <td className="p-3 text-center">
+                              {emr.recommend && <span className="px-2 py-1 bg-cyan-100 text-cyan-700 rounded text-xs">추천</span>}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+                {/* 킬러 #16: 약품 도매상 비교 */}
+                <div className="card p-6 border-2 border-violet-200 dark:border-violet-800">
+                  <div className="flex items-center gap-2 mb-4">
+                    <span className="px-2 py-1 bg-violet-500 text-white text-xs font-bold rounded">PHARMACY</span>
+                    <h3 className="font-semibold text-foreground flex items-center gap-2">
+                      <Package className="w-5 h-5 text-violet-600" />
+                      약품 도매상 비교
+                    </h3>
+                  </div>
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-sm">
+                      <thead className="bg-violet-50 dark:bg-violet-950/30">
+                        <tr>
+                          <th className="p-3 text-left">도매상</th>
+                          <th className="p-3 text-center">마진율</th>
+                          <th className="p-3 text-center">결제조건</th>
+                          <th className="p-3 text-center">배송</th>
+                          <th className="p-3 text-center">최소주문</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y">
+                        {[
+                          { name: '지오영', margin: '12-15%', payment: '월 1회', delivery: '익일', min: '50만원' },
+                          { name: '백제약품', margin: '10-13%', payment: '주 1회', delivery: '당일', min: '30만원' },
+                          { name: '한국콜마', margin: '13-16%', payment: '월 2회', delivery: '익일', min: '100만원' },
+                          { name: '동아제약 직거래', margin: '8-10%', payment: '월 1회', delivery: '주 2회', min: '200만원' },
+                        ].map((vendor, i) => (
+                          <tr key={i} className="hover:bg-muted/50">
+                            <td className="p-3 font-medium">{vendor.name}</td>
+                            <td className="p-3 text-center text-violet-600 font-medium">{vendor.margin}</td>
+                            <td className="p-3 text-center">{vendor.payment}</td>
+                            <td className="p-3 text-center">{vendor.delivery}</td>
+                            <td className="p-3 text-center">{vendor.min}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                  <div className="mt-4 p-4 bg-violet-50 dark:bg-violet-950/20 rounded-lg">
+                    <div className="font-bold text-violet-700 mb-2">💊 약품 구매 전략</div>
+                    <ul className="text-sm space-y-1 text-muted-foreground">
+                      <li>• 복수 도매상 거래로 가격 협상력 확보</li>
+                      <li>• 초기에는 소량 다품목 → 안정화 후 주력 품목 대량 구매</li>
+                      <li>• 유효기간 관리 철저 (선입선출 필수)</li>
+                    </ul>
+                  </div>
+                </div>
+
+                {/* 킬러 #17: 보험 청구 최적화 전략 */}
+                <div className="card p-6 border-2 border-teal-200 dark:border-teal-800">
+                  <div className="flex items-center gap-2 mb-4">
+                    <span className="px-2 py-1 bg-teal-500 text-white text-xs font-bold rounded">CLAIM</span>
+                    <h3 className="font-semibold text-foreground flex items-center gap-2">
+                      <CreditCard className="w-5 h-5 text-teal-600" />
+                      보험 청구 최적화 전략
+                    </h3>
+                  </div>
+                  <div className="space-y-4">
+                    <div className="grid md:grid-cols-2 gap-4">
+                      <div className="p-4 bg-teal-50 dark:bg-teal-950/20 rounded-lg">
+                        <div className="font-bold text-teal-700 mb-3">✅ 삭감 방지 핵심 수칙</div>
+                        <ul className="text-sm space-y-2">
+                          <li className="flex items-start gap-2">
+                            <span className="text-teal-500">•</span>
+                            <span>상병코드와 처치/투약 정합성 확인</span>
+                          </li>
+                          <li className="flex items-start gap-2">
+                            <span className="text-teal-500">•</span>
+                            <span>검사 필요성 차트 기록 필수</span>
+                          </li>
+                          <li className="flex items-start gap-2">
+                            <span className="text-teal-500">•</span>
+                            <span>의학적 필요성 소견서 미리 작성</span>
+                          </li>
+                          <li className="flex items-start gap-2">
+                            <span className="text-teal-500">•</span>
+                            <span>급여/비급여 혼동 방지 체크리스트</span>
+                          </li>
+                        </ul>
+                      </div>
+                      <div className="p-4 bg-red-50 dark:bg-red-950/20 rounded-lg">
+                        <div className="font-bold text-red-700 mb-3">⚠️ 흔한 삭감 사유 TOP 5</div>
+                        <ul className="text-sm space-y-2">
+                          <li className="flex items-start gap-2">
+                            <span className="text-red-500">1.</span>
+                            <span>상병 불일치 (32%)</span>
+                          </li>
+                          <li className="flex items-start gap-2">
+                            <span className="text-red-500">2.</span>
+                            <span>과잉 검사 판정 (24%)</span>
+                          </li>
+                          <li className="flex items-start gap-2">
+                            <span className="text-red-500">3.</span>
+                            <span>투약 기준 초과 (18%)</span>
+                          </li>
+                          <li className="flex items-start gap-2">
+                            <span className="text-red-500">4.</span>
+                            <span>산정 기준 미충족 (15%)</span>
+                          </li>
+                          <li className="flex items-start gap-2">
+                            <span className="text-red-500">5.</span>
+                            <span>서류 미비 (11%)</span>
+                          </li>
+                        </ul>
+                      </div>
+                    </div>
+                    <div className="p-4 bg-blue-50 dark:bg-blue-950/20 rounded-lg">
+                      <div className="font-bold text-blue-700 mb-2">📈 청구 최적화 예상 효과</div>
+                      <div className="grid grid-cols-3 gap-4 text-center">
+                        <div>
+                          <div className="text-2xl font-bold text-blue-600">-15%</div>
+                          <div className="text-xs text-muted-foreground">삭감률 감소</div>
+                        </div>
+                        <div>
+                          <div className="text-2xl font-bold text-blue-600">+8%</div>
+                          <div className="text-xs text-muted-foreground">청구 수익 증가</div>
+                        </div>
+                        <div>
+                          <div className="text-2xl font-bold text-blue-600">2일</div>
+                          <div className="text-xs text-muted-foreground">입금 단축</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 킬러 #18: 의료광고 규제 가이드 */}
+                <div className="card p-6 border-2 border-rose-200 dark:border-rose-800">
+                  <div className="flex items-center gap-2 mb-4">
+                    <span className="px-2 py-1 bg-rose-500 text-white text-xs font-bold rounded">LEGAL</span>
+                    <h3 className="font-semibold text-foreground flex items-center gap-2">
+                      <AlertTriangle className="w-5 h-5 text-rose-600" />
+                      의료광고 규제 가이드
+                    </h3>
+                  </div>
+                  <div className="space-y-4">
+                    <div className="grid md:grid-cols-2 gap-4">
+                      <div className="p-4 bg-green-50 dark:bg-green-950/20 rounded-lg">
+                        <div className="font-bold text-green-700 mb-3">✅ 허용되는 광고</div>
+                        <ul className="text-sm space-y-2">
+                          <li>• 진료과목, 진료시간 안내</li>
+                          <li>• 의료진 학력/경력 (사실 기반)</li>
+                          <li>• 시설/장비 보유 현황</li>
+                          <li>• 건강정보 제공 (교육 목적)</li>
+                          <li>• 비급여 항목 가격 안내</li>
+                        </ul>
+                      </div>
+                      <div className="p-4 bg-red-50 dark:bg-red-950/20 rounded-lg">
+                        <div className="font-bold text-red-700 mb-3">❌ 금지되는 광고</div>
+                        <ul className="text-sm space-y-2">
+                          <li>• "최고", "최초", "유일" 등 최상급 표현</li>
+                          <li>• 치료 효과 보장/과장</li>
+                          <li>• Before/After 사진 (성형 제외)</li>
+                          <li>• 가격 할인/이벤트 (일부 예외)</li>
+                          <li>• 환자 치료 후기 (동의 있어도)</li>
+                        </ul>
+                      </div>
+                    </div>
+                    <div className="p-4 bg-rose-50 dark:bg-rose-950/20 rounded-lg border border-rose-300">
+                      <div className="font-bold text-rose-700 mb-2">⚠️ 과태료 사례</div>
+                      <div className="grid md:grid-cols-3 gap-3 text-sm">
+                        <div className="p-2 bg-white dark:bg-rose-950/30 rounded">
+                          <div className="font-medium">최상급 표현 사용</div>
+                          <div className="text-rose-600 font-bold">300만원</div>
+                        </div>
+                        <div className="p-2 bg-white dark:bg-rose-950/30 rounded">
+                          <div className="font-medium">효과 보장 문구</div>
+                          <div className="text-rose-600 font-bold">500만원</div>
+                        </div>
+                        <div className="p-2 bg-white dark:bg-rose-950/30 rounded">
+                          <div className="font-medium">허위 경력 기재</div>
+                          <div className="text-rose-600 font-bold">1,000만원+</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 킬러 #19: VIP/프리미엄 환자 유치 전략 */}
+                <div className="card p-6 border-2 border-yellow-200 dark:border-yellow-700">
+                  <div className="flex items-center gap-2 mb-4">
+                    <span className="px-2 py-1 bg-yellow-500 text-white text-xs font-bold rounded">VIP</span>
+                    <h3 className="font-semibold text-foreground flex items-center gap-2">
+                      <Star className="w-5 h-5 text-yellow-600" />
+                      VIP/프리미엄 환자 유치 전략
+                    </h3>
+                  </div>
+                  <div className="space-y-4">
+                    <div className="grid md:grid-cols-3 gap-4">
+                      {[
+                        {
+                          tier: '골드',
+                          criteria: '월 50만원 이상 이용',
+                          benefits: ['우선 예약', '대기시간 최소화', '전담 코디네이터'],
+                          color: 'yellow'
+                        },
+                        {
+                          tier: '플래티넘',
+                          criteria: '월 100만원 이상 이용',
+                          benefits: ['VIP 전용 공간', '무료 발렛파킹', '가족 할인 10%'],
+                          color: 'slate'
+                        },
+                        {
+                          tier: '다이아몬드',
+                          criteria: '연 2,000만원 이상',
+                          benefits: ['야간/휴일 핫라인', '프리미엄 건강검진', '파트너 혜택'],
+                          color: 'blue'
+                        }
+                      ].map((tier, i) => (
+                        <div key={i} className={`p-4 bg-${tier.color}-50 dark:bg-${tier.color}-950/20 rounded-lg border-2 border-${tier.color}-200`}>
+                          <div className={`font-bold text-${tier.color}-700 text-lg mb-2`}>{tier.tier}</div>
+                          <div className="text-sm text-muted-foreground mb-3">{tier.criteria}</div>
+                          <ul className="text-sm space-y-1">
+                            {tier.benefits.map((b, j) => (
+                              <li key={j}>✓ {b}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      ))}
+                    </div>
+                    <div className="p-4 bg-yellow-50 dark:bg-yellow-950/20 rounded-lg">
+                      <div className="font-bold text-yellow-700 mb-2">💎 VIP 마케팅 채널</div>
+                      <div className="grid md:grid-cols-4 gap-3 text-sm">
+                        <div className="text-center p-2 bg-white dark:bg-yellow-950/30 rounded">
+                          <div className="font-medium">프리미엄 아파트</div>
+                          <div className="text-muted-foreground">DM/엘리베이터 광고</div>
+                        </div>
+                        <div className="text-center p-2 bg-white dark:bg-yellow-950/30 rounded">
+                          <div className="font-medium">골프장/클럽</div>
+                          <div className="text-muted-foreground">제휴 마케팅</div>
+                        </div>
+                        <div className="text-center p-2 bg-white dark:bg-yellow-950/30 rounded">
+                          <div className="font-medium">보험설계사</div>
+                          <div className="text-muted-foreground">소개 네트워크</div>
+                        </div>
+                        <div className="text-center p-2 bg-white dark:bg-yellow-950/30 rounded">
+                          <div className="font-medium">법인 계약</div>
+                          <div className="text-muted-foreground">임원 건강관리</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 킬러 #20: 건강검진 연계 수익모델 */}
+                <div className="card p-6 border-2 border-lime-200 dark:border-lime-800">
+                  <div className="flex items-center gap-2 mb-4">
+                    <span className="px-2 py-1 bg-lime-500 text-white text-xs font-bold rounded">CHECKUP</span>
+                    <h3 className="font-semibold text-foreground flex items-center gap-2">
+                      <Activity className="w-5 h-5 text-lime-600" />
+                      건강검진 연계 수익모델
+                    </h3>
+                  </div>
+                  <div className="space-y-4">
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-sm">
+                        <thead className="bg-lime-50 dark:bg-lime-950/30">
+                          <tr>
+                            <th className="p-3 text-left">패키지</th>
+                            <th className="p-3 text-right">원가</th>
+                            <th className="p-3 text-right">판매가</th>
+                            <th className="p-3 text-right">마진</th>
+                            <th className="p-3 text-center">타겟</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y">
+                          {[
+                            { name: '베이직 검진', cost: 5, price: 15, margin: 67, target: '20-30대' },
+                            { name: '스탠다드 검진', cost: 12, price: 30, margin: 60, target: '40대' },
+                            { name: '프리미엄 검진', cost: 25, price: 60, margin: 58, target: '50대+' },
+                            { name: '기업 단체검진', cost: 8, price: 18, margin: 56, target: '법인' },
+                            { name: 'VIP 종합검진', cost: 40, price: 100, margin: 60, target: 'VIP' },
+                          ].map((pkg, i) => (
+                            <tr key={i} className="hover:bg-muted/50">
+                              <td className="p-3 font-medium">{pkg.name}</td>
+                              <td className="p-3 text-right text-muted-foreground">{pkg.cost}만원</td>
+                              <td className="p-3 text-right">{pkg.price}만원</td>
+                              <td className="p-3 text-right text-lime-600 font-bold">{pkg.margin}%</td>
+                              <td className="p-3 text-center">{pkg.target}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                    <div className="p-4 bg-lime-50 dark:bg-lime-950/20 rounded-lg">
+                      <div className="font-bold text-lime-700 mb-2">📈 검진 수익 시뮬레이션</div>
+                      <div className="grid md:grid-cols-3 gap-4 text-center">
+                        <div>
+                          <div className="text-muted-foreground text-sm">월 검진 20건 시</div>
+                          <div className="text-2xl font-bold text-lime-600">+400만원</div>
+                        </div>
+                        <div>
+                          <div className="text-muted-foreground text-sm">2차 진료 전환율 30%</div>
+                          <div className="text-2xl font-bold text-lime-600">+180만원</div>
+                        </div>
+                        <div>
+                          <div className="text-muted-foreground text-sm">연간 추가 수익</div>
+                          <div className="text-2xl font-bold text-lime-600">6,960만원</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 킬러 #21: 야간/주말 진료 수익성 분석 */}
+                <div className="card p-6 border-2 border-purple-200 dark:border-purple-800">
+                  <div className="flex items-center gap-2 mb-4">
+                    <span className="px-2 py-1 bg-purple-500 text-white text-xs font-bold rounded">EXTENDED</span>
+                    <h3 className="font-semibold text-foreground flex items-center gap-2">
+                      <Clock className="w-5 h-5 text-purple-600" />
+                      야간/주말 진료 수익성 분석
+                    </h3>
+                  </div>
+                  <div className="space-y-4">
+                    <div className="grid md:grid-cols-2 gap-4">
+                      <div className="p-4 bg-purple-50 dark:bg-purple-950/20 rounded-lg">
+                        <div className="font-bold text-purple-700 mb-3">🌙 야간 진료 (18:00-21:00)</div>
+                        <div className="space-y-2 text-sm">
+                          <div className="flex justify-between">
+                            <span>예상 환자수</span>
+                            <span className="font-medium">10-15명/일</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span>추가 매출</span>
+                            <span className="font-medium text-purple-600">150만원/주</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span>추가 인건비</span>
+                            <span className="font-medium text-red-500">-80만원/주</span>
+                          </div>
+                          <div className="flex justify-between border-t pt-2 font-bold">
+                            <span>순이익</span>
+                            <span className="text-purple-600">+70만원/주</span>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="p-4 bg-orange-50 dark:bg-orange-950/20 rounded-lg">
+                        <div className="font-bold text-orange-700 mb-3">📅 주말 진료 (토 09:00-14:00)</div>
+                        <div className="space-y-2 text-sm">
+                          <div className="flex justify-between">
+                            <span>예상 환자수</span>
+                            <span className="font-medium">25-35명/일</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span>추가 매출</span>
+                            <span className="font-medium text-orange-600">200만원/주</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span>추가 인건비</span>
+                            <span className="font-medium text-red-500">-60만원/주</span>
+                          </div>
+                          <div className="flex justify-between border-t pt-2 font-bold">
+                            <span>순이익</span>
+                            <span className="text-orange-600">+140만원/주</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="p-4 bg-green-50 dark:bg-green-950/20 rounded-lg">
+                      <div className="font-bold text-green-700 mb-2">💰 연장 진료 연간 효과</div>
+                      <div className="grid grid-cols-3 gap-4 text-center">
+                        <div>
+                          <div className="text-2xl font-bold text-green-600">+월 840만원</div>
+                          <div className="text-xs text-muted-foreground">추가 순이익</div>
+                        </div>
+                        <div>
+                          <div className="text-2xl font-bold text-green-600">+1억원</div>
+                          <div className="text-xs text-muted-foreground">연간 추가 수익</div>
+                        </div>
+                        <div>
+                          <div className="text-2xl font-bold text-green-600">+35%</div>
+                          <div className="text-xs text-muted-foreground">환자 충성도 증가</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 킬러 #22: 비대면/원격진료 하이브리드 전략 */}
+                <div className="card p-6 border-2 border-sky-200 dark:border-sky-800">
+                  <div className="flex items-center gap-2 mb-4">
+                    <span className="px-2 py-1 bg-sky-500 text-white text-xs font-bold rounded">TELEHEALTH</span>
+                    <h3 className="font-semibold text-foreground flex items-center gap-2">
+                      <Globe className="w-5 h-5 text-sky-600" />
+                      비대면/원격진료 하이브리드 전략
+                    </h3>
+                  </div>
+                  <div className="space-y-4">
+                    <div className="grid md:grid-cols-2 gap-4">
+                      <div>
+                        <div className="font-bold text-sky-700 mb-3">📱 비대면 진료 가능 항목</div>
+                        <div className="space-y-2">
+                          {[
+                            { item: '재진 상담/처방', feasible: true },
+                            { item: '만성질환 관리', feasible: true },
+                            { item: '검사결과 상담', feasible: true },
+                            { item: '경증 질환 초진', feasible: true },
+                            { item: '건강상담/영양상담', feasible: true },
+                            { item: '정밀검사 필요 케이스', feasible: false },
+                          ].map((item, i) => (
+                            <div key={i} className="flex items-center gap-2 text-sm">
+                              <span className={item.feasible ? 'text-green-500' : 'text-red-500'}>
+                                {item.feasible ? '✅' : '❌'}
+                              </span>
+                              <span>{item.item}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                      <div>
+                        <div className="font-bold text-sky-700 mb-3">💻 추천 플랫폼</div>
+                        <div className="space-y-2">
+                          {[
+                            { name: '닥터나우', fee: '15%', users: '100만+' },
+                            { name: '굿닥', fee: '12%', users: '80만+' },
+                            { name: '똑닥', fee: '10%', users: '60만+' },
+                            { name: '자체 앱', fee: '0%', users: '구축비용' },
+                          ].map((platform, i) => (
+                            <div key={i} className="flex justify-between items-center p-2 bg-sky-50 dark:bg-sky-950/30 rounded text-sm">
+                              <span className="font-medium">{platform.name}</span>
+                              <div className="text-right">
+                                <div className="text-sky-600">수수료 {platform.fee}</div>
+                                <div className="text-xs text-muted-foreground">이용자 {platform.users}</div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                    <div className="p-4 bg-sky-50 dark:bg-sky-950/20 rounded-lg">
+                      <div className="font-bold text-sky-700 mb-2">📈 비대면 진료 수익 예측</div>
+                      <div className="grid grid-cols-4 gap-4 text-center text-sm">
+                        <div>
+                          <div className="font-bold text-sky-600">일 10건</div>
+                          <div className="text-muted-foreground">비대면 진료</div>
+                        </div>
+                        <div>
+                          <div className="font-bold text-sky-600">3만원</div>
+                          <div className="text-muted-foreground">건당 평균</div>
+                        </div>
+                        <div>
+                          <div className="font-bold text-sky-600">월 650만원</div>
+                          <div className="text-muted-foreground">추가 매출</div>
+                        </div>
+                        <div>
+                          <div className="font-bold text-green-600">30%</div>
+                          <div className="text-muted-foreground">대면 전환율</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 킬러 #23: 실시간 온라인 평판 분석 */}
+                <div className="card p-6 border-2 border-fuchsia-200 dark:border-fuchsia-800">
+                  <div className="flex items-center gap-2 mb-4">
+                    <span className="px-2 py-1 bg-fuchsia-500 text-white text-xs font-bold rounded">REPUTATION</span>
+                    <h3 className="font-semibold text-foreground flex items-center gap-2">
+                      <MessageCircle className="w-5 h-5 text-fuchsia-600" />
+                      실시간 온라인 평판 분석
+                    </h3>
+                  </div>
+                  <div className="space-y-4">
+                    <div className="grid md:grid-cols-2 gap-4">
+                      <div>
+                        <div className="font-bold text-fuchsia-700 mb-3">📊 경쟁병원 리뷰 키워드 분석</div>
+                        <div className="space-y-2">
+                          {[
+                            { keyword: '친절함', positive: 85, negative: 15 },
+                            { keyword: '대기시간', positive: 35, negative: 65 },
+                            { keyword: '실력', positive: 78, negative: 22 },
+                            { keyword: '가격', positive: 45, negative: 55 },
+                            { keyword: '시설', positive: 70, negative: 30 },
+                          ].map((kw, i) => (
+                            <div key={i} className="text-sm">
+                              <div className="flex justify-between mb-1">
+                                <span>{kw.keyword}</span>
+                                <span className="text-fuchsia-600">{kw.positive}% 긍정</span>
+                              </div>
+                              <div className="h-2 bg-red-200 rounded-full overflow-hidden">
+                                <div
+                                  className="h-full bg-green-500 rounded-full"
+                                  style={{ width: `${kw.positive}%` }}
+                                />
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                      <div>
+                        <div className="font-bold text-fuchsia-700 mb-3">⚠️ 경쟁병원 주요 불만</div>
+                        <div className="space-y-2">
+                          {[
+                            { complaint: '"대기시간이 너무 길어요"', count: 23 },
+                            { complaint: '"주차가 불편해요"', count: 18 },
+                            { complaint: '"예약이 잘 안 잡혀요"', count: 15 },
+                            { complaint: '"비용이 비싸요"', count: 12 },
+                            { complaint: '"설명이 부족해요"', count: 9 },
+                          ].map((c, i) => (
+                            <div key={i} className="flex justify-between items-center p-2 bg-red-50 dark:bg-red-950/20 rounded text-sm">
+                              <span>{c.complaint}</span>
+                              <span className="text-red-600 font-medium">{c.count}건</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                    <div className="p-4 bg-fuchsia-50 dark:bg-fuchsia-950/20 rounded-lg">
+                      <div className="font-bold text-fuchsia-700 mb-2">💡 차별화 전략 제안</div>
+                      <p className="text-sm text-muted-foreground">
+                        경쟁병원 리뷰 분석 결과, <strong>대기시간 단축</strong>과 <strong>친절한 설명</strong>에 집중하면
+                        빠르게 차별화할 수 있습니다. 실시간 대기현황 안내 시스템 도입을 권장합니다.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 킬러 #24: 계절별 환자 유형 예측 */}
+                <div className="card p-6 border-2 border-orange-200 dark:border-orange-800">
+                  <div className="flex items-center gap-2 mb-4">
+                    <span className="px-2 py-1 bg-orange-500 text-white text-xs font-bold rounded">SEASONAL</span>
+                    <h3 className="font-semibold text-foreground flex items-center gap-2">
+                      <Calendar className="w-5 h-5 text-orange-600" />
+                      계절별 환자 유형 예측
+                    </h3>
+                  </div>
+                  <div className="space-y-4">
+                    <div className="grid md:grid-cols-4 gap-4">
+                      {[
+                        {
+                          season: '봄 (3-5월)',
+                          icon: '🌸',
+                          diseases: ['알레르기 비염', '황사 관련', '춘곤증'],
+                          marketing: '알레르기 검사 패키지',
+                          color: 'pink'
+                        },
+                        {
+                          season: '여름 (6-8월)',
+                          icon: '☀️',
+                          diseases: ['식중독', '냉방병', '피부질환'],
+                          marketing: '여름철 건강검진',
+                          color: 'yellow'
+                        },
+                        {
+                          season: '가을 (9-11월)',
+                          icon: '🍂',
+                          diseases: ['독감 예방', '환절기 감기', '우울증'],
+                          marketing: '독감 예방접종 캠페인',
+                          color: 'orange'
+                        },
+                        {
+                          season: '겨울 (12-2월)',
+                          icon: '❄️',
+                          diseases: ['독감', '심혈관질환', '건조피부'],
+                          marketing: '연말 종합검진 프로모션',
+                          color: 'blue'
+                        }
+                      ].map((s, i) => (
+                        <div key={i} className={`p-4 bg-${s.color}-50 dark:bg-${s.color}-950/20 rounded-lg`}>
+                          <div className="text-2xl mb-2">{s.icon}</div>
+                          <div className="font-bold mb-2">{s.season}</div>
+                          <div className="text-xs text-muted-foreground mb-2">주요 질환:</div>
+                          <ul className="text-sm space-y-1 mb-3">
+                            {s.diseases.map((d, j) => (
+                              <li key={j}>• {d}</li>
+                            ))}
+                          </ul>
+                          <div className={`text-xs p-2 bg-white dark:bg-${s.color}-950/40 rounded`}>
+                            <strong>추천 마케팅:</strong><br/>{s.marketing}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    <div className="p-4 bg-orange-50 dark:bg-orange-950/20 rounded-lg">
+                      <div className="font-bold text-orange-700 mb-2">📅 월별 마케팅 캘린더</div>
+                      <p className="text-sm text-muted-foreground">
+                        시즌 2개월 전 마케팅 준비 → 1개월 전 광고 집행 → 시즌 중 프로모션 운영
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 킬러 #25: 인근 전문의/종합병원 협진 지도 */}
+                <div className="card p-6 border-2 border-indigo-200 dark:border-indigo-800">
+                  <div className="flex items-center gap-2 mb-4">
+                    <span className="px-2 py-1 bg-indigo-500 text-white text-xs font-bold rounded">NETWORK</span>
+                    <h3 className="font-semibold text-foreground flex items-center gap-2">
+                      <MapPin className="w-5 h-5 text-indigo-600" />
+                      인근 전문의/종합병원 협진 지도
+                    </h3>
+                  </div>
+                  <div className="space-y-4">
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-sm">
+                        <thead className="bg-indigo-50 dark:bg-indigo-950/30">
+                          <tr>
+                            <th className="p-3 text-left">의료기관</th>
+                            <th className="p-3 text-center">전문과목</th>
+                            <th className="p-3 text-center">거리</th>
+                            <th className="p-3 text-center">협진 용이성</th>
+                            <th className="p-3 text-center">의뢰 가능</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y">
+                          {[
+                            { name: '○○대학병원', specialty: '종합', distance: '2.5km', ease: '★★★★☆', referral: true },
+                            { name: '△△정형외과', specialty: '정형외과', distance: '0.8km', ease: '★★★★★', referral: true },
+                            { name: '□□영상의학과', specialty: '영상진단', distance: '0.5km', ease: '★★★★★', referral: true },
+                            { name: '◇◇피부과', specialty: '피부과', distance: '1.2km', ease: '★★★★☆', referral: true },
+                            { name: '☆☆종합병원', specialty: '응급/수술', distance: '3.0km', ease: '★★★☆☆', referral: true },
+                          ].map((hospital, i) => (
+                            <tr key={i} className="hover:bg-muted/50">
+                              <td className="p-3 font-medium">{hospital.name}</td>
+                              <td className="p-3 text-center">{hospital.specialty}</td>
+                              <td className="p-3 text-center">{hospital.distance}</td>
+                              <td className="p-3 text-center text-yellow-500">{hospital.ease}</td>
+                              <td className="p-3 text-center">
+                                {hospital.referral && <span className="text-green-500">✅</span>}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                    <div className="grid md:grid-cols-2 gap-4">
+                      <div className="p-4 bg-indigo-50 dark:bg-indigo-950/20 rounded-lg">
+                        <div className="font-bold text-indigo-700 mb-2">🤝 협진 네트워크 구축 팁</div>
+                        <ul className="text-sm space-y-1">
+                          <li>• 개원 인사 방문 (명함 + 소개 자료)</li>
+                          <li>• 의뢰서 양식 미리 준비</li>
+                          <li>• 회송 시 결과 요약 첨부</li>
+                          <li>• 분기 1회 식사 미팅 권장</li>
+                        </ul>
+                      </div>
+                      <div className="p-4 bg-green-50 dark:bg-green-950/20 rounded-lg">
+                        <div className="font-bold text-green-700 mb-2">💰 협진의 숨은 효과</div>
+                        <ul className="text-sm space-y-1">
+                          <li>• 환자 신뢰도 상승</li>
+                          <li>• 역의뢰 환자 유입</li>
+                          <li>• 의료 분쟁 리스크 감소</li>
+                          <li>• 지역 의료계 평판 구축</li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
                 {/* 최종 종합 점수 */}
                 <div className="card p-8 bg-gradient-to-r from-indigo-600 to-purple-600 text-white">
                   <div className="text-center mb-6">
@@ -4053,11 +4980,11 @@ export default function SimulatePage() {
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
                     <div className="text-center p-3 bg-card rounded-lg">
                       <div className="text-xs text-muted-foreground">총 분석 항목</div>
-                      <div className="text-2xl font-bold text-foreground">70+</div>
+                      <div className="text-2xl font-bold text-foreground">85+</div>
                     </div>
                     <div className="text-center p-3 bg-card rounded-lg">
                       <div className="text-xs text-muted-foreground">데이터 소스</div>
-                      <div className="text-2xl font-bold text-foreground">15개</div>
+                      <div className="text-2xl font-bold text-foreground">20개</div>
                     </div>
                     <div className="text-center p-3 bg-card rounded-lg">
                       <div className="text-xs text-muted-foreground">경쟁 병원 분석</div>
