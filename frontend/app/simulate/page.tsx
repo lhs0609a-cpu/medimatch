@@ -366,6 +366,61 @@ const DEMO_RESULT: SimulationResponse = {
   created_at: new Date().toISOString(),
 }
 
+// Helper functions (outside component for better parsing)
+function getRecommendationStyle(recommendation: string): string {
+  switch (recommendation) {
+    case 'VERY_POSITIVE':
+    case 'POSITIVE':
+      return 'bg-green-50 text-green-900 border-green-200'
+    case 'NEUTRAL':
+      return 'bg-amber-50 text-amber-900 border-amber-200'
+    case 'NEGATIVE':
+    case 'VERY_NEGATIVE':
+      return 'bg-red-50 text-red-900 border-red-200'
+    default:
+      return 'bg-secondary text-secondary-foreground border-border'
+  }
+}
+
+function getRecommendationText(recommendation: string): string {
+  switch (recommendation) {
+    case 'VERY_POSITIVE':
+      return '매우 긍정적'
+    case 'POSITIVE':
+      return '긍정적'
+    case 'NEUTRAL':
+      return '보통'
+    case 'NEGATIVE':
+      return '부정적'
+    case 'VERY_NEGATIVE':
+      return '매우 부정적'
+    default:
+      return recommendation
+  }
+}
+
+function getRecommendationIcon(recommendation: string): React.ReactNode {
+  switch (recommendation) {
+    case 'VERY_POSITIVE':
+    case 'POSITIVE':
+      return <CheckCircle2 className="w-5 h-5" />
+    case 'NEUTRAL':
+      return <MinusCircle className="w-5 h-5" />
+    case 'NEGATIVE':
+    case 'VERY_NEGATIVE':
+      return <AlertCircle className="w-5 h-5" />
+    default:
+      return null
+  }
+}
+
+function formatCurrency(value: number): string {
+  if (value >= 100000000) {
+    return `${(value / 100000000).toFixed(1)}억원`
+  }
+  return `${(value / 10000).toLocaleString()}만원`
+}
+
 export default function SimulatePage() {
   const [result, setResult] = useState<SimulationResponse | null>(null)
   const [isAuthRequired, setIsAuthRequired] = useState(false)
@@ -440,60 +495,6 @@ export default function SimulatePage() {
 
   const onSubmit = (data: SimulationForm) => {
     mutation.mutate(data)
-  }
-
-  const getRecommendationStyle = (recommendation: string) => {
-    switch (recommendation) {
-      case 'VERY_POSITIVE':
-      case 'POSITIVE':
-        return 'bg-green-50 text-green-900 border-green-200'
-      case 'NEUTRAL':
-        return 'bg-amber-50 text-amber-900 border-amber-200'
-      case 'NEGATIVE':
-      case 'VERY_NEGATIVE':
-        return 'bg-red-50 text-red-900 border-red-200'
-      default:
-        return 'bg-secondary text-secondary-foreground border-border'
-    }
-  }
-
-  const getRecommendationText = (recommendation: string) => {
-    switch (recommendation) {
-      case 'VERY_POSITIVE':
-        return '매우 긍정적'
-      case 'POSITIVE':
-        return '긍정적'
-      case 'NEUTRAL':
-        return '보통'
-      case 'NEGATIVE':
-        return '부정적'
-      case 'VERY_NEGATIVE':
-        return '매우 부정적'
-      default:
-        return recommendation
-    }
-  }
-
-  const getRecommendationIcon = (recommendation: string) => {
-    switch (recommendation) {
-      case 'VERY_POSITIVE':
-      case 'POSITIVE':
-        return <CheckCircle2 className="w-5 h-5" />
-      case 'NEUTRAL':
-        return <MinusCircle className="w-5 h-5" />
-      case 'NEGATIVE':
-      case 'VERY_NEGATIVE':
-        return <AlertCircle className="w-5 h-5" />
-      default:
-        return null
-    }
-  }
-
-  const formatCurrency = (value: number) => {
-    if (value >= 100000000) {
-      return `${(value / 100000000).toFixed(1)}억원`
-    }
-    return `${(value / 10000).toLocaleString()}만원`
   }
 
   return (
