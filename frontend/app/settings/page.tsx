@@ -10,6 +10,7 @@ import {
 } from 'lucide-react'
 import { useTheme } from '@/components/theme'
 import { useAuth } from '@/lib/hooks/useAuth'
+import { authService } from '@/lib/api/services'
 import { toast } from 'sonner'
 
 export default function SettingsPage() {
@@ -27,12 +28,12 @@ export default function SettingsPage() {
 
   const handleDeleteAccount = async () => {
     try {
-      // TODO: API call to delete account
+      await authService.deleteAccount()
       toast.success('계정이 삭제되었습니다')
-      localStorage.removeItem('token')
       router.push('/')
-    } catch {
-      toast.error('계정 삭제에 실패했습니다')
+    } catch (error: any) {
+      const message = error.response?.data?.detail || '계정 삭제에 실패했습니다'
+      toast.error(message)
     }
   }
 

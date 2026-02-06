@@ -198,16 +198,12 @@ export default function PrivacyPage() {
               <h2 className="text-xl font-semibold text-foreground mb-4">제10조 (개인정보 보호책임자)</h2>
               <div className="text-muted-foreground leading-relaxed space-y-2">
                 <p>회사는 개인정보 처리에 관한 업무를 총괄해서 책임지고, 개인정보 처리와 관련한 정보주체의 불만처리 및 피해구제 등을 위하여 아래와 같이 개인정보 보호책임자를 지정하고 있습니다.</p>
-                {/* TODO: 실제 개인정보 보호책임자 정보로 교체 필요 (법적 필수사항) */}
-                <div className="mt-4 p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg">
-                  <p className="text-amber-800 dark:text-amber-200 text-sm mb-2 font-medium">
-                    ⚠️ 서비스 출시 전 실제 정보로 교체 필요
-                  </p>
-                  <p><strong>개인정보 보호책임자</strong></p>
-                  <p>성명: [담당자 성명 입력]</p>
-                  <p>직책: [직책 입력]</p>
-                  <p>이메일: [이메일 입력]</p>
-                  <p>전화: [연락처 입력]</p>
+                <div className="mt-4 p-4 bg-secondary rounded-lg">
+                  <p className="font-medium text-foreground mb-2">개인정보 보호책임자</p>
+                  <p>성명: 이현수</p>
+                  <p>직책: 대표이사</p>
+                  <p>이메일: privacy@mediplatone.kr</p>
+                  <p>전화: 02-6953-7890</p>
                 </div>
               </div>
             </section>

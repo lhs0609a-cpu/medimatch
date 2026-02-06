@@ -31,6 +31,7 @@ from .group_buying import (
     GroupBuyingVendor, CohortVendor, ParticipantContract, GroupBuyingStats,
     CohortStatus, ParticipantStatus, ContractStatus as GBContractStatus
 )
+from .favorite import Favorite, FavoriteType
 
 __all__ = [
     "User",
@@ -112,4 +113,7 @@ __all__ = [
     "CohortStatus",
     "ParticipantStatus",
     "GBContractStatus",
+    # 즐겨찾기
+    "Favorite",
+    "FavoriteType",
 ]

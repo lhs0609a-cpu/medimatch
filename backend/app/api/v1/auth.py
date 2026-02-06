@@ -158,3 +158,22 @@ async def logout(
     """로그아웃 (클라이언트에서 토큰 삭제)"""
     # In a real implementation, you might want to blacklist the token
     return {"message": "Successfully logged out"}
+
+
+@router.delete("/me")
+async def delete_account(
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_active_user)
+):
+    """계정 삭제 (GDPR/개인정보보호법 준수)"""
+    # Soft delete - mark as inactive and anonymize personal data
+    current_user.is_active = False
+    current_user.email = f"deleted_{current_user.id}@deleted.local"
+    current_user.full_name = "삭제된 사용자"
+    current_user.phone = None
+    current_user.company = None
+    current_user.license_number = None
+
+    await db.commit()
+
+    return {"message": "계정이 성공적으로 삭제되었습니다"}

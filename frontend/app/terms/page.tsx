@@ -31,18 +31,12 @@ export default function TermsPage() {
           <p className="text-muted-foreground mb-8">최종 수정일: 2025년 1월 1일</p>
 
           <div className="prose prose-gray dark:prose-invert max-w-none space-y-8">
-            {/* TODO: 법인 설립 후 실제 회사명으로 교체 필요 */}
             <section>
               <h2 className="text-xl font-semibold text-foreground mb-4">제1조 (목적)</h2>
               <p className="text-muted-foreground leading-relaxed">
-                본 약관은 [회사명](이하 "회사")이 제공하는 메디플라톤 서비스(이하 "서비스")의
+                본 약관은 주식회사 메디플라톤(이하 "회사")이 제공하는 메디플라톤 서비스(이하 "서비스")의
                 이용과 관련하여 회사와 이용자의 권리, 의무 및 책임사항을 규정함을 목적으로 합니다.
               </p>
-              <div className="mt-2 p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg">
-                <p className="text-amber-800 dark:text-amber-200 text-sm">
-                  ⚠️ 서비스 출시 전 법인 정보 확인 필요
-                </p>
-              </div>
             </section>
 
             <section>

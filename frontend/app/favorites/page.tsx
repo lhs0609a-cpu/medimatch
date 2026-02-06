@@ -9,46 +9,47 @@ import {
 } from 'lucide-react'
 import Image from 'next/image'
 import { useAuth } from '@/lib/hooks/useAuth'
+import { favoritesService, FavoriteType } from '@/lib/api/services'
 import { buildingListingImages, pharmacyListingImages } from '@/components/BlurredListingImage'
+import { toast } from 'sonner'
 
-// Mock favorites data - 실제로는 API에서 가져옴
-const mockFavorites = [
-  {
-    id: '1',
-    type: 'building',
-    title: '강남역 의료복합빌딩',
-    address: '서울시 강남구 강남대로 123',
-    price: '보증금 5억 / 월세 800만',
-    area: '165㎡ (50평)',
-    floor: '3층',
-    createdAt: '2024-01-15',
-    imageUrl: null,
-  },
-  {
-    id: '2',
-    type: 'pharmacy',
-    title: '송파구 약국 매물',
-    address: '서울시 송파구 올림픽로 456',
-    price: '권리금 2억 5천',
-    monthlyRevenue: '월매출 8,000만',
-    createdAt: '2024-01-14',
-    imageUrl: null,
-  },
-  {
-    id: '3',
-    type: 'building',
-    title: '마포구 신축 메디컬 빌딩',
-    address: '서울시 마포구 양화로 789',
-    price: '보증금 3억 / 월세 500만',
-    area: '132㎡ (40평)',
-    floor: '2층',
-    createdAt: '2024-01-13',
-    imageUrl: null,
-  },
-]
+// 실제 API에서 가져온 데이터에 추가 정보를 매핑
+interface FavoriteItem {
+  id: string
+  favoriteId: string
+  type: 'building' | 'pharmacy'
+  title: string
+  address: string
+  price: string
+  area?: string
+  floor?: string
+  monthlyRevenue?: string
+  createdAt: string
+}
 
 type ViewMode = 'grid' | 'list'
 type FilterType = 'all' | 'building' | 'pharmacy'
+
+// 즐겨찾기에 표시할 임시 정보 (실제로는 각 매물 API에서 가져와야 함)
+const getItemDisplayInfo = (itemId: string, itemType: 'building' | 'pharmacy'): Partial<FavoriteItem> => {
+  // 실제 구현에서는 buildings API나 pharmacy-match API에서 정보를 가져옴
+  // 임시로 기본값 반환
+  if (itemType === 'building') {
+    return {
+      title: `매물 #${itemId.slice(0, 8)}`,
+      address: '주소 정보를 불러오는 중...',
+      price: '가격 문의',
+      area: '-',
+      floor: '-',
+    }
+  }
+  return {
+    title: `약국 매물 #${itemId.slice(0, 8)}`,
+    address: '주소 정보를 불러오는 중...',
+    price: '권리금 문의',
+    monthlyRevenue: '-',
+  }
+}
 
 export default function FavoritesPage() {
   const { isAuthenticated } = useAuth()
@@ -56,20 +57,36 @@ export default function FavoritesPage() {
   const [viewMode, setViewMode] = useState<ViewMode>('grid')
   const [filterType, setFilterType] = useState<FilterType>('all')
 
-  // TODO: Replace with actual API call
-  const { data: favorites = mockFavorites, isLoading } = useQuery({
+  // 실제 API 호출
+  const { data: favoritesData, isLoading } = useQuery({
     queryKey: ['favorites'],
-    queryFn: async () => mockFavorites,
+    queryFn: async () => {
+      const response = await favoritesService.getAll()
+      // API 응답을 화면 표시용 데이터로 변환
+      return response.favorites.map(fav => ({
+        id: fav.item_id,
+        favoriteId: fav.id,
+        type: fav.item_type as 'building' | 'pharmacy',
+        createdAt: fav.created_at,
+        ...getItemDisplayInfo(fav.item_id, fav.item_type as 'building' | 'pharmacy'),
+      })) as FavoriteItem[]
+    },
     enabled: isAuthenticated,
   })
 
+  const favorites = favoritesData || []
+
   const removeMutation = useMutation({
-    mutationFn: async (id: string) => {
-      // TODO: API call to remove favorite
-      return id
+    mutationFn: async (favoriteId: string) => {
+      await favoritesService.remove(favoriteId)
+      return favoriteId
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['favorites'] })
+      toast.success('즐겨찾기에서 삭제되었습니다')
+    },
+    onError: () => {
+      toast.error('삭제에 실패했습니다')
     },
   })
 
@@ -214,7 +231,7 @@ export default function FavoritesPage() {
                       {item.type === 'building' ? '건물/임대' : '약국 매물'}
                     </span>
                     <button
-                      onClick={() => removeMutation.mutate(item.id)}
+                      onClick={() => removeMutation.mutate(item.favoriteId)}
                       className="p-1.5 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
                     >
                       <Trash2 className="w-4 h-4" />
@@ -292,7 +309,7 @@ export default function FavoritesPage() {
                       <h3 className="font-semibold text-foreground">{item.title}</h3>
                     </div>
                     <button
-                      onClick={() => removeMutation.mutate(item.id)}
+                      onClick={() => removeMutation.mutate(item.favoriteId)}
                       className="p-1.5 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors flex-shrink-0"
                     >
                       <Trash2 className="w-4 h-4" />

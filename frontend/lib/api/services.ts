@@ -57,6 +57,12 @@ export const authService = {
     localStorage.removeItem('access_token')
     localStorage.removeItem('refresh_token')
   },
+
+  deleteAccount: async (): Promise<void> => {
+    await apiClient.delete('/auth/me')
+    localStorage.removeItem('access_token')
+    localStorage.removeItem('refresh_token')
+  },
 }
 
 // Simulation Services (OpenSim)
@@ -1555,5 +1561,49 @@ export const groupBuyingService = {
   }): Promise<SavingsCalculation> => {
     const response = await apiClient.post('/group-buying/stats/calculator', params)
     return response.data
+  },
+}
+
+// Favorites Service - 즐겨찾기
+export type FavoriteType = 'building' | 'pharmacy'
+
+export interface Favorite {
+  id: string
+  item_id: string
+  item_type: FavoriteType
+  created_at: string
+}
+
+export interface FavoriteListResponse {
+  favorites: Favorite[]
+  total: number
+}
+
+export const favoritesService = {
+  getAll: async (itemType?: FavoriteType): Promise<FavoriteListResponse> => {
+    const params = itemType ? { item_type: itemType } : {}
+    const response = await apiClient.get('/favorites', { params })
+    return response.data
+  },
+
+  add: async (itemId: string, itemType: FavoriteType): Promise<Favorite> => {
+    const response = await apiClient.post('/favorites', {
+      item_id: itemId,
+      item_type: itemType
+    })
+    return response.data
+  },
+
+  remove: async (favoriteId: string): Promise<void> => {
+    await apiClient.delete(`/favorites/${favoriteId}`)
+  },
+
+  removeByItem: async (itemType: FavoriteType, itemId: string): Promise<void> => {
+    await apiClient.delete(`/favorites/item/${itemType}/${itemId}`)
+  },
+
+  check: async (itemType: FavoriteType, itemId: string): Promise<boolean> => {
+    const response = await apiClient.get(`/favorites/check/${itemType}/${itemId}`)
+    return response.data.is_favorited
   },
 }
