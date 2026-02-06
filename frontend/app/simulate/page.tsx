@@ -363,7 +363,7 @@ const DEMO_RESULT: SimulationResponse = {
   },
   is_unlocked: true,
   unlock_price: 9900,
-  created_at: new Date().toISOString(),
+  created_at: '2024-01-01T00:00:00.000Z',
 }
 
 // Helper functions (outside component for better parsing)
