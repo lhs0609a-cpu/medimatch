@@ -162,7 +162,10 @@ export default function PartnerDetailPage() {
             project_cost: 120000000,
             project_duration: 45,
             description: '모던하고 세련된 피부과 인테리어. 레이저실 3개, 시술실 5개 구성.',
-            images: ['/placeholder-1.jpg', '/placeholder-2.jpg'],
+            images: [
+              'https://images.unsplash.com/photo-1629909613654-28e377c37b09?w=800&q=80',
+              'https://images.unsplash.com/photo-1631217868264-e5b90bb7e133?w=800&q=80'
+            ],
             is_featured: true,
             created_at: '2024-11-15',
           },
@@ -174,7 +177,9 @@ export default function PartnerDetailPage() {
             project_cost: 180000000,
             project_duration: 60,
             description: '수술실 2개, 회복실 8개를 갖춘 대형 성형외과 리모델링.',
-            images: ['/placeholder-3.jpg'],
+            images: [
+              'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=800&q=80'
+            ],
             is_featured: true,
             created_at: '2024-10-20',
           },
@@ -186,7 +191,9 @@ export default function PartnerDetailPage() {
             project_cost: 80000000,
             project_duration: 30,
             description: '친환경 소재를 활용한 치과 인테리어.',
-            images: [],
+            images: [
+              'https://images.unsplash.com/photo-1629909615184-74f495363b67?w=800&q=80'
+            ],
             is_featured: false,
             created_at: '2024-09-10',
           },
