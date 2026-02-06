@@ -4007,7 +4007,7 @@ export default function SimulatePage() {
                     <span className="px-2 py-1 bg-emerald-500 text-white text-xs font-bold rounded">EQUIPMENT</span>
                     <h3 className="font-semibold text-foreground flex items-center gap-2">
                       <Package className="w-5 h-5 text-emerald-600" />
-                      의료장비 중고 vs 신품 ROI 분석
+                      {result.clinic_type} 의료장비 중고 vs 신품 ROI 분석
                     </h3>
                   </div>
                   <div className="space-y-4">
@@ -4023,35 +4023,64 @@ export default function SimulatePage() {
                           </tr>
                         </thead>
                         <tbody className="divide-y">
-                          {[
-                            { name: '초음파 진단기', new: 4500, used: 1800, recommend: '중고', reason: '기능 차이 적음' },
-                            { name: 'X-ray 장비', new: 8000, used: 3500, recommend: '신품', reason: '안전 인증 중요' },
-                            { name: '심전도계', new: 800, used: 350, recommend: '중고', reason: '내구성 좋음' },
-                            { name: '환자 모니터', new: 1200, used: 500, recommend: '중고', reason: '교체 용이' },
-                            { name: '진료 베드', new: 300, used: 100, recommend: '중고', reason: '소모품 개념' },
-                            { name: '내시경 시스템', new: 12000, used: 5000, recommend: '신품', reason: '화질/AS 중요' },
-                          ].map((eq, i) => (
-                            <tr key={i} className="hover:bg-muted/50">
-                              <td className="p-3 font-medium">{eq.name}</td>
-                              <td className="p-3 text-right">{eq.new.toLocaleString()}만원</td>
-                              <td className="p-3 text-right text-emerald-600">{eq.used.toLocaleString()}만원</td>
-                              <td className="p-3 text-right text-blue-600">-{(eq.new - eq.used).toLocaleString()}만원</td>
-                              <td className="p-3 text-center">
-                                <span className={`px-2 py-1 rounded text-xs ${eq.recommend === '중고' ? 'bg-emerald-100 text-emerald-700' : 'bg-blue-100 text-blue-700'}`}>
-                                  {eq.recommend}
-                                </span>
-                              </td>
-                            </tr>
-                          ))}
+                          {(() => {
+                            const equipmentByType: Record<string, Array<{name: string, new: number, used: number, recommend: string}>> = {
+                              '정형외과': [
+                                { name: 'X-ray 장비', new: 8000, used: 3500, recommend: '신품' },
+                                { name: '초음파 진단기', new: 4500, used: 1800, recommend: '중고' },
+                                { name: 'C-arm', new: 15000, used: 7000, recommend: '중고' },
+                                { name: '견인치료기', new: 2000, used: 800, recommend: '중고' },
+                                { name: '체외충격파', new: 5000, used: 2500, recommend: '신품' },
+                                { name: '진료 베드', new: 300, used: 100, recommend: '중고' },
+                              ],
+                              '내과': [
+                                { name: '초음파 진단기', new: 5000, used: 2000, recommend: '중고' },
+                                { name: '심전도계', new: 800, used: 350, recommend: '중고' },
+                                { name: '내시경 시스템', new: 12000, used: 5000, recommend: '신품' },
+                                { name: '혈액검사기', new: 3000, used: 1200, recommend: '신품' },
+                                { name: '환자 모니터', new: 1200, used: 500, recommend: '중고' },
+                                { name: '진료 베드', new: 300, used: 100, recommend: '중고' },
+                              ],
+                              '피부과': [
+                                { name: '레이저 장비', new: 8000, used: 3500, recommend: '신품' },
+                                { name: 'IPL', new: 4000, used: 1800, recommend: '중고' },
+                                { name: '피부진단기', new: 2000, used: 800, recommend: '중고' },
+                                { name: '고주파 장비', new: 3500, used: 1500, recommend: '중고' },
+                                { name: '스킨스크라이버', new: 500, used: 200, recommend: '중고' },
+                                { name: '시술 베드', new: 400, used: 150, recommend: '중고' },
+                              ],
+                            }
+                            const defaultEquipment = [
+                              { name: '초음파 진단기', new: 4500, used: 1800, recommend: '중고' },
+                              { name: 'X-ray 장비', new: 8000, used: 3500, recommend: '신품' },
+                              { name: '심전도계', new: 800, used: 350, recommend: '중고' },
+                              { name: '환자 모니터', new: 1200, used: 500, recommend: '중고' },
+                              { name: '진료 베드', new: 300, used: 100, recommend: '중고' },
+                              { name: '멸균 소독기', new: 600, used: 250, recommend: '중고' },
+                            ]
+                            return (equipmentByType[result.clinic_type] || defaultEquipment).map((eq, i) => (
+                              <tr key={i} className="hover:bg-muted/50">
+                                <td className="p-3 font-medium">{eq.name}</td>
+                                <td className="p-3 text-right">{eq.new.toLocaleString()}만원</td>
+                                <td className="p-3 text-right text-emerald-600">{eq.used.toLocaleString()}만원</td>
+                                <td className="p-3 text-right text-blue-600">-{(eq.new - eq.used).toLocaleString()}만원</td>
+                                <td className="p-3 text-center">
+                                  <span className={`px-2 py-1 rounded text-xs ${eq.recommend === '중고' ? 'bg-emerald-100 text-emerald-700' : 'bg-blue-100 text-blue-700'}`}>
+                                    {eq.recommend}
+                                  </span>
+                                </td>
+                              </tr>
+                            ))
+                          })()}
                         </tbody>
                       </table>
                     </div>
                     <div className="p-4 bg-emerald-50 dark:bg-emerald-950/20 rounded-lg">
-                      <div className="font-bold text-emerald-700 mb-2">💡 장비 구매 전략</div>
+                      <div className="font-bold text-emerald-700 mb-2">💡 {result.clinic_type} 장비 구매 전략</div>
                       <ul className="text-sm space-y-1 text-muted-foreground">
-                        <li>• 초기 장비비 절감 가능액: <strong className="text-emerald-600">약 8,000만원</strong></li>
-                        <li>• 중고 장비 추천 업체: 메디플렉스, 한국의료기, 의료장터</li>
-                        <li>• 리스 옵션 검토 시 월 납입액 약 150만원으로 부담 완화 가능</li>
+                        <li>• 예상 장비 투자금: <strong className="text-emerald-600">{formatCurrency(result.cost_detail?.initial_equipment || 180000000)}</strong></li>
+                        <li>• 중고 활용 시 절감 가능액: <strong className="text-emerald-600">약 {Math.round((result.cost_detail?.initial_equipment || 180000000) * 0.4 / 10000).toLocaleString()}만원</strong></li>
+                        <li>• 리스 옵션 검토 시 월 납입액 약 {Math.round((result.cost_detail?.initial_equipment || 180000000) / 60 / 10000).toLocaleString()}만원으로 부담 완화 가능</li>
                       </ul>
                     </div>
                   </div>
@@ -4063,7 +4092,7 @@ export default function SimulatePage() {
                     <span className="px-2 py-1 bg-pink-500 text-white text-xs font-bold rounded">HR DATA</span>
                     <h3 className="font-semibold text-foreground flex items-center gap-2">
                       <Users className="w-5 h-5 text-pink-600" />
-                      직원 급여 벤치마크 (해당 지역)
+                      직원 급여 벤치마크 ({result.address.split(' ').slice(0, 2).join(' ')})
                     </h3>
                   </div>
                   <div className="space-y-4">
@@ -4079,26 +4108,31 @@ export default function SimulatePage() {
                           </tr>
                         </thead>
                         <tbody className="divide-y">
-                          {[
-                            { role: '간호사 (경력 3년)', salary: 320, insurance: 35, difficulty: '중', color: 'yellow' },
-                            { role: '간호조무사', salary: 250, insurance: 28, difficulty: '하', color: 'green' },
-                            { role: '물리치료사', salary: 300, insurance: 33, difficulty: '중', color: 'yellow' },
-                            { role: '방사선사', salary: 330, insurance: 36, difficulty: '상', color: 'red' },
-                            { role: '데스크/코디', salary: 230, insurance: 25, difficulty: '하', color: 'green' },
-                            { role: '원무/행정', salary: 250, insurance: 28, difficulty: '하', color: 'green' },
-                          ].map((staff, i) => (
-                            <tr key={i} className="hover:bg-muted/50">
-                              <td className="p-3 font-medium">{staff.role}</td>
-                              <td className="p-3 text-right">{staff.salary}만원</td>
-                              <td className="p-3 text-right text-muted-foreground">+{staff.insurance}만원</td>
-                              <td className="p-3 text-right font-bold text-pink-600">{staff.salary + staff.insurance}만원</td>
-                              <td className="p-3 text-center">
-                                <span className={`px-2 py-1 rounded text-xs bg-${staff.color}-100 text-${staff.color}-700`}>
-                                  {staff.difficulty}
-                                </span>
-                              </td>
-                            </tr>
-                          ))}
+                          {(() => {
+                            const nurseSalary = Math.round((result.cost_detail?.avg_nurse_salary || 3200000) / 10000)
+                            const adminSalary = Math.round((result.cost_detail?.avg_admin_salary || 2800000) / 10000)
+                            const regionFactor = result.address.includes('서울') ? 1.1 : result.address.includes('경기') ? 1.05 : 1
+                            return [
+                              { role: '간호사 (경력 3년)', salary: Math.round(nurseSalary * regionFactor), insurance: Math.round(nurseSalary * 0.11), difficulty: '중', color: 'yellow' },
+                              { role: '간호조무사', salary: Math.round(nurseSalary * 0.78 * regionFactor), insurance: Math.round(nurseSalary * 0.78 * 0.11), difficulty: '하', color: 'green' },
+                              { role: '물리치료사', salary: Math.round(nurseSalary * 0.94 * regionFactor), insurance: Math.round(nurseSalary * 0.94 * 0.11), difficulty: '중', color: 'yellow' },
+                              { role: '방사선사', salary: Math.round(nurseSalary * 1.03 * regionFactor), insurance: Math.round(nurseSalary * 1.03 * 0.11), difficulty: '상', color: 'red' },
+                              { role: '데스크/코디', salary: Math.round(adminSalary * regionFactor), insurance: Math.round(adminSalary * 0.11), difficulty: '하', color: 'green' },
+                              { role: '원무/행정', salary: Math.round(adminSalary * regionFactor), insurance: Math.round(adminSalary * 0.11), difficulty: '하', color: 'green' },
+                            ].map((staff, i) => (
+                              <tr key={i} className="hover:bg-muted/50">
+                                <td className="p-3 font-medium">{staff.role}</td>
+                                <td className="p-3 text-right">{staff.salary}만원</td>
+                                <td className="p-3 text-right text-muted-foreground">+{staff.insurance}만원</td>
+                                <td className="p-3 text-right font-bold text-pink-600">{staff.salary + staff.insurance}만원</td>
+                                <td className="p-3 text-center">
+                                  <span className={`px-2 py-1 rounded text-xs bg-${staff.color}-100 text-${staff.color}-700`}>
+                                    {staff.difficulty}
+                                  </span>
+                                </td>
+                              </tr>
+                            ))
+                          })()}
                         </tbody>
                       </table>
                     </div>
@@ -4106,16 +4140,16 @@ export default function SimulatePage() {
                       <div className="p-4 bg-pink-50 dark:bg-pink-950/20 rounded-lg">
                         <div className="font-bold text-pink-700 mb-2">📋 권장 초기 인력 구성</div>
                         <ul className="text-sm space-y-1">
-                          <li>• 간호사/간호조무사 1명</li>
-                          <li>• 데스크/코디 1명</li>
-                          <li>• <strong>월 인건비 합계: 약 568만원</strong></li>
+                          <li>• 간호사/간호조무사 {result.cost_detail?.nurse_count || 2}명</li>
+                          <li>• 데스크/행정 {result.cost_detail?.admin_count || 2}명</li>
+                          <li>• <strong>월 인건비 합계: {formatCurrency(result.estimated_monthly_cost?.labor || 15000000)}</strong></li>
                         </ul>
                       </div>
                       <div className="p-4 bg-blue-50 dark:bg-blue-950/20 rounded-lg">
-                        <div className="font-bold text-blue-700 mb-2">💼 채용 꿀팁</div>
+                        <div className="font-bold text-blue-700 mb-2">💼 {result.address.split(' ')[0]} 채용 팁</div>
                         <ul className="text-sm space-y-1">
                           <li>• 개원 2개월 전 채용 공고 시작</li>
-                          <li>• 사람인/잡코리아보다 <strong>간호사 커뮤니티</strong> 효과적</li>
+                          <li>• {result.address.includes('서울') ? '서울은 경쟁 심함, 복지 차별화 필요' : '지역 커뮤니티 활용 효과적'}</li>
                           <li>• 수습기간 3개월 권장 (급여 90%)</li>
                         </ul>
                       </div>
@@ -4129,44 +4163,54 @@ export default function SimulatePage() {
                     <span className="px-2 py-1 bg-slate-600 text-white text-xs font-bold rounded">HIDDEN COST</span>
                     <h3 className="font-semibold text-foreground flex items-center gap-2">
                       <AlertCircle className="w-5 h-5 text-slate-600" />
-                      숨겨진 운영비용 총정리
+                      숨겨진 운영비용 총정리 ({result.size_pyeong || 30}평 기준)
                     </h3>
                   </div>
-                  <p className="text-sm text-muted-foreground mb-4">예산 수립 시 놓치기 쉬운 필수 비용들입니다</p>
-                  <div className="grid md:grid-cols-2 gap-4">
-                    {[
-                      { category: '의료폐기물 처리', monthly: 15, yearly: 180, note: '배출량에 따라 변동' },
-                      { category: '세탁 서비스', monthly: 20, yearly: 240, note: '가운/시트/수건 등' },
-                      { category: '소모품 (주사기, 거즈 등)', monthly: 50, yearly: 600, note: '진료량 비례' },
-                      { category: '의료기기 유지보수', monthly: 30, yearly: 360, note: '연간 계약 권장' },
-                      { category: '소프트웨어 라이선스', monthly: 25, yearly: 300, note: 'EMR, 예약시스템 등' },
-                      { category: '정수기/공기청정기 렌탈', monthly: 10, yearly: 120, note: '필터 교체 포함' },
-                      { category: '청소 용역', monthly: 40, yearly: 480, note: '주 3회 기준' },
-                      { category: '보안/CCTV 유지', monthly: 5, yearly: 60, note: '월 구독형' },
-                      { category: '의사배상책임보험', monthly: 15, yearly: 180, note: '필수 가입' },
-                      { category: '화재/재산보험', monthly: 8, yearly: 96, note: '건물 특약 확인' },
-                    ].map((cost, i) => (
-                      <div key={i} className="flex justify-between items-center p-3 bg-slate-50 dark:bg-slate-900/30 rounded-lg">
-                        <div>
-                          <div className="font-medium">{cost.category}</div>
-                          <div className="text-xs text-muted-foreground">{cost.note}</div>
+                  <p className="text-sm text-muted-foreground mb-4">예산 수립 시 놓치기 쉬운 필수 비용들입니다 (예상 환자수 일 {result.revenue_detail?.daily_patients_avg || 30}명 기준)</p>
+                  {(() => {
+                    const sizeRatio = (result.size_pyeong || 30) / 30
+                    const patientRatio = (result.revenue_detail?.daily_patients_avg || 30) / 30
+                    const hiddenCosts = [
+                      { category: '의료폐기물 처리', monthly: Math.round(15 * patientRatio), note: '배출량에 따라 변동' },
+                      { category: '세탁 서비스', monthly: Math.round(20 * patientRatio), note: '가운/시트/수건 등' },
+                      { category: '소모품 (주사기, 거즈 등)', monthly: Math.round((result.cost_detail?.supplies_monthly || 2500000) * 0.2 / 10000), note: '진료량 비례' },
+                      { category: '의료기기 유지보수', monthly: Math.round((result.cost_detail?.equipment_monthly || 2000000) * 0.15 / 10000), note: '연간 계약 권장' },
+                      { category: '소프트웨어 라이선스', monthly: 25, note: 'EMR, 예약시스템 등' },
+                      { category: '정수기/공기청정기 렌탈', monthly: Math.round(10 * sizeRatio), note: '필터 교체 포함' },
+                      { category: '청소 용역', monthly: Math.round(40 * sizeRatio), note: '주 3회 기준' },
+                      { category: '보안/CCTV 유지', monthly: Math.round(5 * sizeRatio), note: '월 구독형' },
+                      { category: '의사배상책임보험', monthly: Math.round((result.cost_detail?.insurance_monthly || 500000) / 10000), note: '필수 가입' },
+                      { category: '화재/재산보험', monthly: Math.round(8 * sizeRatio), note: '건물 특약 확인' },
+                    ]
+                    const totalMonthly = hiddenCosts.reduce((sum, c) => sum + c.monthly, 0)
+                    return (
+                      <>
+                        <div className="grid md:grid-cols-2 gap-4">
+                          {hiddenCosts.map((cost, i) => (
+                            <div key={i} className="flex justify-between items-center p-3 bg-slate-50 dark:bg-slate-900/30 rounded-lg">
+                              <div>
+                                <div className="font-medium">{cost.category}</div>
+                                <div className="text-xs text-muted-foreground">{cost.note}</div>
+                              </div>
+                              <div className="text-right">
+                                <div className="font-bold text-slate-700 dark:text-slate-300">{cost.monthly}만원/월</div>
+                                <div className="text-xs text-muted-foreground">연 {cost.monthly * 12}만원</div>
+                              </div>
+                            </div>
+                          ))}
                         </div>
-                        <div className="text-right">
-                          <div className="font-bold text-slate-700 dark:text-slate-300">{cost.monthly}만원/월</div>
-                          <div className="text-xs text-muted-foreground">연 {cost.yearly}만원</div>
+                        <div className="mt-4 p-4 bg-red-50 dark:bg-red-950/20 rounded-lg border border-red-200">
+                          <div className="flex justify-between items-center">
+                            <span className="font-bold text-red-700">⚠️ 숨겨진 비용 총합</span>
+                            <div className="text-right">
+                              <div className="text-2xl font-bold text-red-600">월 {totalMonthly}만원</div>
+                              <div className="text-sm text-red-500">연간 {(totalMonthly * 12).toLocaleString()}만원</div>
+                            </div>
+                          </div>
                         </div>
-                      </div>
-                    ))}
-                  </div>
-                  <div className="mt-4 p-4 bg-red-50 dark:bg-red-950/20 rounded-lg border border-red-200">
-                    <div className="flex justify-between items-center">
-                      <span className="font-bold text-red-700">⚠️ 숨겨진 비용 총합</span>
-                      <div className="text-right">
-                        <div className="text-2xl font-bold text-red-600">월 218만원</div>
-                        <div className="text-sm text-red-500">연간 2,616만원</div>
-                      </div>
-                    </div>
-                  </div>
+                      </>
+                    )
+                  })()}
                 </div>
 
                 {/* 킬러 #14: 인테리어 업체 견적 비교 */}
@@ -4175,63 +4219,74 @@ export default function SimulatePage() {
                     <span className="px-2 py-1 bg-amber-500 text-white text-xs font-bold rounded">INTERIOR</span>
                     <h3 className="font-semibold text-foreground flex items-center gap-2">
                       <Building className="w-5 h-5 text-amber-600" />
-                      의원 인테리어 견적 비교
+                      {result.clinic_type} 인테리어 견적 ({result.size_pyeong || 30}평 기준)
                     </h3>
                   </div>
                   <div className="space-y-4">
-                    <div className="overflow-x-auto">
-                      <table className="w-full text-sm">
-                        <thead className="bg-amber-50 dark:bg-amber-950/30">
-                          <tr>
-                            <th className="p-3 text-left">시공 항목</th>
-                            <th className="p-3 text-center">필수</th>
-                            <th className="p-3 text-right">일반 등급</th>
-                            <th className="p-3 text-right">프리미엄</th>
-                          </tr>
-                        </thead>
-                        <tbody className="divide-y">
-                          {[
-                            { item: '바닥재 (30평 기준)', required: true, normal: 450, premium: 900 },
-                            { item: '벽체/도장', required: true, normal: 300, premium: 600 },
-                            { item: '천장/조명', required: true, normal: 400, premium: 800 },
-                            { item: '진료실 파티션', required: true, normal: 350, premium: 700 },
-                            { item: '데스크/접수대', required: true, normal: 200, premium: 500 },
-                            { item: '대기실 가구', required: true, normal: 150, premium: 400 },
-                            { item: '간판/사인물', required: true, normal: 100, premium: 300 },
-                            { item: '전기/통신 공사', required: true, normal: 300, premium: 400 },
-                            { item: '냉난방 시스템', required: false, normal: 200, premium: 500 },
-                            { item: '방음 시공', required: false, normal: 150, premium: 300 },
-                          ].map((item, i) => (
-                            <tr key={i} className="hover:bg-muted/50">
-                              <td className="p-3 font-medium">{item.item}</td>
-                              <td className="p-3 text-center">{item.required ? '✅' : '➖'}</td>
-                              <td className="p-3 text-right">{item.normal}만원</td>
-                              <td className="p-3 text-right text-amber-600">{item.premium}만원</td>
-                            </tr>
-                          ))}
-                        </tbody>
-                        <tfoot className="bg-amber-100 dark:bg-amber-900/30 font-bold">
-                          <tr>
-                            <td className="p-3" colSpan={2}>합계 (30평 기준)</td>
-                            <td className="p-3 text-right">2,600만원</td>
-                            <td className="p-3 text-right text-amber-600">5,400만원</td>
-                          </tr>
-                          <tr>
-                            <td className="p-3" colSpan={2}>평당 단가</td>
-                            <td className="p-3 text-right">87만원/평</td>
-                            <td className="p-3 text-right text-amber-600">180만원/평</td>
-                          </tr>
-                        </tfoot>
-                      </table>
-                    </div>
-                    <div className="p-4 bg-amber-50 dark:bg-amber-950/20 rounded-lg">
-                      <div className="font-bold text-amber-700 mb-2">🏗️ 인테리어 팁</div>
-                      <ul className="text-sm space-y-1 text-muted-foreground">
-                        <li>• 의원 전문 인테리어 업체 3곳 이상 비교 견적 필수</li>
-                        <li>• 감리 비용 별도 (총 공사비의 3~5%)</li>
-                        <li>• 진료과목에 따라 특수시설 추가 (예: 피부과 시술실 방음)</li>
-                      </ul>
-                    </div>
+                    {(() => {
+                      const pyeong = result.size_pyeong || 30
+                      const pyeongRatio = pyeong / 30
+                      const items = [
+                        { item: `바닥재 (${pyeong}평)`, required: true, normal: Math.round(450 * pyeongRatio), premium: Math.round(900 * pyeongRatio) },
+                        { item: '벽체/도장', required: true, normal: Math.round(300 * pyeongRatio), premium: Math.round(600 * pyeongRatio) },
+                        { item: '천장/조명', required: true, normal: Math.round(400 * pyeongRatio), premium: Math.round(800 * pyeongRatio) },
+                        { item: '진료실 파티션', required: true, normal: Math.round(350 * pyeongRatio), premium: Math.round(700 * pyeongRatio) },
+                        { item: '데스크/접수대', required: true, normal: 200, premium: 500 },
+                        { item: '대기실 가구', required: true, normal: Math.round(150 * pyeongRatio), premium: Math.round(400 * pyeongRatio) },
+                        { item: '간판/사인물', required: true, normal: 100, premium: 300 },
+                        { item: '전기/통신 공사', required: true, normal: Math.round(300 * pyeongRatio), premium: Math.round(400 * pyeongRatio) },
+                        { item: '냉난방 시스템', required: false, normal: Math.round(200 * pyeongRatio), premium: Math.round(500 * pyeongRatio) },
+                        { item: result.clinic_type === '피부과' ? '시술실 방음' : '방음 시공', required: result.clinic_type === '피부과', normal: Math.round(150 * pyeongRatio), premium: Math.round(300 * pyeongRatio) },
+                      ]
+                      const normalTotal = items.reduce((sum, i) => sum + i.normal, 0)
+                      const premiumTotal = items.reduce((sum, i) => sum + i.premium, 0)
+                      return (
+                        <>
+                          <div className="overflow-x-auto">
+                            <table className="w-full text-sm">
+                              <thead className="bg-amber-50 dark:bg-amber-950/30">
+                                <tr>
+                                  <th className="p-3 text-left">시공 항목</th>
+                                  <th className="p-3 text-center">필수</th>
+                                  <th className="p-3 text-right">일반 등급</th>
+                                  <th className="p-3 text-right">프리미엄</th>
+                                </tr>
+                              </thead>
+                              <tbody className="divide-y">
+                                {items.map((item, i) => (
+                                  <tr key={i} className="hover:bg-muted/50">
+                                    <td className="p-3 font-medium">{item.item}</td>
+                                    <td className="p-3 text-center">{item.required ? '✅' : '➖'}</td>
+                                    <td className="p-3 text-right">{item.normal.toLocaleString()}만원</td>
+                                    <td className="p-3 text-right text-amber-600">{item.premium.toLocaleString()}만원</td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                              <tfoot className="bg-amber-100 dark:bg-amber-900/30 font-bold">
+                                <tr>
+                                  <td className="p-3" colSpan={2}>합계 ({pyeong}평 기준)</td>
+                                  <td className="p-3 text-right">{normalTotal.toLocaleString()}만원</td>
+                                  <td className="p-3 text-right text-amber-600">{premiumTotal.toLocaleString()}만원</td>
+                                </tr>
+                                <tr>
+                                  <td className="p-3" colSpan={2}>평당 단가</td>
+                                  <td className="p-3 text-right">{Math.round(normalTotal / pyeong)}만원/평</td>
+                                  <td className="p-3 text-right text-amber-600">{Math.round(premiumTotal / pyeong)}만원/평</td>
+                                </tr>
+                              </tfoot>
+                            </table>
+                          </div>
+                          <div className="p-4 bg-amber-50 dark:bg-amber-950/20 rounded-lg">
+                            <div className="font-bold text-amber-700 mb-2">🏗️ {result.clinic_type} 인테리어 팁</div>
+                            <ul className="text-sm space-y-1 text-muted-foreground">
+                              <li>• 예상 인테리어 비용: <strong className="text-amber-600">{formatCurrency(result.cost_detail?.initial_interior || normalTotal * 10000)}</strong></li>
+                              <li>• 의원 전문 인테리어 업체 3곳 이상 비교 견적 필수</li>
+                              <li>• {result.clinic_type === '피부과' ? '시술실 방음/조명이 핵심' : result.clinic_type === '정형외과' ? '물리치료실 공간 확보 중요' : '환자 동선 최적화 중요'}</li>
+                            </ul>
+                          </div>
+                        </>
+                      )
+                    })()}
                   </div>
                 </div>
 
@@ -4938,64 +4993,72 @@ export default function SimulatePage() {
                     </h3>
                   </div>
                   <p className="text-sm text-muted-foreground mb-4">매출/비용 변동에 따른 손익분기점 변화를 시뮬레이션합니다</p>
-                  <div className="space-y-4">
-                    <div className="overflow-x-auto">
-                      <table className="w-full text-sm">
-                        <thead className="bg-red-50 dark:bg-red-950/30">
-                          <tr>
-                            <th className="p-3 text-left">시나리오</th>
-                            <th className="p-3 text-right">매출 변동</th>
-                            <th className="p-3 text-right">비용 변동</th>
-                            <th className="p-3 text-right">BEP 도달</th>
-                            <th className="p-3 text-center">리스크</th>
-                          </tr>
-                        </thead>
-                        <tbody className="divide-y">
-                          {[
-                            { scenario: '최악의 경우', revenue: -20, cost: +10, bep: '18개월', risk: '높음', color: 'red' },
-                            { scenario: '비관적', revenue: -10, cost: +5, bep: '14개월', risk: '중상', color: 'orange' },
-                            { scenario: '기본 예측', revenue: 0, cost: 0, bep: '10개월', risk: '중', color: 'yellow' },
-                            { scenario: '낙관적', revenue: +10, cost: -5, bep: '7개월', risk: '중하', color: 'lime' },
-                            { scenario: '최상의 경우', revenue: +20, cost: -10, bep: '5개월', risk: '낮음', color: 'green' },
-                          ].map((s, i) => (
-                            <tr key={i} className="hover:bg-muted/50">
-                              <td className="p-3 font-medium">{s.scenario}</td>
-                              <td className={`p-3 text-right ${s.revenue >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                                {s.revenue >= 0 ? '+' : ''}{s.revenue}%
-                              </td>
-                              <td className={`p-3 text-right ${s.cost <= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                                {s.cost >= 0 ? '+' : ''}{s.cost}%
-                              </td>
-                              <td className="p-3 text-right font-bold">{s.bep}</td>
-                              <td className="p-3 text-center">
-                                <span className={`px-2 py-1 rounded text-xs bg-${s.color}-100 text-${s.color}-700`}>
-                                  {s.risk}
-                                </span>
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                    <div className="grid md:grid-cols-2 gap-4">
-                      <div className="p-4 bg-red-50 dark:bg-red-950/20 rounded-lg">
-                        <div className="font-bold text-red-700 mb-2">⚠️ 주요 리스크 요인</div>
-                        <ul className="text-sm space-y-1">
-                          <li>• 경쟁병원 신규 개원 시 매출 -15% 예상</li>
-                          <li>• 인건비 상승률 연 5% 반영 필요</li>
-                          <li>• 임대료 인상 (2년 후 +10% 예상)</li>
-                        </ul>
+                  {(() => {
+                    const baseBEP = result.profitability?.breakeven_months || result.profitability_detail?.payback_months || 12
+                    const scenarios = [
+                      { scenario: '최악의 경우', revenue: -20, cost: +10, bep: Math.round(baseBEP * 1.8), risk: '높음', color: 'red' },
+                      { scenario: '비관적', revenue: -10, cost: +5, bep: Math.round(baseBEP * 1.4), risk: '중상', color: 'orange' },
+                      { scenario: '기본 예측', revenue: 0, cost: 0, bep: baseBEP, risk: '중', color: 'yellow' },
+                      { scenario: '낙관적', revenue: +10, cost: -5, bep: Math.round(baseBEP * 0.7), risk: '중하', color: 'lime' },
+                      { scenario: '최상의 경우', revenue: +20, cost: -10, bep: Math.round(baseBEP * 0.5), risk: '낮음', color: 'green' },
+                    ]
+                    const competitorCount = result.competition?.same_dept_count || 5
+                    const rentMonthly = Math.round((result.cost_detail?.rent_monthly || result.estimated_monthly_cost?.rent || 7000000) / 10000)
+                    return (
+                      <div className="space-y-4">
+                        <div className="overflow-x-auto">
+                          <table className="w-full text-sm">
+                            <thead className="bg-red-50 dark:bg-red-950/30">
+                              <tr>
+                                <th className="p-3 text-left">시나리오</th>
+                                <th className="p-3 text-right">매출 변동</th>
+                                <th className="p-3 text-right">비용 변동</th>
+                                <th className="p-3 text-right">BEP 도달</th>
+                                <th className="p-3 text-center">리스크</th>
+                              </tr>
+                            </thead>
+                            <tbody className="divide-y">
+                              {scenarios.map((s, i) => (
+                                <tr key={i} className="hover:bg-muted/50">
+                                  <td className="p-3 font-medium">{s.scenario}</td>
+                                  <td className={`p-3 text-right ${s.revenue >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                                    {s.revenue >= 0 ? '+' : ''}{s.revenue}%
+                                  </td>
+                                  <td className={`p-3 text-right ${s.cost <= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                                    {s.cost >= 0 ? '+' : ''}{s.cost}%
+                                  </td>
+                                  <td className="p-3 text-right font-bold">{s.bep}개월</td>
+                                  <td className="p-3 text-center">
+                                    <span className={`px-2 py-1 rounded text-xs bg-${s.color}-100 text-${s.color}-700`}>
+                                      {s.risk}
+                                    </span>
+                                  </td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                        <div className="grid md:grid-cols-2 gap-4">
+                          <div className="p-4 bg-red-50 dark:bg-red-950/20 rounded-lg">
+                            <div className="font-bold text-red-700 mb-2">⚠️ {result.address.split(' ').slice(0, 2).join(' ')} 리스크 요인</div>
+                            <ul className="text-sm space-y-1">
+                              <li>• 반경 내 {result.clinic_type} {competitorCount}곳 경쟁 중</li>
+                              <li>• 인건비 상승률 연 5% 반영 필요</li>
+                              <li>• 임대료 {rentMonthly}만원, 2년 후 +10% 예상</li>
+                            </ul>
+                          </div>
+                          <div className="p-4 bg-blue-50 dark:bg-blue-950/20 rounded-lg">
+                            <div className="font-bold text-blue-700 mb-2">💡 리스크 완화 전략</div>
+                            <ul className="text-sm space-y-1">
+                              <li>• 운영자금 {Math.round((result.estimated_monthly_cost?.total || 33000000) * 6 / 10000).toLocaleString()}만원 확보 권장</li>
+                              <li>• 고정비 비중 40% 이하 유지</li>
+                              <li>• 비급여 매출 비중 {Math.round((result.revenue_detail?.non_insurance_ratio || 0.25) * 100)}% → 35% 목표</li>
+                            </ul>
+                          </div>
+                        </div>
                       </div>
-                      <div className="p-4 bg-blue-50 dark:bg-blue-950/20 rounded-lg">
-                        <div className="font-bold text-blue-700 mb-2">💡 리스크 완화 전략</div>
-                        <ul className="text-sm space-y-1">
-                          <li>• 운영자금 6개월분 확보 권장</li>
-                          <li>• 고정비 비중 40% 이하 유지</li>
-                          <li>• 비급여 매출 비중 30% 목표</li>
-                        </ul>
-                      </div>
-                    </div>
-                  </div>
+                    )
+                  })()}
                 </div>
 
                 {/* 킬러 #27: 투자자/은행 피칭 자료 */}
