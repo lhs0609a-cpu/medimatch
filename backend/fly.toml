@@ -13,8 +13,21 @@ primary_region = "nrt"  # Tokyo (closest to Korea)
   force_https = true
   auto_stop_machines = true
   auto_start_machines = true
-  min_machines_running = 0
+  min_machines_running = 1  # Cold start 방지를 위해 최소 1대 유지
   processes = ["app"]
+
+[http_service.concurrency]
+  type = "connections"
+  hard_limit = 25
+  soft_limit = 20
+
+[[http_service.checks]]
+  grace_period = "10s"
+  interval = "30s"
+  method = "GET"
+  path = "/health"
+  protocol = "http"
+  timeout = "5s"
 
 [[vm]]
   cpu_kind = "shared"

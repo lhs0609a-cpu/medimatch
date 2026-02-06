@@ -5,11 +5,13 @@ import Link from 'next/link'
 import {
   Building2, MapPin, Search, Filter, Eye, MessageSquare,
   Car, Layers, CheckCircle, Lock, TrendingUp, Phone, ArrowLeft,
-  Flame, Clock, Users, Zap, Bell, X, ArrowUpDown, ChevronDown
+  Flame, Clock, Users, Zap, Bell, X, ArrowUpDown, ChevronDown,
+  Map, LayoutGrid
 } from 'lucide-react'
 import Image from 'next/image'
 import { generateBuildingListings, generateActivityFeed, platformStats, type BuildingListing } from '@/lib/data/seedListings'
 import { buildingListingImages } from '@/components/BlurredListingImage'
+import KakaoMap from '@/components/map/KakaoMap'
 
 // 시드 데이터 생성 (클라이언트에서 한 번만)
 const allListings = generateBuildingListings(120)
@@ -34,6 +36,7 @@ export default function BuildingsPage() {
     hasElevator: false,
   })
   const [sortBy, setSortBy] = useState<SortOption>('latest')
+  const [viewMode, setViewMode] = useState<'grid' | 'map'>('grid')
   const [showFilters, setShowFilters] = useState(false)
   const [showSortMenu, setShowSortMenu] = useState(false)
   const [showInquiryModal, setShowInquiryModal] = useState(false)
@@ -123,6 +126,21 @@ export default function BuildingsPage() {
     return result
   }, [filters, sortBy])
 
+  // 지도 마커 데이터 생성
+  const mapMarkers = useMemo(() => {
+    return filteredListings.map(listing => ({
+      id: listing.id,
+      lat: listing.lat,
+      lng: listing.lng,
+      title: listing.title,
+      type: 'listing' as const,
+      info: {
+        address: listing.region,
+        specialty: listing.preferredTenants.slice(0, 2).join(', '),
+      },
+    }))
+  }, [filteredListings])
+
   const formatCurrency = (value: number) => {
     if (value >= 10000) {
       return `${(value / 10000).toFixed(1)}억`
@@ -153,15 +171,42 @@ export default function BuildingsPage() {
                 <p className="text-sm text-muted-foreground">검증된 입점 가능 상가 {platformStats.totalListings}+개</p>
               </div>
             </div>
-            <button
-              onClick={() => setShowFilters(!showFilters)}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
-                showFilters ? 'bg-accent text-accent-foreground' : 'bg-secondary text-secondary-foreground'
-              }`}
-            >
-              <Filter className="w-4 h-4" />
-              필터
-            </button>
+            <div className="flex items-center gap-2">
+              {/* View Toggle */}
+              <div className="flex bg-secondary rounded-lg p-1">
+                <button
+                  onClick={() => setViewMode('grid')}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm transition-colors ${
+                    viewMode === 'grid'
+                      ? 'bg-card text-foreground shadow-sm'
+                      : 'text-muted-foreground hover:text-foreground'
+                  }`}
+                >
+                  <LayoutGrid className="w-4 h-4" />
+                  목록
+                </button>
+                <button
+                  onClick={() => setViewMode('map')}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm transition-colors ${
+                    viewMode === 'map'
+                      ? 'bg-card text-foreground shadow-sm'
+                      : 'text-muted-foreground hover:text-foreground'
+                  }`}
+                >
+                  <Map className="w-4 h-4" />
+                  지도
+                </button>
+              </div>
+              <button
+                onClick={() => setShowFilters(!showFilters)}
+                className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
+                  showFilters ? 'bg-accent text-accent-foreground' : 'bg-secondary text-secondary-foreground'
+                }`}
+              >
+                <Filter className="w-4 h-4" />
+                필터
+              </button>
+            </div>
           </div>
 
           {/* Live Activity Banner */}
@@ -373,7 +418,23 @@ export default function BuildingsPage() {
           </div>
         </div>
 
-        {/* Listings Grid */}
+        {/* Map View */}
+        {viewMode === 'map' && (
+          <div className="h-[calc(100vh-350px)] min-h-[500px] rounded-xl overflow-hidden border border-border">
+            <KakaoMap
+              markers={mapMarkers}
+              level={8}
+              onMarkerClick={(marker) => {
+                const listing = filteredListings.find(l => l.id === marker.id)
+                if (listing) handleInquiry(listing)
+              }}
+              className="w-full h-full"
+            />
+          </div>
+        )}
+
+        {/* Grid View */}
+        {viewMode === 'grid' && (
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
           {filteredListings.map((listing, index) => (
             <div
@@ -530,8 +591,10 @@ export default function BuildingsPage() {
             </div>
           ))}
         </div>
+        )}
 
-        {/* Load More Indicator */}
+        {/* Load More Indicator - Grid View Only */}
+        {viewMode === 'grid' && (
         <div className="mt-8 text-center">
           <p className="text-sm text-muted-foreground mb-2">
             더 많은 매물을 보시려면 회원가입 후 이용해주세요
@@ -540,6 +603,7 @@ export default function BuildingsPage() {
             회원가입하고 전체 매물 보기
           </button>
         </div>
+        )}
       </main>
 
       {/* Inquiry Modal */}
