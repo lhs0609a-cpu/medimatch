@@ -5,7 +5,7 @@ import Link from 'next/link'
 import {
   ArrowLeft, Pill, MapPin, Building2, Heart,
   ChevronRight, Search, Eye, Plus, Sparkles,
-  Lock, Phone, TrendingUp, Users, CheckCircle,
+  Lock, MessageCircle, TrendingUp, Users, CheckCircle,
   Flame, Clock, Zap, AlertTriangle, SlidersHorizontal, X, RotateCcw
 } from 'lucide-react'
 import Image from 'next/image'
@@ -668,9 +668,15 @@ export default function PharmacyMatchPage() {
           <p className="text-sm text-muted-foreground mb-2">
             더 많은 매물 정보를 원하시면 문의해주세요
           </p>
-          <button className="btn-outline">
-            전체 매물 문의하기
-          </button>
+          <a
+            href="https://open.kakao.com/o/sMLX4Zei"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn-outline inline-flex items-center gap-2"
+          >
+            <MessageCircle className="w-4 h-4" />
+            카카오톡으로 문의하기
+          </a>
         </div>
 
         {/* How it Works */}
@@ -744,11 +750,13 @@ export default function PharmacyMatchPage() {
 
             <div className="space-y-3">
               <a
-                href="tel:1588-0000"
-                className="btn-primary w-full py-3"
+                href="https://open.kakao.com/o/sMLX4Zei"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn-primary w-full py-3 bg-[#FEE500] hover:bg-[#FDD835] text-[#3C1E1E] border-0"
               >
-                <Phone className="w-5 h-5" />
-                전화 문의 (1588-0000)
+                <MessageCircle className="w-5 h-5" />
+                카카오톡으로 상담하기
               </a>
               <button
                 onClick={() => setShowInquiryModal(false)}
@@ -759,7 +767,7 @@ export default function PharmacyMatchPage() {
             </div>
 
             <p className="text-center text-xs text-muted-foreground mt-4">
-              상담 후 관심 표시를 하시면 상호 매칭 시 연락처가 공개됩니다
+              카카오톡 상담 후 상호 매칭 시 상세 정보가 공개됩니다
             </p>
           </div>
         </div>

@@ -373,8 +373,8 @@ export default function LandlordPricingPage() {
             무료 상담으로 최적의 플랜을 추천받으세요
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <a href="tel:1588-0000" className="btn-primary">
-              전화 상담 1588-0000
+            <a href="https://open.kakao.com/o/sMLX4Zei" target="_blank" rel="noopener noreferrer" className="btn-primary">
+              카톡 상담
             </a>
             <Link href="/landlord/register" className="btn-outline">
               무료로 매물 등록하기

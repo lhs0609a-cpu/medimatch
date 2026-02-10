@@ -5,7 +5,7 @@ import Link from 'next/link'
 import {
   ArrowLeft, Search, HelpCircle, BookOpen, MessageCircle,
   BarChart3, MapPin, Pill, Building2, Users, CreditCard,
-  ChevronRight, ChevronDown, Mail, Phone
+  ChevronRight, ChevronDown, Mail
 } from 'lucide-react'
 
 const helpCategories = [
@@ -162,10 +162,10 @@ export default function HelpPage() {
             <h3 className="font-semibold text-foreground mb-1">1:1 문의</h3>
             <p className="text-sm text-muted-foreground">전문 상담사에게 문의하세요</p>
           </Link>
-          <a href="tel:1588-0000" className="card card-interactive p-6">
-            <Phone className="w-8 h-8 text-purple-500 mb-3" />
-            <h3 className="font-semibold text-foreground mb-1">전화 상담</h3>
-            <p className="text-sm text-muted-foreground">1588-0000 (평일 9-18시)</p>
+          <a href="https://open.kakao.com/o/sMLX4Zei" target="_blank" rel="noopener noreferrer" className="card card-interactive p-6">
+            <MessageCircle className="w-8 h-8 text-purple-500 mb-3" />
+            <h3 className="font-semibold text-foreground mb-1">카톡 상담</h3>
+            <p className="text-sm text-muted-foreground">카카오톡 오픈채팅</p>
           </a>
         </div>
 
@@ -228,9 +228,9 @@ export default function HelpPage() {
               <MessageCircle className="w-4 h-4" />
               문의하기
             </Link>
-            <a href="tel:1588-0000" className="btn-outline border-background text-background hover:bg-background/10">
-              <Phone className="w-4 h-4" />
-              전화상담
+            <a href="https://open.kakao.com/o/sMLX4Zei" target="_blank" rel="noopener noreferrer" className="btn-outline border-background text-background hover:bg-background/10">
+              <MessageCircle className="w-4 h-4" />
+              카톡 상담
             </a>
           </div>
         </div>

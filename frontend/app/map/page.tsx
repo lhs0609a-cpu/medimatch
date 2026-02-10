@@ -21,7 +21,6 @@ import {
   Navigation,
   Search,
   X,
-  Phone,
   MessageCircle,
   Eye,
   Clock,
@@ -186,9 +185,9 @@ export default function MapPage() {
     }
   };
 
-  // 전화 상담 연결
-  const handleCallConsultation = () => {
-    window.location.href = 'tel:1588-0000';
+  // 카톡 상담 연결
+  const handleKakaoConsultation = () => {
+    window.open('https://open.kakao.com/o/sMLX4Zei', '_blank');
   };
 
   return (
@@ -370,16 +369,16 @@ export default function MapPage() {
                           </p>
                           <p className="text-sm font-semibold text-primary">{marker.info?.price}</p>
 
-                          {/* 전화 상담 버튼 */}
+                          {/* 카톡 상담 버튼 */}
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
-                              handleCallConsultation();
+                              handleKakaoConsultation();
                             }}
                             className="mt-3 w-full btn-primary btn-sm flex items-center justify-center gap-2"
                           >
-                            <Phone className="w-4 h-4" />
-                            전화 상담
+                            <MessageCircle className="w-4 h-4" />
+                            카톡 상담
                           </button>
                         </div>
                       </div>
@@ -481,9 +480,9 @@ export default function MapPage() {
                   <p className="text-sm text-muted-foreground mb-1">{selectedMarker.info?.address}</p>
                   <p className="text-sm font-semibold text-primary mb-3">{selectedMarker.info?.price}</p>
                   <div className="flex gap-2">
-                    <button onClick={handleCallConsultation} className="btn-primary btn-sm flex-1">
-                      <Phone className="w-4 h-4 mr-1" />
-                      전화 상담
+                    <button onClick={handleKakaoConsultation} className="btn-primary btn-sm flex-1">
+                      <MessageCircle className="w-4 h-4 mr-1" />
+                      카톡 상담
                     </button>
                     <button className="btn-secondary btn-sm flex-1">
                       <MessageCircle className="w-4 h-4 mr-1" />

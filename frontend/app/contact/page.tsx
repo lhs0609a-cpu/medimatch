@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import {
-  ArrowLeft, Mail, Phone, MapPin, Clock, Send,
+  ArrowLeft, Mail, MapPin, Clock, Send,
   MessageCircle, CheckCircle2
 } from 'lucide-react'
 import { toast } from 'sonner'
@@ -153,13 +153,13 @@ export default function ContactPage() {
 
               <div className="card p-5">
                 <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 rounded-lg bg-green-100 flex items-center justify-center flex-shrink-0">
-                    <Phone className="w-5 h-5 text-green-600" />
+                  <div className="w-10 h-10 rounded-lg bg-yellow-100 flex items-center justify-center flex-shrink-0">
+                    <MessageCircle className="w-5 h-5 text-yellow-600" />
                   </div>
                   <div>
-                    <h3 className="font-medium text-foreground">전화</h3>
-                    <a href="tel:1588-0000" className="text-muted-foreground hover:text-foreground">
-                      1588-0000
+                    <h3 className="font-medium text-foreground">카톡 상담</h3>
+                    <a href="https://open.kakao.com/o/sMLX4Zei" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground">
+                      카카오톡 오픈채팅
                     </a>
                   </div>
                 </div>

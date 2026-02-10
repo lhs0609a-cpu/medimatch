@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import {
-  ArrowLeft, Check, Star, Shield, Users, Phone,
+  ArrowLeft, Check, Star, Shield, Users, MessageCircle,
   FileText, Link2, Clock, Award, ChevronRight,
   CreditCard, Sparkles, Building2, TrendingUp
 } from 'lucide-react'
@@ -294,11 +294,13 @@ export default function ConsultingPage() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a
-              href="tel:1588-0000"
+              href="https://open.kakao.com/o/sMLX4Zei"
+              target="_blank"
+              rel="noopener noreferrer"
               className="btn-primary flex items-center justify-center gap-2"
             >
-              <Phone className="w-4 h-4" />
-              전화 상담 1588-0000
+              <MessageCircle className="w-4 h-4" />
+              카톡 상담
             </a>
             <Link href="/contact" className="btn-outline">
               온라인 문의하기

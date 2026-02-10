@@ -8,7 +8,6 @@ import {
   Search,
   Star,
   MapPin,
-  Phone,
   BadgeCheck,
   Crown,
   Paintbrush,
@@ -451,13 +450,13 @@ export default function PartnersPage() {
             )}
 
             <div className="space-y-4">
-              <div className="flex items-center gap-3 p-4 bg-secondary/50 rounded-xl">
-                <Phone className="w-5 h-5 text-primary" />
+              <a href="https://open.kakao.com/o/sMLX4Zei" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 p-4 bg-secondary/50 rounded-xl hover:bg-secondary/70 transition-colors">
+                <MessageCircle className="w-5 h-5 text-primary" />
                 <div>
-                  <div className="text-sm text-muted-foreground">전화 문의</div>
-                  <div className="font-semibold text-foreground">1588-0000</div>
+                  <div className="text-sm text-muted-foreground">카톡 상담</div>
+                  <div className="font-semibold text-foreground">카카오톡 오픈채팅</div>
                 </div>
-              </div>
+              </a>
 
               <div className="flex items-center gap-3 p-4 bg-secondary/50 rounded-xl">
                 <MessageCircle className="w-5 h-5 text-primary" />
