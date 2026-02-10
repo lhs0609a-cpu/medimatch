@@ -9,10 +9,7 @@ import Link from 'next/link'
 import {
   ArrowLeft, MapPin, Building2, TrendingUp, Users, Target,
   ChevronRight, Download, AlertCircle, CheckCircle2, MinusCircle, Lock, LogIn, Award,
-  Sparkles, Eye, EyeOff, Train, Car, Calendar, Shield, Lightbulb, BarChart3,
-  PieChart, Activity, Clock, DollarSign, Briefcase, Heart, Star, Zap, TrendingDown,
-  MapPinned, Building, Home, CircleDollarSign, Search, FileText, MessageCircle,
-  Monitor, Smartphone, Plus, GraduationCap, AlertTriangle, Package, CreditCard, Globe
+  Sparkles, Lightbulb, MapPinned
 } from 'lucide-react'
 import { simulationService } from '@/lib/api/services'
 import { SimulationResponse } from '@/lib/api/client'
@@ -38,19 +35,6 @@ const clinicTypes = [
 
 // 무료 체험 상태는 서버에서 관리됨 (is_unlocked 필드)
 // 클라이언트 localStorage 기반 우회 방지
-
-// 블러된 값 표시 컴포넌트
-function BlurredValue({ children, isBlurred }: { children: React.ReactNode; isBlurred: boolean }) {
-  if (!isBlurred) return <>{children}</>
-  return (
-    <span className="relative inline-block">
-      <span className="blur-md select-none">{children}</span>
-      <span className="absolute inset-0 flex items-center justify-center">
-        <Lock className="w-4 h-4 text-muted-foreground" />
-      </span>
-    </span>
-  )
-}
 
 // 스켈레톤 컴포넌트
 function Skeleton({ className }: { className?: string }) {
@@ -495,110 +479,23 @@ export default function SimulatePage() {
                 </div>
               </div>
             ) : (
-              <div className="bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-950/30 dark:to-orange-950/30 border border-amber-200 dark:border-amber-800 rounded-xl p-6">
-                <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 bg-amber-100 dark:bg-amber-900 rounded-xl flex items-center justify-center flex-shrink-0">
-                    <Lock className="w-6 h-6 text-amber-600 dark:text-amber-400" />
+              <div className="bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-950/30 dark:to-orange-950/30 border border-amber-200 dark:border-amber-800 rounded-xl p-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-amber-100 dark:bg-amber-900 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <Lock className="w-5 h-5 text-amber-600 dark:text-amber-400" />
                   </div>
                   <div className="flex-1">
-                    <h3 className="font-semibold text-foreground mb-1">결과가 잠겨있습니다</h3>
-                    <p className="text-sm text-muted-foreground mb-4">
-                      정확한 예상 매출, 비용, 손익분기점 등 상세 분석 결과를 확인하세요.
-                    </p>
-                    <div className="flex items-center gap-3">
-                      <button
-                        onClick={handleUnlock}
-                        disabled={isPaymentLoading}
-                        className="btn-primary"
-                      >
-                        {isPaymentLoading ? (
-                          <>
-                            <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
-                              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                            </svg>
-                            처리중...
-                          </>
-                        ) : (
-                          <>
-                            <Sparkles className="w-4 h-4" />
-                            {(result?.unlock_price ?? 9900).toLocaleString()}원 결제하고 잠금해제
-                          </>
-                        )}
-                      </button>
-                      <span className="text-sm text-muted-foreground">
-                        또는 <Link href="/subscribe" className="text-blue-600 hover:underline">프리미엄 구독</Link>으로 무제한 이용
-                      </span>
-                    </div>
+                    <span className="font-medium text-foreground">일부 결과가 잠겨있습니다</span>
+                    <span className="text-sm text-muted-foreground ml-2">아래 무료 요약을 먼저 확인해보세요</span>
                   </div>
-                </div>
-
-                {/* 무료 vs 유료 비교 테이블 */}
-                <div className="mt-6 pt-6 border-t border-amber-200 dark:border-amber-800">
-                  <div className="text-sm font-medium text-foreground mb-4">무료 미리보기 vs 프리미엄 분석 비교</div>
-                  <div className="grid md:grid-cols-2 gap-4 text-sm">
-                    {/* 무료 - 확장 */}
-                    <div className="p-4 bg-white/50 dark:bg-black/20 rounded-xl">
-                      <div className="font-medium text-green-700 dark:text-green-300 mb-3 flex items-center gap-2">
-                        <Eye className="w-4 h-4" />
-                        무료 미리보기 (12개 항목)
-                      </div>
-                      <ul className="space-y-1.5 text-muted-foreground text-xs">
-                        <li className="flex items-center gap-2"><CheckCircle2 className="w-3 h-3 text-green-500" />AI 개원 추천 등급 및 사유</li>
-                        <li className="flex items-center gap-2"><CheckCircle2 className="w-3 h-3 text-green-500" />분석 신뢰도 점수</li>
-                        <li className="flex items-center gap-2"><CheckCircle2 className="w-3 h-3 text-green-500" />동일 진료과 경쟁 병원 수</li>
-                        <li className="flex items-center gap-2"><CheckCircle2 className="w-3 h-3 text-green-500" />반경 내 전체 의료기관 수</li>
-                        <li className="flex items-center gap-2"><CheckCircle2 className="w-3 h-3 text-green-500" />예상 매출 범위 (대략)</li>
-                        <li className="flex items-center gap-2"><CheckCircle2 className="w-3 h-3 text-green-500" />1km 반경 인구수</li>
-                        <li className="flex items-center gap-2"><CheckCircle2 className="w-3 h-3 text-green-500" />일 유동인구 (대략)</li>
-                        <li className="flex items-center gap-2"><CheckCircle2 className="w-3 h-3 text-green-500" />경쟁 강도 등급</li>
-                        <li className="flex items-center gap-2"><CheckCircle2 className="w-3 h-3 text-green-500" />입지 기본 점수</li>
-                        <li className="flex items-center gap-2"><CheckCircle2 className="w-3 h-3 text-green-500" />대중교통 접근성</li>
-                        <li className="flex items-center gap-2"><CheckCircle2 className="w-3 h-3 text-green-500" />상권 유형</li>
-                        <li className="flex items-center gap-2"><CheckCircle2 className="w-3 h-3 text-green-500" />AI 한줄 요약</li>
-                      </ul>
-                    </div>
-                    {/* 유료 - 대폭 확장 */}
-                    <div className="p-4 bg-gradient-to-br from-blue-500/10 to-purple-500/10 rounded-xl border border-blue-500/20">
-                      <div className="font-medium text-blue-700 dark:text-blue-300 mb-3 flex items-center gap-2">
-                        <Sparkles className="w-4 h-4" />
-                        프리미엄 분석 (50개+ 항목)
-                      </div>
-                      <div className="grid grid-cols-2 gap-x-3 gap-y-1.5 text-xs">
-                        <div className="space-y-1.5">
-                          <li className="flex items-center gap-1 text-foreground font-medium"><Eye className="w-3 h-3 text-blue-500" />정확한 예상 매출/비용</li>
-                          <li className="flex items-center gap-1 text-foreground"><Eye className="w-3 h-3 text-blue-500" />월/연간 순이익 예측</li>
-                          <li className="flex items-center gap-1 text-foreground"><Eye className="w-3 h-3 text-blue-500" />ROI 및 손익분기점</li>
-                          <li className="flex items-center gap-1 text-foreground"><Eye className="w-3 h-3 text-blue-500" />3개년 시나리오 분석</li>
-                          <li className="flex items-center gap-1 text-foreground"><Eye className="w-3 h-3 text-blue-500" />12개월 현금흐름</li>
-                          <li className="flex items-center gap-1 text-foreground"><Eye className="w-3 h-3 text-blue-500" />대출 시뮬레이션</li>
-                          <li className="flex items-center gap-1 text-foreground"><Eye className="w-3 h-3 text-blue-500" />세금/4대보험 예측</li>
-                          <li className="flex items-center gap-1 text-foreground"><Eye className="w-3 h-3 text-blue-500" />경쟁 병원 상세 정보</li>
-                          <li className="flex items-center gap-1 text-foreground"><Eye className="w-3 h-3 text-blue-500" />SWOT 분석</li>
-                          <li className="flex items-center gap-1 text-foreground"><Eye className="w-3 h-3 text-blue-500" />마케팅 ROI 분석</li>
-                          <li className="flex items-center gap-1 text-foreground"><Eye className="w-3 h-3 text-blue-500" />검색 키워드 분석</li>
-                          <li className="flex items-center gap-1 text-foreground"><Eye className="w-3 h-3 text-blue-500" />인력 채용 가이드</li>
-                        </div>
-                        <div className="space-y-1.5">
-                          <li className="flex items-center gap-1 text-foreground font-medium"><Eye className="w-3 h-3 text-purple-500" />의료장비 가이드</li>
-                          <li className="flex items-center gap-1 text-foreground"><Eye className="w-3 h-3 text-purple-500" />인테리어 비용 분석</li>
-                          <li className="flex items-center gap-1 text-foreground"><Eye className="w-3 h-3 text-purple-500" />임대료 협상 전략</li>
-                          <li className="flex items-center gap-1 text-foreground"><Eye className="w-3 h-3 text-purple-500" />비급여 수익 분석</li>
-                          <li className="flex items-center gap-1 text-foreground"><Eye className="w-3 h-3 text-purple-500" />환자 만족도 전략</li>
-                          <li className="flex items-center gap-1 text-foreground"><Eye className="w-3 h-3 text-purple-500" />5년 자산가치 예측</li>
-                          <li className="flex items-center gap-1 text-foreground"><Eye className="w-3 h-3 text-purple-500" />법적 주의사항</li>
-                          <li className="flex items-center gap-1 text-foreground"><Eye className="w-3 h-3 text-purple-500" />개원 체크리스트</li>
-                          <li className="flex items-center gap-1 text-foreground"><Eye className="w-3 h-3 text-purple-500" />자금조달 가이드</li>
-                          <li className="flex items-center gap-1 text-foreground"><Eye className="w-3 h-3 text-purple-500" />인허가 절차 안내</li>
-                          <li className="flex items-center gap-1 text-foreground"><Eye className="w-3 h-3 text-purple-500" />의료 트렌드 분석</li>
-                          <li className="flex items-center gap-1 text-foreground font-medium"><Eye className="w-3 h-3 text-purple-500" />PDF 리포트 제공</li>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <p className="text-xs text-center text-muted-foreground mt-3">
-                    9,900원으로 개원 컨설팅 수백만원 가치의 분석을 받아보세요
-                  </p>
+                  <button
+                    onClick={handleUnlock}
+                    disabled={isPaymentLoading}
+                    className="btn-primary text-sm"
+                  >
+                    <Sparkles className="w-4 h-4" />
+                    {(result?.unlock_price ?? 9900).toLocaleString()}원 잠금해제
+                  </button>
                 </div>
               </div>
             )}
@@ -627,16 +524,16 @@ export default function SimulatePage() {
               </div>
             </div>
 
-            {/* 무료 요약 정보 카드 - 확장 */}
+            {/* 무료 요약 정보 카드 - 핵심 4개만 */}
             <div className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-950/20 dark:to-emerald-950/20 rounded-xl p-5 border border-green-200 dark:border-green-800">
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2">
                   <CheckCircle2 className="w-5 h-5 text-green-600" />
                   <span className="font-medium text-green-800 dark:text-green-200">무료 미리보기 분석 결과</span>
                 </div>
-                <span className="text-xs bg-green-200 dark:bg-green-800 text-green-800 dark:text-green-200 px-2 py-1 rounded-full">12개 항목 공개</span>
+                <span className="text-xs bg-green-200 dark:bg-green-800 text-green-800 dark:text-green-200 px-2 py-1 rounded-full">4개 항목 공개</span>
               </div>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center mb-4">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
                 <div className="p-3 bg-white/60 dark:bg-black/20 rounded-lg">
                   <div className="text-2xl font-bold text-green-700 dark:text-green-300">
                     {result.competition.same_dept_count}개
@@ -662,85 +559,59 @@ export default function SimulatePage() {
                   <div className="text-xs text-green-600 dark:text-green-400">일 유동인구</div>
                 </div>
               </div>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
-                <div className="p-3 bg-white/60 dark:bg-black/20 rounded-lg">
-                  <div className="text-lg font-bold text-green-700 dark:text-green-300">
-                    {getRecommendationText(result.recommendation)}
-                  </div>
-                  <div className="text-xs text-green-600 dark:text-green-400">AI 추천</div>
-                </div>
-                <div className="p-3 bg-white/60 dark:bg-black/20 rounded-lg">
-                  <div className="text-lg font-bold text-green-700 dark:text-green-300">
-                    {result.confidence_score}%
-                  </div>
-                  <div className="text-xs text-green-600 dark:text-green-400">신뢰도</div>
-                </div>
-                <div className="p-3 bg-white/60 dark:bg-black/20 rounded-lg">
-                  <div className="text-lg font-bold text-green-700 dark:text-green-300">
-                    {result.competition_detail?.competition_level || 'MEDIUM'}
-                  </div>
-                  <div className="text-xs text-green-600 dark:text-green-400">경쟁강도</div>
-                </div>
-                <div className="p-3 bg-white/60 dark:bg-black/20 rounded-lg">
-                  <div className="text-lg font-bold text-green-700 dark:text-green-300">
-                    {result.location_analysis?.commercial_district_type?.slice(0, 6) || '상업지역'}
-                  </div>
-                  <div className="text-xs text-green-600 dark:text-green-400">상권유형</div>
-                </div>
-              </div>
             </div>
 
-            {/* 무료 - 입지/교통 기본 정보 */}
-            <div className="grid md:grid-cols-2 gap-4">
-              <div className="card p-5">
-                <div className="flex items-center justify-between mb-3">
-                  <h3 className="font-medium text-foreground flex items-center gap-2">
-                    <MapPinned className="w-4 h-4 text-blue-500" />
-                    입지 기본 점수
-                  </h3>
-                  <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded">무료</span>
-                </div>
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="text-center p-2 bg-secondary rounded-lg">
-                    <div className="text-xl font-bold text-blue-600">{result.location_analysis?.transit_score || 75}</div>
-                    <div className="text-xs text-muted-foreground">교통 접근성</div>
+            {/* 입지/교통 기본 정보 - 잠금 */}
+            {isUnlocked && (
+              <div className="grid md:grid-cols-2 gap-4">
+                <div className="card p-5">
+                  <div className="flex items-center justify-between mb-3">
+                    <h3 className="font-medium text-foreground flex items-center gap-2">
+                      <MapPinned className="w-4 h-4 text-blue-500" />
+                      입지 기본 점수
+                    </h3>
                   </div>
-                  <div className="text-center p-2 bg-secondary rounded-lg">
-                    <div className="text-xl font-bold text-purple-600">{result.location_analysis?.commercial_score || 70}</div>
-                    <div className="text-xs text-muted-foreground">상권 점수</div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="text-center p-2 bg-secondary rounded-lg">
+                      <div className="text-xl font-bold text-blue-600">{result.location_analysis?.transit_score || 75}</div>
+                      <div className="text-xs text-muted-foreground">교통 접근성</div>
+                    </div>
+                    <div className="text-center p-2 bg-secondary rounded-lg">
+                      <div className="text-xl font-bold text-purple-600">{result.location_analysis?.commercial_score || 70}</div>
+                      <div className="text-xs text-muted-foreground">상권 점수</div>
+                    </div>
+                  </div>
+                  <div className="mt-3 text-sm text-muted-foreground">
+                    {result.location_analysis?.subway_stations?.[0] && (
+                      <p>• {result.location_analysis.subway_stations[0].name} {result.location_analysis.subway_stations[0].distance_m}m</p>
+                    )}
+                    <p>• 버스정류장 {result.location_analysis?.bus_stops_count || 5}개 인근</p>
                   </div>
                 </div>
-                <div className="mt-3 text-sm text-muted-foreground">
-                  {result.location_analysis?.subway_stations?.[0] && (
-                    <p>• {result.location_analysis.subway_stations[0].name} {result.location_analysis.subway_stations[0].distance_m}m</p>
-                  )}
-                  <p>• 버스정류장 {result.location_analysis?.bus_stops_count || 5}개 인근</p>
+                <div className="card p-5">
+                  <div className="flex items-center justify-between mb-3">
+                    <h3 className="font-medium text-foreground flex items-center gap-2">
+                      <Users className="w-4 h-4 text-teal-500" />
+                      타겟 환자층 요약
+                    </h3>
+                  </div>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">40대 이상 비율</span>
+                      <span className="font-medium">{(result.demographics.age_40_plus_ratio * 100).toFixed(0)}%</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">주요 타겟</span>
+                      <span className="font-medium">30-50대 직장인</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">상권 특성</span>
+                      <span className="font-medium">{result.location_analysis?.commercial_district_type || '복합상권'}</span>
+                    </div>
+                  </div>
                 </div>
               </div>
-              <div className="card p-5">
-                <div className="flex items-center justify-between mb-3">
-                  <h3 className="font-medium text-foreground flex items-center gap-2">
-                    <Users className="w-4 h-4 text-teal-500" />
-                    타겟 환자층 요약
-                  </h3>
-                  <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded">무료</span>
-                </div>
-                <div className="space-y-2 text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">40대 이상 비율</span>
-                    <span className="font-medium">{(result.demographics.age_40_plus_ratio * 100).toFixed(0)}%</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">주요 타겟</span>
-                    <span className="font-medium">30-50대 직장인</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">상권 특성</span>
-                    <span className="font-medium">{result.location_analysis?.commercial_district_type || '복합상권'}</span>
-                  </div>
-                </div>
-              </div>
-            </div>
+            )}
 
             {/* 무료 - AI 한줄 요약 */}
             <div className="card p-5 bg-gradient-to-r from-indigo-50 to-blue-50 dark:from-indigo-950/20 dark:to-blue-950/20">
@@ -760,56 +631,133 @@ export default function SimulatePage() {
               )}
             </div>
 
+            {/* 중간 결제 유도 CTA - 무료 영역 끝, 잠금 영역 시작 전 */}
+            {!isUnlocked && (
+              <div className="relative overflow-hidden rounded-2xl border-2 border-blue-200 dark:border-blue-800 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-blue-950/40 dark:via-indigo-950/40 dark:to-purple-950/40 p-8">
+                <div className="text-center mb-6">
+                  <div className="inline-flex items-center gap-2 bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 px-4 py-2 rounded-full text-sm font-medium mb-4">
+                    <Lock className="w-4 h-4" />
+                    50개+ 상세 분석 항목을 확인하세요
+                  </div>
+                  <h3 className="text-xl font-bold text-foreground">
+                    아래 모든 분석 결과를 잠금해제하세요
+                  </h3>
+                </div>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+                  <div className="flex items-center gap-2 text-sm text-foreground bg-white/60 dark:bg-black/20 rounded-lg p-3">
+                    <CheckCircle2 className="w-4 h-4 text-blue-500 flex-shrink-0" />
+                    <span>정확한 예상 매출/비용/순이익</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm text-foreground bg-white/60 dark:bg-black/20 rounded-lg p-3">
+                    <CheckCircle2 className="w-4 h-4 text-blue-500 flex-shrink-0" />
+                    <span>ROI 및 손익분기점</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm text-foreground bg-white/60 dark:bg-black/20 rounded-lg p-3">
+                    <CheckCircle2 className="w-4 h-4 text-blue-500 flex-shrink-0" />
+                    <span>경쟁 병원 상세 분석</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm text-foreground bg-white/60 dark:bg-black/20 rounded-lg p-3">
+                    <CheckCircle2 className="w-4 h-4 text-blue-500 flex-shrink-0" />
+                    <span>3개년 시나리오 + 현금흐름</span>
+                  </div>
+                </div>
+                <div className="flex flex-col items-center gap-3">
+                  <button
+                    onClick={handleUnlock}
+                    disabled={isPaymentLoading}
+                    className="btn-primary text-base px-8 py-3 shadow-lg shadow-blue-500/25"
+                  >
+                    {isPaymentLoading ? (
+                      <>
+                        <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                        </svg>
+                        결제 처리중...
+                      </>
+                    ) : (
+                      <>
+                        <Sparkles className="w-5 h-5" />
+                        {(result?.unlock_price ?? 9900).toLocaleString()}원 결제하고 잠금해제
+                      </>
+                    )}
+                  </button>
+                  <span className="text-sm text-muted-foreground">
+                    또는 <Link href="/subscribe" className="text-blue-600 hover:underline font-medium">프리미엄 구독</Link>으로 무제한 이용
+                  </span>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    9,900원으로 개원 컨설팅 수백만원 가치의 분석을 받아보세요
+                  </p>
+                </div>
+              </div>
+            )}
+
             {/* Main Stats Grid */}
             <div className="grid md:grid-cols-3 gap-6">
               {/* Revenue Card */}
-              <div className="card p-6 relative">
+              <div className="card p-6 relative overflow-hidden">
                 <h3 className="text-sm font-medium text-muted-foreground mb-4">예상 월 매출</h3>
-                <div className="text-3xl font-bold text-foreground mb-2">
-                  <BlurredValue isBlurred={!isUnlocked}>
-                    {formatCurrency(result.estimated_monthly_revenue.avg)}
-                  </BlurredValue>
-                </div>
-                <div className="text-sm text-muted-foreground">
-                  <BlurredValue isBlurred={!isUnlocked}>
-                    {formatCurrency(result.estimated_monthly_revenue.min)} ~ {formatCurrency(result.estimated_monthly_revenue.max)}
-                  </BlurredValue>
-                </div>
-                {!isUnlocked && (
-                  <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent rounded-xl" />
+                {isUnlocked ? (
+                  <>
+                    <div className="text-3xl font-bold text-foreground mb-2">
+                      {formatCurrency(result.estimated_monthly_revenue.avg)}
+                    </div>
+                    <div className="text-sm text-muted-foreground">
+                      {formatCurrency(result.estimated_monthly_revenue.min)} ~ {formatCurrency(result.estimated_monthly_revenue.max)}
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div className="text-3xl font-bold text-muted-foreground/40 mb-2">****만원</div>
+                    <div className="text-sm text-muted-foreground/40">****만원 ~ ****만원</div>
+                    <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-transparent rounded-xl" />
+                  </>
                 )}
               </div>
 
               {/* Cost Card */}
-              <div className="card p-6 relative">
+              <div className="card p-6 relative overflow-hidden">
                 <h3 className="text-sm font-medium text-muted-foreground mb-4">예상 월 비용</h3>
-                <div className="text-3xl font-bold text-foreground mb-2">
-                  <BlurredValue isBlurred={!isUnlocked}>
-                    {formatCurrency(result.estimated_monthly_cost.total)}
-                  </BlurredValue>
-                </div>
-                <div className="text-sm text-muted-foreground space-y-1">
-                  <div>임대료: <BlurredValue isBlurred={!isUnlocked}>{formatCurrency(result.estimated_monthly_cost.rent)}</BlurredValue></div>
-                  <div>인건비: <BlurredValue isBlurred={!isUnlocked}>{formatCurrency(result.estimated_monthly_cost.labor)}</BlurredValue></div>
-                </div>
-                {!isUnlocked && (
-                  <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent rounded-xl" />
+                {isUnlocked ? (
+                  <>
+                    <div className="text-3xl font-bold text-foreground mb-2">
+                      {formatCurrency(result.estimated_monthly_cost.total)}
+                    </div>
+                    <div className="text-sm text-muted-foreground space-y-1">
+                      <div>임대료: {formatCurrency(result.estimated_monthly_cost.rent)}</div>
+                      <div>인건비: {formatCurrency(result.estimated_monthly_cost.labor)}</div>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div className="text-3xl font-bold text-muted-foreground/40 mb-2">****만원</div>
+                    <div className="text-sm text-muted-foreground/40 space-y-1">
+                      <div>임대료: ****만원</div>
+                      <div>인건비: ****만원</div>
+                    </div>
+                    <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-transparent rounded-xl" />
+                  </>
                 )}
               </div>
 
               {/* Profit Card */}
-              <div className="card p-6 relative">
+              <div className="card p-6 relative overflow-hidden">
                 <h3 className="text-sm font-medium text-muted-foreground mb-4">예상 월 순이익</h3>
-                <div className={`text-3xl font-bold mb-2 ${result.profitability.monthly_profit_avg >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                  <BlurredValue isBlurred={!isUnlocked}>
-                    {formatCurrency(result.profitability.monthly_profit_avg)}
-                  </BlurredValue>
-                </div>
-                <div className="text-sm text-muted-foreground">
-                  손익분기점: <BlurredValue isBlurred={!isUnlocked}>{result.profitability.breakeven_months}개월</BlurredValue>
-                </div>
-                {!isUnlocked && (
-                  <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent rounded-xl" />
+                {isUnlocked ? (
+                  <>
+                    <div className={`text-3xl font-bold mb-2 ${result.profitability.monthly_profit_avg >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                      {formatCurrency(result.profitability.monthly_profit_avg)}
+                    </div>
+                    <div className="text-sm text-muted-foreground">
+                      손익분기점: {result.profitability.breakeven_months}개월
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div className="text-3xl font-bold text-muted-foreground/40 mb-2">****만원</div>
+                    <div className="text-sm text-muted-foreground/40">손익분기점: **개월</div>
+                    <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-transparent rounded-xl" />
+                  </>
                 )}
               </div>
             </div>
@@ -849,94 +797,127 @@ export default function SimulatePage() {
             </div>
 
             {/* Competition & Demographics */}
-            <div className="grid md:grid-cols-2 gap-6">
-              {/* Competition */}
-              <div className="card p-6 relative">
-                <h3 className="font-semibold text-foreground mb-4 flex items-center gap-2">
-                  <Target className="w-5 h-5" />
-                  경쟁 현황
-                </h3>
-                <div className="space-y-4">
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">분석 반경</span>
-                    <span className="font-medium">{result.competition.radius_m}m</span>
+            {isUnlocked ? (
+              <div className="grid md:grid-cols-2 gap-6">
+                {/* Competition - 잠금해제 */}
+                <div className="card p-6">
+                  <h3 className="font-semibold text-foreground mb-4 flex items-center gap-2">
+                    <Target className="w-5 h-5" />
+                    경쟁 현황
+                  </h3>
+                  <div className="space-y-4">
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">분석 반경</span>
+                      <span className="font-medium">{result.competition.radius_m}m</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">동일 진료과 병원</span>
+                      <span className="font-medium">{result.competition.same_dept_count}개</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">전체 의료기관</span>
+                      <span className="font-medium">{result.competition.total_clinic_count}개</span>
+                    </div>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">동일 진료과 병원</span>
-                    <span className="font-medium">{result.competition.same_dept_count}개</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">전체 의료기관</span>
-                    <span className="font-medium">{result.competition.total_clinic_count}개</span>
-                  </div>
-                </div>
-
-                {result.competitors.length > 0 && (
-                  <div className="mt-4 pt-4 border-t border-border">
-                    <h4 className="text-sm font-medium text-foreground mb-3">주요 경쟁 병원</h4>
-                    <div className="space-y-2">
-                      {isUnlocked ? (
-                        result.competitors.slice(0, 3).map((comp, idx) => (
+                  {result.competitors.length > 0 && (
+                    <div className="mt-4 pt-4 border-t border-border">
+                      <h4 className="text-sm font-medium text-foreground mb-3">주요 경쟁 병원</h4>
+                      <div className="space-y-2">
+                        {result.competitors.slice(0, 3).map((comp, idx) => (
                           <div key={idx} className="flex justify-between text-sm">
                             <span className="text-muted-foreground">{comp.name}</span>
                             <span className="text-muted-foreground">{comp.distance_m}m</span>
                           </div>
-                        ))
-                      ) : (
-                        <>
-                          <div className="flex justify-between text-sm">
-                            <span className="text-muted-foreground blur-sm select-none">OO내과의원</span>
-                            <span className="text-muted-foreground blur-sm select-none">120m</span>
-                          </div>
-                          <div className="flex justify-between text-sm">
-                            <span className="text-muted-foreground blur-sm select-none">XX정형외과</span>
-                            <span className="text-muted-foreground blur-sm select-none">250m</span>
-                          </div>
-                          <div className="flex items-center justify-center text-sm text-amber-600 mt-2">
-                            <Lock className="w-3 h-3 mr-1" />
-                            <span>잠금해제로 상세 정보 확인</span>
-                          </div>
-                        </>
-                      )}
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                )}
-              </div>
+                  )}
+                </div>
 
-              {/* Demographics */}
-              <div className="card p-6 relative">
-                <h3 className="font-semibold text-foreground mb-4 flex items-center gap-2">
-                  <Users className="w-5 h-5" />
-                  인구 현황
-                </h3>
-                <div className="space-y-4">
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">반경 1km 인구</span>
-                    <span className="font-medium">
-                      <BlurredValue isBlurred={!isUnlocked}>
-                        {result.demographics.population_1km.toLocaleString()}명
-                      </BlurredValue>
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">40대 이상 비율</span>
-                    <span className="font-medium">
-                      <BlurredValue isBlurred={!isUnlocked}>
-                        {(result.demographics.age_40_plus_ratio * 100).toFixed(1)}%
-                      </BlurredValue>
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">일 유동인구</span>
-                    <span className="font-medium">
-                      <BlurredValue isBlurred={!isUnlocked}>
-                        {result.demographics.floating_population_daily.toLocaleString()}명
-                      </BlurredValue>
-                    </span>
+                {/* Demographics - 잠금해제 */}
+                <div className="card p-6">
+                  <h3 className="font-semibold text-foreground mb-4 flex items-center gap-2">
+                    <Users className="w-5 h-5" />
+                    인구 현황
+                  </h3>
+                  <div className="space-y-4">
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">반경 1km 인구</span>
+                      <span className="font-medium">{result.demographics.population_1km.toLocaleString()}명</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">40대 이상 비율</span>
+                      <span className="font-medium">{(result.demographics.age_40_plus_ratio * 100).toFixed(1)}%</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">일 유동인구</span>
+                      <span className="font-medium">{result.demographics.floating_population_daily.toLocaleString()}명</span>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
+            ) : (
+              <div className="grid md:grid-cols-2 gap-6 relative">
+                {/* Competition - 잠금 */}
+                <div className="card p-6">
+                  <h3 className="font-semibold text-foreground mb-4 flex items-center gap-2">
+                    <Target className="w-5 h-5" />
+                    경쟁 현황
+                  </h3>
+                  <div className="space-y-4">
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">분석 반경</span>
+                      <span className="font-medium text-muted-foreground/40">***m</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">동일 진료과 병원</span>
+                      <span className="font-medium text-muted-foreground/40">**개</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">전체 의료기관</span>
+                      <span className="font-medium text-muted-foreground/40">**개</span>
+                    </div>
+                  </div>
+                  <div className="mt-4 pt-4 border-t border-border">
+                    <h4 className="text-sm font-medium text-foreground mb-3">주요 경쟁 병원</h4>
+                    <div className="space-y-2 text-sm text-muted-foreground/40">
+                      <div className="flex justify-between"><span>OO***의원</span><span>***m</span></div>
+                      <div className="flex justify-between"><span>XX***과</span><span>***m</span></div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Demographics - 잠금 */}
+                <div className="card p-6">
+                  <h3 className="font-semibold text-foreground mb-4 flex items-center gap-2">
+                    <Users className="w-5 h-5" />
+                    인구 현황
+                  </h3>
+                  <div className="space-y-4">
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">반경 1km 인구</span>
+                      <span className="font-medium text-muted-foreground/40">*****명</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">40대 이상 비율</span>
+                      <span className="font-medium text-muted-foreground/40">**.*%</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">일 유동인구</span>
+                      <span className="font-medium text-muted-foreground/40">*****명</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 잠금 오버레이 */}
+                <div className="absolute inset-0 bg-background/60 backdrop-blur-sm rounded-xl flex items-center justify-center">
+                  <button onClick={handleUnlock} className="btn-primary">
+                    <Lock className="w-4 h-4" />
+                    상세 분석 잠금해제
+                  </button>
+                </div>
+              </div>
+            )}
 
             {/* Region Rank Card */}
             {result.region_stats && (
