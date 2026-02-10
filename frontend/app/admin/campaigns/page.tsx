@@ -22,6 +22,18 @@ interface CampaignStats {
   by_grade: Record<string, number>;
 }
 
+interface CampaignHistoryItem {
+  id: string;
+  name: string;
+  campaign_type: string;
+  target_grade: string;
+  status: string;
+  total_targets: number;
+  sent_count: number;
+  failed_count: number;
+  created_at: string;
+}
+
 export default function CampaignManagePage() {
   const [stats, setStats] = useState<CampaignStats | null>(null);
   const [loading, setLoading] = useState(true);
@@ -32,10 +44,13 @@ export default function CampaignManagePage() {
   const [sending, setSending] = useState(false);
   const [smsTemplate, setSmsTemplate] = useState('');
   const [previewMessage, setPreviewMessage] = useState('');
+  const [history, setHistory] = useState<CampaignHistoryItem[]>([]);
+  const [historyLoading, setHistoryLoading] = useState(false);
 
   useEffect(() => {
     fetchStats();
     fetchTemplate();
+    fetchHistory();
   }, []);
 
   const fetchStats = async () => {
@@ -95,6 +110,27 @@ export default function CampaignManagePage() {
     }
   };
 
+  const fetchHistory = async () => {
+    setHistoryLoading(true);
+    try {
+      const token = localStorage.getItem('access_token');
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1';
+
+      const response = await fetch(`${apiUrl}/campaigns/history?page_size=10`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setHistory(data.items || []);
+      }
+    } catch (error) {
+      console.error('Failed to fetch history:', error);
+    } finally {
+      setHistoryLoading(false);
+    }
+  };
+
   const startCampaign = async () => {
     if (!confirm(`${targetGrade} 등급 타겟 ${limit}명에게 ${campaignType}를 발송하시겠습니까?`)) {
       return;
@@ -124,6 +160,7 @@ export default function CampaignManagePage() {
         alert(`캠페인이 시작되었습니다!\nID: ${result.id}`);
         setShowNewCampaign(false);
         fetchStats();
+        fetchHistory();
       } else {
         alert('캠페인 시작에 실패했습니다.');
       }
@@ -346,19 +383,64 @@ export default function CampaignManagePage() {
       )}
 
       {/* Campaign History */}
-      <div className="bg-white rounded-xl border border-gray-100 p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">최근 캠페인</h3>
-
-        <div className="text-center py-12 text-gray-500">
-          <Send className="w-12 h-12 mx-auto mb-4 text-gray-300" />
-          <p className="mb-2">아직 캠페인 이력이 없습니다.</p>
-          <button
-            onClick={() => setShowNewCampaign(true)}
-            className="text-sky-600 hover:text-sky-700 font-medium"
-          >
-            첫 캠페인 시작하기
-          </button>
+      <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
+        <div className="px-6 py-4 border-b border-gray-100">
+          <h3 className="text-lg font-semibold text-gray-900">최근 캠페인</h3>
         </div>
+
+        {historyLoading ? (
+          <div className="text-center py-12 text-gray-400">로딩 중...</div>
+        ) : history.length === 0 ? (
+          <div className="text-center py-12 text-gray-500">
+            <Send className="w-12 h-12 mx-auto mb-4 text-gray-300" />
+            <p className="mb-2">아직 캠페인 이력이 없습니다.</p>
+            <button onClick={() => setShowNewCampaign(true)} className="text-sky-600 hover:text-sky-700 font-medium">
+              첫 캠페인 시작하기
+            </button>
+          </div>
+        ) : (
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="bg-gray-50 border-b border-gray-100">
+                <th className="text-left px-4 py-3 font-medium text-gray-600">캠페인명</th>
+                <th className="text-left px-4 py-3 font-medium text-gray-600">채널</th>
+                <th className="text-left px-4 py-3 font-medium text-gray-600">등급</th>
+                <th className="text-left px-4 py-3 font-medium text-gray-600">상태</th>
+                <th className="text-right px-4 py-3 font-medium text-gray-600">대상</th>
+                <th className="text-left px-4 py-3 font-medium text-gray-600">발송일</th>
+              </tr>
+            </thead>
+            <tbody>
+              {history.map((c) => (
+                <tr key={c.id} className="border-b border-gray-50 hover:bg-gray-50/50">
+                  <td className="px-4 py-3 text-gray-900">{c.name}</td>
+                  <td className="px-4 py-3">
+                    <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${c.campaign_type === 'SMS' ? 'bg-sky-100 text-sky-700' : 'bg-violet-100 text-violet-700'}`}>
+                      {c.campaign_type}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3">
+                    <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
+                      c.target_grade === 'HOT' ? 'bg-rose-100 text-rose-700' :
+                      c.target_grade === 'WARM' ? 'bg-amber-100 text-amber-700' : 'bg-sky-100 text-sky-700'
+                    }`}>{c.target_grade}</span>
+                  </td>
+                  <td className="px-4 py-3">
+                    <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
+                      c.status === 'COMPLETED' ? 'bg-emerald-100 text-emerald-700' :
+                      c.status === 'RUNNING' ? 'bg-blue-100 text-blue-700' :
+                      c.status === 'SCHEDULED' ? 'bg-amber-100 text-amber-700' : 'bg-gray-100 text-gray-700'
+                    }`}>{c.status}</span>
+                  </td>
+                  <td className="px-4 py-3 text-right text-gray-700">{c.total_targets}명</td>
+                  <td className="px-4 py-3 text-xs text-gray-500">
+                    {c.created_at ? new Date(c.created_at).toLocaleDateString('ko-KR') : '-'}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
       </div>
 
       {/* Tips */}

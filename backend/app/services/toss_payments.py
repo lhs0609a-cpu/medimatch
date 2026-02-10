@@ -276,6 +276,120 @@ class TossPaymentsService:
                 error_message=str(e)
             )
 
+    def _get_billing_auth_header(self) -> Dict[str, str]:
+        """빌링 전용 Basic 인증 헤더 생성 (TOSS_BILLING_SECRET_KEY 우선)"""
+        billing_secret = getattr(settings, 'TOSS_BILLING_SECRET_KEY', '') or self.secret_key
+        auth_string = f"{billing_secret}:"
+        encoded = base64.b64encode(auth_string.encode()).decode()
+        return {
+            "Authorization": f"Basic {encoded}",
+            "Content-Type": "application/json"
+        }
+
+    async def issue_billing_key(self, auth_key: str, customer_key: str) -> Dict[str, Any]:
+        """
+        빌링키 발급
+
+        토스페이먼츠 빌링 인증 후 받은 authKey로 billingKey 발급
+        POST /v1/billing/authorizations/issue
+        """
+        try:
+            async with httpx.AsyncClient() as client:
+                response = await client.post(
+                    f"{self.BASE_URL}/billing/authorizations/issue",
+                    headers=self._get_billing_auth_header(),
+                    json={
+                        "authKey": auth_key,
+                        "customerKey": customer_key,
+                    },
+                    timeout=30.0
+                )
+
+                data = response.json()
+
+                if response.status_code == 200:
+                    logger.info(f"Billing key issued for customer: {customer_key}")
+                    return {
+                        "success": True,
+                        "billingKey": data.get("billingKey"),
+                        "customerKey": data.get("customerKey"),
+                        "cardCompany": data.get("card", {}).get("issuerCode"),
+                        "cardNumber": data.get("card", {}).get("number"),
+                        "authenticatedAt": data.get("authenticatedAt"),
+                    }
+                else:
+                    logger.error(f"Billing key issue failed: {data}")
+                    return {
+                        "success": False,
+                        "error_code": data.get("code"),
+                        "error_message": data.get("message"),
+                    }
+
+        except httpx.TimeoutException:
+            logger.error(f"Billing key issue timeout: customer={customer_key}")
+            return {"success": False, "error_code": "TIMEOUT", "error_message": "빌링키 발급 시간 초과"}
+        except Exception as e:
+            logger.exception(f"Billing key issue error: {e}")
+            return {"success": False, "error_code": "UNKNOWN_ERROR", "error_message": str(e)}
+
+    async def charge_billing_key(
+        self,
+        billing_key: str,
+        customer_key: str,
+        amount: int,
+        order_id: str,
+        order_name: str,
+    ) -> Dict[str, Any]:
+        """
+        빌링키로 자동결제 청구
+
+        POST /v1/billing/{billingKey}
+        """
+        try:
+            async with httpx.AsyncClient() as client:
+                response = await client.post(
+                    f"{self.BASE_URL}/billing/{billing_key}",
+                    headers=self._get_billing_auth_header(),
+                    json={
+                        "customerKey": customer_key,
+                        "amount": amount,
+                        "orderId": order_id,
+                        "orderName": order_name,
+                    },
+                    timeout=30.0
+                )
+
+                data = response.json()
+
+                if response.status_code == 200:
+                    logger.info(f"Billing charge success: order={order_id}, amount={amount}")
+                    return {
+                        "success": True,
+                        "paymentKey": data.get("paymentKey"),
+                        "orderId": data.get("orderId"),
+                        "totalAmount": data.get("totalAmount"),
+                        "status": data.get("status"),
+                        "method": data.get("method"),
+                        "approvedAt": data.get("approvedAt"),
+                        "receipt_url": data.get("receipt", {}).get("url"),
+                        "cardCompany": data.get("card", {}).get("issuerCode"),
+                        "cardNumber": data.get("card", {}).get("number"),
+                    }
+                else:
+                    logger.error(f"Billing charge failed: {data}")
+                    return {
+                        "success": False,
+                        "error_code": data.get("code"),
+                        "error_message": data.get("message"),
+                    }
+
+        except httpx.TimeoutException:
+            logger.error(f"Billing charge timeout: order={order_id}")
+            return {"success": False, "error_code": "TIMEOUT", "error_message": "결제 처리 시간 초과"}
+        except Exception as e:
+            logger.exception(f"Billing charge error: {e}")
+            return {"success": False, "error_code": "UNKNOWN_ERROR", "error_message": str(e)}
+
     def get_bank_code(self, bank_name: str) -> Optional[str]:
         """은행명으로 은행 코드 조회"""
         bank_codes = {

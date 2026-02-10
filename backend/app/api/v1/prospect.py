@@ -71,7 +71,7 @@ async def get_prospects(
     page: int = Query(1, ge=1),
     page_size: int = Query(20, ge=1, le=100),
     grade: Optional[str] = Query(None, pattern="^(HOT|WARM|COLD)$"),
-    contact_status: Optional[str] = None,
+    contact_status: Optional[str] = Query(None, pattern="^(not_contacted|contacted|interested|not_interested)$"),
     region: Optional[str] = None,
     min_score: Optional[int] = None,
     sort_by: str = Query("prospect_score", pattern="^(prospect_score|years_operated|monthly_revenue)$"),
@@ -103,30 +103,32 @@ async def get_prospects(
 
         where_sql = " AND ".join(where_clauses) if where_clauses else "1=1"
 
-        # SQL Injection prevention - validate sort column
+        # SQL Injection prevention - validate sort column against whitelist
         if sort_by not in ALLOWED_SORT_COLUMNS:
             sort_by = "prospect_score"
+        order_dir = "DESC" if sort_order == "desc" else "ASC"
 
-        # 전체 개수
-        count_query = f"SELECT COUNT(*) FROM pharmacy_prospect_targets WHERE {where_sql}"
-        count_result = await db.execute(text(count_query), params)
+        # 전체 개수 (where_clauses are hardcoded strings; values are bound via :param placeholders)
+        count_query = text(
+            "SELECT COUNT(*) FROM pharmacy_prospect_targets WHERE " + where_sql
+        )
+        count_result = await db.execute(count_query, params)
         total = count_result.scalar() or 0
 
-        # 데이터 조회
-        order_dir = "DESC" if sort_order == "desc" else "ASC"
-        query = f"""
-            SELECT ykiho, name, address, phone, latitude, longitude,
-                   years_operated, est_pharmacist_age, monthly_revenue,
-                   nearby_hospital_count, nearby_pharmacy_count,
-                   prospect_score, prospect_grade, score_factors,
-                   contact_status, last_contact_date, notes
-            FROM pharmacy_prospect_targets
-            WHERE {where_sql}
-            ORDER BY {sort_by} {order_dir}
-            OFFSET :offset LIMIT :limit
-        """
+        # 데이터 조회 (sort_by is whitelisted; order_dir is computed from validated input)
+        select_sql = (
+            "SELECT ykiho, name, address, phone, latitude, longitude,"
+            " years_operated, est_pharmacist_age, monthly_revenue,"
+            " nearby_hospital_count, nearby_pharmacy_count,"
+            " prospect_score, prospect_grade, score_factors,"
+            " contact_status, last_contact_date, notes"
+            " FROM pharmacy_prospect_targets"
+            " WHERE " + where_sql +
+            " ORDER BY " + sort_by + " " + order_dir +
+            " OFFSET :offset LIMIT :limit"
+        )
 
-        result = await db.execute(text(query), params)
+        result = await db.execute(text(select_sql), params)
         rows = result.fetchall()
 
         items = []

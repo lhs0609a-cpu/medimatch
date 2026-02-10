@@ -20,7 +20,7 @@ const registerSchema = z.object({
   passwordConfirm: z.string(),
   full_name: z.string().min(2, '이름을 입력해주세요'),
   phone: z.string().optional(),
-  role: z.enum(['DOCTOR', 'PHARMACIST', 'SALES_REP']),
+  role: z.enum(['DOCTOR', 'PHARMACIST', 'SALES_REP', 'LANDLORD']),
   company: z.string().optional(),
   license_number: z.string().optional(),
 }).refine((data) => data.password === data.passwordConfirm, {
@@ -54,6 +54,14 @@ const roles = [
     description: '개원지 탐색, 알림 설정',
     gradient: 'from-amber-500 to-orange-600',
     bgLight: 'bg-amber-50',
+  },
+  {
+    value: 'LANDLORD',
+    label: '건물주/일반인',
+    icon: Building2,
+    description: '병원 매물 등록, 임차인 모집',
+    gradient: 'from-blue-500 to-indigo-600',
+    bgLight: 'bg-blue-50',
   },
 ]
 
@@ -91,7 +99,11 @@ export default function RegisterPage() {
         license_number: data.license_number,
       })
       toast.success('회원가입이 완료되었습니다!')
-      router.push('/')
+      if (data.role === 'LANDLORD') {
+        router.push('/subscription/listing')
+      } else {
+        router.push('/')
+      }
     } catch (e) {
       // Error handled by store
     }

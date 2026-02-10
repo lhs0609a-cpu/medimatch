@@ -32,6 +32,8 @@ from .group_buying import (
     CohortStatus, ParticipantStatus, ContractStatus as GBContractStatus
 )
 from .favorite import Favorite, FavoriteType
+from .listing_subscription import ListingSubscription, ListingSubStatus
+from .pharmacy_transfer import PharmacyTransferListing, PharmTransferStatus
 
 __all__ = [
     "User",
@@ -116,4 +118,10 @@ __all__ = [
     # 즐겨찾기
     "Favorite",
     "FavoriteType",
+    # 매물 등록 구독
+    "ListingSubscription",
+    "ListingSubStatus",
+    # 약국 양도 매물
+    "PharmacyTransferListing",
+    "PharmTransferStatus",
 ]

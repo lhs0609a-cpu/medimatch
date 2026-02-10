@@ -60,7 +60,14 @@ export default function DashboardPage() {
         return;
       }
 
-      const userResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1'}/auth/me`, {
+      const apiBase = process.env.NEXT_PUBLIC_API_URL;
+      if (!apiBase) {
+        console.error('NEXT_PUBLIC_API_URL is not configured');
+        setLoading(false);
+        return;
+      }
+
+      const userResponse = await fetch(`${apiBase}/auth/me`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -78,8 +85,7 @@ export default function DashboardPage() {
       setUserRole(userData.role || 'DOCTOR');
       setUserName(userData.full_name || '사용자');
 
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1';
-      const statsResponse = await fetch(`${apiUrl}/dashboard/stats`, {
+      const statsResponse = await fetch(`${apiBase}/dashboard/stats`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -96,17 +102,17 @@ export default function DashboardPage() {
         });
       } else {
         setStats({
-          totalSimulations: 3,
-          totalBids: 2,
-          successfulBids: 1,
-          pendingAlerts: 5,
-          credits: 10,
-          subscriptionStatus: 'ACTIVE',
-          subscriptionExpires: '2025-12-31',
+          totalSimulations: 0,
+          totalBids: 0,
+          successfulBids: 0,
+          pendingAlerts: 0,
+          credits: 0,
+          subscriptionStatus: 'INACTIVE',
+          subscriptionExpires: null,
         });
       }
 
-      const activitiesResponse = await fetch(`${apiUrl}/dashboard/activities?limit=5`, {
+      const activitiesResponse = await fetch(`${apiBase}/dashboard/activities?limit=5`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -123,21 +129,17 @@ export default function DashboardPage() {
           })) || []
         );
       } else {
-        setActivities([
-          { id: 1, type: 'simulation', title: '개원 시뮬레이션 완료', description: '강남구 역삼동 피부과', timestamp: new Date().toISOString(), status: 'completed' },
-          { id: 2, type: 'alert', title: '새 프로스펙트 감지', description: '서초구 신축 건물 3건', timestamp: new Date(Date.now() - 3600000).toISOString(), status: 'new' },
-        ]);
+        setActivities([]);
       }
     } catch (err) {
-      console.error('Failed to fetch dashboard data:', err);
       setStats({
-        totalSimulations: 3,
-        totalBids: 2,
-        successfulBids: 1,
-        pendingAlerts: 5,
-        credits: 10,
-        subscriptionStatus: 'ACTIVE',
-        subscriptionExpires: '2025-12-31',
+        totalSimulations: 0,
+        totalBids: 0,
+        successfulBids: 0,
+        pendingAlerts: 0,
+        credits: 0,
+        subscriptionStatus: 'INACTIVE',
+        subscriptionExpires: null,
       });
       setActivities([]);
     } finally {
@@ -145,12 +147,31 @@ export default function DashboardPage() {
     }
   };
 
-  const quickActions = [
-    { label: '시뮬레이션', href: '/simulate', icon: BarChart3, color: 'violet', desc: '개원 분석' },
-    { label: '개원지 탐색', href: '/prospects', icon: Search, color: 'emerald', desc: '프로스펙트' },
-    { label: '약국 매칭', href: '/pharmacy', icon: Building2, color: 'fuchsia', desc: '입찰하기' },
-    { label: '지도', href: '/map', icon: MapPin, color: 'sky', desc: '전체보기' },
-  ];
+  const quickActions = (() => {
+    switch (userRole) {
+      case 'LANDLORD':
+        return [
+          { label: '매물 등록', href: '/landlord/register', icon: Plus, color: 'emerald', desc: '새 매물' },
+          { label: '내 매물', href: '/landlord', icon: Building2, color: 'violet', desc: '관리하기' },
+          { label: '구독 관리', href: '/subscription/listing', icon: CreditCard, color: 'amber', desc: '정기결제' },
+          { label: '매물 검색', href: '/buildings', icon: Search, color: 'sky', desc: '입점 현황' },
+        ];
+      case 'PHARMACIST':
+        return [
+          { label: '매물 찾기', href: '/buildings', icon: Search, color: 'emerald', desc: '건물 검색' },
+          { label: '약국 등록', href: '/pharmacist/register', icon: Plus, color: 'violet', desc: '양도 등록' },
+          { label: '내 약국 매물', href: '/pharmacist', icon: Building2, color: 'fuchsia', desc: '관리하기' },
+          { label: '약국 매칭', href: '/pharmacy', icon: MapPin, color: 'sky', desc: '매칭 찾기' },
+        ];
+      default:
+        return [
+          { label: '시뮬레이션', href: '/simulate', icon: BarChart3, color: 'violet', desc: '개원 분석' },
+          { label: '개원지 탐색', href: '/prospects', icon: Search, color: 'emerald', desc: '프로스펙트' },
+          { label: '약국 매칭', href: '/pharmacy', icon: Building2, color: 'fuchsia', desc: '입찰하기' },
+          { label: '지도', href: '/map', icon: MapPin, color: 'sky', desc: '전체보기' },
+        ];
+    }
+  })();
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);

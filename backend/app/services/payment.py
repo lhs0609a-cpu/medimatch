@@ -12,8 +12,8 @@ from app.models.partner_subscription import SUBSCRIPTION_PLANS, SubscriptionPlan
 
 logger = logging.getLogger(__name__)
 
-TOSS_SECRET_KEY = os.getenv("TOSS_SECRET_KEY", "test_sk_xxx")
-TOSS_CLIENT_KEY = os.getenv("TOSS_CLIENT_KEY", "test_ck_xxx")
+TOSS_SECRET_KEY = os.getenv("TOSS_SECRET_KEY", "")
+TOSS_CLIENT_KEY = os.getenv("TOSS_CLIENT_KEY", "")
 TOSS_API_URL = "https://api.tosspayments.com/v1"
 
 
@@ -404,6 +404,13 @@ PRODUCTS = {
         "category": "landlord_ad",
         "ad_type": "push",
         "max_recipients": 1000,
+    },
+    # ===== 매물 등록 정기구독 =====
+    "listing_subscription_monthly": {
+        "name": "매물 등록 구독 (월)",
+        "price": 150000,
+        "description": "매월 매물 등록 크레딧 1개 적립",
+        "category": "listing_subscription",
     },
     "landlord_email_campaign": {
         "name": "이메일 마케팅",

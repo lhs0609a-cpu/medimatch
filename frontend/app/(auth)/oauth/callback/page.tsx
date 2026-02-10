@@ -19,12 +19,29 @@ function OAuthCallbackContent() {
       const refreshToken = searchParams.get('refresh_token')
       const error = searchParams.get('error')
       const oauthSuccess = searchParams.get('oauth_success')
+      const returnedState = searchParams.get('state')
+      const provider = searchParams.get('provider')
+
+      // URL에서 토큰/민감정보 즉시 제거
+      window.history.replaceState({}, '', window.location.pathname)
 
       if (error) {
         setStatus('error')
         setMessage(decodeURIComponent(error))
         setTimeout(() => router.push('/login'), 3000)
         return
+      }
+
+      // OAuth state 검증 (CSRF 방지)
+      if (provider && returnedState) {
+        const storedState = localStorage.getItem(`oauth_state_${provider}`)
+        localStorage.removeItem(`oauth_state_${provider}`)
+        if (!storedState || storedState !== returnedState) {
+          setStatus('error')
+          setMessage('인증 상태 검증에 실패했습니다. 다시 로그인해주세요.')
+          setTimeout(() => router.push('/login'), 3000)
+          return
+        }
       }
 
       if (oauthSuccess === 'true' && accessToken && refreshToken) {
@@ -36,11 +53,17 @@ function OAuthCallbackContent() {
           // 사용자 정보 가져오기
           await fetchUser()
 
+          // fetchUser가 내부에서 에러를 잡으므로 실제 인증 상태 확인
+          const { isAuthenticated } = useAuth.getState()
+          if (!isAuthenticated) {
+            setStatus('error')
+            setMessage('사용자 인증에 실패했습니다. 다시 로그인해주세요.')
+            setTimeout(() => router.push('/login'), 3000)
+            return
+          }
+
           setStatus('success')
           setMessage('로그인 성공! 대시보드로 이동합니다...')
-
-          // URL에서 토큰 제거
-          window.history.replaceState({}, '', '/dashboard')
 
           setTimeout(() => router.push('/dashboard'), 1500)
         } catch (err) {

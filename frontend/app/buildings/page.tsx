@@ -14,10 +14,11 @@ import { buildingListingImages } from '@/components/BlurredListingImage'
 import KakaoMap from '@/components/map/KakaoMap'
 
 // 시드 데이터 생성 (클라이언트에서 한 번만)
-const allListings = generateBuildingListings(120)
+const seedListings = generateBuildingListings(120)
 const activityFeed = generateActivityFeed(20)
 
 type SortOption = 'latest' | 'popular' | 'priceAsc' | 'priceDesc' | 'inquiry'
+type DataSource = 'seed' | 'api'
 
 const sortOptions: { value: SortOption; label: string }[] = [
   { value: 'latest', label: '최신순' },
@@ -42,6 +43,9 @@ export default function BuildingsPage() {
   const [showInquiryModal, setShowInquiryModal] = useState(false)
   const [selectedListing, setSelectedListing] = useState<BuildingListing | null>(null)
   const [currentActivityIndex, setCurrentActivityIndex] = useState(0)
+  const [dataSource, setDataSource] = useState<DataSource>('seed')
+  const [apiListings, setApiListings] = useState<BuildingListing[]>([])
+  const [apiTotal, setApiTotal] = useState(0)
 
   // 적용된 필터 개수 계산
   const activeFilterCount = useMemo(() => {
@@ -73,6 +77,58 @@ export default function BuildingsPage() {
     }))
   }
 
+  // 로그인 시 실제 매물 데이터 로드
+  useEffect(() => {
+    const fetchRealListings = async () => {
+      const token = localStorage.getItem('access_token')
+      if (!token) return
+
+      try {
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL
+        if (!apiUrl) return
+
+        const res = await fetch(`${apiUrl}/landlord/buildings?page_size=100`, {
+          headers: { Authorization: `Bearer ${token}` },
+        })
+        if (!res.ok) return
+
+        const data = await res.json()
+        if (data.items && data.items.length > 0) {
+          const mapped: BuildingListing[] = data.items.map((item: any, idx: number) => ({
+            id: item.id,
+            title: item.title || '매물',
+            region: item.region_name || '',
+            address: item.region_name || '',
+            floor: item.floor || '1층',
+            areaPyeong: item.area_pyeong || 0,
+            monthlyRent: item.rent_monthly_range ? parseInt(item.rent_monthly_range) || 0 : 0,
+            deposit: 0,
+            premium: 0,
+            preferredTenants: item.preferred_tenants || [],
+            hasParking: item.has_parking || false,
+            hasElevator: item.has_elevator || false,
+            buildingAge: 0,
+            previousUse: '',
+            description: '',
+            viewCount: item.view_count || 0,
+            inquiryCount: 0,
+            isHot: (item.view_count || 0) > 50,
+            isNew: true,
+            imageIndex: idx % 6,
+            lat: 37.5 + Math.random() * 0.1,
+            lng: 127.0 + Math.random() * 0.1,
+          }))
+          setApiListings(mapped)
+          setApiTotal(data.total || mapped.length)
+          setDataSource('api')
+        }
+      } catch {
+        // 실패 시 시드 데이터 유지
+      }
+    }
+    fetchRealListings()
+  }, [])
+
   // 실시간 활동 피드 롤링
   useEffect(() => {
     const interval = setInterval(() => {
@@ -80,6 +136,8 @@ export default function BuildingsPage() {
     }, 4000)
     return () => clearInterval(interval)
   }, [])
+
+  const allListings = dataSource === 'api' ? apiListings : seedListings
 
   // 필터링 및 정렬된 매물
   const filteredListings = useMemo(() => {
@@ -124,7 +182,7 @@ export default function BuildingsPage() {
     }
 
     return result
-  }, [filters, sortBy])
+  }, [filters, sortBy, allListings])
 
   // 지도 마커 데이터 생성
   const mapMarkers = useMemo(() => {
@@ -208,6 +266,30 @@ export default function BuildingsPage() {
               </button>
             </div>
           </div>
+
+          {/* Data Source Banner */}
+          {dataSource === 'api' ? (
+            <div className="mt-4 bg-gradient-to-r from-emerald-600/10 to-teal-600/10 border border-emerald-200 dark:border-emerald-800 rounded-lg px-4 py-2">
+              <div className="flex items-center gap-2 text-sm">
+                <CheckCircle className="w-4 h-4 text-emerald-600" />
+                <span className="text-emerald-700 font-medium">
+                  검증된 실제 매물 {apiTotal}건이 표시되고 있습니다
+                </span>
+              </div>
+            </div>
+          ) : (
+            <div className="mt-4 bg-gradient-to-r from-amber-600/10 to-orange-600/10 border border-amber-200 dark:border-amber-800 rounded-lg px-4 py-2">
+              <div className="flex items-center gap-2 text-sm">
+                <Lock className="w-4 h-4 text-amber-600" />
+                <span className="text-amber-700 font-medium">
+                  로그인하면 실제 매물을 확인할 수 있습니다
+                </span>
+                <Link href="/login" className="ml-auto text-amber-700 underline font-medium hover:text-amber-900">
+                  로그인
+                </Link>
+              </div>
+            </div>
+          )}
 
           {/* Live Activity Banner */}
           <div className="mt-4 bg-gradient-to-r from-blue-600/10 to-cyan-600/10 border border-blue-200 dark:border-blue-800 rounded-lg px-4 py-2">

@@ -1,7 +1,9 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
+from pydantic import BaseModel, EmailStr
 from datetime import datetime
+import logging
 
 from ...schemas.user import (
     UserCreate, UserResponse, UserLogin, UserUpdate,
@@ -14,6 +16,8 @@ from ...core.security import (
     get_current_user, TokenData
 )
 from ..deps import get_db, get_current_active_user
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
@@ -177,3 +181,26 @@ async def delete_account(
     await db.commit()
 
     return {"message": "계정이 성공적으로 삭제되었습니다"}
+
+
+class PasswordResetRequest(BaseModel):
+    email: EmailStr
+
+
+@router.post("/forgot-password")
+async def forgot_password(
+    data: PasswordResetRequest,
+    db: AsyncSession = Depends(get_db)
+):
+    """비밀번호 재설정 이메일 발송 요청"""
+    # Always return success to prevent email enumeration
+    result = await db.execute(
+        select(User).where(User.email == data.email)
+    )
+    user = result.scalar_one_or_none()
+
+    if user and user.is_active:
+        # TODO: Send password reset email via SMTP when configured
+        logger.info(f"Password reset requested for: {data.email}")
+
+    return {"message": "등록된 이메일이라면 비밀번호 재설정 링크가 발송됩니다."}

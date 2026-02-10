@@ -21,6 +21,7 @@ celery_app = Celery(
         "app.tasks.prospect_tasks",
         "app.tasks.campaign_tasks",
         "app.tasks.sales_match_tasks",
+        "app.tasks.listing_subscription_tasks",
     ]
 )
 
@@ -102,5 +103,17 @@ celery_app.conf.beat_schedule = {
     "match-request-reminder": {
         "task": "app.tasks.sales_match_tasks.send_match_request_reminder",
         "schedule": crontab(hour="*/6", minute=30),
+    },
+
+    # ===== 매물 등록 구독 =====
+    # 매일 오전 6시: 구독 자동갱신 결제
+    "listing-subscription-renewals": {
+        "task": "app.tasks.listing_subscription_tasks.process_listing_renewals",
+        "schedule": crontab(hour=6, minute=0),
+    },
+    # 매일 자정: 취소된 구독 만료 처리
+    "listing-subscription-expire": {
+        "task": "app.tasks.listing_subscription_tasks.expire_canceled_subscriptions",
+        "schedule": crontab(hour=0, minute=0),
     },
 }

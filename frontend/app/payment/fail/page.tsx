@@ -400,7 +400,7 @@ function PaymentFailContent() {
           <h2 className="font-semibold text-gray-900 mb-4">도움이 필요하신가요?</h2>
           <div className="space-y-3">
             <a
-              href="mailto:support@mediplatone.kr"
+              href={`mailto:${process.env.NEXT_PUBLIC_SUPPORT_EMAIL || 'support@mediplaton.kr'}`}
               className="flex items-center gap-4 p-4 border border-gray-200 rounded-xl hover:border-blue-300 hover:bg-blue-50 transition-all"
             >
               <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center text-blue-600">
@@ -408,7 +408,7 @@ function PaymentFailContent() {
               </div>
               <div className="flex-1">
                 <p className="font-medium text-gray-900">고객센터 문의</p>
-                <p className="text-sm text-gray-500">support@mediplatone.kr</p>
+                <p className="text-sm text-gray-500">{process.env.NEXT_PUBLIC_SUPPORT_EMAIL || 'support@mediplaton.kr'}</p>
               </div>
               <ExternalLink className="w-5 h-5 text-gray-400" />
             </a>

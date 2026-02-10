@@ -3,15 +3,17 @@
 """
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, func, text
+from sqlalchemy import select, func, text, or_
 from typing import Optional
 from datetime import datetime, timedelta
 from pydantic import BaseModel
+from uuid import UUID
 
 from app.core.database import get_db
 from app.core.security import get_current_user
 from app.models.user import User, UserRole
-from app.models.payment import Payment, PaymentStatus
+from app.models.payment import Payment, Subscription, UsageCredit, PaymentStatus
+from app.models.listing_subscription import ListingSubscription, ListingSubStatus
 
 router = APIRouter()
 
@@ -265,43 +267,133 @@ async def get_stats(
 
 @router.get("/users")
 async def list_users(
-    skip: int = 0,
-    limit: int = 20,
+    page: int = 1,
+    page_size: int = 20,
     role: Optional[str] = None,
     search: Optional[str] = None,
+    is_active: Optional[bool] = None,
     db: AsyncSession = Depends(get_db),
     admin: User = Depends(require_admin)
 ):
     """사용자 목록 조회"""
     query = select(User)
+    count_query = select(func.count(User.id))
 
     if role:
-        query = query.where(User.role == role)
+        try:
+            role_enum = UserRole(role)
+            query = query.where(User.role == role_enum)
+            count_query = count_query.where(User.role == role_enum)
+        except ValueError:
+            pass
 
     if search:
-        query = query.where(
-            (User.email.ilike(f"%{search}%")) |
-            (User.full_name.ilike(f"%{search}%"))
+        search_filter = or_(
+            User.email.ilike(f"%{search}%"),
+            User.full_name.ilike(f"%{search}%"),
+            User.phone.ilike(f"%{search}%"),
         )
+        query = query.where(search_filter)
+        count_query = count_query.where(search_filter)
 
-    query = query.offset(skip).limit(limit).order_by(User.created_at.desc())
+    if is_active is not None:
+        query = query.where(User.is_active == is_active)
+        count_query = count_query.where(User.is_active == is_active)
+
+    total_result = await db.execute(count_query)
+    total = total_result.scalar()
+
+    # 역할별 통계
+    role_stats_result = await db.execute(
+        select(User.role, func.count(User.id)).group_by(User.role)
+    )
+    role_stats = {r.value: c for r, c in role_stats_result.all()}
+
+    query = query.offset((page - 1) * page_size).limit(page_size).order_by(User.created_at.desc())
     result = await db.execute(query)
     users = result.scalars().all()
 
     return {
-        "users": [
+        "items": [
             {
                 "id": str(u.id),
                 "email": u.email,
                 "full_name": u.full_name,
+                "phone": u.phone,
                 "role": u.role.value if hasattr(u.role, 'value') else str(u.role),
                 "is_active": u.is_active,
                 "is_verified": u.is_verified,
+                "oauth_provider": u.oauth_provider,
                 "created_at": u.created_at.isoformat() if u.created_at else None,
                 "last_login": u.last_login.isoformat() if u.last_login else None
             }
             for u in users
-        ]
+        ],
+        "total": total,
+        "page": page,
+        "page_size": page_size,
+        "role_stats": role_stats,
+    }
+
+
+@router.get("/users/{user_id}")
+async def get_user_detail(
+    user_id: str,
+    db: AsyncSession = Depends(get_db),
+    admin: User = Depends(require_admin)
+):
+    """사용자 상세 조회"""
+    result = await db.execute(select(User).where(User.id == UUID(user_id)))
+    user = result.scalar_one_or_none()
+    if not user:
+        raise HTTPException(status_code=404, detail="사용자를 찾을 수 없습니다")
+
+    # 결제 건수
+    pay_count_result = await db.execute(
+        select(func.count(Payment.id)).where(Payment.user_id == user.id)
+    )
+    payment_count = pay_count_result.scalar() or 0
+
+    # 구독 정보
+    sub_result = await db.execute(
+        select(Subscription).where(Subscription.user_id == user.id)
+    )
+    subscription = sub_result.scalar_one_or_none()
+
+    # 매물 구독
+    listing_sub_result = await db.execute(
+        select(ListingSubscription).where(ListingSubscription.user_id == user.id)
+    )
+    listing_sub = listing_sub_result.scalar_one_or_none()
+
+    return {
+        "id": str(user.id),
+        "email": user.email,
+        "full_name": user.full_name,
+        "phone": user.phone,
+        "role": user.role.value,
+        "is_active": user.is_active,
+        "is_verified": user.is_verified,
+        "oauth_provider": user.oauth_provider,
+        "company": user.company,
+        "license_number": user.license_number,
+        "specialty": user.specialty,
+        "opening_region": user.opening_region,
+        "opening_status": user.opening_status,
+        "created_at": user.created_at.isoformat() if user.created_at else None,
+        "last_login": user.last_login.isoformat() if user.last_login else None,
+        "payment_count": payment_count,
+        "subscription": {
+            "plan": subscription.plan,
+            "status": subscription.status,
+            "expires_at": subscription.expires_at.isoformat() if subscription.expires_at else None,
+        } if subscription else None,
+        "listing_subscription": {
+            "status": listing_sub.status.value,
+            "total_credits": listing_sub.total_credits,
+            "used_credits": listing_sub.used_credits,
+            "next_billing_date": listing_sub.next_billing_date.isoformat() if listing_sub.next_billing_date else None,
+        } if listing_sub else None,
     }
 
 
@@ -313,8 +405,6 @@ async def update_user_status(
     admin: User = Depends(require_admin)
 ):
     """사용자 활성화/비활성화"""
-    from uuid import UUID
-
     result = await db.execute(select(User).where(User.id == UUID(user_id)))
     user = result.scalar_one_or_none()
 
@@ -325,3 +415,179 @@ async def update_user_status(
     await db.commit()
 
     return {"status": "updated", "is_active": is_active}
+
+
+@router.patch("/users/{user_id}/role")
+async def update_user_role(
+    user_id: str,
+    role: str,
+    db: AsyncSession = Depends(get_db),
+    admin: User = Depends(require_admin)
+):
+    """사용자 역할 변경"""
+    result = await db.execute(select(User).where(User.id == UUID(user_id)))
+    user = result.scalar_one_or_none()
+
+    if not user:
+        raise HTTPException(status_code=404, detail="사용자를 찾을 수 없습니다")
+
+    try:
+        new_role = UserRole(role)
+    except ValueError:
+        raise HTTPException(status_code=400, detail=f"유효하지 않은 역할: {role}")
+
+    user.role = new_role
+    user.updated_at = datetime.utcnow()
+    await db.commit()
+
+    return {"status": "updated", "role": new_role.value}
+
+
+# ===== 결제/구독 관리자 API =====
+
+@router.get("/payments")
+async def admin_list_payments(
+    page: int = 1,
+    page_size: int = 20,
+    status: Optional[str] = None,
+    search: Optional[str] = None,
+    db: AsyncSession = Depends(get_db),
+    admin: User = Depends(require_admin)
+):
+    """전체 결제 내역 조회 (관리자)"""
+    query = select(Payment, User.email, User.full_name).join(User, Payment.user_id == User.id)
+    count_query = select(func.count(Payment.id))
+
+    if status:
+        try:
+            status_enum = PaymentStatus(status)
+            query = query.where(Payment.status == status_enum)
+            count_query = count_query.where(Payment.status == status_enum)
+        except ValueError:
+            pass
+
+    if search:
+        search_filter = or_(
+            User.email.ilike(f"%{search}%"),
+            User.full_name.ilike(f"%{search}%"),
+            Payment.order_id.ilike(f"%{search}%"),
+        )
+        query = query.where(search_filter)
+        count_query = count_query.where(
+            Payment.user_id.in_(
+                select(User.id).where(or_(
+                    User.email.ilike(f"%{search}%"),
+                    User.full_name.ilike(f"%{search}%"),
+                ))
+            ) | Payment.order_id.ilike(f"%{search}%")
+        )
+
+    total_result = await db.execute(count_query)
+    total = total_result.scalar()
+
+    # 통계
+    stats_result = await db.execute(
+        select(Payment.status, func.count(Payment.id), func.coalesce(func.sum(Payment.amount), 0))
+        .group_by(Payment.status)
+    )
+    stats = {s.value: {"count": c, "amount": a} for s, c, a in stats_result.all()}
+
+    result = await db.execute(
+        query.order_by(Payment.created_at.desc())
+        .offset((page - 1) * page_size).limit(page_size)
+    )
+    rows = result.all()
+
+    items = []
+    for row in rows:
+        p = row[0]
+        items.append({
+            "id": p.id,
+            "order_id": p.order_id,
+            "user_email": row[1],
+            "user_name": row[2],
+            "product_id": p.product_id,
+            "product_name": p.product_name,
+            "amount": p.amount,
+            "status": p.status.value,
+            "method": p.method.value if p.method else None,
+            "card_company": p.card_company,
+            "paid_at": p.paid_at.isoformat() if p.paid_at else None,
+            "created_at": p.created_at.isoformat() if p.created_at else None,
+            "cancel_reason": p.cancel_reason,
+        })
+
+    return {
+        "items": items,
+        "total": total,
+        "page": page,
+        "page_size": page_size,
+        "stats": stats,
+    }
+
+
+@router.get("/subscriptions")
+async def admin_list_subscriptions(
+    page: int = 1,
+    page_size: int = 20,
+    sub_type: Optional[str] = None,
+    db: AsyncSession = Depends(get_db),
+    admin: User = Depends(require_admin)
+):
+    """전체 구독 현황 조회 (관리자)"""
+
+    items = []
+
+    # 시뮬레이션 구독 (Subscription 모델)
+    if sub_type in (None, "simulation"):
+        sim_query = select(Subscription, User.email, User.full_name).join(User, Subscription.user_id == User.id)
+        sim_result = await db.execute(sim_query.order_by(Subscription.created_at.desc()))
+        for row in sim_result.all():
+            s = row[0]
+            items.append({
+                "id": s.id,
+                "type": "simulation",
+                "user_email": row[1],
+                "user_name": row[2],
+                "plan": s.plan,
+                "status": s.status,
+                "started_at": s.started_at.isoformat() if s.started_at else None,
+                "expires_at": s.expires_at.isoformat() if s.expires_at else None,
+                "is_auto_renew": s.is_auto_renew,
+                "amount": None,
+            })
+
+    # 매물 등록 구독 (ListingSubscription 모델)
+    if sub_type in (None, "listing"):
+        ls_query = select(ListingSubscription, User.email, User.full_name).join(User, ListingSubscription.user_id == User.id)
+        ls_result = await db.execute(ls_query.order_by(ListingSubscription.created_at.desc()))
+        for row in ls_result.all():
+            ls = row[0]
+            items.append({
+                "id": ls.id,
+                "type": "listing",
+                "user_email": row[1],
+                "user_name": row[2],
+                "plan": "매물등록",
+                "status": ls.status.value,
+                "started_at": ls.current_period_start.isoformat() if ls.current_period_start else None,
+                "expires_at": ls.current_period_end.isoformat() if ls.current_period_end else None,
+                "is_auto_renew": ls.status == ListingSubStatus.ACTIVE,
+                "amount": ls.monthly_amount,
+                "total_credits": ls.total_credits,
+                "used_credits": ls.used_credits,
+                "next_billing_date": ls.next_billing_date.isoformat() if ls.next_billing_date else None,
+                "card_info": f"{ls.card_company} {ls.card_number}" if ls.card_company else None,
+            })
+
+    # 간단한 페이지네이션
+    total = len(items)
+    start = (page - 1) * page_size
+    paged_items = items[start:start + page_size]
+
+    return {
+        "items": paged_items,
+        "total": total,
+        "page": page,
+        "page_size": page_size,
+    }

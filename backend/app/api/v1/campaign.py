@@ -14,6 +14,9 @@ from ...models.user import User
 
 router = APIRouter()
 
+# 메모리 기반 캠페인 이력 (프로덕션에서는 DB 사용)
+_campaign_history: list = []
+
 
 # ===== Schemas =====
 
@@ -103,15 +106,21 @@ async def create_campaign(
             )
         status = "RUNNING"
 
-    return CampaignResponse(
+    response = CampaignResponse(
         id=campaign_id,
         name=campaign_data.name,
         campaign_type=campaign_data.campaign_type,
         target_grade=campaign_data.target_grade,
         status=status,
         scheduled_time=campaign_data.scheduled_time,
+        total_targets=campaign_data.limit,
         created_at=datetime.now().isoformat()
     )
+
+    # 이력 저장
+    _campaign_history.insert(0, response.model_dump())
+
+    return response
 
 
 @router.get("/stats", response_model=CampaignStatsResponse)
@@ -268,4 +277,23 @@ async def preview_message(
         "sample_data": sample_data,
         "character_count": len(rendered),
         "sms_type": "LMS" if len(rendered) > 90 else "SMS"
+    }
+
+
+@router.get("/history")
+async def get_campaign_history(
+    page: int = Query(1, ge=1),
+    page_size: int = Query(20, ge=1, le=100),
+    current_user: User = Depends(get_current_user),
+):
+    """캠페인 발송 이력 조회"""
+    total = len(_campaign_history)
+    start = (page - 1) * page_size
+    items = _campaign_history[start:start + page_size]
+
+    return {
+        "items": items,
+        "total": total,
+        "page": page,
+        "page_size": page_size,
     }

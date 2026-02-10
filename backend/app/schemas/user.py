@@ -10,6 +10,7 @@ class UserRole(str, Enum):
     PHARMACIST = "PHARMACIST"
     SALES_REP = "SALES_REP"
     DOCTOR = "DOCTOR"
+    LANDLORD = "LANDLORD"
 
 
 class UserBase(BaseModel):

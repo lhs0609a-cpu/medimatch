@@ -15,10 +15,16 @@ import {
   Pill,
   Send,
   TrendingUp,
+  ClipboardCheck,
+  CreditCard,
 } from 'lucide-react';
 
 const sidebarItems = [
   { href: '/admin', label: '대시보드', icon: Home },
+  { href: '/admin/listings', label: '매물 심사', icon: ClipboardCheck },
+  { href: '/admin/pharmacy-listings', label: '약국 매물', icon: Pill },
+  { href: '/admin/users', label: '회원 관리', icon: Users },
+  { href: '/admin/payments', label: '결제/구독', icon: CreditCard },
   { href: '/admin/realestate', label: '부동산 매물', icon: Building2 },
   { href: '/admin/prospects', label: '약국 타겟팅', icon: Pill },
   { href: '/admin/campaigns', label: '아웃바운드 캠페인', icon: Send },

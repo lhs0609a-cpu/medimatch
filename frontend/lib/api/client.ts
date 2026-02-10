@@ -61,7 +61,7 @@ export interface User {
   email: string
   full_name: string
   phone?: string
-  role: 'ADMIN' | 'PHARMACIST' | 'SALES_REP' | 'DOCTOR'
+  role: 'ADMIN' | 'PHARMACIST' | 'SALES_REP' | 'DOCTOR' | 'LANDLORD'
   company?: string
   license_number?: string
   is_active: boolean

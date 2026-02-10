@@ -39,12 +39,26 @@ export default function ContactPage() {
     setIsSubmitting(true)
 
     try {
-      // API 호출 시뮬레이션
-      await new Promise(resolve => setTimeout(resolve, 1500))
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL
+      if (!apiUrl) {
+        throw new Error('API URL이 설정되지 않았습니다.')
+      }
+
+      const res = await fetch(`${apiUrl}/contact`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      })
+
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}))
+        throw new Error(errorData.detail || '문의 접수에 실패했습니다.')
+      }
+
       setIsSubmitted(true)
       toast.success('문의가 성공적으로 접수되었습니다.')
     } catch (error) {
-      toast.error('문의 접수에 실패했습니다. 다시 시도해주세요.')
+      toast.error(error instanceof Error ? error.message : '문의 접수에 실패했습니다. 다시 시도해주세요.')
     } finally {
       setIsSubmitting(false)
     }

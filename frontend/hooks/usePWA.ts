@@ -18,7 +18,7 @@ export function usePWA() {
   const [state, setState] = useState<PWAState>({
     isInstallable: false,
     isInstalled: false,
-    isOnline: typeof navigator !== 'undefined' ? navigator.onLine : true,
+    isOnline: true, // Always start as true to avoid hydration mismatch
     isUpdateAvailable: false,
   })
 
@@ -98,6 +98,9 @@ export function usePWA() {
 
   // 온라인/오프라인 상태 감지
   useEffect(() => {
+    // Set actual online status after mount (avoids hydration mismatch)
+    setState((prev) => ({ ...prev, isOnline: navigator.onLine }))
+
     const handleOnline = () => {
       setState((prev) => ({ ...prev, isOnline: true }))
     }

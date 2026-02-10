@@ -48,8 +48,13 @@ export default function LoginPage() {
         // OAuth 페이지로 리다이렉트
         window.location.href = response.auth_url
       }
-    } catch (err) {
-      toast.error(`${provider} 로그인 연동 중 오류가 발생했습니다.`)
+    } catch (err: any) {
+      const detail = err.response?.data?.detail || ''
+      if (detail.includes('설정되지 않았습니다')) {
+        toast.error(`${provider} 로그인은 현재 준비 중입니다.`)
+      } else {
+        toast.error(`${provider} 로그인 연동 중 오류가 발생했습니다.`)
+      }
       setSocialLoading(null)
     }
   }

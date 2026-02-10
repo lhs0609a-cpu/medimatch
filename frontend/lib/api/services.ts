@@ -1607,3 +1607,90 @@ export const favoritesService = {
     return response.data.is_favorited
   },
 }
+
+// Pharmacy Transfer Service (약국 양도 매물)
+export const pharmacyTransferService = {
+  createListing: async (data: {
+    pharmacy_name: string
+    address: string
+    region_name?: string
+    latitude?: number
+    longitude?: number
+    area_pyeong?: number
+    monthly_revenue?: number
+    monthly_rx_count?: number
+    premium?: number
+    rent_monthly?: number
+    rent_deposit?: number
+    transfer_reason?: string
+    description?: string
+    contact_name?: string
+    contact_phone?: string
+    images?: string[]
+  }) => {
+    const response = await apiClient.post('/pharmacy-transfer/listings', data)
+    return response.data
+  },
+
+  getMyListings: async (params?: { page?: number; page_size?: number }) => {
+    const response = await apiClient.get('/pharmacy-transfer/listings/my', { params })
+    return response.data
+  },
+
+  getListing: async (id: string) => {
+    const response = await apiClient.get(`/pharmacy-transfer/listings/${id}`)
+    return response.data
+  },
+
+  updateListing: async (id: string, data: any) => {
+    const response = await apiClient.patch(`/pharmacy-transfer/listings/${id}`, data)
+    return response.data
+  },
+
+  deleteListing: async (id: string) => {
+    await apiClient.delete(`/pharmacy-transfer/listings/${id}`)
+  },
+
+  getPublicListings: async (params?: { region?: string; page?: number; page_size?: number }) => {
+    const response = await apiClient.get('/pharmacy-transfer/public', { params })
+    return response.data
+  },
+
+  getPublicListing: async (id: string) => {
+    const response = await apiClient.get(`/pharmacy-transfer/public/${id}`)
+    return response.data
+  },
+}
+
+// Listing Subscription Service (매물 등록 정기구독)
+export const listingSubscriptionService = {
+  getConfig: async () => {
+    const response = await apiClient.get('/listing-subscription/config')
+    return response.data
+  },
+
+  activate: async (data: { auth_key: string; customer_key: string }) => {
+    const response = await apiClient.post('/listing-subscription/activate', data)
+    return response.data
+  },
+
+  getStatus: async () => {
+    const response = await apiClient.get('/listing-subscription/status')
+    return response.data
+  },
+
+  cancel: async (reason?: string) => {
+    const response = await apiClient.post('/listing-subscription/cancel', { reason })
+    return response.data
+  },
+
+  reactivate: async () => {
+    const response = await apiClient.post('/listing-subscription/reactivate')
+    return response.data
+  },
+
+  getBillingHistory: async () => {
+    const response = await apiClient.get('/listing-subscription/billing-history')
+    return response.data
+  },
+}

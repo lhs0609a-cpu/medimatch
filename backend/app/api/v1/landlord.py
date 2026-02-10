@@ -7,7 +7,7 @@
 """
 from fastapi import APIRouter, Depends, HTTPException, status, Query, UploadFile, File, Body
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, and_, func
+from sqlalchemy import select, and_, func, case, or_
 from typing import Optional, List
 from uuid import UUID
 from datetime import datetime
@@ -21,6 +21,7 @@ from ...models.landlord import (
     LandlordListingStatus, VerificationStatus, PreferredTenant,
     LANDLORD_ACCESS_FIELDS
 )
+from ...models.listing_subscription import ListingSubscription, ListingSubStatus
 
 router = APIRouter()
 
@@ -88,6 +89,11 @@ class LandlordListingUpdate(BaseModel):
     show_contact: Optional[bool] = None
 
 
+class AdminStatusChange(BaseModel):
+    new_status: str
+    reason: Optional[str] = None
+
+
 class BuildingInquiryCreate(BaseModel):
     message: str
     inquiry_type: Optional[str] = "general"
@@ -101,6 +107,31 @@ class BuildingInquiryCreate(BaseModel):
 # 건물주용 API
 # ============================================================
 
+@router.get("/stats")
+async def get_landlord_stats(
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_active_user)
+):
+    """건물주 매물 통계"""
+    result = await db.execute(
+        select(
+            func.count(LandlordListing.id).label("total_listings"),
+            func.count(case(
+                (LandlordListing.status == LandlordListingStatus.ACTIVE, LandlordListing.id),
+            )).label("active_listings"),
+            func.coalesce(func.sum(LandlordListing.view_count), 0).label("total_views"),
+            func.coalesce(func.sum(LandlordListing.inquiry_count), 0).label("total_inquiries"),
+        ).where(LandlordListing.owner_id == current_user.id)
+    )
+    row = result.one()
+    return {
+        "total_listings": row.total_listings,
+        "active_listings": row.active_listings,
+        "total_views": row.total_views,
+        "total_inquiries": row.total_inquiries,
+    }
+
+
 @router.post("/listings", status_code=status.HTTP_201_CREATED)
 async def create_landlord_listing(
     data: LandlordListingCreate,
@@ -112,7 +143,41 @@ async def create_landlord_listing(
 
     등록 후 증빙서류(등기부등본/임대차계약서)를 업로드해야 합니다.
     관리자 승인 후 공개됩니다.
+    구독 크레딧이 필요합니다.
     """
+    # 구독 크레딧 확인
+    sub_result = await db.execute(
+        select(ListingSubscription).where(
+            ListingSubscription.user_id == current_user.id
+        ).with_for_update()
+    )
+    sub = sub_result.scalar_one_or_none()
+
+    if not sub:
+        raise HTTPException(
+            status_code=status.HTTP_402_PAYMENT_REQUIRED,
+            detail="매물 등록 구독이 필요합니다."
+        )
+
+    if sub.status in (ListingSubStatus.EXPIRED, ListingSubStatus.SUSPENDED):
+        raise HTTPException(
+            status_code=status.HTTP_402_PAYMENT_REQUIRED,
+            detail="구독이 만료되었습니다. 구독을 갱신해주세요."
+        )
+
+    if sub.status not in (ListingSubStatus.ACTIVE, ListingSubStatus.CANCELED):
+        raise HTTPException(
+            status_code=status.HTTP_402_PAYMENT_REQUIRED,
+            detail="구독 상태를 확인해주세요."
+        )
+
+    remaining = sub.total_credits - sub.used_credits
+    if remaining <= 0:
+        raise HTTPException(
+            status_code=status.HTTP_402_PAYMENT_REQUIRED,
+            detail="사용 가능한 크레딧이 없습니다. 다음 결제일까지 기다리거나 추가 구독이 필요합니다."
+        )
+
     # 지역명 추출 (간단한 파싱)
     region_name = data.region_name or (" ".join(data.address.split()[:2]) if data.address else None)
 
@@ -153,6 +218,11 @@ async def create_landlord_listing(
     )
 
     db.add(listing)
+
+    # 크레딧 차감
+    sub.used_credits += 1
+    sub.updated_at = datetime.utcnow()
+
     await db.commit()
     await db.refresh(listing)
 
@@ -160,6 +230,7 @@ async def create_landlord_listing(
         "id": str(listing.id),
         "status": listing.status.value,
         "verification_status": listing.verification_status.value,
+        "remaining_credits": sub.total_credits - sub.used_credits,
         "message": "매물이 등록되었습니다. 증빙서류를 업로드해주세요."
     }
 
@@ -353,6 +424,17 @@ async def delete_landlord_listing(
 
     if listing.owner_id != current_user.id:
         raise HTTPException(status_code=403, detail="Not authorized")
+
+    # 크레딧 반환
+    sub_result = await db.execute(
+        select(ListingSubscription).where(
+            ListingSubscription.user_id == current_user.id
+        )
+    )
+    sub = sub_result.scalar_one_or_none()
+    if sub and sub.used_credits > 0:
+        sub.used_credits -= 1
+        sub.updated_at = datetime.utcnow()
 
     await db.delete(listing)
     await db.commit()
@@ -825,6 +907,225 @@ async def verify_listing(
         "status": listing.status.value,
         "verification_status": listing.verification_status.value,
         "message": message
+    }
+
+
+@router.get("/admin/listings")
+async def admin_list_all_listings(
+    status_filter: Optional[str] = Query(None, alias="status"),
+    search: Optional[str] = None,
+    page: int = Query(1, ge=1),
+    page_size: int = Query(20, ge=1, le=100),
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_active_user)
+):
+    """전체 매물 목록 + 상태별 통계 (관리자용)"""
+    if current_user.role != UserRole.ADMIN:
+        raise HTTPException(status_code=403, detail="Admin access required")
+
+    # 기본 쿼리 (User JOIN)
+    query = select(
+        LandlordListing,
+        User.email.label("owner_email"),
+        User.full_name.label("owner_name"),
+    ).join(User, LandlordListing.owner_id == User.id)
+
+    count_query = select(func.count(LandlordListing.id))
+
+    # 필터: 상태
+    if status_filter:
+        try:
+            status_enum = LandlordListingStatus(status_filter)
+            query = query.where(LandlordListing.status == status_enum)
+            count_query = count_query.where(LandlordListing.status == status_enum)
+        except ValueError:
+            raise HTTPException(status_code=400, detail=f"Invalid status: {status_filter}")
+
+    # 필터: 검색 (제목/주소)
+    if search:
+        search_filter = or_(
+            LandlordListing.title.ilike(f"%{search}%"),
+            LandlordListing.address.ilike(f"%{search}%"),
+        )
+        query = query.where(search_filter)
+        count_query = count_query.where(search_filter)
+
+    # 전체 개수
+    count_result = await db.execute(count_query)
+    total = count_result.scalar()
+
+    # 목록 조회
+    result = await db.execute(
+        query.order_by(LandlordListing.created_at.desc())
+        .offset((page - 1) * page_size)
+        .limit(page_size)
+    )
+    rows = result.all()
+
+    items = []
+    for row in rows:
+        listing = row[0]
+        owner_email = row[1]
+        owner_name = row[2]
+        items.append({
+            "id": str(listing.id),
+            "title": listing.title,
+            "address": listing.address,
+            "region_name": listing.region_name,
+            "owner_email": owner_email,
+            "owner_name": owner_name,
+            "status": listing.status.value,
+            "verification_status": listing.verification_status.value,
+            "rent_deposit": listing.rent_deposit,
+            "rent_monthly": listing.rent_monthly,
+            "area_pyeong": listing.area_pyeong,
+            "view_count": listing.view_count,
+            "inquiry_count": listing.inquiry_count,
+            "created_at": listing.created_at.isoformat() if listing.created_at else None,
+            "updated_at": listing.updated_at.isoformat() if listing.updated_at else None,
+        })
+
+    # 상태별 통계
+    stats_result = await db.execute(
+        select(
+            LandlordListing.status,
+            func.count(LandlordListing.id),
+        ).group_by(LandlordListing.status)
+    )
+    stats_rows = stats_result.all()
+    stats = {s.value: 0 for s in LandlordListingStatus}
+    for status_val, cnt in stats_rows:
+        stats[status_val.value] = cnt
+
+    return {
+        "items": items,
+        "total": total,
+        "page": page,
+        "page_size": page_size,
+        "stats": stats,
+    }
+
+
+@router.get("/admin/listings/{listing_id}")
+async def admin_get_listing_detail(
+    listing_id: UUID,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_active_user)
+):
+    """매물 상세 (관리자용) — 소유자 정보 포함"""
+    if current_user.role != UserRole.ADMIN:
+        raise HTTPException(status_code=403, detail="Admin access required")
+
+    result = await db.execute(
+        select(LandlordListing).where(LandlordListing.id == listing_id)
+    )
+    listing = result.scalar_one_or_none()
+    if not listing:
+        raise HTTPException(status_code=404, detail="Listing not found")
+
+    # 소유자 정보 조회
+    owner_result = await db.execute(
+        select(User).where(User.id == listing.owner_id)
+    )
+    owner = owner_result.scalar_one_or_none()
+
+    data = _listing_to_dict(listing, include_all=True)
+    data["owner_email"] = owner.email if owner else None
+    data["owner_name"] = owner.full_name if owner else None
+    data["owner_phone"] = owner.phone if owner and hasattr(owner, 'phone') else None
+    data["verified_at"] = listing.verified_at.isoformat() if listing.verified_at else None
+    data["verified_by"] = str(listing.verified_by) if listing.verified_by else None
+    data["is_public"] = listing.is_public
+
+    return data
+
+
+# 상태 전이 규칙
+ADMIN_STATUS_TRANSITIONS = {
+    LandlordListingStatus.DRAFT: [LandlordListingStatus.CLOSED],
+    LandlordListingStatus.PENDING_REVIEW: [
+        LandlordListingStatus.ACTIVE,
+        LandlordListingStatus.REJECTED,
+        LandlordListingStatus.CLOSED,
+    ],
+    LandlordListingStatus.ACTIVE: [
+        LandlordListingStatus.RESERVED,
+        LandlordListingStatus.CONTRACTED,
+        LandlordListingStatus.CLOSED,
+    ],
+    LandlordListingStatus.RESERVED: [
+        LandlordListingStatus.ACTIVE,
+        LandlordListingStatus.CONTRACTED,
+        LandlordListingStatus.CLOSED,
+    ],
+    LandlordListingStatus.CONTRACTED: [LandlordListingStatus.CLOSED],
+    LandlordListingStatus.REJECTED: [
+        LandlordListingStatus.PENDING_REVIEW,
+        LandlordListingStatus.CLOSED,
+    ],
+    LandlordListingStatus.CLOSED: [LandlordListingStatus.ACTIVE],
+}
+
+
+@router.post("/admin/listings/{listing_id}/status")
+async def admin_change_listing_status(
+    listing_id: UUID,
+    data: AdminStatusChange,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_active_user)
+):
+    """매물 상태 강제 변경 (관리자용)"""
+    if current_user.role != UserRole.ADMIN:
+        raise HTTPException(status_code=403, detail="Admin access required")
+
+    result = await db.execute(
+        select(LandlordListing).where(LandlordListing.id == listing_id)
+    )
+    listing = result.scalar_one_or_none()
+    if not listing:
+        raise HTTPException(status_code=404, detail="Listing not found")
+
+    # 새 상태 파싱
+    try:
+        new_status = LandlordListingStatus(data.new_status)
+    except ValueError:
+        raise HTTPException(status_code=400, detail=f"Invalid status: {data.new_status}")
+
+    # 전이 규칙 검사
+    allowed = ADMIN_STATUS_TRANSITIONS.get(listing.status, [])
+    if new_status not in allowed:
+        raise HTTPException(
+            status_code=400,
+            detail=f"'{listing.status.value}' → '{new_status.value}' 상태 변경이 불가능합니다."
+        )
+
+    # 부수 효과
+    if new_status == LandlordListingStatus.ACTIVE:
+        listing.is_public = True
+        listing.verified_at = datetime.utcnow()
+        listing.verified_by = current_user.id
+        listing.verification_status = VerificationStatus.VERIFIED
+        listing.rejection_reason = None
+    elif new_status == LandlordListingStatus.CLOSED:
+        listing.is_public = False
+    elif new_status == LandlordListingStatus.REJECTED:
+        listing.is_public = False
+        listing.verification_status = VerificationStatus.REJECTED
+        if data.reason:
+            listing.rejection_reason = data.reason
+    elif new_status == LandlordListingStatus.PENDING_REVIEW:
+        listing.rejection_reason = None
+        listing.verification_status = VerificationStatus.PENDING
+
+    listing.status = new_status
+    listing.updated_at = datetime.utcnow()
+    await db.commit()
+
+    return {
+        "id": str(listing.id),
+        "status": listing.status.value,
+        "verification_status": listing.verification_status.value,
+        "message": f"상태가 '{new_status.value}'(으)로 변경되었습니다.",
     }
 
 

@@ -11,6 +11,7 @@ import {
   ArrowUpRight,
   ArrowDownRight,
   RefreshCw,
+  ClipboardCheck,
 } from 'lucide-react';
 
 interface AdminStats {
@@ -19,6 +20,8 @@ interface AdminStats {
   hotProspects: number;
   campaignsSent: number;
   smsBalance: number;
+  pendingReview: number;
+  pharmacyPendingReview: number;
 }
 
 export default function AdminDashboardPage() {
@@ -28,6 +31,8 @@ export default function AdminDashboardPage() {
     hotProspects: 0,
     campaignsSent: 0,
     smsBalance: 0,
+    pendingReview: 0,
+    pharmacyPendingReview: 0,
   });
   const [loading, setLoading] = useState(true);
 
@@ -38,7 +43,12 @@ export default function AdminDashboardPage() {
   const fetchStats = async () => {
     try {
       const token = localStorage.getItem('access_token');
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1';
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+      if (!apiUrl) {
+        console.error('NEXT_PUBLIC_API_URL is not configured');
+        setLoading(false);
+        return;
+      }
 
       // 부동산 매물 통계
       const listingRes = await fetch(`${apiUrl}/realestate/stats`, {
@@ -55,9 +65,21 @@ export default function AdminDashboardPage() {
         headers: { Authorization: `Bearer ${token}` },
       });
 
+      // 심사 대기 매물 통계
+      const pendingRes = await fetch(`${apiUrl}/landlord/admin/listings?status=PENDING_REVIEW&page_size=1`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      // 약국 양도 심사 대기 통계
+      const pharmPendingRes = await fetch(`${apiUrl}/pharmacy-transfer/admin/listings?status=PENDING_REVIEW&page_size=1`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
       const listingData = listingRes.ok ? await listingRes.json() : {};
       const prospectData = prospectRes.ok ? await prospectRes.json() : {};
       const campaignData = campaignRes.ok ? await campaignRes.json() : {};
+      const pendingData = pendingRes.ok ? await pendingRes.json() : {};
+      const pharmPendingData = pharmPendingRes.ok ? await pharmPendingRes.json() : {};
 
       setStats({
         realEstateListings: listingData.total_listings || 0,
@@ -65,6 +87,8 @@ export default function AdminDashboardPage() {
         hotProspects: prospectData.hot || 0,
         campaignsSent: campaignData.total_sent || 0,
         smsBalance: campaignData.sms_balance || 0,
+        pendingReview: pendingData.total || 0,
+        pharmacyPendingReview: pharmPendingData.total || 0,
       });
     } catch (error) {
       console.error('Failed to fetch stats:', error);
@@ -74,6 +98,15 @@ export default function AdminDashboardPage() {
   };
 
   const statCards = [
+    {
+      title: '심사 대기',
+      value: stats.pendingReview,
+      icon: ClipboardCheck,
+      color: 'orange',
+      href: '/admin/listings',
+      change: '건물주 매물',
+      changeType: stats.pendingReview > 0 ? 'up' : 'neutral',
+    },
     {
       title: '부동산 매물',
       value: stats.realEstateListings,
@@ -100,6 +133,15 @@ export default function AdminDashboardPage() {
       href: '/admin/campaigns',
       change: '이번 주',
       changeType: 'neutral',
+    },
+    {
+      title: '약국 매물 대기',
+      value: stats.pharmacyPendingReview,
+      icon: Pill,
+      color: 'teal',
+      href: '/admin/pharmacy-listings',
+      change: '약국 양도',
+      changeType: stats.pharmacyPendingReview > 0 ? 'up' : 'neutral',
     },
     {
       title: 'SMS 잔액',
@@ -130,7 +172,7 @@ export default function AdminDashboardPage() {
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-6 mb-8">
         {statCards.map((card) => (
           <Link
             key={card.title}
@@ -166,7 +208,61 @@ export default function AdminDashboardPage() {
       </div>
 
       {/* Quick Actions */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+        {/* 매물 심사 */}
+        <div className="bg-white rounded-2xl p-6 border border-gray-100">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-10 h-10 rounded-xl bg-orange-100 flex items-center justify-center">
+              <ClipboardCheck className="w-5 h-5 text-orange-600" />
+            </div>
+            <div>
+              <h3 className="font-semibold text-gray-900">매물 심사</h3>
+              <p className="text-sm text-gray-500">건물주 등록 매물 심사</p>
+            </div>
+          </div>
+          <div className="space-y-2">
+            <Link
+              href="/admin/listings"
+              className="block px-4 py-3 bg-gray-50 rounded-xl text-gray-700 hover:bg-orange-50 hover:text-orange-700 transition-colors"
+            >
+              심사 목록 보기
+            </Link>
+            <Link
+              href="/admin/listings?status=PENDING_REVIEW"
+              className="block w-full px-4 py-3 bg-orange-600 text-white rounded-xl hover:bg-orange-700 transition-colors text-center"
+            >
+              대기 중인 매물 ({stats.pendingReview}건)
+            </Link>
+          </div>
+        </div>
+
+        {/* 약국 매물 심사 */}
+        <div className="bg-white rounded-2xl p-6 border border-gray-100">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-10 h-10 rounded-xl bg-teal-100 flex items-center justify-center">
+              <Pill className="w-5 h-5 text-teal-600" />
+            </div>
+            <div>
+              <h3 className="font-semibold text-gray-900">약국 매물 심사</h3>
+              <p className="text-sm text-gray-500">약사 등록 약국 양도 심사</p>
+            </div>
+          </div>
+          <div className="space-y-2">
+            <Link
+              href="/admin/pharmacy-listings"
+              className="block px-4 py-3 bg-gray-50 rounded-xl text-gray-700 hover:bg-teal-50 hover:text-teal-700 transition-colors"
+            >
+              심사 목록 보기
+            </Link>
+            <Link
+              href="/admin/pharmacy-listings?status=PENDING_REVIEW"
+              className="block w-full px-4 py-3 bg-teal-600 text-white rounded-xl hover:bg-teal-700 transition-colors text-center"
+            >
+              대기 중인 매물 ({stats.pharmacyPendingReview}건)
+            </Link>
+          </div>
+        </div>
+
         {/* 부동산 매물 */}
         <div className="bg-white rounded-2xl p-6 border border-gray-100">
           <div className="flex items-center gap-3 mb-4">

@@ -88,6 +88,13 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
   const [error, setError] = useState<Error | null>(null)
 
   const fetchSubscription = useCallback(async () => {
+    // 로그인하지 않은 경우 API 호출 스킵
+    const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null
+    if (!token) {
+      setIsLoading(false)
+      return
+    }
+
     setIsLoading(true)
     setError(null)
 

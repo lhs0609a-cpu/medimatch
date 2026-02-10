@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useForm } from 'react-hook-form'
@@ -10,9 +10,9 @@ import { useMutation } from '@tanstack/react-query'
 import {
   ArrowLeft, Building2, MapPin, DollarSign, Users, Upload,
   CheckCircle2, AlertCircle, ChevronRight, ChevronLeft, Loader2,
-  Car, Layers, FileText, Phone, Mail
+  Car, Layers, FileText, Phone, Mail, CreditCard, Coins
 } from 'lucide-react'
-import { landlordService } from '@/lib/api/services'
+import { landlordService, listingSubscriptionService } from '@/lib/api/services'
 import { toast } from 'sonner'
 
 const listingSchema = z.object({
@@ -50,6 +50,30 @@ export default function LandlordRegisterPage() {
   const router = useRouter()
   const [step, setStep] = useState(1)
   const [uploadedDocs, setUploadedDocs] = useState<File[]>([])
+  const [subCheck, setSubCheck] = useState<{
+    loading: boolean
+    hasSubscription: boolean
+    remainingCredits: number
+    status: string | null
+  }>({ loading: true, hasSubscription: false, remainingCredits: 0, status: null })
+
+  useEffect(() => {
+    listingSubscriptionService.getStatus()
+      .then((data) => {
+        const active = data.has_subscription &&
+          (data.status === 'ACTIVE' || data.status === 'CANCELED') &&
+          (data.remaining_credits > 0)
+        setSubCheck({
+          loading: false,
+          hasSubscription: active,
+          remainingCredits: data.remaining_credits || 0,
+          status: data.status || null,
+        })
+      })
+      .catch(() => {
+        setSubCheck({ loading: false, hasSubscription: false, remainingCredits: 0, status: null })
+      })
+  }, [])
 
   const {
     register,
@@ -86,6 +110,11 @@ export default function LandlordRegisterPage() {
       router.push('/landlord')
     },
     onError: (error: any) => {
+      if (error.response?.status === 402) {
+        toast.error(error.response.data.detail || '구독이 필요합니다.')
+        router.push('/subscription/listing')
+        return
+      }
       toast.error(error.response?.data?.detail || '매물 등록에 실패했습니다.')
     },
   })
@@ -428,6 +457,60 @@ export default function LandlordRegisterPage() {
     }
   }
 
+  // 구독 체크 로딩
+  if (subCheck.loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-emerald-600" />
+      </div>
+    )
+  }
+
+  // 구독 없거나 크레딧 없으면 구독 안내
+  if (!subCheck.hasSubscription) {
+    return (
+      <div className="min-h-screen bg-gray-50 py-12 px-4">
+        <div className="max-w-lg mx-auto">
+          <div className="bg-white rounded-2xl shadow-lg p-8 text-center">
+            <div className="w-20 h-20 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <CreditCard className="w-10 h-10 text-amber-600" />
+            </div>
+            <h1 className="text-2xl font-bold text-gray-900 mb-2">구독이 필요합니다</h1>
+            <p className="text-gray-600 mb-2">
+              매물을 등록하려면 매물 등록 구독(월 150,000원)이 필요합니다.
+            </p>
+            {subCheck.status && ['EXPIRED', 'SUSPENDED'].includes(subCheck.status) && (
+              <p className="text-sm text-red-500 mb-4">
+                {subCheck.status === 'EXPIRED' ? '구독이 만료되었습니다.' : '결제 실패로 구독이 정지되었습니다.'}
+              </p>
+            )}
+            {subCheck.status && ['ACTIVE', 'CANCELED'].includes(subCheck.status) && subCheck.remainingCredits <= 0 && (
+              <p className="text-sm text-amber-600 mb-4">
+                사용 가능한 크레딧이 없습니다. 다음 결제일까지 기다려주세요.
+              </p>
+            )}
+            <div className="space-y-3 mt-6">
+              <Link
+                href="/subscription/listing"
+                className="w-full py-3 bg-blue-600 text-white rounded-xl font-medium hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
+              >
+                <Coins className="w-5 h-5" />
+                구독 시작하기
+              </Link>
+              <Link
+                href="/landlord"
+                className="w-full py-3 bg-gray-100 text-gray-700 rounded-xl font-medium hover:bg-gray-200 transition-colors flex items-center justify-center gap-2"
+              >
+                <ArrowLeft className="w-5 h-5" />
+                돌아가기
+              </Link>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
@@ -459,6 +542,16 @@ export default function LandlordRegisterPage() {
               style={{ width: `${(step / totalSteps) * 100}%` }}
             />
           </div>
+        </div>
+      </div>
+
+      {/* 크레딧 정보 */}
+      <div className="container mx-auto px-4 mt-4 max-w-2xl">
+        <div className="flex items-center gap-2 px-4 py-2 bg-blue-50 border border-blue-200 rounded-lg text-sm text-blue-700">
+          <Coins className="w-4 h-4" />
+          <span>잔여 크레딧: <strong>{subCheck.remainingCredits}개</strong></span>
+          <span className="text-blue-400 mx-1">|</span>
+          <span>이 매물을 등록하면 크레딧 1개가 차감됩니다.</span>
         </div>
       </div>
 

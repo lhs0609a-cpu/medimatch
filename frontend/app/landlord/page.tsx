@@ -5,9 +5,9 @@ import Link from 'next/link'
 import { useQuery } from '@tanstack/react-query'
 import {
   Building2, Plus, Eye, MessageSquare, Clock, CheckCircle2,
-  XCircle, AlertCircle, ChevronRight, BarChart3, Home
+  XCircle, AlertCircle, ChevronRight, BarChart3, Home, CreditCard, Coins
 } from 'lucide-react'
-import { landlordService } from '@/lib/api/services'
+import { landlordService, listingSubscriptionService } from '@/lib/api/services'
 
 const statusConfig: Record<string, { label: string; color: string; icon: any }> = {
   DRAFT: { label: '임시저장', color: 'bg-gray-100 text-gray-700', icon: Clock },
@@ -39,6 +39,11 @@ export default function LandlordDashboardPage() {
     queryFn: () => landlordService.getStats(),
   })
 
+  const { data: subStatus } = useQuery({
+    queryKey: ['listing-subscription-status'],
+    queryFn: () => listingSubscriptionService.getStatus(),
+  })
+
   const formatCurrency = (value: number) => {
     if (value >= 10000) {
       return `${(value / 10000).toFixed(1)}억원`
@@ -61,12 +66,24 @@ export default function LandlordDashboardPage() {
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <Link
-              href="/landlord/pricing"
-              className="flex items-center gap-2 px-4 py-2 bg-amber-100 text-amber-700 rounded-lg font-medium hover:bg-amber-200 transition-colors"
-            >
-              프리미엄 서비스
-            </Link>
+            {subStatus?.has_subscription && (
+              <Link
+                href="/subscription/listing"
+                className="flex items-center gap-2 px-3 py-2 bg-blue-50 text-blue-700 rounded-lg text-sm font-medium hover:bg-blue-100 transition-colors"
+              >
+                <Coins className="w-4 h-4" />
+                크레딧 {subStatus.remaining_credits}개
+              </Link>
+            )}
+            {!subStatus?.has_subscription && (
+              <Link
+                href="/subscription/listing"
+                className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors"
+              >
+                <CreditCard className="w-4 h-4" />
+                구독 시작
+              </Link>
+            )}
             <Link
               href="/landlord/register"
               className="flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white rounded-lg font-medium hover:bg-emerald-700 transition-colors"
@@ -218,6 +235,19 @@ export default function LandlordDashboardPage() {
                         </p>
                       </div>
                     </div>
+
+                    {listing.status === 'ACTIVE' && (
+                      <div className="mt-4 flex items-center gap-2">
+                        <Link
+                          href="/buildings"
+                          onClick={(e) => e.stopPropagation()}
+                          className="inline-flex items-center gap-1.5 text-sm text-blue-600 hover:text-blue-800 font-medium"
+                        >
+                          <Eye className="w-4 h-4" />
+                          공개 페이지에서 보기
+                        </Link>
+                      </div>
+                    )}
 
                     {listing.rejection_reason && (
                       <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700">

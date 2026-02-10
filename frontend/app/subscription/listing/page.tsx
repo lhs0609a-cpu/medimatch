@@ -1,0 +1,339 @@
+'use client';
+
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
+import {
+  Building2, Check, CreditCard, X, RefreshCw,
+  Calendar, Coins, ArrowRight, Shield, Loader2
+} from 'lucide-react';
+import { listingSubscriptionService } from '@/lib/api/services';
+
+type SubStatus = 'ACTIVE' | 'CANCELED' | 'EXPIRED' | 'PAST_DUE' | 'SUSPENDED' | null;
+
+interface SubscriptionInfo {
+  has_subscription: boolean;
+  subscription_id?: number;
+  status?: SubStatus;
+  card_company?: string;
+  card_number?: string;
+  monthly_amount?: number;
+  total_credits?: number;
+  used_credits?: number;
+  remaining_credits?: number;
+  current_period_end?: string;
+  next_billing_date?: string;
+  canceled_at?: string;
+}
+
+const FEATURES = [
+  '매월 매물 등록 크레딧 1개 자동 적립',
+  '크레딧 누적 가능 (미사용분 이월)',
+  '관리자 승인 후 매물 공개',
+  '구독 기간 중 매물 노출 유지',
+  '언제든 구독 취소 가능 (잔여 기간 보장)',
+];
+
+export default function ListingSubscriptionPage() {
+  const router = useRouter();
+  const [subInfo, setSubInfo] = useState<SubscriptionInfo | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [actionLoading, setActionLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [cancelReason, setCancelReason] = useState('');
+  const [showCancelConfirm, setShowCancelConfirm] = useState(false);
+
+  useEffect(() => {
+    fetchStatus();
+  }, []);
+
+  const fetchStatus = async () => {
+    try {
+      setLoading(true);
+      const data = await listingSubscriptionService.getStatus();
+      setSubInfo(data);
+    } catch {
+      setSubInfo({ has_subscription: false });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSubscribe = async () => {
+    try {
+      setActionLoading(true);
+      setError(null);
+
+      // 1) 설정 가져오기
+      const config = await listingSubscriptionService.getConfig();
+
+      // 2) 토스 SDK 로드
+      const script = document.createElement('script');
+      script.src = 'https://js.tosspayments.com/v1/payment';
+      script.async = true;
+      document.head.appendChild(script);
+
+      await new Promise<void>((resolve, reject) => {
+        script.onload = () => resolve();
+        script.onerror = () => reject(new Error('토스 SDK 로드 실패'));
+      });
+
+      // 3) 빌링 인증 요청
+      const tossPayments = (window as any).TossPayments(config.clientKey);
+      await tossPayments.requestBillingAuth('카드', {
+        customerKey: config.customerKey,
+        successUrl: config.successUrl,
+        failUrl: config.failUrl,
+      });
+    } catch (err: any) {
+      if (err?.message?.includes('취소')) return;
+      setError(err?.response?.data?.detail || err?.message || '구독 시작에 실패했습니다.');
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const handleCancel = async () => {
+    try {
+      setActionLoading(true);
+      setError(null);
+      const result = await listingSubscriptionService.cancel(cancelReason || undefined);
+      setShowCancelConfirm(false);
+      setCancelReason('');
+      await fetchStatus();
+      alert(result.message);
+    } catch (err: any) {
+      setError(err?.response?.data?.detail || '구독 취소에 실패했습니다.');
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const handleReactivate = async () => {
+    try {
+      setActionLoading(true);
+      setError(null);
+      const result = await listingSubscriptionService.reactivate();
+      await fetchStatus();
+      alert(result.message);
+    } catch (err: any) {
+      setError(err?.response?.data?.detail || '재활성화에 실패했습니다.');
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+      </div>
+    );
+  }
+
+  const hasActive = subInfo?.has_subscription && subInfo.status &&
+    ['ACTIVE', 'CANCELED', 'PAST_DUE'].includes(subInfo.status);
+
+  return (
+    <div className="min-h-screen bg-gray-50 py-12 px-4">
+      <div className="max-w-2xl mx-auto">
+        {/* 헤더 */}
+        <div className="text-center mb-8">
+          <div className="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+            <Building2 className="w-8 h-8 text-blue-600" />
+          </div>
+          <h1 className="text-3xl font-bold text-gray-900">매물 등록 구독</h1>
+          <p className="mt-2 text-gray-600">매월 150,000원으로 병원 매물을 등록하세요</p>
+        </div>
+
+        {error && (
+          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl text-red-700 text-sm">
+            {error}
+          </div>
+        )}
+
+        {/* 현재 구독 상태 표시 */}
+        {hasActive && subInfo && (
+          <div className="bg-white rounded-2xl shadow-lg p-6 mb-6">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-bold text-gray-900">내 구독</h2>
+              <span className={`px-3 py-1 rounded-full text-sm font-medium ${
+                subInfo.status === 'ACTIVE' ? 'bg-green-100 text-green-700' :
+                subInfo.status === 'CANCELED' ? 'bg-yellow-100 text-yellow-700' :
+                'bg-red-100 text-red-700'
+              }`}>
+                {subInfo.status === 'ACTIVE' ? '활성' :
+                 subInfo.status === 'CANCELED' ? '취소 예정' :
+                 subInfo.status === 'PAST_DUE' ? '결제 실패' : subInfo.status}
+              </span>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4 mb-4">
+              <div className="bg-gray-50 rounded-xl p-4">
+                <div className="flex items-center gap-2 text-sm text-gray-500 mb-1">
+                  <Coins className="w-4 h-4" />
+                  잔여 크레딧
+                </div>
+                <div className="text-2xl font-bold text-blue-600">{subInfo.remaining_credits}개</div>
+                <div className="text-xs text-gray-400">
+                  총 {subInfo.total_credits}개 중 {subInfo.used_credits}개 사용
+                </div>
+              </div>
+              <div className="bg-gray-50 rounded-xl p-4">
+                <div className="flex items-center gap-2 text-sm text-gray-500 mb-1">
+                  <Calendar className="w-4 h-4" />
+                  {subInfo.status === 'CANCELED' ? '만료일' : '다음 결제일'}
+                </div>
+                <div className="text-lg font-bold text-gray-900">
+                  {subInfo.status === 'CANCELED' && subInfo.current_period_end
+                    ? new Date(subInfo.current_period_end).toLocaleDateString('ko-KR')
+                    : subInfo.next_billing_date
+                    ? new Date(subInfo.next_billing_date).toLocaleDateString('ko-KR')
+                    : '-'}
+                </div>
+              </div>
+            </div>
+
+            {subInfo.card_number && (
+              <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl text-sm">
+                <CreditCard className="w-5 h-5 text-gray-400" />
+                <span className="text-gray-700">
+                  {subInfo.card_company} {subInfo.card_number}
+                </span>
+                <span className="ml-auto text-gray-500">
+                  월 {(subInfo.monthly_amount || 150000).toLocaleString()}원
+                </span>
+              </div>
+            )}
+
+            {/* 액션 버튼 */}
+            <div className="mt-4 space-y-2">
+              {subInfo.status === 'ACTIVE' && (
+                <>
+                  <Link
+                    href="/landlord/register"
+                    className="w-full py-3 bg-blue-600 text-white rounded-xl font-medium hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
+                  >
+                    <Building2 className="w-5 h-5" />
+                    매물 등록하기
+                    <ArrowRight className="w-4 h-4" />
+                  </Link>
+                  <button
+                    onClick={() => setShowCancelConfirm(true)}
+                    className="w-full py-3 text-gray-500 text-sm hover:text-red-500 transition-colors"
+                  >
+                    구독 취소
+                  </button>
+                </>
+              )}
+              {subInfo.status === 'CANCELED' && (
+                <button
+                  onClick={handleReactivate}
+                  disabled={actionLoading}
+                  className="w-full py-3 bg-green-600 text-white rounded-xl font-medium hover:bg-green-700 transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
+                >
+                  {actionLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : <RefreshCw className="w-5 h-5" />}
+                  구독 재활성화
+                </button>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* 취소 확인 모달 */}
+        {showCancelConfirm && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-2xl max-w-md w-full p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-bold">구독 취소</h3>
+                <button onClick={() => setShowCancelConfirm(false)}>
+                  <X className="w-5 h-5 text-gray-400" />
+                </button>
+              </div>
+              <p className="text-gray-600 text-sm mb-4">
+                구독을 취소하면 현재 결제 기간이 끝난 후 더 이상 갱신되지 않습니다.
+                잔여 기간 동안은 계속 이용 가능합니다.
+              </p>
+              <textarea
+                value={cancelReason}
+                onChange={(e) => setCancelReason(e.target.value)}
+                placeholder="취소 사유 (선택)"
+                className="w-full p-3 border border-gray-200 rounded-xl text-sm resize-none h-24 mb-4"
+              />
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setShowCancelConfirm(false)}
+                  className="flex-1 py-3 bg-gray-100 text-gray-700 rounded-xl font-medium"
+                >
+                  돌아가기
+                </button>
+                <button
+                  onClick={handleCancel}
+                  disabled={actionLoading}
+                  className="flex-1 py-3 bg-red-600 text-white rounded-xl font-medium hover:bg-red-700 disabled:opacity-50"
+                >
+                  {actionLoading ? '처리 중...' : '구독 취소'}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* 플랜 카드 (구독 없을 때 또는 만료/정지 상태) */}
+        {!hasActive && (
+          <div className="bg-white rounded-2xl shadow-lg overflow-hidden mb-6">
+            <div className="bg-gradient-to-r from-blue-600 to-blue-700 p-6 text-white text-center">
+              <div className="text-sm font-medium opacity-80 mb-1">매물 등록 구독</div>
+              <div className="text-4xl font-bold mb-1">
+                150,000<span className="text-lg font-normal">원/월</span>
+              </div>
+              <div className="text-sm opacity-80">매월 자동결제 (카드)</div>
+            </div>
+
+            <div className="p-6">
+              <ul className="space-y-3 mb-6">
+                {FEATURES.map((feature, idx) => (
+                  <li key={idx} className="flex items-start gap-3 text-sm">
+                    <Check className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                    <span className="text-gray-700">{feature}</span>
+                  </li>
+                ))}
+              </ul>
+
+              <button
+                onClick={handleSubscribe}
+                disabled={actionLoading}
+                className="w-full py-4 bg-blue-600 text-white rounded-xl font-bold text-lg hover:bg-blue-700 transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
+              >
+                {actionLoading ? (
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                ) : (
+                  <CreditCard className="w-5 h-5" />
+                )}
+                구독 시작하기
+              </button>
+
+              <div className="mt-4 flex items-center justify-center gap-2 text-xs text-gray-400">
+                <Shield className="w-4 h-4" />
+                토스페이먼츠 안전 결제
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* 안내 */}
+        <div className="bg-white rounded-2xl shadow-lg p-6">
+          <h3 className="font-bold text-gray-900 mb-3">이용 안내</h3>
+          <div className="space-y-2 text-sm text-gray-600">
+            <p>- 구독 시작 즉시 매물 등록 크레딧 1개가 부여됩니다.</p>
+            <p>- 매월 결제일에 크레딧 1개가 자동 추가됩니다.</p>
+            <p>- 미사용 크레딧은 다음 달로 이월됩니다.</p>
+            <p>- 구독 취소 시 잔여 기간 동안 이용 가능합니다.</p>
+            <p>- 구독 만료/정지 시 등록된 매물은 비공개 처리됩니다.</p>
+            <p>- 매물 삭제 시 해당 크레딧이 반환됩니다.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

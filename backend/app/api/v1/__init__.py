@@ -25,6 +25,9 @@ from .sales_match import router as sales_match_router
 from .dashboard import router as dashboard_router
 from .group_buying import router as group_buying_router
 from .favorites import router as favorites_router
+from .contact import router as contact_router
+from .listing_subscription import router as listing_subscription_router
+from .pharmacy_transfer import router as pharmacy_transfer_router
 
 api_router = APIRouter()
 
@@ -54,3 +57,6 @@ api_router.include_router(sales_match_router, tags=["Sales Match - 영업사원 
 api_router.include_router(dashboard_router, tags=["Dashboard - 대시보드"])
 api_router.include_router(group_buying_router, prefix="/group-buying", tags=["Group Buying - 개원 공동구매"])
 api_router.include_router(favorites_router, prefix="/favorites", tags=["Favorites - 즐겨찾기"])
+api_router.include_router(contact_router, prefix="/contact", tags=["Contact - 문의"])
+api_router.include_router(listing_subscription_router, prefix="/listing-subscription", tags=["Listing Subscription - 매물 등록 구독"])
+api_router.include_router(pharmacy_transfer_router, prefix="/pharmacy-transfer", tags=["Pharmacy Transfer - 약국 양도"])

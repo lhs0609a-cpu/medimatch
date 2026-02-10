@@ -44,3 +44,5 @@ venv/
 # Vercel
 .vercel
 nul
+
+.vercel

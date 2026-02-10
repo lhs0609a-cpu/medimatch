@@ -25,8 +25,8 @@ from app.api.deps import get_current_active_user
 router = APIRouter(prefix="/payments", tags=["payments"])
 
 # 토스 페이먼츠 설정
-TOSS_CLIENT_KEY = os.getenv("TOSS_CLIENT_KEY", "test_ck_D5GePWvyJnrK0W0k6q8gLzN97Eoq")
-TOSS_SECRET_KEY = os.getenv("TOSS_SECRET_KEY", "test_sk_zXLkKEypNArWmo50nX3lmeaxYG5R")
+TOSS_CLIENT_KEY = os.getenv("TOSS_CLIENT_KEY", "")
+TOSS_SECRET_KEY = os.getenv("TOSS_SECRET_KEY", "")
 TOSS_WEBHOOK_SECRET = os.getenv("TOSS_WEBHOOK_SECRET", "")  # 프로덕션에서 반드시 설정 필요
 TOSS_API_URL = "https://api.tosspayments.com/v1"
 
@@ -39,8 +39,8 @@ def verify_webhook_signature(secret: str, payload: bytes, signature: str) -> boo
     - signature: Toss-Signature 헤더 값
     """
     if not secret:
-        logger.warning("TOSS_WEBHOOK_SECRET이 설정되지 않음 - 개발 환경에서만 허용")
-        return True  # 개발 환경에서는 서명 검증 스킵 (프로덕션에서는 False 반환 권장)
+        logger.error("TOSS_WEBHOOK_SECRET이 설정되지 않음 - 웹훅 검증 불가")
+        return False
 
     if not signature:
         logger.error("웹훅 서명 헤더 없음")
@@ -362,11 +362,15 @@ async def process_payment_success(db: AsyncSession, payment: Payment):
 async def cancel_payment(
     order_id: str,
     cancel_reason: str = "사용자 요청",
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_active_user)
 ):
     """결제 취소"""
     result = await db.execute(
-        select(Payment).where(Payment.order_id == order_id)
+        select(Payment).where(
+            Payment.order_id == order_id,
+            Payment.user_id == current_user.id
+        )
     )
     payment = result.scalar_one_or_none()
 
