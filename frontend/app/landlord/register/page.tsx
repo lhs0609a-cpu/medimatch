@@ -106,7 +106,7 @@ export default function LandlordRegisterPage() {
   const createMutation = useMutation({
     mutationFn: landlordService.createListing,
     onSuccess: (data) => {
-      toast.success('매물이 등록되었습니다. 관리자 승인 후 공개됩니다.')
+      toast.success('매물이 등록되었습니다! 즉시 공개됩니다.')
       router.push('/landlord')
     },
     onError: (error: any) => {

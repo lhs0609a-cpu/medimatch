@@ -208,8 +208,9 @@ async def create_landlord_listing(
         description=data.description,
         features=data.features,
         images=data.images,
-        status=LandlordListingStatus.DRAFT,
-        verification_status=VerificationStatus.PENDING,
+        status=LandlordListingStatus.ACTIVE,
+        is_public=True,
+        verification_status=VerificationStatus.VERIFIED,
         contact_name=data.contact_name or (current_user.full_name if hasattr(current_user, 'full_name') else None),
         contact_phone=data.contact_phone or (current_user.phone if hasattr(current_user, 'phone') else None),
         contact_email=data.contact_email or current_user.email,
@@ -231,7 +232,7 @@ async def create_landlord_listing(
         "status": listing.status.value,
         "verification_status": listing.verification_status.value,
         "remaining_credits": sub.total_credits - sub.used_credits,
-        "message": "매물이 등록되었습니다. 증빙서류를 업로드해주세요."
+        "message": "매물이 등록되었습니다. 즉시 공개됩니다."
     }
 
 
@@ -278,6 +279,10 @@ async def get_my_landlord_listings(
                 "title": l.title,
                 "address": l.address,
                 "region_name": l.region_name,
+                "area_pyeong": l.area_pyeong,
+                "rent_deposit": l.rent_deposit,
+                "rent_monthly": l.rent_monthly,
+                "premium": l.premium,
                 "status": l.status.value,
                 "verification_status": l.verification_status.value,
                 "view_count": l.view_count,
