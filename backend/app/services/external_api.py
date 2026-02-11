@@ -10,6 +10,11 @@ import logging
 logger = logging.getLogger(__name__)
 
 
+def _get_mois_key() -> str:
+    """행안부 API 키 반환 — MOIS_API_KEY 우선, 없으면 HIRA_API_KEY(같은 data.go.kr 키)"""
+    return settings.MOIS_API_KEY or settings.HIRA_API_KEY
+
+
 def _get_recent_ym() -> str:
     """최근 데이터가 확실히 존재하는 YYYYMM 반환 (2개월 전)"""
     now = datetime.now()
@@ -313,7 +318,8 @@ class ExternalAPIService:
 
     async def _get_mois_age_population(self, stdg_cd: str) -> Optional[Dict[str, Any]]:
         """행정안전부 법정동별 성/연령별 주민등록 인구수 API 호출"""
-        if not settings.MOIS_API_KEY:
+        api_key = _get_mois_key()
+        if not api_key:
             return None
 
         ym = _get_recent_ym()
@@ -321,7 +327,7 @@ class ExternalAPIService:
         try:
             async with httpx.AsyncClient() as client:
                 params = {
-                    "serviceKey": settings.MOIS_API_KEY,
+                    "serviceKey": api_key,
                     "stdgCd": stdg_cd,
                     "srchFrYm": ym,
                     "srchToYm": ym,
@@ -383,7 +389,8 @@ class ExternalAPIService:
 
     async def _get_mois_household(self, stdg_cd: str) -> Optional[Dict[str, Any]]:
         """행정안전부 법정동별 주민등록 인구 및 세대현황 API 호출"""
-        if not settings.MOIS_API_KEY:
+        api_key = _get_mois_key()
+        if not api_key:
             return None
 
         ym = _get_recent_ym()
@@ -391,7 +398,7 @@ class ExternalAPIService:
         try:
             async with httpx.AsyncClient() as client:
                 params = {
-                    "serviceKey": settings.MOIS_API_KEY,
+                    "serviceKey": api_key,
                     "stdgCd": stdg_cd,
                     "srchFrYm": ym,
                     "srchToYm": ym,
@@ -554,7 +561,7 @@ class ExternalAPIService:
         """인구통계 데이터 — 행안부 실데이터 API 우선, 실패 시 좌표 추정 모델 폴백"""
 
         # 1) 행안부 API (API 키 + 법정동코드가 있을 때)
-        if settings.MOIS_API_KEY and stdg_cd:
+        if _get_mois_key() and stdg_cd:
             try:
                 age_result, hh_result = await asyncio.gather(
                     self._get_mois_age_population(stdg_cd),
