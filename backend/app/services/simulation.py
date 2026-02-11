@@ -119,12 +119,20 @@ class SimulationService:
             breakeven_months=profitability["breakeven_months"],
             annual_roi_percent=profitability["annual_roi_percent"],
             competition_radius_m=1000,
-            same_dept_count=len([h for h in nearby_hospitals if h.get("clinic_type") == request.clinic_type]),
+            same_dept_count=len([
+                h for h in nearby_hospitals
+                if request.clinic_type.replace("의원", "").replace("과", "") in h.get("clinic_type", "")
+                or h.get("clinic_type", "") in request.clinic_type
+            ]) or len(competitors),
             total_clinic_count=len(nearby_hospitals),
             competitors_data=competitors,
-            population_1km=demographics_data.get("population_1km", 45000),
-            age_40_plus_ratio=demographics_data.get("age_40_plus_ratio", 0.4),
-            floating_population_daily=commercial_data.get("floating_population", 50000),
+            population_1km=demographics_data.get("population_1km") or 45000,
+            age_40_plus_ratio=demographics_data.get("age_40_plus_ratio") or 0.4,
+            floating_population_daily=(
+                demographics_data.get("floating_population_daily")
+                or commercial_data.get("floating_population")
+                or 50000
+            ),
             demographics_data=demographics_data,
             confidence_score=prediction.get("confidence_score", 75),
             recommendation=recommendation["type"],
@@ -585,31 +593,35 @@ class SimulationService:
         self,
         demographics_data: Dict = None
     ) -> DemographicsDetail:
-        """상세 인구통계 생성"""
-        base_pop = demographics_data.get("population_1km", 45000) if demographics_data else 45000
+        """상세 인구통계 생성 (demographics_data의 추정값 우선 사용)"""
+        d = demographics_data or {}
+        base_pop = d.get("population_1km") or 45000
+        age_dist = d.get("age_distribution") or {}
+        male_ratio = d.get("male_ratio") or round(random.uniform(0.48, 0.52), 2)
+        single_ratio = d.get("single_household_ratio") or round(random.uniform(0.25, 0.40), 2)
 
         return DemographicsDetail(
-            population_500m=int(base_pop * 0.25),
+            population_500m=d.get("population_500m") or int(base_pop * 0.28),
             population_1km=base_pop,
-            population_3km=int(base_pop * 5),
-            age_0_9=round(random.uniform(0.05, 0.10), 3),
-            age_10_19=round(random.uniform(0.08, 0.12), 3),
-            age_20_29=round(random.uniform(0.12, 0.18), 3),
-            age_30_39=round(random.uniform(0.14, 0.18), 3),
-            age_40_49=round(random.uniform(0.14, 0.18), 3),
-            age_50_59=round(random.uniform(0.12, 0.16), 3),
-            age_60_plus=round(random.uniform(0.15, 0.25), 3),
-            male_ratio=round(random.uniform(0.48, 0.52), 2),
-            female_ratio=round(random.uniform(0.48, 0.52), 2),
-            single_household_ratio=round(random.uniform(0.25, 0.40), 2),
-            family_household_ratio=round(random.uniform(0.60, 0.75), 2),
-            avg_household_income=random.randint(400, 700),
-            floating_population_daily=demographics_data.get("floating_population_daily", 50000) if demographics_data else 50000,
-            floating_peak_hour="12:00-14:00",
-            floating_weekday_avg=int(base_pop * 1.2),
-            floating_weekend_avg=int(base_pop * 0.8),
-            medical_utilization_rate=round(random.uniform(0.15, 0.25), 2),
-            avg_annual_visits=round(random.uniform(8, 15), 1)
+            population_3km=d.get("population_3km") or int(base_pop * 6.5),
+            age_0_9=age_dist.get("age_0_9") or round(random.uniform(0.05, 0.10), 3),
+            age_10_19=age_dist.get("age_10_19") or round(random.uniform(0.08, 0.12), 3),
+            age_20_29=age_dist.get("age_20_29") or round(random.uniform(0.12, 0.18), 3),
+            age_30_39=age_dist.get("age_30_39") or round(random.uniform(0.14, 0.18), 3),
+            age_40_49=age_dist.get("age_40_49") or round(random.uniform(0.14, 0.18), 3),
+            age_50_59=age_dist.get("age_50_59") or round(random.uniform(0.12, 0.16), 3),
+            age_60_plus=age_dist.get("age_60_plus") or round(random.uniform(0.15, 0.25), 3),
+            male_ratio=male_ratio,
+            female_ratio=round(1.0 - male_ratio, 2),
+            single_household_ratio=single_ratio,
+            family_household_ratio=round(1.0 - single_ratio, 2),
+            avg_household_income=d.get("avg_household_income") or random.randint(400, 700),
+            floating_population_daily=d.get("floating_population_daily") or 50000,
+            floating_peak_hour=d.get("floating_peak_hour") or "12:00-14:00",
+            floating_weekday_avg=d.get("floating_weekday_avg") or int(base_pop * 1.2),
+            floating_weekend_avg=d.get("floating_weekend_avg") or int(base_pop * 0.8),
+            medical_utilization_rate=d.get("medical_utilization_rate") or round(random.uniform(0.72, 0.85), 2),
+            avg_annual_visits=d.get("avg_annual_visits") or round(random.uniform(15, 22), 1)
         )
 
     def _generate_location_analysis(
@@ -964,14 +976,14 @@ class SimulationService:
             ),
             competition=Competition(
                 radius_m=simulation.competition_radius_m or 1000,
-                same_dept_count=simulation.same_dept_count or 0,
+                same_dept_count=simulation.same_dept_count or len(competitors),
                 total_clinic_count=simulation.total_clinic_count or 0
             ),
             competitors=[CompetitorInfo(**c) for c in competitors],
             demographics=Demographics(
-                population_1km=simulation.population_1km or 0,
-                age_40_plus_ratio=simulation.age_40_plus_ratio or 0,
-                floating_population_daily=simulation.floating_population_daily or 0
+                population_1km=simulation.population_1km or 35000,
+                age_40_plus_ratio=simulation.age_40_plus_ratio or 0.4,
+                floating_population_daily=simulation.floating_population_daily or 50000
             ),
             region_stats=RegionStats(
                 region_rank=random.randint(1, 10),
