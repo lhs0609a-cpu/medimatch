@@ -21,6 +21,12 @@ import FreeInsights from './components/FreeInsights'
 import DemographicsPreview from './components/DemographicsPreview'
 import OverallRadar from './components/OverallRadar'
 import RevenueSimulator from './components/RevenueSimulator'
+import BreakevenTimeline from './components/BreakevenTimeline'
+import MonthlyForecast from './components/MonthlyForecast'
+import CostPreview from './components/CostPreview'
+import CompetitorDistance from './components/CompetitorDistance'
+import WeeklyPattern from './components/WeeklyPattern'
+import SuccessFactors from './components/SuccessFactors'
 import ShareResult from './components/ShareResult'
 import PaywallCTA from './components/PaywallCTA'
 import PremiumAnalysis from './PremiumAnalysis'
@@ -361,10 +367,16 @@ export default function SimulatePage() {
             {/* ── Act 1: 무료 프리뷰 (고퀄리티 핵심 정보) ── */}
             <ScoreHero result={result} />
             <RegionBenchmark result={result} />
-            <RevenueSimulator result={result} />
             <OverallRadar result={result} />
+            <RevenueSimulator result={result} />
+            <BreakevenTimeline result={result} />
+            <MonthlyForecast result={result} />
+            <CostPreview result={result} />
             <FreeInsights result={result} />
+            <CompetitorDistance result={result} />
             <DemographicsPreview result={result} isUnlocked={isUnlocked} />
+            <WeeklyPattern result={result} />
+            <SuccessFactors result={result} />
 
             {/* ── Act 2+3: 프리미엄 (잠금 시 블러 + CTA / 해제 시 풀) ── */}
             {!isUnlocked ? (
