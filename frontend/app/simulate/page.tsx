@@ -16,8 +16,12 @@ import { toast } from 'sonner'
 import { useSimulationUnlock } from '@/lib/hooks/usePayment'
 import { DEMO_RESULT } from './demo-data'
 import ScoreHero from './components/ScoreHero'
+import RegionBenchmark from './components/RegionBenchmark'
 import FreeInsights from './components/FreeInsights'
 import DemographicsPreview from './components/DemographicsPreview'
+import OverallRadar from './components/OverallRadar'
+import RevenueSimulator from './components/RevenueSimulator'
+import ShareResult from './components/ShareResult'
 import PaywallCTA from './components/PaywallCTA'
 import PremiumAnalysis from './PremiumAnalysis'
 
@@ -312,12 +316,15 @@ export default function SimulatePage() {
                 <h1 className="text-2xl font-semibold text-foreground">시뮬레이션 결과</h1>
                 <p className="text-muted-foreground">{result.address} · {result.clinic_type}</p>
               </div>
-              <button
-                onClick={() => { setResult(null); setIsUnlocked(false) }}
-                className="btn-ghost"
-              >
-                새로운 시뮬레이션
-              </button>
+              <div className="flex items-center gap-2">
+                <ShareResult result={result} />
+                <button
+                  onClick={() => { setResult(null); setIsUnlocked(false) }}
+                  className="btn-ghost"
+                >
+                  새로운 시뮬레이션
+                </button>
+              </div>
             </div>
 
             {/* Status Banner */}
@@ -353,6 +360,9 @@ export default function SimulatePage() {
 
             {/* ── Act 1: 무료 프리뷰 (고퀄리티 핵심 정보) ── */}
             <ScoreHero result={result} />
+            <RegionBenchmark result={result} />
+            <RevenueSimulator result={result} />
+            <OverallRadar result={result} />
             <FreeInsights result={result} />
             <DemographicsPreview result={result} isUnlocked={isUnlocked} />
 
