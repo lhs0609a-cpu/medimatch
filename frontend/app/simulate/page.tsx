@@ -27,6 +27,21 @@ import CostPreview from './components/CostPreview'
 import CompetitorDistance from './components/CompetitorDistance'
 import WeeklyPattern from './components/WeeklyPattern'
 import SuccessFactors from './components/SuccessFactors'
+import MarketTrend from './components/MarketTrend'
+import PatientFlow from './components/PatientFlow'
+import InsuranceAnalysis from './components/InsuranceAnalysis'
+import RentAnalysis from './components/RentAnalysis'
+import StaffingPlan from './components/StaffingPlan'
+import MarketingROI from './components/MarketingROI'
+import NearbyFacilities from './components/NearbyFacilities'
+import TransitScore from './components/TransitScore'
+import FinancialStatement from './components/FinancialStatement'
+import OpeningTimeline from './components/OpeningTimeline'
+import AnalysisPack1 from './components/AnalysisPack1'
+import AnalysisPack2 from './components/AnalysisPack2'
+import AnalysisPack3 from './components/AnalysisPack3'
+import FinancialPack from './components/FinancialPack'
+import OperationalPack from './components/OperationalPack'
 import ShareResult from './components/ShareResult'
 import PaywallCTA from './components/PaywallCTA'
 import PremiumAnalysis from './PremiumAnalysis'
@@ -372,16 +387,17 @@ export default function SimulatePage() {
             {!isUnlocked ? (
               <div className="relative">
                 <div className="paywall-blur space-y-6">
-                  {/* 킬러 콘텐츠 10종 (DEMO_RESULT로 항상 렌더) */}
+                  {/* ── 그룹 1: 시장/경쟁 분석 ── */}
                   <RegionBenchmark result={DEMO_RESULT} />
                   <OverallRadar result={DEMO_RESULT} />
-                  <DemographicsPreview result={DEMO_RESULT} isUnlocked={false} />
+                  <CompetitorDistance result={DEMO_RESULT} />
+                  <MarketTrend result={DEMO_RESULT} />
 
                   {/* 1차 잠금 리마인더 */}
                   <div className="flex items-center gap-3 p-4 bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-950/30 dark:to-orange-950/30 border border-amber-200 dark:border-amber-800 rounded-xl">
                     <Lock className="w-5 h-5 text-amber-600 flex-shrink-0" />
                     <div className="flex-1">
-                      <span className="text-sm font-medium text-foreground">아래에 16개 분석 섹션이 더 있습니다</span>
+                      <span className="text-sm font-medium text-foreground">아래에 80개 이상의 분석 섹션이 있습니다</span>
                       <span className="text-xs text-muted-foreground ml-2">잠금해제로 전체 확인</span>
                     </div>
                     <button onClick={handleUnlock} className="btn-primary text-xs px-4 py-2">
@@ -390,17 +406,23 @@ export default function SimulatePage() {
                     </button>
                   </div>
 
+                  {/* ── 그룹 2: 인구/수요 분석 ── */}
+                  <DemographicsPreview result={DEMO_RESULT} isUnlocked={false} />
+                  <PatientFlow result={DEMO_RESULT} />
+                  <InsuranceAnalysis result={DEMO_RESULT} />
+
+                  {/* ── 그룹 3: 비용/수익 분석 ── */}
                   <CostPreview result={DEMO_RESULT} />
-                  <CompetitorDistance result={DEMO_RESULT} />
                   <BreakevenTimeline result={DEMO_RESULT} />
                   <MonthlyForecast result={DEMO_RESULT} />
+                  <RentAnalysis result={DEMO_RESULT} />
 
                   {/* 2차 잠금 리마인더 */}
                   <div className="flex items-center gap-3 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/30 dark:to-indigo-950/30 border border-blue-200 dark:border-blue-800 rounded-xl">
                     <Lock className="w-5 h-5 text-blue-600 flex-shrink-0" />
                     <div className="flex-1">
                       <span className="text-sm font-medium text-foreground">AI 전략 리포트 · SWOT · 리스크 분석</span>
-                      <span className="text-xs text-muted-foreground ml-2">아직 12개 섹션 남음</span>
+                      <span className="text-xs text-muted-foreground ml-2">아직 70개 이상 섹션 남음</span>
                     </div>
                     <button onClick={handleUnlock} className="btn-primary text-xs px-4 py-2">
                       <Sparkles className="w-3 h-3" />
@@ -408,16 +430,23 @@ export default function SimulatePage() {
                     </button>
                   </div>
 
+                  {/* ── 그룹 4: 운영/시간대 분석 ── */}
                   <WeeklyPattern result={DEMO_RESULT} />
                   <RevenueSimulator result={DEMO_RESULT} />
                   <SuccessFactors result={DEMO_RESULT} />
+                  <StaffingPlan result={DEMO_RESULT} />
+                  <TransitScore result={DEMO_RESULT} />
+                  <NearbyFacilities result={DEMO_RESULT} />
+
+                  {/* ── 그룹 5: 진료/의료 심층 분석 (10개 카드) ── */}
+                  <AnalysisPack1 result={DEMO_RESULT} />
 
                   {/* 3차 잠금 리마인더 */}
                   <div className="flex items-center gap-3 p-4 bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-950/30 dark:to-pink-950/30 border border-purple-200 dark:border-purple-800 rounded-xl">
                     <Lock className="w-5 h-5 text-purple-600 flex-shrink-0" />
                     <div className="flex-1">
-                      <span className="text-sm font-medium text-foreground">프리미엄 심층 분석 9개 섹션</span>
-                      <span className="text-xs text-muted-foreground ml-2">매출·비용·수익성·경쟁·인구·입지·성장·리스크·AI</span>
+                      <span className="text-sm font-medium text-foreground">심층 의료 수요 · 인구 분석 50개+ 섹션</span>
+                      <span className="text-xs text-muted-foreground ml-2">끝없는 인사이트가 기다립니다</span>
                     </div>
                     <button onClick={handleUnlock} className="btn-primary text-xs px-4 py-2">
                       <Sparkles className="w-3 h-3" />
@@ -425,7 +454,48 @@ export default function SimulatePage() {
                     </button>
                   </div>
 
-                  {/* 프리미엄 9개 섹션 */}
+                  {/* ── 그룹 6: 의료수요/인구 심층 (10개 카드) ── */}
+                  <AnalysisPack2 result={DEMO_RESULT} />
+
+                  {/* ── 그룹 7: 부동산/입지 심층 (10개 카드) ── */}
+                  <AnalysisPack3 result={DEMO_RESULT} />
+
+                  {/* 4차 잠금 리마인더 */}
+                  <div className="flex items-center gap-3 p-4 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-950/30 dark:to-emerald-950/30 border border-green-200 dark:border-green-800 rounded-xl">
+                    <Lock className="w-5 h-5 text-green-600 flex-shrink-0" />
+                    <div className="flex-1">
+                      <span className="text-sm font-medium text-foreground">재무 분석 · 세금 · 투자 회수 시뮬레이션</span>
+                      <span className="text-xs text-muted-foreground ml-2">손익계산서 · 현금흐름 · 대출 상환 포함</span>
+                    </div>
+                    <button onClick={handleUnlock} className="btn-primary text-xs px-4 py-2">
+                      <Sparkles className="w-3 h-3" />
+                      {(result?.unlock_price ?? 9900).toLocaleString()}원
+                    </button>
+                  </div>
+
+                  {/* ── 그룹 8: 재무 심층 (10개 카드) ── */}
+                  <FinancialPack result={DEMO_RESULT} />
+                  <FinancialStatement result={DEMO_RESULT} />
+                  <MarketingROI result={DEMO_RESULT} />
+
+                  {/* ── 그룹 9: 운영/개원 계획 (10개 카드) ── */}
+                  <OperationalPack result={DEMO_RESULT} />
+                  <OpeningTimeline result={DEMO_RESULT} />
+
+                  {/* 5차 잠금 리마인더 */}
+                  <div className="flex items-center gap-3 p-4 bg-gradient-to-r from-rose-50 to-pink-50 dark:from-rose-950/30 dark:to-pink-950/30 border border-rose-200 dark:border-rose-800 rounded-xl">
+                    <Lock className="w-5 h-5 text-rose-600 flex-shrink-0" />
+                    <div className="flex-1">
+                      <span className="text-sm font-medium text-foreground">프리미엄 AI 전략 리포트 9개 섹션</span>
+                      <span className="text-xs text-muted-foreground ml-2">SWOT · 3년 성장전략 · 마케팅 · 리스크 대응</span>
+                    </div>
+                    <button onClick={handleUnlock} className="btn-primary text-xs px-4 py-2">
+                      <Sparkles className="w-3 h-3" />
+                      잠금해제
+                    </button>
+                  </div>
+
+                  {/* ── 그룹 10: 프리미엄 9개 섹션 ── */}
                   <PremiumAnalysis result={DEMO_RESULT} />
                 </div>
                 <PaywallCTA
@@ -438,14 +508,29 @@ export default function SimulatePage() {
               <>
                 <RegionBenchmark result={result} />
                 <OverallRadar result={result} />
-                <DemographicsPreview result={result} isUnlocked={true} />
-                <CostPreview result={result} />
                 <CompetitorDistance result={result} />
+                <MarketTrend result={result} />
+                <DemographicsPreview result={result} isUnlocked={true} />
+                <PatientFlow result={result} />
+                <InsuranceAnalysis result={result} />
+                <CostPreview result={result} />
                 <BreakevenTimeline result={result} />
                 <MonthlyForecast result={result} />
+                <RentAnalysis result={result} />
                 <WeeklyPattern result={result} />
                 <RevenueSimulator result={result} />
                 <SuccessFactors result={result} />
+                <StaffingPlan result={result} />
+                <TransitScore result={result} />
+                <NearbyFacilities result={result} />
+                <AnalysisPack1 result={result} />
+                <AnalysisPack2 result={result} />
+                <AnalysisPack3 result={result} />
+                <FinancialPack result={result} />
+                <FinancialStatement result={result} />
+                <MarketingROI result={result} />
+                <OperationalPack result={result} />
+                <OpeningTimeline result={result} />
                 <PremiumAnalysis result={result} />
               </>
             )}

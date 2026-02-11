@@ -39,7 +39,7 @@ export default function PaywallCTA({ onUnlock, isLoading, price }: PaywallCTAPro
           <div className="text-center mb-4">
             <div className="inline-flex items-center gap-2 bg-amber-100 dark:bg-amber-900/50 text-amber-700 dark:text-amber-300 px-3 py-1.5 rounded-full text-sm font-medium mb-2">
               <Lock className="w-3.5 h-3.5" />
-              19개 섹션 · 80+ 데이터 포인트 잠금
+              80개 이상 분석 섹션 · 200+ 데이터 포인트 잠금
             </div>
             <p className="text-sm text-muted-foreground">
               위의 블러 처리된 차트, 그래프, AI 전략 리포트를 <span className="font-semibold text-foreground">즉시 확인</span>하세요
