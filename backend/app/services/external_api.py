@@ -1,11 +1,21 @@
+import asyncio
 import httpx
 import math
 import random
+from datetime import datetime, timedelta
 from typing import Optional, Dict, List, Any
 from ..core.config import settings
 import logging
 
 logger = logging.getLogger(__name__)
+
+
+def _get_recent_ym() -> str:
+    """최근 데이터가 확실히 존재하는 YYYYMM 반환 (2개월 전)"""
+    now = datetime.now()
+    first = now.replace(day=1)
+    two_months_ago = (first - timedelta(days=1)).replace(day=1) - timedelta(days=1)
+    return two_months_ago.strftime("%Y%m")
 
 
 # ── 서울/수도권 행정구별 인구밀도 추정 테이블 (명/km², 2023 통계청 기반) ──
@@ -284,39 +294,299 @@ class ExternalAPIService:
             logger.error(f"Failed to geocode address: {e}")
             return None
 
+    # ── 행정안전부 주민등록 인구통계 API ──────────────────────────
+
+    def _extract_mois_items(self, data: Dict[str, Any]) -> List[Dict[str, Any]]:
+        """행안부 API 응답에서 items 배열 추출 (다양한 응답 구조 처리)"""
+        for path in [
+            lambda d: d.get("response", {}).get("body", {}).get("items", {}).get("item", []),
+            lambda d: d.get("body", {}).get("items", {}).get("item", []),
+            lambda d: d.get("items", {}).get("item", []),
+        ]:
+            try:
+                items = path(data)
+                if items:
+                    return items if isinstance(items, list) else [items]
+            except (AttributeError, TypeError):
+                continue
+        return []
+
+    async def _get_mois_age_population(self, stdg_cd: str) -> Optional[Dict[str, Any]]:
+        """행정안전부 법정동별 성/연령별 주민등록 인구수 API 호출"""
+        if not settings.MOIS_API_KEY:
+            return None
+
+        ym = _get_recent_ym()
+
+        try:
+            async with httpx.AsyncClient() as client:
+                params = {
+                    "serviceKey": settings.MOIS_API_KEY,
+                    "stdgCd": stdg_cd,
+                    "srchFrYm": ym,
+                    "srchToYm": ym,
+                    "lv": "7",        # 단일 읍면동
+                    "regSeCd": "2",    # 주민등록자만
+                    "type": "JSON",
+                    "numOfRows": "100",
+                    "pageNo": "1",
+                }
+
+                response = await client.get(
+                    "https://apis.data.go.kr/1741000/stdgSexdAgePpltn/selectStdgSexdAgePpltn",
+                    params=params,
+                    timeout=15.0,
+                )
+                response.raise_for_status()
+                data = response.json()
+
+                items = self._extract_mois_items(data)
+                if not items:
+                    logger.warning(f"MOIS age API returned no items for stdgCd={stdg_cd}")
+                    return None
+
+                # 통/반 단위 → 동 단위로 합산
+                total_pop = 0
+                male_pop = 0
+                female_pop = 0
+                age_keys = (
+                    [f"male{a}AgeNmprCnt" for a in [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]]
+                    + [f"feml{a}AgeNmprCnt" for a in [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]]
+                )
+                age_groups: Dict[str, int] = {k: 0 for k in age_keys}
+
+                for item in items:
+                    total_pop += int(item.get("totNmprCnt", 0) or 0)
+                    male_pop += int(item.get("maleNmprCnt", 0) or 0)
+                    female_pop += int(item.get("femlNmprCnt", 0) or 0)
+                    for key in age_keys:
+                        age_groups[key] += int(item.get(key, 0) or 0)
+
+                region_name = " ".join(filter(None, [
+                    items[0].get("ctpvNm", ""),
+                    items[0].get("sggNm", ""),
+                    items[0].get("stdgNm", ""),
+                ]))
+
+                logger.info(f"MOIS age API: {region_name} pop={total_pop}")
+                return {
+                    "total_population": total_pop,
+                    "male_population": male_pop,
+                    "female_population": female_pop,
+                    "age_groups": age_groups,
+                    "stats_ym": ym,
+                    "region_name": region_name,
+                }
+        except Exception as e:
+            logger.error(f"MOIS age population API failed: {e}")
+            return None
+
+    async def _get_mois_household(self, stdg_cd: str) -> Optional[Dict[str, Any]]:
+        """행정안전부 법정동별 주민등록 인구 및 세대현황 API 호출"""
+        if not settings.MOIS_API_KEY:
+            return None
+
+        ym = _get_recent_ym()
+
+        try:
+            async with httpx.AsyncClient() as client:
+                params = {
+                    "serviceKey": settings.MOIS_API_KEY,
+                    "stdgCd": stdg_cd,
+                    "srchFrYm": ym,
+                    "srchToYm": ym,
+                    "lv": "7",
+                    "regSeCd": "2",
+                    "type": "JSON",
+                    "numOfRows": "100",
+                    "pageNo": "1",
+                }
+
+                response = await client.get(
+                    "https://apis.data.go.kr/1741000/stdgPpltnHhStus/selectStdgPpltnHhStus",
+                    params=params,
+                    timeout=15.0,
+                )
+                response.raise_for_status()
+                data = response.json()
+
+                items = self._extract_mois_items(data)
+                if not items:
+                    return None
+
+                total_pop = 0
+                total_hh = 0
+
+                for item in items:
+                    total_pop += int(item.get("totNmprCnt", 0) or 0)
+                    total_hh += int(item.get("hhCnt", 0) or 0)
+
+                pph = round(total_pop / total_hh, 2) if total_hh > 0 else 2.3
+                logger.info(f"MOIS household API: pop={total_pop}, hh={total_hh}, pph={pph}")
+
+                return {
+                    "total_population": total_pop,
+                    "household_count": total_hh,
+                    "persons_per_household": pph,
+                }
+        except Exception as e:
+            logger.error(f"MOIS household API failed: {e}")
+            return None
+
+    def _build_demographics_from_mois(
+        self,
+        age_data: Dict[str, Any],
+        hh_data: Optional[Dict[str, Any]],
+        latitude: float,
+        longitude: float,
+        radius_m: int,
+    ) -> Dict[str, Any]:
+        """행안부 API 실데이터 → 시뮬레이션 demographics 포맷 변환"""
+        total = age_data["total_population"]
+        male = age_data["male_population"]
+        female = age_data["female_population"]
+        ag = age_data["age_groups"]
+
+        # ─── 연령 비율 계산 ───
+        def age_ratio(*keys: str) -> float:
+            return sum(ag.get(k, 0) for k in keys) / total if total > 0 else 0
+
+        age_0_9 = age_ratio("male0AgeNmprCnt", "feml0AgeNmprCnt")
+        age_10_19 = age_ratio("male10AgeNmprCnt", "feml10AgeNmprCnt")
+        age_20_29 = age_ratio("male20AgeNmprCnt", "feml20AgeNmprCnt")
+        age_30_39 = age_ratio("male30AgeNmprCnt", "feml30AgeNmprCnt")
+        age_40_49 = age_ratio("male40AgeNmprCnt", "feml40AgeNmprCnt")
+        age_50_59 = age_ratio("male50AgeNmprCnt", "feml50AgeNmprCnt")
+        age_60_plus = age_ratio(
+            "male60AgeNmprCnt", "feml60AgeNmprCnt",
+            "male70AgeNmprCnt", "feml70AgeNmprCnt",
+            "male80AgeNmprCnt", "feml80AgeNmprCnt",
+            "male90AgeNmprCnt", "feml90AgeNmprCnt",
+            "male100AgeNmprCnt", "feml100AgeNmprCnt",
+        )
+        age_40_plus = age_40_49 + age_50_59 + age_60_plus
+
+        # ─── 법정동 인구 → 반경 인구 추정 ───
+        # 서울 법정동 평균 면적 ≈ 0.5~1.5 km², 1km 반경 원 ≈ 3.14 km²
+        # 동 인구 크기에 따른 적응적 스케일링
+        if total < 5000:
+            scale = 2.8
+        elif total < 15000:
+            scale = 2.0
+        elif total < 30000:
+            scale = 1.5
+        else:
+            scale = 1.2
+        population_1km = int(total * scale)
+
+        # ─── 세대 ───
+        hh_count = hh_data["household_count"] if hh_data else int(total * 0.45)
+        pph = hh_data.get("persons_per_household", 2.3) if hh_data else 2.3
+        # 1인가구 비율 추정: pph 낮을수록 1인가구 많음
+        single_hh_ratio = round(max(0.15, min(0.55, 0.70 - pph * 0.15)), 2)
+
+        # ─── 유동인구 (행안부에는 없으므로 인구 기반 추정) ───
+        floating_multiplier = random.uniform(1.5, 2.8)
+        floating = int(population_1km * floating_multiplier)
+
+        male_ratio = round(male / total, 2) if total > 0 else 0.48
+
+        return {
+            "population_1km": population_1km,
+            "population_500m": int(population_1km * 0.28),
+            "population_3km": int(population_1km * 6.5),
+            "age_40_plus_ratio": round(age_40_plus, 4),
+            "age_distribution": {
+                "age_0_9": round(age_0_9, 4),
+                "age_10_19": round(age_10_19, 4),
+                "age_20_29": round(age_20_29, 4),
+                "age_30_39": round(age_30_39, 4),
+                "age_40_49": round(age_40_49, 4),
+                "age_50_59": round(age_50_59, 4),
+                "age_60_plus": round(age_60_plus, 4),
+            },
+            "male_ratio": male_ratio,
+            "female_ratio": round(1.0 - male_ratio, 2),
+            "household_count": int(hh_count * scale),
+            "single_household_ratio": single_hh_ratio,
+            "avg_household_income": random.choice([450, 500, 550, 600, 650, 700, 750]),
+            "floating_population_daily": floating,
+            "floating_weekday_avg": int(floating * 1.08),
+            "floating_weekend_avg": int(floating * 0.75),
+            "floating_peak_hour": random.choice(["12:00-13:00", "13:00-14:00", "18:00-19:00"]),
+            "medical_utilization_rate": round(0.72 + age_40_plus * 0.2, 2),
+            "avg_annual_visits": round(15.0 + age_40_plus * 12.0, 1),
+            "data_source": "mois_api",
+            "data_ym": age_data.get("stats_ym", ""),
+            "region_name": age_data.get("region_name", ""),
+            "dong_population": total,
+        }
+
+    def _get_default_demographics(self) -> Dict[str, Any]:
+        """안전한 기본값 (모든 API/추정 실패 시)"""
+        return {
+            "population_1km": 35000,
+            "population_500m": 10000,
+            "population_3km": 200000,
+            "age_40_plus_ratio": 0.42,
+            "age_distribution": {},
+            "household_count": 15000,
+            "male_ratio": 0.48,
+            "female_ratio": 0.52,
+            "single_household_ratio": 0.35,
+            "avg_household_income": 550,
+            "floating_population_daily": 65000,
+            "floating_weekday_avg": 70000,
+            "floating_weekend_avg": 50000,
+            "floating_peak_hour": "12:00-13:00",
+            "medical_utilization_rate": 0.78,
+            "avg_annual_visits": 18.0,
+            "data_source": "default",
+        }
+
     async def get_demographics(
         self,
         latitude: float,
         longitude: float,
-        radius_m: int = 1000
+        radius_m: int = 1000,
+        stdg_cd: Optional[str] = None,
     ) -> Dict[str, Any]:
-        """인구통계 데이터 추정 (통계청 인구밀도 + 좌표 기반 모델)"""
+        """인구통계 데이터 — 행안부 실데이터 API 우선, 실패 시 좌표 추정 모델 폴백"""
+
+        # 1) 행안부 API (API 키 + 법정동코드가 있을 때)
+        if settings.MOIS_API_KEY and stdg_cd:
+            try:
+                age_result, hh_result = await asyncio.gather(
+                    self._get_mois_age_population(stdg_cd),
+                    self._get_mois_household(stdg_cd),
+                    return_exceptions=True,
+                )
+
+                age_data = age_result if isinstance(age_result, dict) else None
+                hh_data = hh_result if isinstance(hh_result, dict) else None
+
+                if age_data and age_data.get("total_population", 0) > 0:
+                    logger.info(
+                        f"Demographics from MOIS API: {age_data.get('region_name')} "
+                        f"pop={age_data['total_population']}"
+                    )
+                    return self._build_demographics_from_mois(
+                        age_data, hh_data, latitude, longitude, radius_m
+                    )
+                else:
+                    logger.warning("MOIS API returned 0 population, falling back to estimation")
+            except Exception as e:
+                logger.warning(f"MOIS API failed, falling back to estimation: {e}")
+
+        # 2) 폴백: 좌표 기반 추정 모델
         try:
             result = _estimate_demographics_from_coords(latitude, longitude, radius_m)
-            # female_ratio 계산
             result["female_ratio"] = round(1.0 - result["male_ratio"], 2)
+            result["data_source"] = "estimation"
             return result
         except Exception as e:
-            logger.error(f"Failed to estimate demographics: {e}")
-            # 안전한 기본값 반환
-            return {
-                "population_1km": 35000,
-                "population_500m": 10000,
-                "population_3km": 200000,
-                "age_40_plus_ratio": 0.42,
-                "age_distribution": {},
-                "household_count": 15000,
-                "male_ratio": 0.48,
-                "female_ratio": 0.52,
-                "single_household_ratio": 0.35,
-                "avg_household_income": 550,
-                "floating_population_daily": 65000,
-                "floating_weekday_avg": 70000,
-                "floating_weekend_avg": 50000,
-                "floating_peak_hour": "12:00-13:00",
-                "medical_utilization_rate": 0.78,
-                "avg_annual_visits": 18.0,
-            }
+            logger.error(f"Demographics estimation also failed: {e}")
+            return self._get_default_demographics()
 
     def _get_clinic_code(self, clinic_type: str) -> str:
         """진료과목명을 코드로 변환"""

@@ -58,9 +58,9 @@ class SimulationService:
             latitude, longitude
         )
 
-        # 5. 인구통계 데이터 수집
+        # 5. 인구통계 데이터 수집 (행안부 API → 추정 모델 폴백)
         demographics_data = await external_api_service.get_demographics(
-            latitude, longitude
+            latitude, longitude, stdg_cd=region_code
         )
 
         # 5. 예측 모델 실행
