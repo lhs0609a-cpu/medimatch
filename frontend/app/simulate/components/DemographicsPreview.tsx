@@ -104,7 +104,7 @@ export default function DemographicsPreview({ result, isUnlocked }: Demographics
                 연령별 인구 분포 (행정안전부 실데이터)
               </h4>
               {AGE_GROUPS.map((ag) => {
-                const raw = (dd as Record<string, number>)[ag.key] || 0
+                const raw = (dd as unknown as Record<string, number>)[ag.key] || 0
                 const pct = Math.round(raw * 100)
                 const barWidth = Math.min(pct * 4, 100) // scale: 25% fills 100%
                 return (
