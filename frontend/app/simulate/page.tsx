@@ -17,7 +17,6 @@ import { useSimulationUnlock } from '@/lib/hooks/usePayment'
 import { DEMO_RESULT } from './demo-data'
 import ScoreHero from './components/ScoreHero'
 import FreeInsights from './components/FreeInsights'
-import CompetitionRadar from './components/CompetitionRadar'
 import DemographicsPreview from './components/DemographicsPreview'
 import PaywallCTA from './components/PaywallCTA'
 import PremiumAnalysis from './PremiumAnalysis'
@@ -352,10 +351,9 @@ export default function SimulatePage() {
               </div>
             )}
 
-            {/* ── Act 1: 무료 프리뷰 ── */}
+            {/* ── Act 1: 무료 프리뷰 (고퀄리티 핵심 정보) ── */}
             <ScoreHero result={result} />
             <FreeInsights result={result} />
-            <CompetitionRadar result={result} isUnlocked={isUnlocked} />
             <DemographicsPreview result={result} isUnlocked={isUnlocked} />
 
             {/* ── Act 2: 페이월 ── */}
