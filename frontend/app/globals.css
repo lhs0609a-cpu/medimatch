@@ -414,10 +414,31 @@
 
 /* ===== PAYWALL BLUR ===== */
 .paywall-blur .card > *:not(:first-child) {
-  filter: blur(6px);
+  filter: blur(8px);
   -webkit-user-select: none;
   user-select: none;
   pointer-events: none;
+}
+
+.paywall-blur .card {
+  position: relative;
+}
+
+.paywall-blur .card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(ellipse at center, transparent 30%, rgba(255,255,255,0.15) 100%);
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.dark .paywall-blur .card::after {
+  background: radial-gradient(ellipse at center, transparent 30%, rgba(0,0,0,0.15) 100%);
 }
 
 /* ===== ANIMATIONS ===== */
