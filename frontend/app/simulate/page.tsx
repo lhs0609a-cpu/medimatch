@@ -356,17 +356,21 @@ export default function SimulatePage() {
             <FreeInsights result={result} />
             <DemographicsPreview result={result} isUnlocked={isUnlocked} />
 
-            {/* ── Act 2: 페이월 ── */}
-            {!isUnlocked && (
-              <PaywallCTA
-                onUnlock={handleUnlock}
-                isLoading={isPaymentLoading}
-                price={result?.unlock_price ?? 9900}
-              />
+            {/* ── Act 2+3: 프리미엄 (잠금 시 블러 + CTA / 해제 시 풀) ── */}
+            {!isUnlocked ? (
+              <div className="relative">
+                <div className="paywall-blur">
+                  <PremiumAnalysis result={DEMO_RESULT} />
+                </div>
+                <PaywallCTA
+                  onUnlock={handleUnlock}
+                  isLoading={isPaymentLoading}
+                  price={result?.unlock_price ?? 9900}
+                />
+              </div>
+            ) : (
+              <PremiumAnalysis result={result} />
             )}
-
-            {/* ── Act 3: 프리미엄 ── */}
-            {isUnlocked && <PremiumAnalysis result={result} />}
 
             {/* ── 하단 CTA ── */}
             {isUnlocked ? (

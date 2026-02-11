@@ -412,6 +412,14 @@
   .max-w-prose { max-width: 65ch; }
 }
 
+/* ===== PAYWALL BLUR ===== */
+.paywall-blur .card > *:not(:first-child) {
+  filter: blur(6px);
+  -webkit-user-select: none;
+  user-select: none;
+  pointer-events: none;
+}
+
 /* ===== ANIMATIONS ===== */
 @keyframes fadeIn {
   from { opacity: 0; }
