@@ -7,7 +7,7 @@ import { z } from 'zod'
 import { useMutation } from '@tanstack/react-query'
 import Link from 'next/link'
 import {
-  ArrowLeft, MapPin, Building2, TrendingUp,
+  ArrowLeft, Building2, TrendingUp,
   ChevronRight, Download, Lock, LogIn, Sparkles, CheckCircle2,
 } from 'lucide-react'
 import { simulationService } from '@/lib/api/services'
@@ -15,6 +15,7 @@ import { SimulationResponse } from '@/lib/api/client'
 import { toast } from 'sonner'
 import { useSimulationUnlock } from '@/lib/hooks/usePayment'
 import { DEMO_RESULT } from './demo-data'
+import AddressSelector from './components/AddressSelector'
 import ScoreHero from './components/ScoreHero'
 import RegionBenchmark from './components/RegionBenchmark'
 import FreeInsights from './components/FreeInsights'
@@ -149,6 +150,7 @@ export default function SimulatePage() {
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors },
   } = useForm<SimulationForm>({
     resolver: zodResolver(simulationSchema),
@@ -260,19 +262,10 @@ export default function SimulatePage() {
               </p>
 
               <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-                <div>
-                  <label className="label mb-2 block">개원 예정 주소 *</label>
-                  <div className="relative">
-                    <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-                    <input
-                      {...register('address')}
-                      type="text"
-                      placeholder="예: 서울시 강남구 역삼동 123-45"
-                      className="input pl-12"
-                    />
-                  </div>
-                  {errors.address && <p className="mt-2 text-sm text-red-500">{errors.address.message}</p>}
-                </div>
+                <AddressSelector
+                  onChange={(addr) => setValue('address', addr, { shouldValidate: !!addr })}
+                  error={errors.address?.message}
+                />
 
                 <div>
                   <label className="label mb-2 block">진료과목 *</label>

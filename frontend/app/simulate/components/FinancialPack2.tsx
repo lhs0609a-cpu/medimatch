@@ -1,7 +1,7 @@
 'use client'
 
 import React from 'react'
-import { Wallet, CircleDollarSign, TrendingDown, Percent, Receipt, CreditCard, HandCoins, PiggyBank, ArrowDownUp, Landmark } from 'lucide-react'
+import { Wallet, CircleDollarSign, TrendingDown, Percent, Receipt, CreditCard, HandIcon, PiggyBank, ArrowDownUp, Landmark } from 'lucide-react'
 import { SimulationResponse } from '@/lib/api/client'
 
 interface Props { result: SimulationResponse }
@@ -220,7 +220,7 @@ export default function FinancialPack2({ result }: Props) {
       </Card>
 
       {/* 7. 급여 분배 최적화 */}
-      <Card icon={HandCoins} title="원장 급여 · 배당 최적화" color="text-pink-600">
+      <Card icon={HandIcon} title="원장 급여 · 배당 최적화" color="text-pink-600">
         <div className="space-y-3">
           {[
             { plan: '급여 중심형', salary: '월 1,200만', dividend: '분기 500만', tax: '적음', flexibility: '낮음' },

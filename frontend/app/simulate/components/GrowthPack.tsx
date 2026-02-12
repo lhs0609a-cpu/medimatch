@@ -1,7 +1,7 @@
 'use client'
 
 import React from 'react'
-import { Rocket, GitBranch, Globe2, Handshake, GraduationCap, Lightbulb, Building, Users2, LineChart, Crown } from 'lucide-react'
+import { Rocket, GitBranch, Globe2, Heart, GraduationCap, Lightbulb, Building, Users2, LineChart, Crown } from 'lucide-react'
 import { SimulationResponse } from '@/lib/api/client'
 
 interface Props { result: SimulationResponse }
@@ -91,7 +91,7 @@ export default function GrowthPack({ result }: Props) {
       </Card>
 
       {/* 3. 제휴/파트너십 */}
-      <Card icon={Handshake} title="제휴 · 파트너십 기회" color="text-green-500">
+      <Card icon={Heart} title="제휴 · 파트너십 기회" color="text-green-500">
         <div className="space-y-2">
           {[
             { partner: '인근 약국 (처방전 연계)', benefit: '환자 편의 + 추천 관계', revenue: '간접 효과', difficulty: '쉬움' },

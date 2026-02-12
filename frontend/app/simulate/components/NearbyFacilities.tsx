@@ -2,7 +2,7 @@
 
 import React from 'react'
 import {
-  MapPin, Pill, UtensilsCrossed, Coffee, Landmark, CarFront, Store, GraduationCap, Hospital,
+  MapPin, Pill, UtensilsCrossed, Coffee, Landmark, CarFront, Store, GraduationCap, Activity,
 } from 'lucide-react'
 import { SimulationResponse } from '@/lib/api/client'
 
@@ -14,7 +14,7 @@ const FACILITY_CONFIG = [
   { key: 'parking', label: '주차장', icon: CarFront, color: 'text-slate-500', bg: 'bg-slate-50 dark:bg-slate-950/30' },
   { key: 'convenience_store', label: '편의점', icon: Store, color: 'text-red-500', bg: 'bg-red-50 dark:bg-red-950/30' },
   { key: 'school', label: '학교', icon: GraduationCap, color: 'text-indigo-500', bg: 'bg-indigo-50 dark:bg-indigo-950/30' },
-  { key: 'hospital', label: '병원', icon: Hospital, color: 'text-teal-500', bg: 'bg-teal-50 dark:bg-teal-950/30' },
+  { key: 'hospital', label: '병원', icon: Activity, color: 'text-teal-500', bg: 'bg-teal-50 dark:bg-teal-950/30' },
 ]
 
 const DEFAULT_FACILITIES: Record<string, number> = {

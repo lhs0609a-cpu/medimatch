@@ -78,7 +78,7 @@ export default function ShareResult({ result }: ShareResultProps) {
     <div className="relative">
       <button
         onClick={() => {
-          if (navigator.share) {
+          if (typeof navigator !== 'undefined' && typeof navigator.share === 'function') {
             handleNativeShare()
           } else {
             setShowMenu(!showMenu)
