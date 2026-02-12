@@ -119,11 +119,7 @@ class SimulationService:
             breakeven_months=profitability["breakeven_months"],
             annual_roi_percent=profitability["annual_roi_percent"],
             competition_radius_m=1000,
-            same_dept_count=len([
-                h for h in nearby_hospitals
-                if request.clinic_type.replace("의원", "").replace("과", "") in h.get("clinic_type", "")
-                or h.get("clinic_type", "") in request.clinic_type
-            ]) or len(competitors),
+            same_dept_count=len(competitors),
             total_clinic_count=len(nearby_hospitals),
             competitors_data=competitors,
             population_1km=demographics_data.get("population_1km") or 45000,
@@ -147,7 +143,8 @@ class SimulationService:
         return self._build_response(
             simulation, competitors,
             request.clinic_type, latitude, longitude,
-            demographics_data, commercial_data, prediction, estimated_cost, profitability
+            demographics_data, commercial_data, prediction, estimated_cost, profitability,
+            nearby_hospitals=nearby_hospitals
         )
 
     async def get_simulation(
@@ -228,9 +225,15 @@ class SimulationService:
         """경쟁 병원 분석"""
         competitors = []
 
+        # 진료과 매칭: "정형외과" → "정형외" 키워드로 유연 매칭
+        keyword = clinic_type.replace("의원", "").replace("과", "").strip()
         same_dept_hospitals = [
             h for h in nearby_hospitals
-            if clinic_type.lower() in h.get("clinic_type", "").lower()
+            if h.get("clinic_type", "").strip()  # 빈 문자열 제외
+            and (
+                keyword in h.get("clinic_type", "")
+                or clinic_type.lower() in h.get("clinic_type", "").lower()
+            )
         ]
 
         for hospital in same_dept_hospitals[:10]:  # Top 10
@@ -551,7 +554,12 @@ class SimulationService:
         demographics_data: Dict = None
     ) -> CompetitionDetail:
         """상세 경쟁 분석 생성"""
-        same_dept = [c for c in competitors if clinic_type.lower() in c.get("clinic_type", "").lower()]
+        keyword = clinic_type.replace("의원", "").replace("과", "").strip()
+        same_dept = [
+            c for c in competitors
+            if c.get("clinic_type", "").strip()
+            and (keyword in c.get("clinic_type", "") or clinic_type.lower() in c.get("clinic_type", "").lower())
+        ]
 
         # 경쟁 강도 지수 계산
         competition_index = min(100, len(same_dept) * 15 + len(competitors) * 3)
@@ -888,11 +896,18 @@ class SimulationService:
     def _generate_region_stats_detail(
         self,
         clinic_type: str,
-        revenue_avg: int
+        revenue_avg: int,
+        address: str = ""
     ) -> RegionStatsDetail:
         """상세 지역 통계 생성"""
+        # 주소에서 시/도 추출
+        region_name = "서울특별시"
+        if address:
+            parts = address.split()
+            if parts:
+                region_name = parts[0]
         return RegionStatsDetail(
-            region_name="서울특별시",
+            region_name=region_name,
             region_rank=random.randint(1, 5),
             total_regions=17,
             rank_percentile=round(random.uniform(10, 40), 1),
@@ -917,7 +932,8 @@ class SimulationService:
         commercial_data: Dict = None,
         prediction: Dict = None,
         estimated_cost: Dict = None,
-        profitability_data: Dict = None
+        profitability_data: Dict = None,
+        nearby_hospitals: List[Dict] = None
     ) -> SimulationResponse:
         """응답 객체 생성 - Enhanced Version"""
 
@@ -997,7 +1013,7 @@ class SimulationService:
             revenue_detail=self._generate_revenue_detail(clinic_type, revenue_avg, demographics_data),
             cost_detail=self._generate_cost_detail(clinic_type, simulation.size_pyeong or 30, cost),
             profitability_detail=self._generate_profitability_detail(revenue, cost, profitability, simulation.budget_million),
-            competition_detail=self._generate_competition_detail(competitors, [], clinic_type, demographics_data),
+            competition_detail=self._generate_competition_detail(competitors, nearby_hospitals or [], clinic_type, demographics_data),
             demographics_detail=self._generate_demographics_detail(demographics_data),
             location_analysis=self._generate_location_analysis(lat, lng, commercial_data),
             growth_projection=self._generate_growth_projection(revenue_avg, profitability, clinic_type),
