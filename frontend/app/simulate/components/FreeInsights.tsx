@@ -50,8 +50,16 @@ export default function FreeInsights({ result }: FreeInsightsProps) {
         </div>
       </div>
 
-      {/* Competitor Table */}
-      {competitors.length > 0 ? (
+      {/* Competitor Table or Blue Ocean */}
+      {same_dept_count === 0 ? (
+        <div className="text-center py-8">
+          <Shield className="w-10 h-10 mx-auto mb-3 text-green-500" />
+          <p className="font-semibold text-foreground text-lg mb-1">블루오션!</p>
+          <p className="text-sm text-muted-foreground">
+            반경 {radius_m}m 내 동일 진료과 의원이 없어 매우 유리한 입지입니다.
+          </p>
+        </div>
+      ) : competitors.length > 0 ? (
         <div>
           <h4 className="text-sm font-medium text-muted-foreground mb-3">
             주변 경쟁 의원 ({competitors.length}개)
@@ -106,11 +114,13 @@ export default function FreeInsights({ result }: FreeInsightsProps) {
           )}
         </div>
       ) : (
-        <div className="text-center py-8">
-          <Shield className="w-10 h-10 mx-auto mb-3 text-green-500" />
-          <p className="font-semibold text-foreground text-lg mb-1">블루오션!</p>
+        <div className="text-center py-6">
+          <Target className="w-8 h-8 mx-auto mb-2 text-amber-500" />
+          <p className="font-medium text-foreground mb-1">
+            반경 {radius_m}m 내 동일과 {same_dept_count}개 의원 존재
+          </p>
           <p className="text-sm text-muted-foreground">
-            반경 {radius_m}m 내 동일 진료과 의원이 없어 매우 유리한 입지입니다.
+            경쟁 의원 상세 정보(실명·매출·점유율)는 프리미엄에서 확인하세요.
           </p>
         </div>
       )}

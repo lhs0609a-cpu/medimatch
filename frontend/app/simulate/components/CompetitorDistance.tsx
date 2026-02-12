@@ -11,8 +11,28 @@ interface CompetitorDistanceProps {
 export default function CompetitorDistance({ result }: CompetitorDistanceProps) {
   const competitors = result.competitors || []
   const radius = result.competition.radius_m
+  const sameDeptCount = result.competition.same_dept_count
 
-  if (competitors.length === 0) return null
+  if (competitors.length === 0 && sameDeptCount === 0) return null
+
+  if (competitors.length === 0 && sameDeptCount > 0) {
+    return (
+      <div className="card p-6">
+        <div className="flex items-center gap-2 mb-4">
+          <Crosshair className="w-5 h-5 text-rose-500" />
+          <h3 className="font-semibold text-foreground">경쟁 병원 거리 분포</h3>
+          <span className="ml-auto text-[11px] text-muted-foreground">{sameDeptCount}개 의원</span>
+        </div>
+        <div className="text-center py-6 text-sm text-muted-foreground">
+          <p>반경 {radius}m 내 동일과 <span className="font-bold text-foreground">{sameDeptCount}개</span> 의원이 존재합니다.</p>
+          <p className="mt-1 flex items-center justify-center gap-1">
+            <Lock className="w-3 h-3" />
+            상세 위치·거리 정보는 프리미엄에서 확인
+          </p>
+        </div>
+      </div>
+    )
+  }
 
   const maxDistance = Math.max(...competitors.map((c) => c.distance_m), radius)
   const ringDistances = [250, 500, 750, 1000].filter((d) => d <= maxDistance + 100)

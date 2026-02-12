@@ -26,13 +26,16 @@ export default function AnalysisPack3({ result }: Props) {
       {/* 1. 부동산 시세 추이 */}
       <Card icon={Building} title="부동산 시세 추이 (5년)" color="text-blue-600">
         <div className="space-y-2 mb-4">
-          {[
-            { year: '2021', rent: 185, deposit: 6500 },
-            { year: '2022', rent: 195, deposit: 7000 },
-            { year: '2023', rent: 210, deposit: 7500 },
-            { year: '2024', rent: 225, deposit: 8000 },
-            { year: '2025', rent: 235, deposit: 8200 },
-          ].map((d) => (
+          {(() => {
+            const y = new Date().getFullYear()
+            return [
+              { year: `${y - 4}`, rent: 185, deposit: 6500 },
+              { year: `${y - 3}`, rent: 195, deposit: 7000 },
+              { year: `${y - 2}`, rent: 210, deposit: 7500 },
+              { year: `${y - 1}`, rent: 225, deposit: 8000 },
+              { year: `${y}`, rent: 235, deposit: 8200 },
+            ]
+          })().map((d) => (
             <div key={d.year} className="flex items-center gap-3">
               <span className="text-xs text-muted-foreground w-10">{d.year}</span>
               <div className="flex-1 h-4 bg-muted rounded overflow-hidden">
@@ -169,12 +172,18 @@ export default function AnalysisPack3({ result }: Props) {
       {/* 5. 주변 개발 계획 */}
       <Card icon={Landmark} title="주변 개발 계획 · 호재 분석" color="text-amber-600">
         <div className="space-y-3">
-          {[
-            { project: 'GTX-C 교대역 환승역 확정', year: '2028', impact: '매우 긍정', desc: '유동인구 30% 증가 예상' },
-            { project: '서초역 역세권 재개발', year: '2027', impact: '긍정', desc: '상주인구 5,000명 증가' },
-            { project: '서리풀공원 확장', year: '2026', impact: '긍정', desc: '주거 매력도 상승' },
-            { project: '강남대로 버스전용차로 확대', year: '2026', impact: '보통', desc: '교통 접근성 변화' },
-          ].map((p) => (
+          {(() => {
+            const plans = result.growth_projection?.development_plans || []
+            const y = new Date().getFullYear()
+            const defaults = [
+              { project: '역세권 재개발 사업', year: `${y + 2}`, impact: '긍정', desc: '상주인구 증가 기대' },
+              { project: '대중교통 확충 계획', year: `${y + 1}`, impact: '긍정', desc: '교통 접근성 개선' },
+              { project: '주변 공원·녹지 조성', year: `${y + 1}`, impact: '보통', desc: '주거 환경 개선' },
+            ]
+            return plans.length > 0
+              ? plans.map((p, i) => ({ project: p, year: `${y + 1 + i}`, impact: i === 0 ? '매우 긍정' : '긍정', desc: '지역 발전 기대' }))
+              : defaults
+          })().map((p) => (
             <div key={p.project} className="p-3 border border-border rounded-lg">
               <div className="flex items-center justify-between mb-1">
                 <span className="text-sm font-medium text-foreground">{p.project}</span>

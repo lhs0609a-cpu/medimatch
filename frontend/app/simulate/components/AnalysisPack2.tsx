@@ -256,7 +256,7 @@ export default function AnalysisPack2({ result }: Props) {
             { dept: '통증의학과', count: 4, overlap: 55, threat: '높음' },
             { dept: '한의원', count: 8, overlap: 30, threat: '중간' },
             { dept: '마취통증과', count: 1, overlap: 25, threat: '낮음' },
-          ].map((d) => (
+          ].filter((d) => d.dept !== result.clinic_type).map((d) => (
             <div key={d.dept} className="flex items-center gap-3 p-2 rounded-lg bg-secondary/30">
               <span className="text-sm text-foreground flex-1">{d.dept}</span>
               <span className="text-xs text-muted-foreground">{d.count}개</span>

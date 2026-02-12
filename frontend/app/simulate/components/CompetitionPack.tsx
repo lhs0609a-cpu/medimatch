@@ -26,12 +26,25 @@ export default function CompetitionPack({ result }: Props) {
       {/* 1. 경쟁자 프로파일 */}
       <Card icon={Search} title="핵심 경쟁자 상세 프로파일" color="text-red-500">
         <div className="space-y-3">
-          {[
-            { name: `${result.clinic_type} A의원`, dist: 250, years: 8, doctors: 2, specialty: '도수치료 특화', strength: '높은 인지도', weakness: '노후 시설', rating: 4.5, share: 28 },
-            { name: `${result.clinic_type} B클리닉`, dist: 400, years: 3, doctors: 1, specialty: '비보험 특화', strength: '최신 장비', weakness: '낮은 인지도', rating: 4.3, share: 15 },
-            { name: `${result.clinic_type} C병원`, dist: 600, years: 15, doctors: 4, specialty: '종합 진료', strength: '대형 규모', weakness: '긴 대기시간', rating: 4.1, share: 35 },
-            { name: `${result.clinic_type} D의원`, dist: 350, years: 5, doctors: 1, specialty: '야간 진료', strength: '접근성 좋음', weakness: '소규모', rating: 4.4, share: 12 },
-          ].map((c) => (
+          {(() => {
+            const comps = result.competitors || []
+            if (comps.length > 0) {
+              return comps.slice(0, 4).map((c, i) => ({
+                name: c.name, dist: c.distance_m, years: c.years_open || 5,
+                doctors: Math.max(1, Math.ceil(((c as any).est_monthly_revenue || 50000000) / 40000000)),
+                specialty: c.specialty_detail || '일반 진료', strength: i === 0 ? '높은 인지도' : i === 1 ? '최신 장비' : i === 2 ? '대형 규모' : '접근성 좋음',
+                weakness: i === 0 ? '높은 가격' : i === 1 ? '낮은 인지도' : i === 2 ? '긴 대기시간' : '소규모',
+                rating: c.rating || 4.0, share: Math.round(100 / (comps.length + 1)),
+              }))
+            }
+            const cnt = result.competition?.same_dept_count || 0
+            return cnt > 0 ? [
+              { name: `${result.clinic_type} A의원`, dist: 250, years: 8, doctors: 2, specialty: '전문 진료', strength: '높은 인지도', weakness: '노후 시설', rating: 4.5, share: 28 },
+              { name: `${result.clinic_type} B클리닉`, dist: 400, years: 3, doctors: 1, specialty: '비보험 특화', strength: '최신 장비', weakness: '낮은 인지도', rating: 4.3, share: 15 },
+            ] : [
+              { name: '인접 진료과 의원 A', dist: 300, years: 5, doctors: 1, specialty: '유사 진료', strength: '기존 환자', weakness: '전문성 부족', rating: 4.2, share: 20 },
+            ]
+          })().map((c) => (
             <div key={c.name} className="p-3 border border-border rounded-lg">
               <div className="flex items-center justify-between mb-2">
                 <div>
@@ -58,13 +71,15 @@ export default function CompetitionPack({ result }: Props) {
       {/* 2. 시장 점유율 */}
       <Card icon={Target} title="지역 시장 점유율 분석" color="text-blue-600">
         <div className="space-y-2 mb-4">
-          {[
-            { name: 'C병원 (대형)', share: 35, color: '#ef4444' },
-            { name: 'A의원 (중견)', share: 28, color: '#f59e0b' },
-            { name: 'B클리닉', share: 15, color: '#3b82f6' },
-            { name: 'D의원', share: 12, color: '#22c55e' },
-            { name: '내 의원 (예상)', share: 10, color: '#8b5cf6' },
-          ].map((m) => (
+          {(() => {
+            const comps = result.competitors || []
+            const colors = ['#ef4444', '#f59e0b', '#3b82f6', '#22c55e']
+            const myShare = result.competition_detail?.estimated_market_share || 10
+            const others = comps.slice(0, 4).map((c, i) => ({
+              name: c.name.slice(0, 8), share: Math.round((100 - myShare) / Math.max(comps.length, 1)), color: colors[i % colors.length],
+            }))
+            return [...others, { name: '내 의원 (예상)', share: Math.round(myShare), color: '#8b5cf6' }]
+          })().map((m) => (
             <div key={m.name} className="flex items-center gap-2">
               <span className="w-3 h-3 rounded-full flex-shrink-0" style={{ backgroundColor: m.color }} />
               <span className="text-xs text-foreground flex-1">{m.name}</span>
