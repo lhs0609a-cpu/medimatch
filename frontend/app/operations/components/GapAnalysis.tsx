@@ -26,13 +26,13 @@ export default function GapAnalysis({ records, forecasts }: GapAnalysisProps) {
         status: revenueGapPct >= 0 ? 'above' as const : revenueGapPct >= -10 ? 'close' as const : 'below' as const,
       }
     })
-    .filter(Boolean) as NonNullable<ReturnType<typeof Array.prototype.map>[number]>[]
+    .filter((x): x is NonNullable<typeof x> => x !== null)
 
   const avgRevenueGapPct = gaps.length > 0
-    ? gaps.reduce((s, g) => s + (g as any).revenueGapPct, 0) / gaps.length
+    ? gaps.reduce((s: number, g) => s + g.revenueGapPct, 0) / gaps.length
     : 0
 
-  const latestGap = gaps[gaps.length - 1] as any
+  const latestGap = gaps[gaps.length - 1]
 
   return (
     <div className="card p-5">
