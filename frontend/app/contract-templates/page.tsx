@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { ArrowLeft, FileText, Building2, PaintBucket, UserCheck, Handshake, Monitor, ArrowRightLeft, Download, Eye, ChevronRight, AlertTriangle, CheckCircle2, X, Scale, ChevronDown, ChevronUp } from 'lucide-react'
+import { ArrowLeft, FileText, Building2, PaintBucket, UserCheck, HeartHandshake, Monitor, ArrowRightLeft, Download, Eye, ChevronRight, AlertTriangle, CheckCircle2, X, Scale, ChevronDown, ChevronUp } from 'lucide-react'
 import Link from 'next/link'
 
 interface Template {
@@ -87,7 +87,7 @@ const categoriesData: Category[] = [
     ]
   },
   {
-    id: 'partnership', name: '동업계약서', icon: <Handshake className="w-6 h-6" />,
+    id: 'partnership', name: '동업계약서', icon: <HeartHandshake className="w-6 h-6" />,
     description: '공동개원, 지분 배분, 탈퇴 조건 등 동업 관련 계약서',
     color: 'bg-purple-500/10 text-purple-600',
     templates: [
