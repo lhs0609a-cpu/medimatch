@@ -128,9 +128,48 @@ function generateLiveFeed(): ActivityItem[] {
   return activities
 }
 
+/* ─── 개원/개국 도구 25종 데이터 ─── */
+const TOOL_CATS = ['전체', '재무/분석', '개원 준비', '운영/마케팅', '약국 전용', '법률/계약'] as const
+
+const ALL_TOOLS: { name: string; href: string; cat: string; desc: string; Icon: typeof Building2; c: string }[] = [
+  // 재무/분석 (8)
+  { name: '개원 비용 계산기', href: '/cost-calculator', cat: '재무/분석', desc: '진료과별 초기비용 산출', Icon: DollarSign, c: 'text-blue-600 bg-blue-100 dark:bg-blue-900/30' },
+  { name: 'BEP 분석기', href: '/bep-analyzer', cat: '재무/분석', desc: '손익분기점 시뮬레이션', Icon: TrendingUp, c: 'text-green-600 bg-green-100 dark:bg-green-900/30' },
+  { name: '진료과별 트렌드', href: '/trend-report', cat: '재무/분석', desc: '6년 개원 트렌드 분석', Icon: BarChart3, c: 'text-indigo-600 bg-indigo-100 dark:bg-indigo-900/30' },
+  { name: '상권 인구통계', href: '/demographics', cat: '재무/분석', desc: '연령·소득·인구 분석', Icon: Users, c: 'text-cyan-600 bg-cyan-100 dark:bg-cyan-900/30' },
+  { name: '개원 vs 인수', href: '/open-vs-acquire', cat: '재무/분석', desc: '비용/리스크 비교', Icon: Target, c: 'text-orange-600 bg-orange-100 dark:bg-orange-900/30' },
+  { name: '대출/금융 비교', href: '/loan-compare', cat: '재무/분석', desc: '20+ 금융상품 비교', Icon: Wallet, c: 'text-emerald-600 bg-emerald-100 dark:bg-emerald-900/30' },
+  { name: '보험 비교', href: '/insurance-compare', cat: '재무/분석', desc: '의료인 보험 비교', Icon: Shield, c: 'text-purple-600 bg-purple-100 dark:bg-purple-900/30' },
+  { name: '병원 벤치마크', href: '/benchmark', cat: '재무/분석', desc: '매출/환자수 비교', Icon: Star, c: 'text-yellow-600 bg-yellow-100 dark:bg-yellow-900/30' },
+  // 개원 준비 (7)
+  { name: '개원 체크리스트', href: '/checklist', cat: '개원 준비', desc: '단계별 타임라인', Icon: CheckCircle2, c: 'text-green-600 bg-green-100 dark:bg-green-900/30' },
+  { name: '인허가 가이드', href: '/license-guide', cat: '개원 준비', desc: '의원 개설 절차 안내', Icon: Shield, c: 'text-blue-600 bg-blue-100 dark:bg-blue-900/30' },
+  { name: '동선 설계', href: '/floor-plan', cat: '개원 준비', desc: '진료과별 평면 설계', Icon: MapPin, c: 'text-violet-600 bg-violet-100 dark:bg-violet-900/30' },
+  { name: 'EMR 비교', href: '/emr-compare', cat: '개원 준비', desc: '전자차트 시스템 비교', Icon: LayoutDashboard, c: 'text-indigo-600 bg-indigo-100 dark:bg-indigo-900/30' },
+  { name: '의료기기 비교', href: '/equipment', cat: '개원 준비', desc: '장비 견적/중고 매물', Icon: Briefcase, c: 'text-gray-600 bg-gray-100 dark:bg-gray-800/50' },
+  { name: '인테리어 견적', href: '/interior', cat: '개원 준비', desc: '진료과별 비용 산출', Icon: Home, c: 'text-pink-600 bg-pink-100 dark:bg-pink-900/30' },
+  { name: '세무/회계사 매칭', href: '/tax-advisor', cat: '개원 준비', desc: '의료 전문 세무사', Icon: Wallet, c: 'text-teal-600 bg-teal-100 dark:bg-teal-900/30' },
+  // 운영/마케팅 (5)
+  { name: '마케팅 패키지', href: '/marketing', cat: '운영/마케팅', desc: '개원 마케팅 전략', Icon: Sparkles, c: 'text-pink-600 bg-pink-100 dark:bg-pink-900/30' },
+  { name: '보험 청구 최적화', href: '/insurance-billing', cat: '운영/마케팅', desc: '건강보험 삭감 방지', Icon: Heart, c: 'text-red-600 bg-red-100 dark:bg-red-900/30' },
+  { name: '리뷰/평판 관리', href: '/reputation', cat: '운영/마케팅', desc: '온라인 평판 모니터링', Icon: Award, c: 'text-amber-600 bg-amber-100 dark:bg-amber-900/30' },
+  { name: '수가 시뮬레이터', href: '/fee-simulator', cat: '운영/마케팅', desc: '진료과별 수가 계산', Icon: Activity, c: 'text-blue-600 bg-blue-100 dark:bg-blue-900/30' },
+  { name: '경영 모니터링', href: '/operations', cat: '운영/마케팅', desc: '매출/환자 갭 분석', Icon: BarChart3, c: 'text-indigo-600 bg-indigo-100 dark:bg-indigo-900/30' },
+  // 약국 전용 (5)
+  { name: '처방전 유입 예측', href: '/pharmacy-forecast', cat: '약국 전용', desc: '인근 병원 기반 추정', Icon: Target, c: 'text-teal-600 bg-teal-100 dark:bg-teal-900/30' },
+  { name: '약국 개국 비용', href: '/pharmacy-cost', cat: '약국 전용', desc: '입지별 초기비용 산출', Icon: Pill, c: 'text-purple-600 bg-purple-100 dark:bg-purple-900/30' },
+  { name: '도매상 가격 비교', href: '/wholesale-compare', cat: '약국 전용', desc: '40+ 약품 가격 비교', Icon: Search, c: 'text-cyan-600 bg-cyan-100 dark:bg-cyan-900/30' },
+  { name: 'OTC/건기식 전략', href: '/otc-strategy', cat: '약국 전용', desc: '비처방 매출 전략', Icon: Zap, c: 'text-orange-600 bg-orange-100 dark:bg-orange-900/30' },
+  { name: '약국 벤치마크', href: '/pharmacy-benchmark', cat: '약국 전용', desc: '규모별 경영 비교', Icon: Activity, c: 'text-green-600 bg-green-100 dark:bg-green-900/30' },
+  // 법률/계약 (2)
+  { name: '법률 Q&A', href: '/legal', cat: '법률/계약', desc: '의료법/노동법 자문', Icon: Shield, c: 'text-slate-600 bg-slate-100 dark:bg-slate-800/50' },
+  { name: '계약서 템플릿', href: '/contract-templates', cat: '법률/계약', desc: '임대/동업/근로 계약서', Icon: Eye, c: 'text-violet-600 bg-violet-100 dark:bg-violet-900/30' },
+]
+
 export default function HomePage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [servicesOpen, setServicesOpen] = useState(false)
+  const [toolTab, setToolTab] = useState<string>('전체')
   const { showOnboarding, setShowOnboarding } = useOnboarding()
 
   // 실시간 피드
@@ -275,24 +314,24 @@ export default function HomePage() {
                           </div>
                         </div>
                         <div>
-                          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">더 보기</p>
+                          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">개원 도구</p>
                           <div className="space-y-1">
-                            <Link href="/map" className="flex items-center gap-3 p-3 rounded-xl hover:bg-accent transition-colors">
-                              <Globe className="w-5 h-5 text-cyan-500" />
-                              <span className="text-sm">지도로 매물 보기</span>
+                            <Link href="/cost-calculator" className="flex items-center gap-3 p-3 rounded-xl hover:bg-accent transition-colors">
+                              <DollarSign className="w-5 h-5 text-blue-500" />
+                              <span className="text-sm">개원 비용 계산기</span>
                             </Link>
-                            <Link href="/prospects" className="flex items-center gap-3 p-3 rounded-xl hover:bg-accent transition-colors">
-                              <Target className="w-5 h-5 text-orange-500" />
-                              <span className="text-sm">SalesScanner</span>
+                            <Link href="/bep-analyzer" className="flex items-center gap-3 p-3 rounded-xl hover:bg-accent transition-colors">
+                              <TrendingUp className="w-5 h-5 text-green-500" />
+                              <span className="text-sm">BEP 분석기</span>
                             </Link>
-                            <Link href="/partners" className="flex items-center gap-3 p-3 rounded-xl hover:bg-accent transition-colors">
-                              <Link2 className="w-5 h-5 text-indigo-500" />
-                              <span className="text-sm">파트너사</span>
+                            <Link href="/checklist" className="flex items-center gap-3 p-3 rounded-xl hover:bg-accent transition-colors">
+                              <CheckCircle2 className="w-5 h-5 text-emerald-500" />
+                              <span className="text-sm">개원 체크리스트</span>
                             </Link>
-                            <Link href="/group-buying" className="flex items-center gap-3 p-3 rounded-xl hover:bg-accent transition-colors">
-                              <Users className="w-5 h-5 text-orange-500" />
-                              <span className="text-sm">공동구매</span>
-                              <span className="px-1.5 py-0.5 text-[10px] font-bold bg-orange-100 text-orange-600 rounded">NEW</span>
+                            <Link href="/#tools" className="flex items-center gap-3 p-3 rounded-xl hover:bg-accent transition-colors">
+                              <Sparkles className="w-5 h-5 text-indigo-500" />
+                              <span className="text-sm">전체 도구 27종 보기</span>
+                              <span className="px-1.5 py-0.5 text-[10px] font-bold bg-indigo-100 text-indigo-600 rounded">NEW</span>
                             </Link>
                           </div>
                         </div>
@@ -350,10 +389,14 @@ export default function HomePage() {
                   <Globe className="w-5 h-5 text-cyan-500" />
                   <span>지도</span>
                 </Link>
-                <Link href="/group-buying" className="flex items-center gap-3 p-3 rounded-xl hover:bg-accent" onClick={() => setMobileMenuOpen(false)}>
-                  <Users className="w-5 h-5 text-orange-500" />
-                  <span>공동구매</span>
-                  <span className="px-1.5 py-0.5 text-[10px] font-bold bg-orange-100 text-orange-600 rounded">NEW</span>
+                <Link href="/cost-calculator" className="flex items-center gap-3 p-3 rounded-xl hover:bg-accent" onClick={() => setMobileMenuOpen(false)}>
+                  <DollarSign className="w-5 h-5 text-blue-500" />
+                  <span>개원 비용 계산기</span>
+                </Link>
+                <Link href="/#tools" className="flex items-center gap-3 p-3 rounded-xl hover:bg-accent" onClick={() => setMobileMenuOpen(false)}>
+                  <Sparkles className="w-5 h-5 text-indigo-500" />
+                  <span>전체 도구 27종</span>
+                  <span className="px-1.5 py-0.5 text-[10px] font-bold bg-indigo-100 text-indigo-600 rounded">NEW</span>
                 </Link>
                 <div className="pt-4 border-t border-border space-y-2">
                   <Link href="/login" className="block w-full text-center py-3 text-foreground hover:bg-accent rounded-xl" onClick={() => setMobileMenuOpen(false)}>
@@ -829,6 +872,85 @@ export default function HomePage() {
           </div>
         </section>
 
+        {/* ===== 개원/개국 전문 도구 25종 ===== */}
+        <section id="tools" className="py-20">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-10">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 text-sm font-medium mb-4">
+                <Sparkles className="w-4 h-4" />
+                27개 전문 도구 무료 제공
+              </div>
+              <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-4">
+                개원부터 운영까지, 필요한 모든 도구
+              </h2>
+              <p className="text-muted-foreground max-w-2xl mx-auto">
+                비용 계산, 상권 분석, 인허가, 마케팅까지 — 개원 준비에 필요한 전문 도구를 한 곳에서 이용하세요
+              </p>
+            </div>
+
+            {/* Category Tabs */}
+            <div className="flex gap-2 justify-center mb-8 overflow-x-auto pb-2 scrollbar-hide">
+              {TOOL_CATS.map((cat) => (
+                <button
+                  key={cat}
+                  onClick={() => setToolTab(cat)}
+                  className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all ${
+                    toolTab === cat
+                      ? 'bg-foreground text-background shadow-lg'
+                      : 'bg-secondary hover:bg-accent text-foreground'
+                  }`}
+                >
+                  {cat}
+                  {cat !== '전체' && (
+                    <span className="ml-1.5 text-xs opacity-60">
+                      {ALL_TOOLS.filter(t => t.cat === cat).length}
+                    </span>
+                  )}
+                </button>
+              ))}
+            </div>
+
+            {/* Tools Grid */}
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+              {(toolTab === '전체' ? ALL_TOOLS : ALL_TOOLS.filter(t => t.cat === toolTab)).map((tool) => (
+                <Link
+                  key={tool.href}
+                  href={tool.href}
+                  className="group flex items-start gap-3 p-4 bg-card border border-border rounded-2xl hover:border-foreground/20 hover:shadow-lg transition-all duration-200"
+                >
+                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${tool.c}`}>
+                    <tool.Icon className="w-5 h-5" />
+                  </div>
+                  <div className="min-w-0">
+                    <h3 className="text-sm font-semibold text-foreground group-hover:text-blue-600 transition-colors">
+                      {tool.name}
+                    </h3>
+                    <p className="text-xs text-muted-foreground mt-0.5">{tool.desc}</p>
+                  </div>
+                  <ArrowUpRight className="w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0 mt-0.5" />
+                </Link>
+              ))}
+            </div>
+
+            {/* 건물주 도구 배너 */}
+            <div className="mt-8 p-6 bg-gradient-to-r from-blue-600/10 to-indigo-600/10 border border-blue-500/20 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center flex-shrink-0">
+                  <Building2 className="w-6 h-6 text-white" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-foreground">건물주 전용: 병원 입점 확률 시뮬레이터</h3>
+                  <p className="text-sm text-muted-foreground">내 건물에 의료기관이 입점할 가능성을 22개 항목으로 분석</p>
+                </div>
+              </div>
+              <Link href="/landlord-simulator" className="btn-primary btn-sm whitespace-nowrap">
+                무료 분석 시작
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+            </div>
+          </div>
+        </section>
+
         {/* ===== 지도 기반 매물 프리뷰 ===== */}
         <section className="py-20">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -952,7 +1074,7 @@ export default function HomePage() {
         {/* ===== FOOTER ===== */}
         <footer className="py-16 border-t border-border" role="contentinfo">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
+            <div className="grid md:grid-cols-2 lg:grid-cols-5 gap-8 mb-12">
               <div className="lg:col-span-1">
                 <Link href="/" className="flex items-center gap-2.5 mb-4">
                   <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center">
@@ -972,6 +1094,18 @@ export default function HomePage() {
                   <li><Link href="/buildings" className="hover:text-foreground transition-colors">매물 검색</Link></li>
                   <li><Link href="/pharmacy-match" className="hover:text-foreground transition-colors">PharmMatch</Link></li>
                   <li><Link href="/map" className="hover:text-foreground transition-colors">지도</Link></li>
+                  <li><Link href="/landlord-simulator" className="hover:text-foreground transition-colors">입점 확률 분석</Link></li>
+                </ul>
+              </div>
+
+              <div>
+                <h4 className="font-semibold mb-4">개원 도구</h4>
+                <ul className="space-y-3 text-sm text-muted-foreground">
+                  <li><Link href="/cost-calculator" className="hover:text-foreground transition-colors">비용 계산기</Link></li>
+                  <li><Link href="/bep-analyzer" className="hover:text-foreground transition-colors">BEP 분석기</Link></li>
+                  <li><Link href="/checklist" className="hover:text-foreground transition-colors">체크리스트</Link></li>
+                  <li><Link href="/emr-compare" className="hover:text-foreground transition-colors">EMR 비교</Link></li>
+                  <li><Link href="/#tools" className="hover:text-foreground transition-colors">전체 도구 보기 →</Link></li>
                 </ul>
               </div>
 
