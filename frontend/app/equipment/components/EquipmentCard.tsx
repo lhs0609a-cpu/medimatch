@@ -1,8 +1,15 @@
 'use client'
 
+import { useState } from 'react'
 import { Eye, MapPin, Flame, Shield } from 'lucide-react'
 import Link from 'next/link'
 import { Equipment, conditionLabels } from '../data/seed'
+
+const categoryEmoji: Record<string, string> = {
+  '초음파': '🔬', '내시경': '🏥', '치과장비': '🦷', '안과장비': '👁️',
+  'EMR/IT': '💻', '가구/집기': '🪑', '영상진단': '📡', '물리치료': '💪',
+  '수술장비': '🔧', '검사장비': '🧪',
+}
 
 interface EquipmentCardProps {
   equipment: Equipment
@@ -11,14 +18,25 @@ interface EquipmentCardProps {
 export default function EquipmentCard({ equipment: eq }: EquipmentCardProps) {
   const cond = conditionLabels[eq.condition]
   const discount = eq.originalPrice ? Math.round((1 - eq.price / eq.originalPrice) * 100) : 0
+  const [imgError, setImgError] = useState(false)
 
   return (
     <Link href={`/equipment/${eq.id}`} className="card-interactive overflow-hidden group">
-      {/* Image placeholder */}
-      <div className="aspect-[4/3] bg-gradient-to-br from-muted to-muted/50 flex items-center justify-center relative">
-        <div className="text-4xl text-muted-foreground/30">
-          {eq.category === '초음파' ? '🔬' : eq.category === '내시경' ? '🏥' : eq.category === '치과장비' ? '🦷' : eq.category === '안과장비' ? '👁️' : eq.category === 'EMR/IT' ? '💻' : eq.category === '가구/집기' ? '🪑' : '⚕️'}
-        </div>
+      {/* Image */}
+      <div className="aspect-[4/3] bg-gradient-to-br from-muted to-muted/50 flex items-center justify-center relative overflow-hidden">
+        {eq.imageUrl && !imgError ? (
+          <img
+            src={eq.imageUrl}
+            alt={eq.name}
+            className="w-full h-full object-contain p-4 group-hover:scale-105 transition-transform duration-300"
+            loading="lazy"
+            onError={() => setImgError(true)}
+          />
+        ) : (
+          <div className="text-4xl text-muted-foreground/30">
+            {categoryEmoji[eq.category] ?? '⚕️'}
+          </div>
+        )}
         {/* Badges */}
         <div className="absolute top-2 left-2 flex gap-1.5">
           {eq.isHot && (

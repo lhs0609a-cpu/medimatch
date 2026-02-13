@@ -13,6 +13,7 @@ export default function EquipmentDetailPage() {
   const params = useParams()
   const eq = useMemo(() => equipmentList.find((e) => e.id === params.id) || equipmentList[0], [params.id])
   const [liked, setLiked] = useState(false)
+  const [imgError, setImgError] = useState(false)
 
   const cond = conditionLabels[eq.condition]
   const discount = eq.originalPrice ? Math.round((1 - eq.price / eq.originalPrice) * 100) : 0
@@ -48,10 +49,19 @@ export default function EquipmentDetailPage() {
       <main className="container mx-auto px-4 py-6 max-w-4xl">
         <div className="grid md:grid-cols-2 gap-6 mb-8">
           {/* Image */}
-          <div className="aspect-square bg-gradient-to-br from-muted to-muted/50 rounded-2xl flex items-center justify-center">
-            <div className="text-8xl text-muted-foreground/20">
-              {eq.category === '초음파' ? '🔬' : eq.category === '내시경' ? '🏥' : eq.category === '치과장비' ? '🦷' : '⚕️'}
-            </div>
+          <div className="aspect-square bg-gradient-to-br from-muted to-muted/50 rounded-2xl flex items-center justify-center overflow-hidden">
+            {eq.imageUrl && !imgError ? (
+              <img
+                src={eq.imageUrl}
+                alt={eq.name}
+                className="w-full h-full object-contain p-6"
+                onError={() => setImgError(true)}
+              />
+            ) : (
+              <div className="text-8xl text-muted-foreground/20">
+                {eq.category === '초음파' ? '🔬' : eq.category === '내시경' ? '🏥' : eq.category === '치과장비' ? '🦷' : '⚕️'}
+              </div>
+            )}
           </div>
 
           {/* Info */}
