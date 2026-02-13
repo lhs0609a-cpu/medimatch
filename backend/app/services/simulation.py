@@ -43,9 +43,16 @@ class SimulationService:
         longitude = geo_data.get("longitude", 126.9780) if geo_data else 126.9780
         region_code = geo_data.get("region_code", "") if geo_data else ""
 
-        # 2. 주변 병원 데이터 수집 (매출 데이터 포함)
+        # 2. 주변 병원 데이터 수집 (동일 진료과 — 매출 데이터 포함)
         nearby_hospitals = await external_api_service.get_nearby_hospitals_with_revenue(
-            latitude, longitude, 1000, request.clinic_type
+            latitude, longitude, 1000, request.clinic_type,
+            region_code=region_code,
+        )
+
+        # 2-1. 전체 의료기관 수 조회 (진료과 무관)
+        all_nearby = await external_api_service.get_nearby_hospitals(
+            latitude, longitude, 1000, clinic_type=None,
+            region_code=region_code,
         )
 
         # 3. 지역/진료과별 평균 통계 조회
@@ -120,7 +127,7 @@ class SimulationService:
             annual_roi_percent=profitability["annual_roi_percent"],
             competition_radius_m=1000,
             same_dept_count=len(competitors),
-            total_clinic_count=len(nearby_hospitals),
+            total_clinic_count=len(all_nearby),
             competitors_data=competitors,
             population_1km=demographics_data.get("population_1km") or 45000,
             age_40_plus_ratio=demographics_data.get("age_40_plus_ratio") or 0.4,
@@ -144,7 +151,7 @@ class SimulationService:
             simulation, competitors,
             request.clinic_type, latitude, longitude,
             demographics_data, commercial_data, prediction, estimated_cost, profitability,
-            nearby_hospitals=nearby_hospitals
+            nearby_hospitals=all_nearby
         )
 
     async def get_simulation(

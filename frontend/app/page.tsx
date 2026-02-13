@@ -998,7 +998,10 @@ export default function HomePage() {
 
             <div className="pt-8 border-t border-border flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-muted-foreground">
               <p>© {new Date().getFullYear()} 메디플라톤. All rights reserved.</p>
-              <p>의료 개원의 모든 것을 연결합니다</p>
+              <div className="flex items-center gap-4">
+                <p>의료 개원의 모든 것을 연결합니다</p>
+                <Link href="/admin" className="text-muted-foreground/40 hover:text-muted-foreground transition-colors">관리자</Link>
+              </div>
             </div>
           </div>
         </footer>

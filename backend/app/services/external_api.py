@@ -145,22 +145,35 @@ class ExternalAPIService:
         self.commercial_base_url = "http://apis.data.go.kr/B553077/api/open/sdsc2"
         self.kakao_base_url = "https://dapi.kakao.com/v2/local"
 
-    async def get_nearby_hospitals(
+    @staticmethod
+    def _haversine(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
+        """두 좌표 간 거리(m) 계산 — Haversine 공식"""
+        R = 6371000
+        phi1, phi2 = math.radians(lat1), math.radians(lat2)
+        dphi = math.radians(lat2 - lat1)
+        dlam = math.radians(lon2 - lon1)
+        a = math.sin(dphi / 2) ** 2 + math.cos(phi1) * math.cos(phi2) * math.sin(dlam / 2) ** 2
+        return R * 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
+
+    async def _fetch_hira_hospitals(
         self,
-        latitude: float,
-        longitude: float,
-        radius_m: int = 1000,
-        clinic_type: Optional[str] = None
+        region_code: str,
+        clinic_type: Optional[str] = None,
+        num_of_rows: int = 200,
     ) -> List[Dict[str, Any]]:
-        """주변 병원 정보 조회 (심평원 API)"""
+        """심평원 API로 지역 기반 병원 목록 조회 (sidoCd/sgguCd 사용)"""
+        if not region_code or len(region_code) < 5:
+            return []
+        sido_cd = region_code[:2]
+        sggu_cd = region_code[2:5]
         try:
             async with httpx.AsyncClient() as client:
-                params = {
+                params: Dict[str, Any] = {
                     "serviceKey": settings.HIRA_API_KEY,
-                    "xPos": str(longitude),
-                    "yPos": str(latitude),
-                    "radius": str(radius_m),
-                    "_type": "json"
+                    "sidoCd": sido_cd,
+                    "sgguCd": sggu_cd,
+                    "numOfRows": num_of_rows,
+                    "_type": "json",
                 }
                 if clinic_type:
                     params["dgsbjtCd"] = self._get_clinic_code(clinic_type)
@@ -168,7 +181,7 @@ class ExternalAPIService:
                 response = await client.get(
                     f"{self.hira_base_url}/getHospBasisList",
                     params=params,
-                    timeout=30.0
+                    timeout=30.0,
                 )
                 response.raise_for_status()
                 data = response.json()
@@ -179,8 +192,35 @@ class ExternalAPIService:
 
                 return [self._parse_hospital_data(item) for item in items]
         except Exception as e:
-            logger.error(f"Failed to get nearby hospitals: {e}")
+            logger.error(f"Failed to fetch HIRA hospitals (region={region_code}, type={clinic_type}): {e}")
             return []
+
+    async def get_nearby_hospitals(
+        self,
+        latitude: float,
+        longitude: float,
+        radius_m: int = 1000,
+        clinic_type: Optional[str] = None,
+        region_code: str = "",
+    ) -> List[Dict[str, Any]]:
+        """주변 병원 정보 조회 — 지역코드 기반 조회 후 좌표 거리 필터"""
+        hospitals = await self._fetch_hira_hospitals(region_code, clinic_type)
+
+        # 좌표 기반 거리 계산 및 반경 필터
+        nearby = []
+        for h in hospitals:
+            h_lat = h.get("latitude", 0)
+            h_lng = h.get("longitude", 0)
+            if h_lat == 0 or h_lng == 0:
+                continue
+            dist = self._haversine(latitude, longitude, h_lat, h_lng)
+            h["distance"] = round(dist)
+            if dist <= radius_m:
+                nearby.append(h)
+
+        # 거리순 정렬
+        nearby.sort(key=lambda x: x.get("distance", 9999))
+        return nearby
 
     async def get_building_info(self, address: str) -> Optional[Dict[str, Any]]:
         """건축물대장 정보 조회 (국토교통부 API)"""
@@ -784,10 +824,13 @@ class ExternalAPIService:
         latitude: float,
         longitude: float,
         radius_m: int = 1000,
-        clinic_type: Optional[str] = None
+        clinic_type: Optional[str] = None,
+        region_code: str = "",
     ) -> List[Dict[str, Any]]:
         """주변 병원 정보 + 매출 데이터 조회"""
-        hospitals = await self.get_nearby_hospitals(latitude, longitude, radius_m, clinic_type)
+        hospitals = await self.get_nearby_hospitals(
+            latitude, longitude, radius_m, clinic_type, region_code=region_code
+        )
 
         # 각 병원의 청구 데이터 조회
         for hospital in hospitals:

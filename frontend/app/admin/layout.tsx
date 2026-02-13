@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, FormEvent } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
@@ -17,6 +17,7 @@ import {
   TrendingUp,
   ClipboardCheck,
   CreditCard,
+  LogIn,
 } from 'lucide-react';
 
 const sidebarItems = [
@@ -40,6 +41,12 @@ export default function AdminLayout({
   const pathname = usePathname();
   const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [loginEmail, setLoginEmail] = useState('');
+  const [loginPassword, setLoginPassword] = useState('');
+  const [loginError, setLoginError] = useState('');
+  const [loginLoading, setLoginLoading] = useState(false);
+
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1';
 
   useEffect(() => {
     checkAdmin();
@@ -49,33 +56,74 @@ export default function AdminLayout({
     try {
       const token = localStorage.getItem('access_token');
       if (!token) {
-        window.location.href = '/login';
+        setLoading(false);
         return;
       }
 
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1'}/auth/me`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
+      const response = await fetch(`${apiUrl}/auth/me`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
 
       if (!response.ok) {
-        window.location.href = '/login';
+        setLoading(false);
         return;
       }
 
       const user = await response.json();
       if (user.role === 'ADMIN' || user.role === 'SALES_REP') {
         setIsAdmin(true);
-      } else {
-        window.location.href = '/dashboard';
       }
     } catch (error) {
       console.error('Auth check failed:', error);
-      window.location.href = '/login';
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleLogin = async (e: FormEvent) => {
+    e.preventDefault();
+    setLoginError('');
+    setLoginLoading(true);
+
+    try {
+      const loginRes = await fetch(`${apiUrl}/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: loginEmail, password: loginPassword }),
+      });
+
+      if (!loginRes.ok) {
+        setLoginError('이메일 또는 비밀번호가 올바르지 않습니다.');
+        return;
+      }
+
+      const token = await loginRes.json();
+      localStorage.setItem('access_token', token.access_token);
+      if (token.refresh_token) {
+        localStorage.setItem('refresh_token', token.refresh_token);
+      }
+
+      const meRes = await fetch(`${apiUrl}/auth/me`, {
+        headers: { Authorization: `Bearer ${token.access_token}` },
+      });
+
+      if (!meRes.ok) {
+        setLoginError('사용자 정보를 가져올 수 없습니다.');
+        return;
+      }
+
+      const user = await meRes.json();
+      if (user.role === 'ADMIN' || user.role === 'SALES_REP') {
+        setIsAdmin(true);
+      } else {
+        localStorage.removeItem('access_token');
+        localStorage.removeItem('refresh_token');
+        setLoginError('관리자 권한이 없습니다.');
+      }
+    } catch (error) {
+      setLoginError('로그인 중 오류가 발생했습니다.');
+    } finally {
+      setLoginLoading(false);
     }
   };
 
@@ -93,7 +141,71 @@ export default function AdminLayout({
   }
 
   if (!isAdmin) {
-    return null;
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="w-full max-w-sm mx-auto">
+          <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-8">
+            <div className="text-center mb-6">
+              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center mx-auto mb-4">
+                <Sparkles className="w-7 h-7 text-white" />
+              </div>
+              <h1 className="text-xl font-bold text-gray-900">관리자 로그인</h1>
+              <p className="text-sm text-gray-500 mt-1">메디플라톤 관리자 페이지</p>
+            </div>
+
+            <form onSubmit={handleLogin} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">이메일</label>
+                <input
+                  type="email"
+                  required
+                  value={loginEmail}
+                  onChange={(e) => setLoginEmail(e.target.value)}
+                  className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent"
+                  placeholder="admin@example.com"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">비밀번호</label>
+                <input
+                  type="password"
+                  required
+                  value={loginPassword}
+                  onChange={(e) => setLoginPassword(e.target.value)}
+                  className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent"
+                  placeholder="••••••••"
+                />
+              </div>
+
+              {loginError && (
+                <p className="text-sm text-red-600 bg-red-50 px-3 py-2 rounded-lg">{loginError}</p>
+              )}
+
+              <button
+                type="submit"
+                disabled={loginLoading}
+                className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-gradient-to-r from-violet-600 to-indigo-600 text-white text-sm font-medium rounded-xl hover:from-violet-700 hover:to-indigo-700 transition-all disabled:opacity-50"
+              >
+                {loginLoading ? (
+                  <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                ) : (
+                  <>
+                    <LogIn className="w-4 h-4" />
+                    로그인
+                  </>
+                )}
+              </button>
+            </form>
+
+            <div className="mt-6 text-center">
+              <Link href="/" className="text-sm text-gray-400 hover:text-gray-600 transition-colors">
+                메인으로 돌아가기
+              </Link>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   return (
