@@ -5,7 +5,7 @@ import Link from 'next/link';
 import {
   Building2, MapPin, Train, Users, Car,
   Zap, Clock, ShieldCheck,
-  Wind, Flame, Landmark, Pill, Hospital, Banknote,
+  Wind, Flame, Landmark, Pill, Cross, Banknote,
   CreditCard, Receipt, HeartHandshake, ArrowRight, ArrowLeft,
   TrendingUp, AlertTriangle, CheckCircle2,
   ChevronDown, Info, BarChart3, Target, Stethoscope,
@@ -791,7 +791,7 @@ export default function LandlordSimulatorPage() {
                   label="반경 500m 인근 의원 수"
                   value={form.nearbyClinics}
                   onChange={(v) => set('nearbyClinics', v)}
-                  icon={Hospital}
+                  icon={Cross}
                   options={[
                     { value: 'optimal', label: '적정 (3~8개)' },
                     { value: 'few', label: '소수 (1~2개)' },
