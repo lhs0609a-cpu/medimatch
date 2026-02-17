@@ -81,7 +81,7 @@ export default function EscrowPayPage() {
       })
 
       // Initialize Toss Payments
-      const TossPayments = window.TossPayments as any
+      const TossPayments = (window as any).TossPayments
       const tossPayments = TossPayments(process.env.NEXT_PUBLIC_TOSS_CLIENT_KEY)
 
       // Request payment

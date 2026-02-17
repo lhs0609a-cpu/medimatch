@@ -32,7 +32,7 @@ export function usePayment(): UsePaymentReturn {
   const [error, setError] = useState<Error | null>(null)
 
   const loadTossPaymentsSDK = useCallback(async () => {
-    if (window.TossPayments) return
+    if ((window as any).TossPayments) return
 
     return new Promise<void>((resolve, reject) => {
       const script = document.createElement('script')
@@ -73,7 +73,7 @@ export function usePayment(): UsePaymentReturn {
           throw new Error('토스페이먼츠 클라이언트 키가 설정되지 않았습니다.')
         }
 
-        const tossPayments = window.TossPayments!(clientKey)
+        const tossPayments = (window as any).TossPayments!(clientKey)
 
         const successUrl = `${window.location.origin}/payment/success?type=${productType}&ref=${referenceId || ''}`
         const failUrl = `${window.location.origin}/payment/fail?type=${productType}&ref=${referenceId || ''}`
@@ -107,7 +107,7 @@ export function usePayment(): UsePaymentReturn {
           throw new Error('토스페이먼츠 클라이언트 키가 설정되지 않았습니다.')
         }
 
-        const tossPayments = window.TossPayments!(clientKey)
+        const tossPayments = (window as any).TossPayments!(clientKey)
 
         const successUrl = `${window.location.origin}/payment/success?type=${productType}&ref=${referenceId || ''}`
         const failUrl = `${window.location.origin}/payment/fail?type=${productType}&ref=${referenceId || ''}`

@@ -284,6 +284,18 @@ export default function HomePage() {
                         <div>
                           <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">핵심 서비스</p>
                           <div className="space-y-1">
+                            <Link href="/opening-package" className="flex items-center gap-3 p-3 rounded-xl bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800/30 group">
+                              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-orange-500 to-amber-500 flex items-center justify-center">
+                                <Sparkles className="w-5 h-5 text-white" />
+                              </div>
+                              <div>
+                                <div className="flex items-center gap-2">
+                                  <p className="font-medium text-foreground group-hover:text-orange-600">개원의 패키지</p>
+                                  <span className="px-1.5 py-0.5 text-[10px] font-bold bg-red-500 text-white rounded">HOT</span>
+                                </div>
+                                <p className="text-xs text-muted-foreground">대출 + 마케팅 + PG + 중개 원스톱</p>
+                              </div>
+                            </Link>
                             <Link href="/simulate" className="flex items-center gap-3 p-3 rounded-xl hover:bg-accent transition-colors group">
                               <div className="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
                                 <BarChart3 className="w-5 h-5 text-blue-600 dark:text-blue-400" />
@@ -340,6 +352,10 @@ export default function HomePage() {
                   )}
                 </div>
 
+                <Link href="/opening-package" className="nav-link flex items-center gap-1">
+                  개원의 패키지
+                  <span className="px-1.5 py-0.5 text-[10px] font-bold bg-red-500 text-white rounded">HOT</span>
+                </Link>
                 <Link href="/buildings" className="nav-link">매물</Link>
                 <Link href="/group-buying" className="nav-link hidden xl:block">공동구매</Link>
                 <Link href="/map" className="nav-link">지도</Link>
@@ -392,6 +408,11 @@ export default function HomePage() {
                 <Link href="/cost-calculator" className="flex items-center gap-3 p-3 rounded-xl hover:bg-accent" onClick={() => setMobileMenuOpen(false)}>
                   <DollarSign className="w-5 h-5 text-blue-500" />
                   <span>개원 비용 계산기</span>
+                </Link>
+                <Link href="/opening-package" className="flex items-center gap-3 p-3 rounded-xl bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800/30" onClick={() => setMobileMenuOpen(false)}>
+                  <Sparkles className="w-5 h-5 text-orange-500" />
+                  <span>개원의 패키지</span>
+                  <span className="px-1.5 py-0.5 text-[10px] font-bold bg-red-500 text-white rounded">HOT</span>
                 </Link>
                 <Link href="/#tools" className="flex items-center gap-3 p-3 rounded-xl hover:bg-accent" onClick={() => setMobileMenuOpen(false)}>
                   <Sparkles className="w-5 h-5 text-indigo-500" />
@@ -1095,6 +1116,7 @@ export default function HomePage() {
                   <li><Link href="/pharmacy-match" className="hover:text-foreground transition-colors">PharmMatch</Link></li>
                   <li><Link href="/map" className="hover:text-foreground transition-colors">지도</Link></li>
                   <li><Link href="/landlord-simulator" className="hover:text-foreground transition-colors">입점 확률 분석</Link></li>
+                  <li><Link href="/opening-package" className="hover:text-foreground transition-colors">개원의 패키지</Link></li>
                 </ul>
               </div>
 
