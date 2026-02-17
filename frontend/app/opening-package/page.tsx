@@ -31,6 +31,7 @@ import {
   Plus,
   AlertCircle,
   CheckCircle2,
+  Stethoscope,
 } from 'lucide-react'
 
 /* ─── 숫자 카운터 애니메이션 훅 ─── */
@@ -701,7 +702,58 @@ export default function OpeningPackagePage() {
               <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-4">
                 이것만 하시면 됩니다
               </h2>
-              <p className="text-muted-foreground">PG 단말기 무료 설치 하나로 모든 혜택이 시작됩니다</p>
+              <p className="text-muted-foreground">PG 단말기 설치 하나로 모든 혜택이 시작됩니다</p>
+            </div>
+
+            {/* 시장 vs 메디플라톤 비교 */}
+            <div className="mb-12">
+              <h3 className="text-lg font-semibold text-center mb-6">시장 대비 경쟁력 있는 조건</h3>
+              <div className="overflow-x-auto">
+                <table className="w-full border-collapse">
+                  <thead>
+                    <tr>
+                      <th className="text-left p-4 bg-card border border-border rounded-tl-xl text-sm font-medium text-muted-foreground">항목</th>
+                      <th className="text-center p-4 bg-card border border-border text-sm font-medium">타사 (자영업자)</th>
+                      <th className="text-center p-4 bg-card border border-border text-sm font-medium">타사 (병의원·약국)</th>
+                      <th className="text-center p-4 bg-gradient-to-r from-blue-600 to-purple-600 border border-blue-500/30 rounded-tr-xl text-sm font-medium text-white">메디플라톤</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td className="p-4 bg-card border border-border text-sm font-medium">단말기 비용</td>
+                      <td className="p-4 bg-card border border-border text-sm text-center text-muted-foreground">무상 지원</td>
+                      <td className="p-4 bg-card border border-border text-sm text-center text-muted-foreground">무상 지원</td>
+                      <td className="p-4 border border-blue-500/20 text-sm text-center font-semibold text-blue-600 bg-blue-50 dark:bg-blue-900/10">
+                        병의원 무상 / 일반 20만원
+                      </td>
+                    </tr>
+                    <tr>
+                      <td className="p-4 bg-card border border-border text-sm font-medium">월 관리비</td>
+                      <td className="p-4 bg-card border border-border text-sm text-center text-red-500 font-medium">월 11,000원</td>
+                      <td className="p-4 bg-card border border-border text-sm text-center text-muted-foreground">없음</td>
+                      <td className="p-4 border border-blue-500/20 text-sm text-center font-semibold text-green-600 bg-blue-50 dark:bg-blue-900/10">
+                        없음 (전 업종)
+                      </td>
+                    </tr>
+                    <tr>
+                      <td className="p-4 bg-card border border-border text-sm font-medium">DSR-Free 대출</td>
+                      <td className="p-4 bg-card border border-border text-sm text-center text-muted-foreground">미제공</td>
+                      <td className="p-4 bg-card border border-border text-sm text-center text-muted-foreground">미제공</td>
+                      <td className="p-4 border border-blue-500/20 text-sm text-center font-semibold text-blue-600 bg-blue-50 dark:bg-blue-900/10">
+                        5.3%~ 제공
+                      </td>
+                    </tr>
+                    <tr>
+                      <td className="p-4 bg-card border border-border text-sm font-medium rounded-bl-xl">무료 마케팅</td>
+                      <td className="p-4 bg-card border border-border text-sm text-center text-muted-foreground">미제공</td>
+                      <td className="p-4 bg-card border border-border text-sm text-center text-muted-foreground">미제공</td>
+                      <td className="p-4 border border-blue-500/20 text-sm text-center font-semibold text-blue-600 bg-blue-50 dark:bg-blue-900/10 rounded-br-xl">
+                        최대 1,970만원 지원
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
             </div>
 
             {/* 3스텝 프로세스 */}
@@ -710,8 +762,8 @@ export default function OpeningPackagePage() {
                 {
                   step: '01',
                   icon: CreditCard,
-                  title: 'PG 단말기 무료 설치',
-                  desc: 'KB국민카드 제휴 PG 단말기를 무료로 설치합니다. 설치비·보증금 0원.',
+                  title: 'PG 단말기 설치',
+                  desc: '병의원·약국은 무상 지원, 일반 사업자는 20만원. 월 관리비 없음.',
                   color: 'from-blue-500 to-cyan-500',
                 },
                 {
@@ -747,16 +799,37 @@ export default function OpeningPackagePage() {
               ))}
             </div>
 
-            {/* 부담이 적다는 점 강조 */}
+            {/* 업종별 단말기 안내 */}
+            <div className="grid sm:grid-cols-2 gap-6 mb-8">
+              <div className="bg-gradient-to-br from-blue-500/5 to-cyan-500/5 border-2 border-blue-500/30 rounded-2xl p-6 text-center">
+                <div className="w-12 h-12 rounded-xl bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center mx-auto mb-3">
+                  <Stethoscope className="w-6 h-6 text-blue-600" />
+                </div>
+                <h4 className="font-semibold mb-1">병의원 · 약국</h4>
+                <p className="text-3xl font-bold text-blue-600 mb-1">무상 지원</p>
+                <p className="text-sm text-muted-foreground">단말기 비용 0원 · 월 관리비 0원</p>
+              </div>
+              <div className="bg-card border border-border rounded-2xl p-6 text-center">
+                <div className="w-12 h-12 rounded-xl bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center mx-auto mb-3">
+                  <Building2 className="w-6 h-6 text-purple-600" />
+                </div>
+                <h4 className="font-semibold mb-1">일반 사업자</h4>
+                <p className="text-3xl font-bold text-foreground mb-1">20만원</p>
+                <p className="text-sm text-muted-foreground">단말기 가격만 · 월 관리비 0원</p>
+                <p className="text-xs text-muted-foreground mt-2">* 심사 후 기본거래 보증보험이 요구될 수 있습니다</p>
+              </div>
+            </div>
+
+            {/* 핵심 포인트 */}
             <div className="bg-card border border-border rounded-2xl p-6 md:p-8">
               <div className="grid sm:grid-cols-3 gap-6 text-center">
                 <div>
                   <p className="text-2xl font-bold text-green-600 mb-1">0원</p>
-                  <p className="text-sm text-muted-foreground">PG 단말기 설치비</p>
+                  <p className="text-sm text-muted-foreground">월 관리비 (전 업종)</p>
                 </div>
                 <div>
                   <p className="text-2xl font-bold text-green-600 mb-1">0원</p>
-                  <p className="text-sm text-muted-foreground">보증금·위약금</p>
+                  <p className="text-sm text-muted-foreground">병의원 단말기 비용</p>
                 </div>
                 <div>
                   <p className="text-2xl font-bold text-blue-600 mb-1">업계 최저</p>
@@ -788,7 +861,7 @@ export default function OpeningPackagePage() {
                     { label: '중개 수수료', value: '별도 청구', icon: X, iconColor: 'text-red-500' },
                     { label: '대출 금리', value: '일반 금리 + DSR 반영', icon: X, iconColor: 'text-red-500' },
                     { label: '마케팅비', value: '월 200~500만원 지출', icon: X, iconColor: 'text-red-500' },
-                    { label: 'PG 단말기', value: '별도 설치비 + 보증금', icon: X, iconColor: 'text-red-500' },
+                    { label: 'PG 단말기', value: '단말기 무상이지만 월 11,000원 관리비', icon: X, iconColor: 'text-red-500' },
                     { label: '총 관리', value: '4~5개 업체 별도 관리', icon: X, iconColor: 'text-red-500' },
                   ].map((item) => (
                     <div key={item.label} className="flex items-center gap-3">
@@ -812,7 +885,7 @@ export default function OpeningPackagePage() {
                     { label: '전담 매니저', value: '1:1 전담 배정', icon: Check, iconColor: 'text-green-500' },
                     { label: 'DSR-Free 대출', value: '5.3%~ 업계 최저', icon: Check, iconColor: 'text-green-500' },
                     { label: '무료 마케팅', value: '최대 1,970만원 무료', icon: Check, iconColor: 'text-green-500' },
-                    { label: 'PG 단말기', value: '설치비·보증금 무료', icon: Check, iconColor: 'text-green-500' },
+                    { label: 'PG 단말기', value: '병의원 무상 + 관리비 0원', icon: Check, iconColor: 'text-green-500' },
                     { label: '원스톱 관리', value: '모든 서비스 한 곳에서', icon: Check, iconColor: 'text-green-500' },
                   ].map((item) => (
                     <div key={item.label} className="flex items-center gap-3">
