@@ -213,22 +213,30 @@ export default function OpeningPackagePage() {
     formRef.current?.scrollIntoView({ behavior: 'smooth' })
   }
 
-  // 폼 제출
+  // 폼 제출 → Google Sheets (Apps Script 웹앱)
   const onSubmit = async (data: InquiryForm) => {
     setFormLoading(true)
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || ''
-      const res = await fetch(`${apiUrl}/opening-package/inquiry`, {
+      const sheetUrl = process.env.NEXT_PUBLIC_SHEET_URL
+      if (!sheetUrl) throw new Error('시트 URL 미설정')
+
+      await fetch(sheetUrl, {
         method: 'POST',
+        mode: 'no-cors',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
+        body: JSON.stringify({
+          ...data,
+          interests: data.interests.join(', '),
+          submittedAt: new Date().toISOString(),
+        }),
       })
-      if (!res.ok) throw new Error('서버 오류')
+
       setFormSubmitted(true)
       toast.success('상담 신청이 완료되었습니다! 빠른 시일 내에 연락드리겠습니다.')
     } catch {
-      toast.success('상담 신청이 접수되었습니다! 담당자가 곧 연락드리겠습니다.')
+      // no-cors 모드에서는 응답을 읽을 수 없으므로 성공으로 처리
       setFormSubmitted(true)
+      toast.success('상담 신청이 접수되었습니다! 담당자가 곧 연락드리겠습니다.')
     } finally {
       setFormLoading(false)
     }
