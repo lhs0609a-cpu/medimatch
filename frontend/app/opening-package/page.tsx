@@ -33,7 +33,6 @@ import {
   CheckCircle2,
   Stethoscope,
   Lock,
-  Store,
 } from 'lucide-react'
 
 /* ─── 숫자 카운터 애니메이션 훅 ─── */
@@ -102,15 +101,6 @@ const DOCTOR_MARKETING: MarketingItem[] = [
   { name: 'SNS 마케팅 3개월', value: '600만원', numericValue: 600, desc: '인스타그램·유튜브 숏츠 운영', condition: 'brokerage', conditionLabel: '+ 중개' },
 ]
 
-/** 자영업자 마케팅 혜택 */
-const BIZ_MARKETING: MarketingItem[] = [
-  { name: '블로그 마케팅 3개월', value: '440만원', numericValue: 440, desc: '키워드 최적화 + 콘텐츠 발행', condition: 'pg', conditionLabel: 'PG 설치' },
-  { name: '플레이스 광고 3개월', value: '790만원', numericValue: 790, desc: '네이버 플레이스 상위노출', condition: 'pg', conditionLabel: 'PG 설치' },
-  { name: 'SNS 마케팅 3개월', value: '600만원', numericValue: 600, desc: '인스타그램·유튜브 숏츠 운영', condition: 'pg', conditionLabel: 'PG 설치' },
-  { name: '체험단 마케팅 3개월', value: '350만원', numericValue: 350, desc: '블로거·인플루언서 체험단 운영', condition: 'loan', conditionLabel: '+ 대출' },
-  { name: '홈페이지 제작', value: '300만원', numericValue: 300, desc: '맞춤형 반응형 홈페이지', condition: 'loan', conditionLabel: '+ 대출' },
-]
-
 function isItemUnlocked(
   condition: MarketingItem['condition'],
   pg: boolean,
@@ -135,15 +125,8 @@ function isItemUnlocked(
 function getTierLabel(
   pg: boolean,
   loan: boolean,
-  brokerage: boolean,
-  bizType: 'doctor' | 'biz'
+  brokerage: boolean
 ): { label: string; gradient: string } {
-  if (bizType === 'biz') {
-    if (pg && loan) return { label: '플러스', gradient: 'from-purple-500 to-pink-500' }
-    if (pg) return { label: '기본', gradient: 'from-blue-600 to-purple-600' }
-    return { label: '-', gradient: 'from-gray-400 to-gray-500' }
-  }
-  // doctor
   if (pg && loan && brokerage) return { label: '프리미엄', gradient: 'from-orange-500 to-red-500' }
   if (pg && loan) return { label: '플러스', gradient: 'from-purple-500 to-pink-500' }
   if (pg) return { label: '기본', gradient: 'from-blue-600 to-purple-600' }
@@ -177,15 +160,14 @@ export default function OpeningPackagePage() {
   const formRef = useRef<HTMLElement>(null)
 
   // 계산기 상태
-  const [calcBizType, setCalcBizType] = useState<'doctor' | 'biz'>('doctor')
   const [calcPg, setCalcPg] = useState(true)
   const [calcLoan, setCalcLoan] = useState(false)
   const [calcBrokerage, setCalcBrokerage] = useState(false)
   const [calcArea, setCalcArea] = useState(35)
 
   // 계산
-  const marketingItems = calcBizType === 'doctor' ? DOCTOR_MARKETING : BIZ_MARKETING
-  const tierInfo = getTierLabel(calcPg, calcLoan, calcBrokerage, calcBizType)
+  const marketingItems = DOCTOR_MARKETING
+  const tierInfo = getTierLabel(calcPg, calcLoan, calcBrokerage)
   const totalSavings = marketingItems.reduce(
     (sum, item) =>
       sum + (isItemUnlocked(item.condition, calcPg, calcLoan, calcBrokerage, calcArea) ? item.numericValue : 0),
@@ -302,11 +284,6 @@ export default function OpeningPackagePage() {
   // 다음 단계 유도 메시지
   const getNextTierHint = () => {
     if (!calcPg) return { msg: 'PG 단말기를 설치하면 마케팅 혜택이 시작됩니다!', action: 'PG 설치' }
-    if (calcBizType === 'biz') {
-      if (!calcLoan) return { msg: '대출을 추가하면 체험단 + 홈페이지도 무료!', action: '대출 추가' }
-      return null
-    }
-    // doctor
     if (!calcLoan) return { msg: '대출을 추가하면 카페 바이럴 + 전담 마케터 무료!', action: '대출 추가' }
     if (calcLoan && calcArea < 80) return { msg: `80평 이상이면 홈페이지 제작도 무료! (현재 ${calcArea}평)`, action: '80평 이상' }
     if (!calcBrokerage) return { msg: '중개를 추가하면 SNS 마케팅까지 풀마케팅!', action: '중개 추가' }
@@ -497,15 +474,10 @@ export default function OpeningPackagePage() {
               <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-4">
                 서비스를 추가할수록 마케팅이 무료
               </h2>
-              <p className="text-white/60">개원의 · 자영업자 모두 PG 설치만으로 시작</p>
+              <p className="text-white/60">PG 설치만으로 시작, 서비스 추가 시 마케팅 혜택 확대</p>
             </div>
 
-            {/* 개원의 트랙 */}
-            <div className="mb-10">
-              <div className="flex items-center gap-2 mb-5">
-                <Stethoscope className="w-5 h-5 text-blue-400" />
-                <h3 className="text-lg font-bold text-white">개원의</h3>
-              </div>
+            <div>
               <div className="grid md:grid-cols-3 gap-4">
                 {[
                   { tier: '기본', condition: 'PG 단말기 설치', marketing: ['블로그 마케팅 3개월', '플레이스 광고 3개월'], value: '1,230만원', icon: CreditCard, color: 'from-blue-400 to-cyan-400' },
@@ -541,145 +513,10 @@ export default function OpeningPackagePage() {
               </div>
             </div>
 
-            {/* 자영업자 트랙 */}
-            <div>
-              <div className="flex items-center gap-2 mb-5">
-                <Store className="w-5 h-5 text-purple-400" />
-                <h3 className="text-lg font-bold text-white">자영업자</h3>
-              </div>
-              <div className="grid md:grid-cols-2 gap-4">
-                {[
-                  { tier: '기본', condition: 'PG 단말기 설치', marketing: ['블로그 마케팅 3개월', '플레이스 광고 3개월', 'SNS 마케팅 3개월'], value: '1,830만원', icon: CreditCard, color: 'from-blue-400 to-cyan-400' },
-                  { tier: '플러스', condition: '+ DSR-Free 대출', marketing: ['체험단 마케팅 3개월', '홈페이지 제작'], value: '+650만원', icon: DollarSign, color: 'from-purple-400 to-pink-400' },
-                ].map((item, i) => (
-                  <div key={item.tier} className="relative">
-                    <div className="bg-white/5 border border-white/10 rounded-2xl p-6 h-full backdrop-blur-sm">
-                      <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${item.color} flex items-center justify-center mb-4`}>
-                        <item.icon className="w-6 h-6 text-white" />
-                      </div>
-                      <h3 className="text-lg font-bold text-white mb-1">{item.tier}</h3>
-                      <p className="text-sm text-white/60 mb-3">{item.condition}</p>
-                      <div className="space-y-1 mb-4">
-                        {item.marketing.map((m) => (
-                          <div key={m} className="flex items-center gap-2 text-xs">
-                            <Check className="w-3 h-3 text-green-400 flex-shrink-0" />
-                            <span className="text-white/80">{m}</span>
-                          </div>
-                        ))}
-                      </div>
-                      <div className={`text-sm font-bold bg-gradient-to-r ${item.color} bg-clip-text text-transparent`}>
-                        {item.value} 상당
-                      </div>
-                    </div>
-                    {i < 1 && (
-                      <div className="hidden md:flex absolute top-1/2 -right-2 -translate-y-1/2 z-10">
-                        <ChevronRight className="w-5 h-5 text-white/20" />
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </div>
           </div>
         </section>
 
-        {/* ===== Section 3: 고민 포인트 ===== */}
-        <section className="py-20">
-          <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-12">
-              <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-4">
-                개원 준비, 이런 고민 있으시죠?
-              </h2>
-            </div>
-
-            <div className="grid md:grid-cols-3 gap-6 mb-12">
-              {[
-                { icon: AlertCircle, title: 'DSR 규제로 대출 한도 부족', desc: '이미 주담대·학자금이 있으면 추가 대출이 어렵고, 금리도 높아집니다.', color: 'text-red-500 bg-red-100 dark:bg-red-900/30' },
-                { icon: DollarSign, title: '마케팅비 수백~수천만원', desc: '홈페이지 제작, 블로그, 플레이스, SNS, 체험단… 전부 하면 수천만원이 듭니다.', color: 'text-amber-500 bg-amber-100 dark:bg-amber-900/30' },
-                { icon: Users, title: '여러 업체를 따로 관리', desc: '중개, 대출, 마케팅, PG를 각각 다른 업체와 상담하면 시간과 비용 모두 낭비됩니다.', color: 'text-blue-500 bg-blue-100 dark:bg-blue-900/30' },
-              ].map((item) => (
-                <div key={item.title} className="bg-card border border-border rounded-2xl p-6 md:p-8">
-                  <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-4 ${item.color}`}>
-                    <item.icon className="w-6 h-6" />
-                  </div>
-                  <h3 className="text-lg font-semibold mb-2">{item.title}</h3>
-                  <p className="text-sm text-muted-foreground">{item.desc}</p>
-                </div>
-              ))}
-            </div>
-
-            <div className="text-center">
-              <div className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 text-white font-medium">
-                <Zap className="w-5 h-5" />
-                이제 한 곳에서, 서비스 추가할수록 무료로
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* ===== Section 4: DSR-Free 대출 ===== */}
-        <section className="py-20 bg-secondary/50">
-          <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-12">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-600 text-sm font-medium mb-4">
-                <Shield className="w-4 h-4" />
-                신협중앙회 정식 제휴
-              </div>
-              <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-4">
-                DSR 규제에 반영되지 않는
-                <br />
-                <span className="text-blue-600">카드매출 담보대출</span>
-              </h2>
-              <p className="text-muted-foreground max-w-xl mx-auto">
-                기존 대출과 완전히 별개로 진행 · 대출 추가 시 플러스 등급으로 추가 마케팅 무료
-              </p>
-            </div>
-
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-12">
-              {[
-                { label: '금리', value: '5.3%~6.9%', sub: '신용도별 차등', color: 'from-blue-500 to-cyan-500' },
-                { label: '최대 한도', value: '3억원', sub: '최소 1,000만원', color: 'from-green-500 to-emerald-500' },
-                { label: '중도상환 수수료', value: '0원', sub: '언제든 상환 가능', color: 'from-purple-500 to-pink-500' },
-                { label: '대출 기간', value: '365~700일', sub: '평균 3영업일 심사', color: 'from-orange-500 to-amber-500' },
-              ].map((stat) => (
-                <div key={stat.label} className="relative overflow-hidden bg-card border border-border rounded-2xl p-6 text-center">
-                  <div className={`absolute top-0 left-0 right-0 h-1 bg-gradient-to-r ${stat.color}`} />
-                  <p className="text-sm text-muted-foreground mb-1">{stat.label}</p>
-                  <p className="text-2xl md:text-3xl font-bold mb-1">{stat.value}</p>
-                  <p className="text-xs text-muted-foreground">{stat.sub}</p>
-                </div>
-              ))}
-            </div>
-
-            <div className="bg-gradient-to-r from-blue-500/5 to-cyan-500/5 border border-blue-500/20 rounded-2xl p-6 md:p-8 mb-8">
-              <div className="grid md:grid-cols-2 gap-6">
-                {[
-                  { title: '신용점수 영향 없음', desc: '카드매출 담보이므로 개인 신용조회 불필요' },
-                  { title: '기존 대출과 별개', desc: '주담대, 학자금 대출 있어도 별도 실행 가능' },
-                  { title: '고객 부담 수수료 0원', desc: '제휴 금융기관 수수료로 운영, 고객 부담 없음' },
-                  { title: 'PG 설치 후 바로 진행', desc: '카드결제 실적 발생 시 바로 대출 가능' },
-                ].map((item) => (
-                  <div key={item.title} className="flex items-start gap-3">
-                    <CheckCircle2 className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
-                    <div>
-                      <p className="font-semibold mb-0.5">{item.title}</p>
-                      <p className="text-sm text-muted-foreground">{item.desc}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div className="text-center">
-              <button onClick={scrollToForm} className="btn-primary btn-lg">
-                지금 한도 조회하기
-                <ArrowRight className="w-5 h-5" />
-              </button>
-            </div>
-          </div>
-        </section>
-
-        {/* ===== Section 5: 인터랙티브 혜택 계산기 ===== */}
+        {/* ===== Section 3: 인터랙티브 혜택 계산기 ===== */}
         <section id="calculator" className="py-20">
           <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-12">
@@ -690,57 +527,20 @@ export default function OpeningPackagePage() {
               <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-4">
                 나의 무료 마케팅 혜택은?
               </h2>
-              <p className="text-muted-foreground">업종을 선택하고 이용할 서비스를 체크하세요</p>
+              <p className="text-muted-foreground">이용할 서비스를 체크하고 혜택을 확인하세요</p>
             </div>
 
             <div className="max-w-3xl mx-auto">
               <div className="bg-card border border-border rounded-3xl p-6 md:p-10 shadow-xl">
-                {/* 업종 선택 토글 */}
-                <div className="mb-8">
-                  <label className="block text-sm font-medium mb-3">업종 선택</label>
-                  <div className="grid grid-cols-2 gap-3">
-                    <button
-                      type="button"
-                      onClick={() => { setCalcBizType('doctor'); setCalcBrokerage(false) }}
-                      className={`flex items-center gap-3 p-4 rounded-xl border-2 transition-all ${
-                        calcBizType === 'doctor'
-                          ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
-                          : 'border-border hover:border-foreground/20'
-                      }`}
-                    >
-                      <Stethoscope className={`w-6 h-6 ${calcBizType === 'doctor' ? 'text-blue-600' : 'text-muted-foreground'}`} />
-                      <div className="text-left">
-                        <p className={`text-sm font-semibold ${calcBizType === 'doctor' ? 'text-blue-600' : ''}`}>개원의</p>
-                        <p className="text-xs text-muted-foreground">병의원 · 약국</p>
-                      </div>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => { setCalcBizType('biz'); setCalcBrokerage(false) }}
-                      className={`flex items-center gap-3 p-4 rounded-xl border-2 transition-all ${
-                        calcBizType === 'biz'
-                          ? 'border-purple-500 bg-purple-50 dark:bg-purple-900/20'
-                          : 'border-border hover:border-foreground/20'
-                      }`}
-                    >
-                      <Store className={`w-6 h-6 ${calcBizType === 'biz' ? 'text-purple-600' : 'text-muted-foreground'}`} />
-                      <div className="text-left">
-                        <p className={`text-sm font-semibold ${calcBizType === 'biz' ? 'text-purple-600' : ''}`}>자영업자</p>
-                        <p className="text-xs text-muted-foreground">일반 소상공인</p>
-                      </div>
-                    </button>
-                  </div>
-                </div>
-
                 {/* 서비스 선택 */}
                 <div className="mb-8">
                   <label className="block text-sm font-medium mb-3">이용할 서비스 선택</label>
-                  <div className={`grid grid-cols-1 ${calcBizType === 'doctor' ? 'sm:grid-cols-3' : 'sm:grid-cols-2'} gap-3`}>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                     {[
-                      { id: 'pg', label: 'PG 단말기', desc: '카드결제 시작', icon: CreditCard, checked: calcPg, toggle: () => { setCalcPg(!calcPg); if (calcPg) { setCalcLoan(false); setCalcBrokerage(false) } }, show: true },
-                      { id: 'loan', label: 'DSR-Free 대출', desc: '5.3%~ 카드매출 담보', icon: DollarSign, checked: calcLoan, toggle: () => { if (calcPg) setCalcLoan(!calcLoan); if (calcLoan) setCalcBrokerage(false) }, show: true },
-                      { id: 'brokerage', label: '개원 중개', desc: '전담 매니저 배정', icon: Building2, checked: calcBrokerage, toggle: () => { if (calcPg && calcLoan) setCalcBrokerage(!calcBrokerage) }, show: calcBizType === 'doctor' },
-                    ].filter((svc) => svc.show).map((svc) => {
+                      { id: 'pg', label: 'PG 단말기', desc: '카드결제 시작', icon: CreditCard, checked: calcPg, toggle: () => { setCalcPg(!calcPg); if (calcPg) { setCalcLoan(false); setCalcBrokerage(false) } } },
+                      { id: 'loan', label: 'DSR-Free 대출', desc: '5.3%~ 카드매출 담보', icon: DollarSign, checked: calcLoan, toggle: () => { if (calcPg) setCalcLoan(!calcLoan); if (calcLoan) setCalcBrokerage(false) } },
+                      { id: 'brokerage', label: '개원 중개', desc: '전담 매니저 배정', icon: Building2, checked: calcBrokerage, toggle: () => { if (calcPg && calcLoan) setCalcBrokerage(!calcBrokerage) } },
+                    ].map((svc) => {
                       const disabled = (svc.id === 'loan' && !calcPg) || (svc.id === 'brokerage' && (!calcPg || !calcLoan))
                       return (
                         <button
@@ -768,30 +568,28 @@ export default function OpeningPackagePage() {
                   </div>
                 </div>
 
-                {/* 평수 입력 (개원의만) */}
-                {calcBizType === 'doctor' && (
-                  <div className="mb-8">
-                    <label className="block text-sm font-medium mb-3">개원 예정 평수</label>
-                    <div className="flex items-center gap-4 mb-3">
-                      <button onClick={() => setCalcArea(Math.max(5, calcArea - 5))} className="w-10 h-10 rounded-xl bg-secondary flex items-center justify-center hover:bg-accent transition-colors">
-                        <Minus className="w-4 h-4" />
-                      </button>
-                      <div className="flex-1">
-                        <input type="range" min={5} max={150} value={calcArea} onChange={(e) => setCalcArea(Number(e.target.value))} className="w-full h-2 rounded-full appearance-none cursor-pointer bg-secondary accent-blue-600" />
-                      </div>
-                      <button onClick={() => setCalcArea(Math.min(150, calcArea + 5))} className="w-10 h-10 rounded-xl bg-secondary flex items-center justify-center hover:bg-accent transition-colors">
-                        <Plus className="w-4 h-4" />
-                      </button>
+                {/* 평수 입력 */}
+                <div className="mb-8">
+                  <label className="block text-sm font-medium mb-3">개원 예정 평수</label>
+                  <div className="flex items-center gap-4 mb-3">
+                    <button onClick={() => setCalcArea(Math.max(5, calcArea - 5))} className="w-10 h-10 rounded-xl bg-secondary flex items-center justify-center hover:bg-accent transition-colors">
+                      <Minus className="w-4 h-4" />
+                    </button>
+                    <div className="flex-1">
+                      <input type="range" min={5} max={150} value={calcArea} onChange={(e) => setCalcArea(Number(e.target.value))} className="w-full h-2 rounded-full appearance-none cursor-pointer bg-secondary accent-blue-600" />
                     </div>
-                    <div className="text-center">
-                      <span className="text-4xl font-bold">{calcArea}</span>
-                      <span className="text-lg text-muted-foreground ml-1">평</span>
-                      {calcArea >= 80 && calcPg && calcLoan && (
-                        <span className="ml-2 px-2 py-0.5 text-xs font-bold bg-green-100 text-green-600 rounded-full">홈페이지 제작 조건 충족</span>
-                      )}
-                    </div>
+                    <button onClick={() => setCalcArea(Math.min(150, calcArea + 5))} className="w-10 h-10 rounded-xl bg-secondary flex items-center justify-center hover:bg-accent transition-colors">
+                      <Plus className="w-4 h-4" />
+                    </button>
                   </div>
-                )}
+                  <div className="text-center">
+                    <span className="text-4xl font-bold">{calcArea}</span>
+                    <span className="text-lg text-muted-foreground ml-1">평</span>
+                    {calcArea >= 80 && calcPg && calcLoan && (
+                      <span className="ml-2 px-2 py-0.5 text-xs font-bold bg-green-100 text-green-600 rounded-full">홈페이지 제작 조건 충족</span>
+                    )}
+                  </div>
+                </div>
 
                 {/* 현재 등급 */}
                 <div className={`rounded-2xl p-6 mb-6 text-center ${tierInfo.label !== '-' ? `bg-gradient-to-r ${tierInfo.gradient} text-white` : 'bg-secondary text-muted-foreground'}`}>
@@ -861,6 +659,102 @@ export default function OpeningPackagePage() {
           </div>
         </section>
 
+        {/* ===== Section 4: 고민 포인트 ===== */}
+        <section className="py-20">
+          <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-4">
+                개원 준비, 이런 고민 있으시죠?
+              </h2>
+            </div>
+
+            <div className="grid md:grid-cols-3 gap-6 mb-12">
+              {[
+                { icon: AlertCircle, title: 'DSR 규제로 대출 한도 부족', desc: '이미 주담대·학자금이 있으면 추가 대출이 어렵고, 금리도 높아집니다.', color: 'text-red-500 bg-red-100 dark:bg-red-900/30' },
+                { icon: DollarSign, title: '마케팅비 수백~수천만원', desc: '홈페이지 제작, 블로그, 플레이스, SNS, 체험단… 전부 하면 수천만원이 듭니다.', color: 'text-amber-500 bg-amber-100 dark:bg-amber-900/30' },
+                { icon: Users, title: '여러 업체를 따로 관리', desc: '중개, 대출, 마케팅, PG를 각각 다른 업체와 상담하면 시간과 비용 모두 낭비됩니다.', color: 'text-blue-500 bg-blue-100 dark:bg-blue-900/30' },
+              ].map((item) => (
+                <div key={item.title} className="bg-card border border-border rounded-2xl p-6 md:p-8">
+                  <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-4 ${item.color}`}>
+                    <item.icon className="w-6 h-6" />
+                  </div>
+                  <h3 className="text-lg font-semibold mb-2">{item.title}</h3>
+                  <p className="text-sm text-muted-foreground">{item.desc}</p>
+                </div>
+              ))}
+            </div>
+
+            <div className="text-center">
+              <div className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 text-white font-medium">
+                <Zap className="w-5 h-5" />
+                이제 한 곳에서, 서비스 추가할수록 무료로
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ===== Section 5: DSR-Free 대출 ===== */}
+        <section className="py-20 bg-secondary/50">
+          <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-12">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-600 text-sm font-medium mb-4">
+                <Shield className="w-4 h-4" />
+                신협중앙회 정식 제휴
+              </div>
+              <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-4">
+                DSR 규제에 반영되지 않는
+                <br />
+                <span className="text-blue-600">카드매출 담보대출</span>
+              </h2>
+              <p className="text-muted-foreground max-w-xl mx-auto">
+                기존 대출과 완전히 별개로 진행 · 대출 추가 시 플러스 등급으로 추가 마케팅 무료
+              </p>
+            </div>
+
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-12">
+              {[
+                { label: '금리', value: '5.3%~6.9%', sub: '신용도별 차등', color: 'from-blue-500 to-cyan-500' },
+                { label: '최대 한도', value: '3억원', sub: '최소 1,000만원', color: 'from-green-500 to-emerald-500' },
+                { label: '중도상환 수수료', value: '0원', sub: '언제든 상환 가능', color: 'from-purple-500 to-pink-500' },
+                { label: '대출 기간', value: '365~700일', sub: '평균 3영업일 심사', color: 'from-orange-500 to-amber-500' },
+              ].map((stat) => (
+                <div key={stat.label} className="relative overflow-hidden bg-card border border-border rounded-2xl p-6 text-center">
+                  <div className={`absolute top-0 left-0 right-0 h-1 bg-gradient-to-r ${stat.color}`} />
+                  <p className="text-sm text-muted-foreground mb-1">{stat.label}</p>
+                  <p className="text-2xl md:text-3xl font-bold mb-1">{stat.value}</p>
+                  <p className="text-xs text-muted-foreground">{stat.sub}</p>
+                </div>
+              ))}
+            </div>
+
+            <div className="bg-gradient-to-r from-blue-500/5 to-cyan-500/5 border border-blue-500/20 rounded-2xl p-6 md:p-8 mb-8">
+              <div className="grid md:grid-cols-2 gap-6">
+                {[
+                  { title: '신용점수 영향 없음', desc: '카드매출 담보이므로 개인 신용조회 불필요' },
+                  { title: '기존 대출과 별개', desc: '주담대, 학자금 대출 있어도 별도 실행 가능' },
+                  { title: '고객 부담 수수료 0원', desc: '제휴 금융기관 수수료로 운영, 고객 부담 없음' },
+                  { title: 'PG 설치 후 바로 진행', desc: '카드결제 실적 발생 시 바로 대출 가능' },
+                ].map((item) => (
+                  <div key={item.title} className="flex items-start gap-3">
+                    <CheckCircle2 className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                    <div>
+                      <p className="font-semibold mb-0.5">{item.title}</p>
+                      <p className="text-sm text-muted-foreground">{item.desc}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="text-center">
+              <button onClick={scrollToForm} className="btn-primary btn-lg">
+                지금 한도 조회하기
+                <ArrowRight className="w-5 h-5" />
+              </button>
+            </div>
+          </div>
+        </section>
+
         {/* ===== Section 6: PG 단말기 조건 ===== */}
         <section className="py-20 bg-secondary/50">
           <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -871,8 +765,8 @@ export default function OpeningPackagePage() {
               <p className="text-muted-foreground">기존 카드사 계약은 유지, PG사만 변경하면 됩니다 · 당일 설치 완료</p>
             </div>
 
-            {/* 업종별 단말기 안내 */}
-            <div className="grid sm:grid-cols-2 gap-6 mb-12">
+            {/* 단말기 안내 */}
+            <div className="max-w-md mx-auto mb-12">
               <div className="bg-gradient-to-br from-blue-500/5 to-cyan-500/5 border-2 border-blue-500/30 rounded-2xl p-6 text-center">
                 <div className="w-12 h-12 rounded-xl bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center mx-auto mb-3">
                   <Stethoscope className="w-6 h-6 text-blue-600" />
@@ -880,15 +774,6 @@ export default function OpeningPackagePage() {
                 <h4 className="font-semibold mb-1">병의원 · 약국</h4>
                 <p className="text-3xl font-bold text-blue-600 mb-1">무상 지원</p>
                 <p className="text-sm text-muted-foreground">단말기 비용 0원 · 월 관리비 0원</p>
-              </div>
-              <div className="bg-card border border-border rounded-2xl p-6 text-center">
-                <div className="w-12 h-12 rounded-xl bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center mx-auto mb-3">
-                  <Building2 className="w-6 h-6 text-purple-600" />
-                </div>
-                <h4 className="font-semibold mb-1">일반 사업자</h4>
-                <p className="text-3xl font-bold text-foreground mb-1">20만원</p>
-                <p className="text-sm text-muted-foreground">단말기 가격만 · 월 관리비 0원</p>
-                <p className="text-xs text-muted-foreground mt-2">* 심사 후 기본거래 보증보험이 요구될 수 있습니다</p>
               </div>
             </div>
 
@@ -900,22 +785,20 @@ export default function OpeningPackagePage() {
                   <thead>
                     <tr>
                       <th className="text-left p-4 bg-card border border-border rounded-tl-xl text-sm font-medium text-muted-foreground">항목</th>
-                      <th className="text-center p-4 bg-card border border-border text-sm font-medium">타사 (자영업자)</th>
-                      <th className="text-center p-4 bg-card border border-border text-sm font-medium">타사 (병의원)</th>
+                      <th className="text-center p-4 bg-card border border-border text-sm font-medium">타사</th>
                       <th className="text-center p-4 bg-gradient-to-r from-blue-600 to-purple-600 border border-blue-500/30 rounded-tr-xl text-sm font-medium text-white">메디플라톤</th>
                     </tr>
                   </thead>
                   <tbody>
                     {[
-                      { label: '단말기', other1: '무상 지원', other2: '무상 지원', medi: '병의원 무상 / 일반 20만원' },
-                      { label: '월 관리비', other1: '월 11,000원', other2: '없음', medi: '없음 (전 업종)', mediGreen: true },
-                      { label: 'DSR-Free 대출', other1: '미제공', other2: '미제공', medi: '5.3%~ 제공' },
-                      { label: '무료 마케팅', other1: '미제공', other2: '미제공', medi: '최대 2,580만원', last: true },
+                      { label: '단말기', other: '무상 지원', medi: '무상 지원' },
+                      { label: '월 관리비', other: '없음', medi: '없음', mediGreen: true },
+                      { label: 'DSR-Free 대출', other: '미제공', medi: '5.3%~ 제공' },
+                      { label: '무료 마케팅', other: '미제공', medi: '최대 2,580만원', last: true },
                     ].map((row) => (
                       <tr key={row.label}>
                         <td className={`p-4 bg-card border border-border text-sm font-medium ${row.last ? 'rounded-bl-xl' : ''}`}>{row.label}</td>
-                        <td className={`p-4 bg-card border border-border text-sm text-center ${row.label === '월 관리비' ? 'text-red-500 font-medium' : 'text-muted-foreground'}`}>{row.other1}</td>
-                        <td className="p-4 bg-card border border-border text-sm text-center text-muted-foreground">{row.other2}</td>
+                        <td className="p-4 bg-card border border-border text-sm text-center text-muted-foreground">{row.other}</td>
                         <td className={`p-4 border border-blue-500/20 text-sm text-center font-semibold bg-blue-50 dark:bg-blue-900/10 ${row.mediGreen ? 'text-green-600' : 'text-blue-600'} ${row.last ? 'rounded-br-xl' : ''}`}>{row.medi}</td>
                       </tr>
                     ))}
@@ -1039,7 +922,7 @@ export default function OpeningPackagePage() {
               {[
                 { name: '김○○ 원장님', specialty: '내과', quote: 'PG만 바꿨을 뿐인데 블로그·플레이스가 무료로 돌아가고, 대출까지 하니 카페 바이럴과 전담 마케터까지 배정됐어요. 개원 초기 비용이 크게 줄었습니다.', rating: 5 },
                 { name: '박○○ 원장님', specialty: '피부과', quote: '중개까지 맡기니 프리미엄 등급이 되면서 SNS 마케팅도 무료! 전담 매니저가 한 번에 처리해줘서 정말 편했습니다.', rating: 5 },
-                { name: '이○○ 대표님', specialty: '카페', quote: '자영업자인데 PG 설치만으로 블로그·플레이스·SNS 3종이 다 무료라니 놀랐어요. 대출까지 하니 체험단과 홈페이지도 무료로 받았습니다.', rating: 5 },
+                { name: '최○○ 원장님', specialty: '치과', quote: 'PG만 설치했을 뿐인데 블로그·플레이스가 바로 무료로 시작되고, 대출까지 추가하니 홈페이지까지 무료로 만들어줬어요. 원스톱이라 정말 편합니다.', rating: 5 },
               ].map((review) => (
                 <div key={review.name} className="bg-card border border-border rounded-2xl p-6">
                   <div className="flex items-center gap-1 mb-3">
