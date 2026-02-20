@@ -262,26 +262,6 @@
            mb-4;
   }
 
-  /* ===== 3D ICON (Toss-style) ===== */
-  .icon-3d {
-    position: relative;
-    isolation: isolate;
-  }
-
-  .icon-3d::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    border-radius: inherit;
-    background: linear-gradient(
-      135deg,
-      rgba(255, 255, 255, 0.4) 0%,
-      rgba(255, 255, 255, 0.12) 50%,
-      transparent 100%
-    );
-    pointer-events: none;
-    z-index: 1;
-  }
 
   /* ===== STAT ===== */
   .stat {
