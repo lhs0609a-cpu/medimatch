@@ -14,25 +14,22 @@ import {
   X,
   Sparkles,
   Phone,
-  Shield,
   CreditCard,
-  TrendingUp,
-  Clock,
   Building2,
   DollarSign,
-  Users,
-  BarChart3,
-  Megaphone,
-  Globe,
   Zap,
   Star,
   ChevronRight,
   Minus,
   Plus,
-  AlertCircle,
   CheckCircle2,
-  Stethoscope,
   Lock,
+  MapPin,
+  BarChart3,
+  Users,
+  Target,
+  TrendingUp,
+  Search,
 } from 'lucide-react'
 
 /* ─── 숫자 카운터 애니메이션 훅 ─── */
@@ -114,7 +111,7 @@ function isItemUnlocked(
     case 'loan':
       return pg && loan
     case 'brokerage':
-      return pg && loan && brokerage
+      return pg && brokerage
     case 'loan_area80':
       return pg && loan && area >= 80
     default:
@@ -127,8 +124,9 @@ function getTierLabel(
   loan: boolean,
   brokerage: boolean
 ): { label: string; gradient: string } {
-  if (pg && loan && brokerage) return { label: '프리미엄', gradient: 'from-orange-500 to-red-500' }
-  if (pg && loan) return { label: '플러스', gradient: 'from-purple-500 to-pink-500' }
+  const extras = (loan ? 1 : 0) + (brokerage ? 1 : 0)
+  if (pg && extras === 2) return { label: '프리미엄', gradient: 'from-orange-500 to-red-500' }
+  if (pg && extras === 1) return { label: '플러스', gradient: 'from-purple-500 to-pink-500' }
   if (pg) return { label: '기본', gradient: 'from-blue-600 to-purple-600' }
   return { label: '-', gradient: 'from-gray-400 to-gray-500' }
 }
@@ -284,9 +282,11 @@ export default function OpeningPackagePage() {
   // 다음 단계 유도 메시지
   const getNextTierHint = () => {
     if (!calcPg) return { msg: 'PG 단말기를 설치하면 마케팅 혜택이 시작됩니다!', action: 'PG 설치' }
-    if (!calcLoan) return { msg: '대출을 추가하면 카페 바이럴 + 전담 마케터 무료!', action: '대출 추가' }
+    const hints: string[] = []
+    if (!calcLoan) hints.push('대출 → 카페 바이럴 + 전담 마케터')
+    if (!calcBrokerage) hints.push('중개 → SNS 마케팅')
     if (calcLoan && calcArea < 80) return { msg: `80평 이상이면 홈페이지 제작도 무료! (현재 ${calcArea}평)`, action: '80평 이상' }
-    if (!calcBrokerage) return { msg: '중개를 추가하면 SNS 마케팅까지 풀마케팅!', action: '중개 추가' }
+    if (hints.length > 0) return { msg: `${hints.join(', ')} 무료!`, action: '서비스 추가' }
     return null
   }
 
@@ -332,18 +332,14 @@ export default function OpeningPackagePage() {
                         </div>
                       </Link>
                       <Link href="/simulate" className="flex items-center gap-3 p-3 rounded-xl hover:bg-accent transition-colors group">
-                        <div className="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
-                          <BarChart3 className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-                        </div>
+                        <span className="text-2xl leading-none">📊</span>
                         <div>
                           <p className="font-medium text-foreground group-hover:text-blue-600">OpenSim</p>
                           <p className="text-xs text-muted-foreground">AI 개원 시뮬레이터</p>
                         </div>
                       </Link>
                       <Link href="/buildings" className="flex items-center gap-3 p-3 rounded-xl hover:bg-accent transition-colors group">
-                        <div className="w-10 h-10 rounded-lg bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
-                          <Building2 className="w-5 h-5 text-green-600 dark:text-green-400" />
-                        </div>
+                        <span className="text-2xl leading-none">🏥</span>
                         <div>
                           <p className="font-medium text-foreground group-hover:text-green-600">매물 검색</p>
                           <p className="text-xs text-muted-foreground">개원 적합 공간 찾기</p>
@@ -378,15 +374,15 @@ export default function OpeningPackagePage() {
           <nav className="lg:hidden border-t border-border bg-background animate-fade-in-down">
             <div className="px-4 py-4 space-y-2">
               <Link href="/" className="flex items-center gap-3 p-3 rounded-xl hover:bg-accent" onClick={() => setMobileMenuOpen(false)}>
-                <Globe className="w-5 h-5 text-blue-500" />
+                <span className="text-lg">🏠</span>
                 <span>홈</span>
               </Link>
               <Link href="/buildings" className="flex items-center gap-3 p-3 rounded-xl hover:bg-accent" onClick={() => setMobileMenuOpen(false)}>
-                <Building2 className="w-5 h-5 text-green-500" />
+                <span className="text-lg">🏥</span>
                 <span>매물 검색</span>
               </Link>
               <Link href="/simulate" className="flex items-center gap-3 p-3 rounded-xl hover:bg-accent" onClick={() => setMobileMenuOpen(false)}>
-                <BarChart3 className="w-5 h-5 text-indigo-500" />
+                <span className="text-lg">📊</span>
                 <span>OpenSim</span>
               </Link>
               <div className="pt-4 border-t border-border">
@@ -411,7 +407,7 @@ export default function OpeningPackagePage() {
           <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
             <div className="text-center">
               <div className="inline-flex items-center gap-3 px-4 py-2 rounded-full bg-gradient-to-r from-blue-500/10 to-orange-500/10 border border-blue-500/20 mb-8 animate-fade-in">
-                <Shield className="w-4 h-4 text-blue-600" />
+                <span className="text-base">🏦</span>
                 <span className="text-sm font-medium">
                   <span className="text-blue-600 font-semibold">신협중앙회</span> · <span className="text-orange-600 font-semibold">KB국민카드</span> 정식 제휴
                 </span>
@@ -447,8 +443,8 @@ export default function OpeningPackagePage() {
               <div className="grid grid-cols-3 gap-3 max-w-2xl mx-auto animate-fade-in-up delay-300">
                 {[
                   { name: '기본', gradient: 'from-blue-500 to-cyan-500', borderColor: 'border-blue-500/30', color: 'text-blue-600', desc: 'PG 설치' },
-                  { name: '플러스', gradient: 'from-purple-500 to-pink-500', borderColor: 'border-purple-500/30', color: 'text-purple-600', desc: '+ 대출' },
-                  { name: '프리미엄', gradient: 'from-orange-500 to-red-500', borderColor: 'border-orange-500/30', color: 'text-orange-600', desc: '+ 중개' },
+                  { name: '플러스', gradient: 'from-purple-500 to-pink-500', borderColor: 'border-purple-500/30', color: 'text-purple-600', desc: 'PG + 1개' },
+                  { name: '프리미엄', gradient: 'from-orange-500 to-red-500', borderColor: 'border-orange-500/30', color: 'text-orange-600', desc: 'PG + 2개' },
                 ].map((t) => (
                   <div key={t.name} className={`flex flex-col items-center gap-1.5 p-4 rounded-2xl bg-card border ${t.borderColor}`}>
                     <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${t.gradient} flex items-center justify-center`}>
@@ -480,9 +476,9 @@ export default function OpeningPackagePage() {
             <div>
               <div className="grid md:grid-cols-3 gap-4">
                 {[
-                  { tier: '기본', condition: 'PG 단말기 설치', marketing: ['블로그 마케팅 3개월', '플레이스 광고 3개월'], value: '1,230만원', icon: CreditCard, color: 'from-blue-400 to-cyan-400' },
-                  { tier: '플러스', condition: '+ DSR-Free 대출', marketing: ['카페 바이럴 3개월', '전담 마케터 배정', '홈페이지 제작 (80평+)'], value: '+750만원', icon: DollarSign, color: 'from-purple-400 to-pink-400' },
-                  { tier: '프리미엄', condition: '+ 개원 중개', marketing: ['SNS 마케팅 3개월'], value: '+600만원', icon: Building2, color: 'from-orange-400 to-red-400' },
+                  { tier: 'PG 단말기', condition: '기본 필수', marketing: ['블로그 마케팅 3개월', '플레이스 광고 3개월'], value: '1,230만원', icon: CreditCard, color: 'from-blue-400 to-cyan-400' },
+                  { tier: 'DSR-Free 대출', condition: '자유 선택', marketing: ['카페 바이럴 3개월', '전담 마케터 배정', '홈페이지 제작 (80평+)'], value: '+750만원', icon: DollarSign, color: 'from-purple-400 to-pink-400' },
+                  { tier: '개원 중개', condition: '자유 선택', marketing: ['SNS 마케팅 3개월'], value: '+600만원', icon: Building2, color: 'from-orange-400 to-red-400' },
                 ].map((item, i) => (
                   <div key={item.tier} className="relative">
                     <div className="bg-white/5 border border-white/10 rounded-2xl p-6 h-full backdrop-blur-sm">
@@ -505,12 +501,13 @@ export default function OpeningPackagePage() {
                     </div>
                     {i < 2 && (
                       <div className="hidden md:flex absolute top-1/2 -right-2 -translate-y-1/2 z-10">
-                        <ChevronRight className="w-5 h-5 text-white/20" />
+                        <Plus className="w-4 h-4 text-white/30" />
                       </div>
                     )}
                   </div>
                 ))}
               </div>
+              <p className="text-center text-white/40 text-sm mt-4">PG 필수 · 대출/중개는 독립 선택 가능 · 많이 선택할수록 등급 UP</p>
             </div>
 
           </div>
@@ -520,8 +517,8 @@ export default function OpeningPackagePage() {
         <section id="calculator" className="py-20">
           <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-12">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-orange-100 dark:bg-orange-900/30 text-orange-600 text-sm font-medium mb-4">
-                <Sparkles className="w-4 h-4" />
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-orange-600/10 text-orange-600 text-sm font-medium mb-4">
+                <span className="text-base">🧮</span>
                 인터랙티브 계산기
               </div>
               <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-4">
@@ -538,10 +535,10 @@ export default function OpeningPackagePage() {
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                     {[
                       { id: 'pg', label: 'PG 단말기', desc: '카드결제 시작', icon: CreditCard, checked: calcPg, toggle: () => { setCalcPg(!calcPg); if (calcPg) { setCalcLoan(false); setCalcBrokerage(false) } } },
-                      { id: 'loan', label: 'DSR-Free 대출', desc: '5.3%~ 카드매출 담보', icon: DollarSign, checked: calcLoan, toggle: () => { if (calcPg) setCalcLoan(!calcLoan); if (calcLoan) setCalcBrokerage(false) } },
-                      { id: 'brokerage', label: '개원 중개', desc: '전담 매니저 배정', icon: Building2, checked: calcBrokerage, toggle: () => { if (calcPg && calcLoan) setCalcBrokerage(!calcBrokerage) } },
+                      { id: 'loan', label: 'DSR-Free 대출', desc: '5.3%~ 카드매출 담보', icon: DollarSign, checked: calcLoan, toggle: () => { if (calcPg) setCalcLoan(!calcLoan) } },
+                      { id: 'brokerage', label: '개원 중개', desc: '전담 매니저 배정', icon: Building2, checked: calcBrokerage, toggle: () => { if (calcPg) setCalcBrokerage(!calcBrokerage) } },
                     ].map((svc) => {
-                      const disabled = (svc.id === 'loan' && !calcPg) || (svc.id === 'brokerage' && (!calcPg || !calcLoan))
+                      const disabled = (svc.id === 'loan' && !calcPg) || (svc.id === 'brokerage' && !calcPg)
                       return (
                         <button
                           key={svc.id}
@@ -668,16 +665,15 @@ export default function OpeningPackagePage() {
               </h2>
             </div>
 
-            <div className="grid md:grid-cols-3 gap-6 mb-12">
+            <div className="grid md:grid-cols-2 gap-6 mb-12">
               {[
-                { icon: AlertCircle, title: 'DSR 규제로 대출 한도 부족', desc: '이미 주담대·학자금이 있으면 추가 대출이 어렵고, 금리도 높아집니다.', color: 'text-red-500 bg-red-100 dark:bg-red-900/30' },
-                { icon: DollarSign, title: '마케팅비 수백~수천만원', desc: '홈페이지 제작, 블로그, 플레이스, SNS, 체험단… 전부 하면 수천만원이 듭니다.', color: 'text-amber-500 bg-amber-100 dark:bg-amber-900/30' },
-                { icon: Users, title: '여러 업체를 따로 관리', desc: '중개, 대출, 마케팅, PG를 각각 다른 업체와 상담하면 시간과 비용 모두 낭비됩니다.', color: 'text-blue-500 bg-blue-100 dark:bg-blue-900/30' },
+                { emoji: '📍', title: '어디에 개원해야 할지 막막', desc: '부동산 말만 믿고 계약했다가 환자가 안 오면? 경쟁 의원 수, 타깃 인구가 충분한지 데이터 없이는 판단할 수 없습니다.' },
+                { emoji: '🚫', title: 'DSR 규제로 대출 한도 부족', desc: '이미 주담대·학자금이 있으면 추가 대출이 어렵고, 금리도 높아집니다.' },
+                { emoji: '💸', title: '마케팅비 수백~수천만원', desc: '홈페이지 제작, 블로그, 플레이스, SNS, 체험단… 전부 하면 수천만원이 듭니다.' },
+                { emoji: '🔀', title: '여러 업체를 따로 관리', desc: '중개, 대출, 마케팅, PG를 각각 다른 업체와 상담하면 시간과 비용 모두 낭비됩니다.' },
               ].map((item) => (
                 <div key={item.title} className="bg-card border border-border rounded-2xl p-6 md:p-8">
-                  <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-4 ${item.color}`}>
-                    <item.icon className="w-6 h-6" />
-                  </div>
+                  <span className="text-4xl leading-none block mb-4">{item.emoji}</span>
                   <h3 className="text-lg font-semibold mb-2">{item.title}</h3>
                   <p className="text-sm text-muted-foreground">{item.desc}</p>
                 </div>
@@ -693,12 +689,85 @@ export default function OpeningPackagePage() {
           </div>
         </section>
 
+        {/* ===== Section: 데이터 기반 입지 분석 ===== */}
+        <section className="py-20 bg-secondary/50">
+          <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-12">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-green-600/10 text-green-600 text-sm font-medium mb-4">
+                <MapPin className="w-4 h-4" />
+                입지 분석
+              </div>
+              <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-4">
+                입지가 매출의 80%를 결정합니다
+              </h2>
+              <p className="text-muted-foreground max-w-xl mx-auto">
+                감이 아닌 데이터로 검증하세요. 심평원·국토교통부·소상공인진흥공단 데이터를 AI가 3분 만에 분석합니다.
+              </p>
+            </div>
+
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4 mb-12">
+              {[
+                { icon: Target, title: '경쟁 분석', source: '심평원', desc: '반경 내 동일 진료과 의원 수·매출 추정', color: 'from-red-500 to-orange-500' },
+                { icon: Users, title: '인구 분석', source: '국토교통부', desc: '연령대별 인구, 세대수, 유동인구 분석', color: 'from-blue-500 to-cyan-500' },
+                { icon: TrendingUp, title: '매출 예측', source: '소상공인진흥공단', desc: '진료과·지역별 예상 월 매출 산출', color: 'from-green-500 to-emerald-500' },
+                { icon: BarChart3, title: '손익분기점', source: '복합 데이터', desc: '임대료·인건비 대비 BEP 도달 시점', color: 'from-purple-500 to-pink-500' },
+              ].map((item) => (
+                <div key={item.title} className="bg-card border border-border rounded-2xl p-6 text-center">
+                  <div className={`w-12 h-12 mx-auto rounded-xl bg-gradient-to-br ${item.color} flex items-center justify-center mb-4`}>
+                    <item.icon className="w-6 h-6 text-white" />
+                  </div>
+                  <h3 className="font-semibold mb-1">{item.title}</h3>
+                  <p className="text-xs text-blue-600 font-medium mb-2">{item.source}</p>
+                  <p className="text-sm text-muted-foreground">{item.desc}</p>
+                </div>
+              ))}
+            </div>
+
+            <div className="mb-12">
+              <h3 className="text-lg font-semibold text-center mb-6">입지 분석, 기존 방식과 비교하면</h3>
+              <div className="overflow-x-auto">
+                <table className="w-full border-collapse">
+                  <thead>
+                    <tr>
+                      <th className="text-left p-4 bg-card border border-border rounded-tl-xl text-sm font-medium text-muted-foreground">항목</th>
+                      <th className="text-center p-4 bg-card border border-border text-sm font-medium">기존 방식</th>
+                      <th className="text-center p-4 bg-gradient-to-r from-green-600 to-emerald-600 border border-green-500/30 rounded-tr-xl text-sm font-medium text-white">메디플라톤</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {[
+                      { label: '입지 조사', old: '부동산 중개인 의견 의존', medi: '빅데이터 AI 분석 리포트', last: false },
+                      { label: '소요 시간', old: '수개월 발품', medi: '3분 무료 시뮬레이션', last: false },
+                      { label: '경쟁 파악', old: '직접 현장 답사', medi: '심평원 데이터 자동 분석', last: false },
+                      { label: '매출 예측', old: '경험적 추정', medi: '실제 청구 데이터 기반', last: false },
+                      { label: '비용', old: '컨설팅비 500만원+', medi: '무료', last: true },
+                    ].map((row) => (
+                      <tr key={row.label}>
+                        <td className={`p-4 bg-card border border-border text-sm font-medium ${row.last ? 'rounded-bl-xl' : ''}`}>{row.label}</td>
+                        <td className="p-4 bg-card border border-border text-sm text-center text-muted-foreground">{row.old}</td>
+                        <td className={`p-4 border border-green-500/20 text-sm text-center font-semibold bg-green-50 dark:bg-green-900/10 text-green-600 ${row.last ? 'rounded-br-xl' : ''}`}>{row.medi}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div className="text-center">
+              <Link href="/simulate" className="btn-primary btn-lg">
+                <BarChart3 className="w-5 h-5" />
+                무료 입지 분석 해보기
+              </Link>
+            </div>
+          </div>
+        </section>
+
         {/* ===== Section 5: DSR-Free 대출 ===== */}
         <section className="py-20 bg-secondary/50">
           <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-12">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-600 text-sm font-medium mb-4">
-                <Shield className="w-4 h-4" />
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-600/10 text-blue-600 text-sm font-medium mb-4">
+                <span className="text-base">🏦</span>
                 신협중앙회 정식 제휴
               </div>
               <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-4">
@@ -768,9 +837,7 @@ export default function OpeningPackagePage() {
             {/* 단말기 안내 */}
             <div className="max-w-md mx-auto mb-12">
               <div className="bg-gradient-to-br from-blue-500/5 to-cyan-500/5 border-2 border-blue-500/30 rounded-2xl p-6 text-center">
-                <div className="w-12 h-12 rounded-xl bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center mx-auto mb-3">
-                  <Stethoscope className="w-6 h-6 text-blue-600" />
-                </div>
+                <span className="text-4xl leading-none block mb-3">🩺</span>
                 <h4 className="font-semibold mb-1">병의원 · 약국</h4>
                 <p className="text-3xl font-bold text-blue-600 mb-1">무상 지원</p>
                 <p className="text-sm text-muted-foreground">단말기 비용 0원 · 월 관리비 0원</p>
@@ -826,6 +893,70 @@ export default function OpeningPackagePage() {
           </div>
         </section>
 
+        {/* ===== Section: 개원 원스톱 파이프라인 ===== */}
+        <section className="py-20 bg-foreground text-background">
+          <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-4">
+                입지 분석부터 마케팅까지, 원스톱
+              </h2>
+              <p className="text-white/60">메디플라톤 하나로 개원 전 과정을 해결합니다</p>
+            </div>
+
+            {/* Desktop: horizontal flow */}
+            <div className="hidden lg:flex items-start justify-between">
+              {[
+                { step: '1', label: '입지 AI 분석', desc: '무료', icon: MapPin, color: 'from-green-500 to-emerald-500' },
+                { step: '2', label: '매물 추천', desc: '470+ 매물', icon: Search, color: 'from-cyan-500 to-blue-500' },
+                { step: '3', label: '개원 중개', desc: '전담 매니저', icon: Building2, color: 'from-blue-500 to-indigo-500' },
+                { step: '4', label: 'PG 설치', desc: '무상 지원', icon: CreditCard, color: 'from-indigo-500 to-purple-500' },
+                { step: '5', label: 'DSR-Free 대출', desc: '5.3%~', icon: DollarSign, color: 'from-purple-500 to-pink-500' },
+                { step: '6', label: '마케팅', desc: '최대 2,580만원', icon: Sparkles, color: 'from-orange-500 to-red-500' },
+              ].map((item, i, arr) => (
+                <div key={item.step} className="flex items-start flex-1">
+                  <div className="flex flex-col items-center text-center flex-1">
+                    <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${item.color} flex items-center justify-center mb-3 shadow-lg`}>
+                      <item.icon className="w-7 h-7 text-white" />
+                    </div>
+                    <p className="text-sm font-semibold text-white mb-0.5">{item.label}</p>
+                    <p className="text-xs text-white/50">{item.desc}</p>
+                  </div>
+                  {i < arr.length - 1 && (
+                    <ChevronRight className="w-5 h-5 text-white/30 mt-4 flex-shrink-0" />
+                  )}
+                </div>
+              ))}
+            </div>
+
+            {/* Mobile: vertical flow */}
+            <div className="lg:hidden space-y-3">
+              {[
+                { step: '1', label: '입지 AI 분석', desc: '무료', icon: MapPin, color: 'from-green-500 to-emerald-500' },
+                { step: '2', label: '매물 추천', desc: '470+ 매물', icon: Search, color: 'from-cyan-500 to-blue-500' },
+                { step: '3', label: '개원 중개', desc: '전담 매니저', icon: Building2, color: 'from-blue-500 to-indigo-500' },
+                { step: '4', label: 'PG 설치', desc: '무상 지원', icon: CreditCard, color: 'from-indigo-500 to-purple-500' },
+                { step: '5', label: 'DSR-Free 대출', desc: '5.3%~', icon: DollarSign, color: 'from-purple-500 to-pink-500' },
+                { step: '6', label: '마케팅', desc: '최대 2,580만원', icon: Sparkles, color: 'from-orange-500 to-red-500' },
+              ].map((item, i, arr) => (
+                <div key={item.step}>
+                  <div className="flex items-center gap-4">
+                    <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${item.color} flex items-center justify-center flex-shrink-0`}>
+                      <item.icon className="w-6 h-6 text-white" />
+                    </div>
+                    <div>
+                      <p className="font-semibold text-white">{item.label}</p>
+                      <p className="text-sm text-white/50">{item.desc}</p>
+                    </div>
+                  </div>
+                  {i < arr.length - 1 && (
+                    <div className="ml-6 h-3 border-l-2 border-dashed border-white/20" />
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
         {/* ===== Section 7: 왜 메디플라톤인가 ===== */}
         <section className="py-20">
           <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -873,9 +1004,7 @@ export default function OpeningPackagePage() {
                     { label: '원스톱 관리', value: '모든 서비스 한 곳에서' },
                   ].map((item) => (
                     <div key={item.label} className="flex items-center gap-3">
-                      <div className="w-6 h-6 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center flex-shrink-0">
-                        <Check className="w-4 h-4 text-green-500" />
-                      </div>
+                      <span className="text-base flex-shrink-0">✅</span>
                       <div>
                         <span className="font-medium">{item.label}</span>
                         <span className="text-sm text-blue-600 dark:text-blue-400 ml-2 font-semibold">{item.value}</span>
@@ -896,7 +1025,7 @@ export default function OpeningPackagePage() {
               <div className="flex flex-wrap items-center justify-center gap-4 mb-12">
                 {['신협중앙회', 'KB국민카드', '신한카드', '우리카드', '하나카드'].map((partner) => (
                   <div key={partner} className="flex items-center gap-2 px-5 py-2.5 bg-card border border-border rounded-xl">
-                    <Shield className="w-5 h-5 text-blue-600" />
+                    <span className="text-base">🏦</span>
                     <span className="font-medium text-sm">{partner}</span>
                   </div>
                 ))}
@@ -952,8 +1081,8 @@ export default function OpeningPackagePage() {
             <div className="grid lg:grid-cols-5 gap-12">
               <div className="lg:col-span-2">
                 <div className="sticky top-24">
-                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-600 text-sm font-medium mb-4">
-                    <Phone className="w-4 h-4" />
+                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-600/10 text-blue-600 text-sm font-medium mb-4">
+                    <span className="text-base">📞</span>
                     무료 상담
                   </div>
                   <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-4">
@@ -968,14 +1097,12 @@ export default function OpeningPackagePage() {
                   </p>
                   <div className="space-y-4">
                     {[
-                      { icon: Clock, text: '평균 응답 시간 4시간' },
-                      { icon: Shield, text: '개인정보 안전하게 보호' },
-                      { icon: Phone, text: '전화 또는 카카오톡 상담' },
+                      { emoji: '⏱️', text: '평균 응답 시간 4시간' },
+                      { emoji: '🔒', text: '개인정보 안전하게 보호' },
+                      { emoji: '📱', text: '전화 또는 카카오톡 상담' },
                     ].map((item) => (
                       <div key={item.text} className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
-                          <item.icon className="w-4 h-4 text-blue-600" />
-                        </div>
+                        <span className="text-xl leading-none">{item.emoji}</span>
                         <span className="text-sm">{item.text}</span>
                       </div>
                     ))}
@@ -986,9 +1113,7 @@ export default function OpeningPackagePage() {
               <div className="lg:col-span-3">
                 {formSubmitted ? (
                   <div className="bg-card border border-border rounded-3xl p-8 md:p-12 text-center">
-                    <div className="w-16 h-16 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center mx-auto mb-6">
-                      <CheckCircle2 className="w-8 h-8 text-green-600" />
-                    </div>
+                    <span className="text-6xl leading-none block mb-6">✅</span>
                     <h3 className="text-2xl font-bold mb-3">상담 신청 완료!</h3>
                     <p className="text-muted-foreground mb-6">
                       전문 상담사가 1영업일 이내에 연락드리겠습니다.
