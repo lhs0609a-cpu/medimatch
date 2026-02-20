@@ -231,39 +231,39 @@ const DEFAULT_ERROR: ErrorInfo = {
 };
 
 // 카테고리별 아이콘 및 색상
-const CATEGORY_STYLES: Record<ErrorCategory, { icon: React.ReactNode; bgColor: string; iconColor: string }> = {
+const CATEGORY_STYLES: Record<ErrorCategory, { icon: any; gradient: string; shadow: string }> = {
   user_action: {
-    icon: <HelpCircle className="w-10 h-10" />,
-    bgColor: 'bg-blue-100',
-    iconColor: 'text-blue-600'
+    icon: HelpCircle,
+    gradient: 'from-blue-500 to-indigo-500',
+    shadow: 'shadow-blue-500/25'
   },
   card_issue: {
-    icon: <CreditCard className="w-10 h-10" />,
-    bgColor: 'bg-orange-100',
-    iconColor: 'text-orange-600'
+    icon: CreditCard,
+    gradient: 'from-indigo-500 to-purple-500',
+    shadow: 'shadow-indigo-500/25'
   },
   limit_exceeded: {
-    icon: <Ban className="w-10 h-10" />,
-    bgColor: 'bg-amber-100',
-    iconColor: 'text-amber-600'
+    icon: Ban,
+    gradient: 'from-amber-500 to-orange-500',
+    shadow: 'shadow-amber-500/25'
   },
   technical: {
-    icon: <AlertTriangle className="w-10 h-10" />,
-    bgColor: 'bg-red-100',
-    iconColor: 'text-red-600'
+    icon: AlertTriangle,
+    gradient: 'from-red-500 to-rose-500',
+    shadow: 'shadow-red-500/25'
   },
   canceled: {
-    icon: <Clock className="w-10 h-10" />,
-    bgColor: 'bg-gray-100',
-    iconColor: 'text-gray-600'
+    icon: Clock,
+    gradient: 'from-slate-500 to-gray-600',
+    shadow: 'shadow-slate-500/25'
   },
 };
 
 // 대체 결제 수단
 const ALTERNATIVE_METHODS = [
-  { name: '다른 신용카드', description: '보유한 다른 카드 사용', icon: <CreditCard className="w-5 h-5" /> },
-  { name: '체크카드', description: '잔액 확인 후 결제', icon: <Wallet className="w-5 h-5" /> },
-  { name: '카카오페이', description: '간편결제 이용', icon: <Shield className="w-5 h-5" /> },
+  { name: '다른 신용카드', description: '보유한 다른 카드 사용', icon: CreditCard, gradient: 'from-indigo-500 to-purple-500', shadow: 'shadow-indigo-500/25' },
+  { name: '체크카드', description: '잔액 확인 후 결제', icon: Wallet, gradient: 'from-green-500 to-emerald-500', shadow: 'shadow-green-500/25' },
+  { name: '카카오페이', description: '간편결제 이용', icon: Shield, gradient: 'from-teal-500 to-cyan-500', shadow: 'shadow-teal-500/25' },
 ];
 
 function PaymentFailContent() {
@@ -307,8 +307,8 @@ function PaymentFailContent() {
         <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
           {/* 헤더 */}
           <div className="p-6 text-center border-b border-gray-100">
-            <div className={`w-20 h-20 ${categoryStyle.bgColor} rounded-full flex items-center justify-center mx-auto mb-4`}>
-              <span className={categoryStyle.iconColor}>{categoryStyle.icon}</span>
+            <div className="flex justify-center mb-4">
+              <TossIcon icon={categoryStyle.icon} color={categoryStyle.gradient} size="xl" shadow={categoryStyle.shadow} />
             </div>
             <h1 className="text-2xl font-bold text-gray-900 mb-2">{errorInfo.title}</h1>
             <p className="text-gray-600">{displayDescription}</p>
@@ -383,9 +383,7 @@ function PaymentFailContent() {
                   onClick={handleRetry}
                   className="w-full flex items-center gap-4 p-4 border border-gray-200 rounded-xl hover:border-blue-300 hover:bg-blue-50 transition-all text-left"
                 >
-                  <span className="text-2xl">
-                    {method.icon}
-                  </span>
+                  <TossIcon icon={method.icon} color={method.gradient} size="sm" shadow={method.shadow} />
                   <div className="flex-1">
                     <p className="font-medium text-gray-900">{method.name}</p>
                     <p className="text-sm text-gray-500">{method.description}</p>
@@ -443,3 +441,7 @@ export default function PaymentFailPage() {
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
       </div>
     }>
+      <PaymentFailContent />
+    </Suspense>
+  );
+}

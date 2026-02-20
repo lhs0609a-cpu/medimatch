@@ -8,6 +8,7 @@ import {
   ArrowLeft, MapPin, Building2, Clock, TrendingUp, Users,
   FileText, Download, Star, Target, BarChart3, AlertCircle
 } from 'lucide-react'
+import { TossIcon } from '@/components/ui/TossIcon'
 import { prospectsService } from '@/lib/api/services'
 
 const typeLabels: Record<string, { label: string; color: string; bg: string }> = {
@@ -179,7 +180,7 @@ export default function ProspectDetailPage() {
         {prospect.recommended_dept && prospect.recommended_dept.length > 0 && (
           <div className="bg-white rounded-2xl border p-6 mb-6">
             <h2 className="font-bold text-gray-900 mb-4 flex items-center gap-2">
-              <Target className="w-5 h-5 text-green-600" />
+              <TossIcon icon={Target} color="from-red-500 to-orange-500" size="sm" shadow="shadow-red-500/25" />
               추천 진료과목
             </h2>
             <div className="flex flex-wrap gap-2">
@@ -212,7 +213,7 @@ export default function ProspectDetailPage() {
         {/* AI Report Section */}
         <div className="bg-white rounded-2xl border p-6 mb-6">
           <h2 className="font-bold text-gray-900 mb-4 flex items-center gap-2">
-            <BarChart3 className="w-5 h-5 text-green-600" />
+            <TossIcon icon={BarChart3} color="from-green-500 to-emerald-500" size="sm" shadow="shadow-green-500/25" />
             AI 영업 리포트
           </h2>
 
@@ -311,7 +312,7 @@ export default function ProspectDetailPage() {
         {/* Map Placeholder */}
         <div className="bg-white rounded-2xl border p-6">
           <h2 className="font-bold text-gray-900 mb-4 flex items-center gap-2">
-            <MapPin className="w-5 h-5 text-green-600" />
+            <TossIcon icon={MapPin} color="from-orange-500 to-red-500" size="sm" shadow="shadow-orange-500/25" />
             위치
           </h2>
           <div className="bg-gray-100 rounded-xl h-64 flex items-center justify-center">

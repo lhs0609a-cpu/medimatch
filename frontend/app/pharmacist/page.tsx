@@ -8,6 +8,7 @@ import {
   XCircle, AlertCircle, ChevronRight, BarChart3, Home
 } from 'lucide-react'
 import { pharmacyTransferService } from '@/lib/api/services'
+import { TossIcon } from '@/components/ui/TossIcon'
 
 const statusConfig: Record<string, { label: string; color: string; icon: any }> = {
   PENDING_REVIEW: { label: '심사중', color: 'bg-amber-100 text-amber-700', icon: AlertCircle },
@@ -47,9 +48,7 @@ export default function PharmacistDashboardPage() {
       <header className="bg-white border-b sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-teal-500 to-cyan-600 rounded-xl flex items-center justify-center">
-              <Pill className="w-5 h-5 text-white" />
-            </div>
+            <TossIcon icon={Pill} color="from-teal-500 to-cyan-600" size="sm" shadow="shadow-teal-500/25" />
             <div>
               <h1 className="text-xl font-bold text-gray-900">약사 센터</h1>
               <p className="text-sm text-gray-500">약국 양도 매물 관리</p>
@@ -70,27 +69,21 @@ export default function PharmacistDashboardPage() {
         <div className="grid md:grid-cols-3 gap-4 mb-8">
           <div className="bg-white rounded-xl p-6 border">
             <div className="flex items-center justify-between mb-4">
-              <div className="w-12 h-12 bg-teal-100 rounded-xl flex items-center justify-center">
-                <Home className="w-6 h-6 text-teal-600" />
-              </div>
+              <TossIcon icon={Home} color="from-blue-500 to-cyan-500" size="md" shadow="shadow-blue-500/25" />
               <span className="text-2xl font-bold text-gray-900">{stats.total}</span>
             </div>
             <p className="text-gray-500">총 등록 매물</p>
           </div>
           <div className="bg-white rounded-xl p-6 border">
             <div className="flex items-center justify-between mb-4">
-              <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
-                <CheckCircle2 className="w-6 h-6 text-green-600" />
-              </div>
+              <TossIcon icon={CheckCircle2} color="from-green-500 to-emerald-500" size="md" shadow="shadow-green-500/25" />
               <span className="text-2xl font-bold text-gray-900">{stats.active}</span>
             </div>
             <p className="text-gray-500">공개중 매물</p>
           </div>
           <div className="bg-white rounded-xl p-6 border">
             <div className="flex items-center justify-between mb-4">
-              <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
-                <Eye className="w-6 h-6 text-blue-600" />
-              </div>
+              <TossIcon icon={Eye} color="from-sky-500 to-blue-500" size="md" shadow="shadow-sky-500/25" />
               <span className="text-2xl font-bold text-gray-900">{stats.totalViews}</span>
             </div>
             <p className="text-gray-500">총 조회수</p>

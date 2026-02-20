@@ -11,7 +11,9 @@ import {
   AlertCircle,
   Loader2,
   Building,
+  Building2,
 } from 'lucide-react'
+import { TossIcon } from '@/components/ui/TossIcon'
 import { escrowService } from '@/lib/api/services'
 
 // TossPayments 타입은 payment/page.tsx에서 전역 선언됨
@@ -183,7 +185,7 @@ export default function EscrowPayPage() {
         {/* Transaction Info */}
         <div className="bg-white rounded-2xl p-6 shadow-sm mb-6">
           <div className="flex items-center gap-4 mb-6">
-            <span className="text-3xl">🏢</span>
+            <TossIcon icon={Building2} color="from-blue-500 to-indigo-500" size="md" shadow="shadow-blue-500/25" />
             <div>
               <h2 className="font-bold text-gray-900">{transaction.partner_name || '파트너'}</h2>
               <p className="text-sm text-gray-500">{transaction.contract?.title || '에스크로 거래'}</p>
@@ -209,7 +211,7 @@ export default function EscrowPayPage() {
         {/* Escrow Info */}
         <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-6">
           <div className="flex items-start gap-3">
-            <Shield className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+            <TossIcon icon={Shield} color="from-teal-500 to-cyan-500" size="sm" shadow="shadow-teal-500/25" className="flex-shrink-0" />
             <div className="text-sm text-blue-700">
               <p className="font-medium">에스크로 결제 안내</p>
               <ul className="mt-2 space-y-1 list-disc list-inside">

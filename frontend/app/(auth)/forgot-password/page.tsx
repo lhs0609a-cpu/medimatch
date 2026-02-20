@@ -5,7 +5,8 @@ import Link from 'next/link'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { ArrowLeft, Mail, Sparkles } from 'lucide-react'
+import { ArrowLeft, Mail, Sparkles, CheckCircle2 } from 'lucide-react'
+import { TossIcon } from '@/components/ui/TossIcon'
 import { toast } from 'sonner'
 
 const forgotPasswordSchema = z.object({
@@ -56,8 +57,8 @@ export default function ForgotPasswordPage() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
         <div className="max-w-md w-full bg-white rounded-2xl shadow-lg p-8 text-center">
-          <div className="text-center mx-auto mb-6">
-            <span className="text-4xl">&#x2709;&#xFE0F;</span>
+          <div className="flex justify-center mb-6">
+            <TossIcon icon={Mail} color="from-violet-500 to-purple-500" size="lg" shadow="shadow-violet-500/25" />
           </div>
           <h2 className="text-2xl font-bold text-gray-900 mb-2">이메일을 확인해주세요</h2>
           <p className="text-gray-500 mb-6">
@@ -83,9 +84,7 @@ export default function ForgotPasswordPage() {
         <div className="bg-white rounded-2xl shadow-lg p-8">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-3 mb-8">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-600 to-indigo-600 flex items-center justify-center shadow-lg shadow-violet-500/30">
-              <Sparkles className="w-5 h-5 text-white" />
-            </div>
+            <TossIcon icon={Sparkles} color="from-amber-500 to-orange-500" size="sm" shadow="shadow-amber-500/25" />
             <span className="text-xl font-bold text-gray-900">메디플라톤</span>
           </Link>
 

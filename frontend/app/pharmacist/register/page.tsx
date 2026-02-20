@@ -9,6 +9,7 @@ import {
   Phone, FileText
 } from 'lucide-react'
 import { pharmacyTransferService } from '@/lib/api/services'
+import { TossIcon } from '@/components/ui/TossIcon'
 import { toast } from 'sonner'
 
 const transferReasonOptions = [
@@ -121,9 +122,7 @@ export default function PharmacistRegisterPage() {
             <Link href="/pharmacist" className="text-gray-400 hover:text-gray-600 transition-colors">
               <ArrowLeft className="w-5 h-5" />
             </Link>
-            <div className="w-10 h-10 bg-gradient-to-br from-teal-500 to-cyan-600 rounded-xl flex items-center justify-center">
-              <Pill className="w-5 h-5 text-white" />
-            </div>
+            <TossIcon icon={Pill} color="from-teal-500 to-cyan-600" size="sm" shadow="shadow-teal-500/25" />
             <div>
               <h1 className="text-xl font-bold text-gray-900">약국 양도 매물 등록</h1>
               <p className="text-sm text-gray-500">무료로 등록하고 매수자를 찾아보세요</p>
