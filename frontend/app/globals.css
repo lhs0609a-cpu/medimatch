@@ -7,58 +7,58 @@
 
 @layer base {
   :root {
-    /* Modern Minimal with Accent Color */
+    /* ===== Toss Design Tokens ===== */
     --background: 0 0% 100%;
-    --foreground: 0 0% 9%;
+    --foreground: 213 22% 13%;       /* #191f28 */
     --card: 0 0% 100%;
-    --card-foreground: 0 0% 9%;
+    --card-foreground: 213 22% 13%;
     --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 9%;
-    --primary: 221 83% 53%;
+    --popover-foreground: 213 22% 13%;
+    --primary: 215 91% 58%;          /* #3182f6 - Toss Blue */
     --primary-foreground: 0 0% 100%;
-    --secondary: 0 0% 96%;
-    --secondary-foreground: 0 0% 9%;
-    --muted: 0 0% 96%;
-    --muted-foreground: 0 0% 45%;
-    --accent: 221 83% 96%;
-    --accent-foreground: 221 83% 53%;
-    --destructive: 0 84% 60%;
+    --secondary: 213 16% 96%;        /* #f2f4f6 */
+    --secondary-foreground: 213 19% 25%; /* #333d4b */
+    --muted: 210 20% 98%;            /* #f9fafb */
+    --muted-foreground: 213 11% 47%; /* #6b7684 */
+    --accent: 215 100% 96%;          /* #ebf2ff */
+    --accent-foreground: 215 91% 58%;
+    --destructive: 354 82% 60%;      /* #f04452 - Toss Red */
     --destructive-foreground: 0 0% 100%;
-    --border: 0 0% 90%;
-    --input: 0 0% 90%;
-    --ring: 221 83% 53%;
-    --radius: 0.625rem;
+    --border: 213 10% 93%;           /* #eceef1 - subtle */
+    --input: 213 10% 91%;            /* #e5e8eb */
+    --ring: 215 91% 58%;
+    --radius: 0.75rem;
 
-    /* Brand Colors */
-    --brand: 221 83% 53%;
-    --brand-light: 221 83% 96%;
-    --brand-dark: 221 83% 45%;
+    /* Toss Brand */
+    --brand: 215 91% 58%;
+    --brand-light: 215 100% 96%;
+    --brand-dark: 215 91% 45%;
   }
 
   .dark {
-    --background: 0 0% 4%;
-    --foreground: 0 0% 98%;
-    --card: 0 0% 7%;
-    --card-foreground: 0 0% 98%;
-    --popover: 0 0% 7%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 221 83% 60%;
+    --background: 220 20% 7%;        /* #101214 */
+    --foreground: 210 20% 95%;
+    --card: 220 16% 10%;
+    --card-foreground: 210 20% 95%;
+    --popover: 220 16% 10%;
+    --popover-foreground: 210 20% 95%;
+    --primary: 215 91% 62%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 0 0% 12%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 0 0% 12%;
-    --muted-foreground: 0 0% 64%;
-    --accent: 221 83% 15%;
-    --accent-foreground: 221 83% 60%;
-    --destructive: 0 62% 30%;
+    --secondary: 220 14% 14%;
+    --secondary-foreground: 210 20% 90%;
+    --muted: 220 14% 14%;
+    --muted-foreground: 213 10% 59%;
+    --accent: 215 60% 15%;
+    --accent-foreground: 215 91% 62%;
+    --destructive: 354 70% 45%;
     --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 15%;
-    --input: 0 0% 15%;
-    --ring: 221 83% 60%;
+    --border: 220 12% 18%;
+    --input: 220 12% 18%;
+    --ring: 215 91% 62%;
 
-    --brand: 221 83% 60%;
-    --brand-light: 221 83% 15%;
-    --brand-dark: 221 83% 70%;
+    --brand: 215 91% 62%;
+    --brand-light: 215 60% 15%;
+    --brand-dark: 215 91% 72%;
   }
 }
 
@@ -76,103 +76,104 @@
   body {
     @apply bg-background text-foreground;
     font-family: 'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
-    letter-spacing: -0.01em;
+    letter-spacing: -0.02em;
+    line-height: 1.6;
   }
 
-  /* Better Typography */
   h1, h2, h3, h4, h5, h6 {
-    @apply font-semibold tracking-tight;
+    @apply font-bold tracking-tight;
+    line-height: 1.35;
   }
 
-  h1 { @apply text-4xl md:text-5xl lg:text-6xl; }
-  h2 { @apply text-3xl md:text-4xl; }
-  h3 { @apply text-2xl md:text-3xl; }
+  h1 { @apply text-4xl md:text-5xl lg:text-[3.5rem]; }
+  h2 { @apply text-3xl md:text-[2.5rem]; }
+  h3 { @apply text-2xl md:text-[1.75rem]; }
   h4 { @apply text-xl md:text-2xl; }
 }
 
 @layer components {
-  /* ===== BUTTONS ===== */
+  /* ===== BUTTONS (Toss-style) ===== */
   .btn {
     @apply inline-flex items-center justify-center gap-2
-           text-sm font-medium
-           rounded-lg
+           text-sm font-semibold
+           rounded-xl
            transition-all duration-200
            focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2
-           disabled:opacity-50 disabled:pointer-events-none;
+           disabled:opacity-40 disabled:pointer-events-none;
   }
 
   .btn-primary {
-    @apply btn px-5 py-2.5
+    @apply btn px-6 py-3
            bg-primary text-primary-foreground
-           hover:bg-primary/90
+           hover:brightness-110
            active:scale-[0.98];
   }
 
   .btn-secondary {
-    @apply btn px-5 py-2.5
+    @apply btn px-6 py-3
            bg-secondary text-secondary-foreground
-           hover:bg-secondary/80
-           border border-border;
+           hover:bg-secondary/70;
   }
 
   .btn-outline {
-    @apply btn px-5 py-2.5
+    @apply btn px-6 py-3
            bg-transparent
            border border-border
-           hover:bg-accent hover:text-accent-foreground;
+           hover:bg-secondary;
   }
 
   .btn-ghost {
-    @apply btn px-4 py-2
-           hover:bg-accent hover:text-accent-foreground;
+    @apply btn px-4 py-2.5
+           hover:bg-secondary;
   }
 
   .btn-link {
-    @apply btn text-foreground underline-offset-4 hover:underline;
+    @apply btn text-primary hover:underline underline-offset-4;
   }
 
   .btn-icon {
-    @apply btn h-10 w-10 p-0;
+    @apply btn h-10 w-10 p-0 rounded-xl;
   }
 
   .btn-lg {
-    @apply h-12 px-8 text-base rounded-xl;
+    @apply h-12 px-8 text-base rounded-2xl;
   }
 
   .btn-sm {
-    @apply h-8 px-3 text-xs;
+    @apply h-8 px-3 text-xs rounded-lg;
   }
 
-  /* ===== CARDS ===== */
+  /* ===== CARDS (Toss-style: shadow-based, no heavy borders) ===== */
   .card {
     @apply bg-card text-card-foreground
-           rounded-xl border border-border
-           transition-all duration-300;
+           rounded-2xl
+           transition-all duration-200;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 2px 8px rgba(0, 0, 0, 0.02);
   }
 
   .card-hover {
-    @apply hover:border-foreground/20 hover:shadow-lg;
+    @apply hover:shadow-lg;
   }
 
   .card-interactive {
     @apply cursor-pointer
-           hover:border-foreground/20 hover:shadow-lg hover:-translate-y-0.5
+           hover:shadow-lg hover:-translate-y-0.5
            active:translate-y-0 active:shadow-md;
   }
 
   /* ===== INPUTS ===== */
   .input {
-    @apply w-full h-11 px-4
-           bg-background
-           border border-border rounded-lg
-           text-sm placeholder:text-muted-foreground
-           focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent
+    @apply w-full h-12 px-4
+           bg-secondary/50
+           border-0 rounded-xl
+           text-sm text-foreground placeholder:text-muted-foreground
+           focus:outline-none focus:ring-2 focus:ring-primary/30 focus:bg-background
            transition-all duration-200
            disabled:opacity-50 disabled:cursor-not-allowed;
   }
 
   .input-lg {
-    @apply h-12 px-5 text-base rounded-xl;
+    @apply h-14 px-5 text-base rounded-2xl;
   }
 
   .textarea {
@@ -181,19 +182,19 @@
 
   .select {
     @apply input appearance-none cursor-pointer
-           bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20fill%3D%22none%22%20viewBox%3D%220%200%2024%2024%22%20stroke%3D%22%23666%22%3E%3Cpath%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20stroke-width%3D%222%22%20d%3D%22M19%209l-7%207-7-7%22%2F%3E%3C%2Fsvg%3E')]
+           bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20fill%3D%22none%22%20viewBox%3D%220%200%2024%2024%22%20stroke%3D%22%236b7684%22%3E%3Cpath%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20stroke-width%3D%222%22%20d%3D%22M19%209l-7%207-7-7%22%2F%3E%3C%2Fsvg%3E')]
            bg-[length:20px] bg-[right_12px_center] bg-no-repeat pr-10;
   }
 
   .label {
-    @apply text-sm font-medium text-foreground;
+    @apply text-sm font-semibold text-foreground;
   }
 
   /* ===== BADGES ===== */
   .badge {
     @apply inline-flex items-center gap-1
            px-2.5 py-0.5
-           text-xs font-medium
+           text-xs font-semibold
            rounded-full
            transition-colors;
   }
@@ -203,65 +204,68 @@
   }
 
   .badge-primary {
-    @apply badge bg-foreground text-background;
+    @apply badge bg-primary/10 text-primary;
   }
 
   .badge-success {
-    @apply badge bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400;
+    @apply badge bg-emerald-50 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400;
   }
 
   .badge-warning {
-    @apply badge bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400;
+    @apply badge bg-amber-50 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400;
   }
 
   .badge-danger {
-    @apply badge bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400;
+    @apply badge bg-red-50 text-red-600 dark:bg-red-900/30 dark:text-red-400;
   }
 
   .badge-info {
-    @apply badge bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400;
+    @apply badge bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400;
   }
 
   /* ===== NAVIGATION ===== */
   .nav-link {
     @apply px-3 py-2 text-sm font-medium text-muted-foreground
-           rounded-lg
-           hover:text-foreground hover:bg-accent
+           rounded-xl
+           hover:text-foreground hover:bg-secondary
            transition-colors;
   }
 
   .nav-link-active {
-    @apply text-foreground bg-accent;
+    @apply text-foreground bg-secondary;
   }
 
   /* ===== SECTION ===== */
   .section {
-    @apply py-16 md:py-24 lg:py-32;
+    @apply py-20 md:py-28 lg:py-36;
   }
 
   .section-sm {
-    @apply py-12 md:py-16;
+    @apply py-12 md:py-20;
   }
 
   .container-tight {
-    @apply max-w-5xl mx-auto px-4 sm:px-6 lg:px-8;
+    @apply max-w-5xl mx-auto px-5 sm:px-6 lg:px-8;
   }
 
-  /* ===== FEATURE CARD ===== */
+  /* ===== FEATURE CARD (Toss-style) ===== */
   .feature-card {
-    @apply p-6 md:p-8
-           bg-card rounded-2xl border border-border
-           transition-all duration-300
-           hover:border-foreground/10 hover:shadow-xl;
+    @apply p-8 md:p-10
+           bg-card rounded-2xl
+           transition-all duration-200;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 2px 8px rgba(0, 0, 0, 0.02);
+  }
+
+  .feature-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06), 0 2px 6px rgba(0, 0, 0, 0.03);
   }
 
   .feature-icon {
-    @apply w-12 h-12 rounded-xl
-           bg-foreground/5
+    @apply w-12 h-12 rounded-2xl
+           bg-secondary
            flex items-center justify-center
-           mb-4;
+           mb-5;
   }
-
 
   /* ===== STAT ===== */
   .stat {
@@ -273,7 +277,7 @@
   }
 
   .stat-label {
-    @apply text-sm text-muted-foreground mt-1;
+    @apply text-sm text-muted-foreground mt-2;
   }
 
   /* ===== DIVIDER ===== */
@@ -285,7 +289,7 @@
   .avatar {
     @apply relative inline-flex items-center justify-center
            overflow-hidden rounded-full
-           bg-muted text-muted-foreground font-medium;
+           bg-secondary text-muted-foreground font-semibold;
   }
 
   .avatar-sm { @apply w-8 h-8 text-xs; }
@@ -295,59 +299,55 @@
 
   /* ===== SKELETON ===== */
   .skeleton {
-    @apply animate-pulse bg-muted rounded;
+    @apply animate-pulse bg-secondary rounded-xl;
   }
 
-  /* ===== GLASS ===== */
+  /* ===== GLASS (Nav header) ===== */
   .glass {
-    @apply bg-background/80 backdrop-blur-xl border-b border-border;
+    @apply bg-background/80 backdrop-blur-xl border-b border-border/50;
   }
 
   /* ===== GRADIENT TEXT ===== */
   .text-gradient {
-    @apply bg-gradient-to-r from-foreground via-foreground/80 to-foreground bg-clip-text text-transparent;
+    @apply bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent;
   }
 
   .text-gradient-blue {
-    @apply bg-gradient-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent;
+    @apply bg-gradient-to-r from-[#3182f6] to-[#1b64da] bg-clip-text text-transparent;
   }
 
   .text-gradient-purple {
-    @apply bg-gradient-to-r from-purple-600 to-pink-500 bg-clip-text text-transparent;
+    @apply bg-gradient-to-r from-purple-600 to-violet-500 bg-clip-text text-transparent;
   }
 
   .text-gradient-green {
-    @apply bg-gradient-to-r from-green-600 to-emerald-500 bg-clip-text text-transparent;
+    @apply bg-gradient-to-r from-emerald-600 to-teal-500 bg-clip-text text-transparent;
   }
 }
 
 @layer utilities {
-  /* Focus Ring - 향상된 키보드 포커스 표시 */
+  /* Focus Ring */
   .focus-ring {
     @apply focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2;
   }
 
-  /* 고대비 포커스 - 접근성 강화 */
   .focus-visible-high-contrast {
-    @apply focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600
+    @apply focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#3182f6]
            focus-visible:ring-0;
   }
 
-  /* 스킵 네비게이션 스타일 */
   .skip-link {
     @apply sr-only focus:not-sr-only
            focus:absolute focus:top-4 focus:left-4 focus:z-[9999]
            focus:px-4 focus:py-2 focus:bg-foreground focus:text-background
-           focus:rounded-lg focus:font-medium
+           focus:rounded-xl focus:font-medium
            focus:outline-none focus:ring-2 focus:ring-ring;
   }
 
-  /* 키보드 사용자를 위한 커스텀 포커스 표시 */
   [data-focus-visible-added] {
-    @apply outline-2 outline-offset-2 outline-blue-600;
+    @apply outline-2 outline-offset-2 outline-[#3182f6];
   }
 
-  /* 감소된 모션 선호 사용자 */
   @media (prefers-reduced-motion: reduce) {
     *,
     *::before,
@@ -373,14 +373,14 @@
 
   /* Custom Scrollbar */
   .custom-scrollbar::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
+    width: 6px;
+    height: 6px;
   }
   .custom-scrollbar::-webkit-scrollbar-track {
     @apply bg-transparent;
   }
   .custom-scrollbar::-webkit-scrollbar-thumb {
-    @apply bg-border rounded-full hover:bg-muted-foreground/30;
+    @apply bg-border rounded-full hover:bg-muted-foreground/20;
   }
 
   /* Line Clamp */
@@ -409,7 +409,6 @@
                 0 1px 6px -1px rgb(0 0 0 / 0.02);
   }
 
-  /* Prose-like max-width */
   .max-w-prose { max-width: 65ch; }
 }
 
@@ -531,7 +530,7 @@
 
 /* ===== SELECTION ===== */
 ::selection {
-  @apply bg-foreground/10;
+  background: rgba(49, 130, 246, 0.15);
 }
 
 /* ===== PLACEHOLDER ===== */
@@ -541,7 +540,6 @@
 
 /* ===== PRINT STYLES ===== */
 @media print {
-  /* 기본 설정 */
   *,
   *::before,
   *::after {
@@ -562,13 +560,11 @@
     background: #fff;
   }
 
-  /* 페이지 여백 */
   @page {
     margin: 2cm;
     size: A4;
   }
 
-  /* 페이지 브레이크 */
   h1, h2, h3, h4, h5, h6 {
     page-break-after: avoid;
     page-break-inside: avoid;
@@ -583,7 +579,6 @@
     widows: 3;
   }
 
-  /* 숨길 요소들 */
   .no-print,
   nav,
   header:not(.print-header),
@@ -607,7 +602,6 @@
     display: none !important;
   }
 
-  /* 링크 스타일 */
   a,
   a:visited {
     color: #000 !important;
@@ -625,7 +619,6 @@
     content: "";
   }
 
-  /* 테이블 스타일 */
   table {
     border-collapse: collapse;
     width: 100%;
@@ -646,7 +639,6 @@
     page-break-inside: avoid;
   }
 
-  /* 카드/박스 스타일 */
   .card,
   .feature-card,
   [class*="bg-card"] {
@@ -655,27 +647,23 @@
     margin-bottom: 16px;
   }
 
-  /* 이미지 */
   img {
     max-width: 100% !important;
     height: auto !important;
   }
 
-  /* 배지 */
   .badge,
   [class*="badge-"] {
     border: 1px solid #999 !important;
     padding: 2px 8px;
   }
 
-  /* 폼 요소 */
   input,
   select,
   textarea {
     border: 1px solid #ddd !important;
   }
 
-  /* 인쇄 전용 요소 */
   .print-only {
     display: block !important;
   }
@@ -685,7 +673,6 @@
     display: block !important;
   }
 
-  /* 시뮬레이션 결과 인쇄 최적화 */
   .simulation-result {
     page-break-before: always;
   }
@@ -705,7 +692,6 @@
     color: #666 !important;
   }
 
-  /* 매물 상세 인쇄 최적화 */
   .building-detail {
     page-break-before: always;
   }
@@ -726,7 +712,6 @@
     background-color: #f9f9f9 !important;
   }
 
-  /* 인쇄 시 그라디언트 텍스트 */
   .text-gradient,
   .text-gradient-blue,
   .text-gradient-purple,
@@ -737,19 +722,16 @@
     -webkit-text-fill-color: #000 !important;
   }
 
-  /* 인쇄 시 컬러 유지할 요소 */
   .print-color {
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
   }
 
-  /* 인쇄 전 페이지 안내 */
   .print-page-number::after {
     content: counter(page);
   }
 }
 
-/* 인쇄 미리보기용 클래스 */
 .print-preview {
   background: #fff;
   color: #000;
@@ -759,12 +741,10 @@
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
-/* 화면에서 숨기고 인쇄에서만 보이는 요소 */
 .print-only {
   display: none !important;
 }
 
-/* 인쇄하지 않을 요소 */
 .no-print {
-  /* 기본 화면에서는 보임 - print 미디어에서 숨김 처리 */
+  /* visible on screen, hidden in print media */
 }

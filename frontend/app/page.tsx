@@ -255,7 +255,7 @@ export default function HomePage() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex items-center justify-between h-16">
               <Link href="/" className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-500/25">
+                <div className="w-9 h-9 rounded-xl bg-[#3182f6] flex items-center justify-center">
                   <span className="text-white font-bold text-lg">M</span>
                 </div>
                 <span className="font-bold text-xl text-foreground">메디플라톤</span>
@@ -505,7 +505,7 @@ export default function HomePage() {
           <div className="relative z-20 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-24">
             <div className="text-center">
               {/* 뱃지 */}
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-blue-500/20 to-purple-500/20 border border-blue-500/30 mb-6 animate-fade-in backdrop-blur-sm">
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#3182f6]/10 mb-6 animate-fade-in backdrop-blur-sm">
                 <Activity className="w-4 h-4 text-blue-500 animate-pulse" />
                 <span className="text-sm font-medium">
                   지금 <span className="text-blue-500 font-bold">{platformStats.onlineNow}명</span>이 매물을 탐색 중
@@ -516,7 +516,7 @@ export default function HomePage() {
               <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight mb-6 animate-fade-in-up">
                 <span className="text-foreground">지금 이 순간에도</span>
                 <br />
-                <span className="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent">
+                <span className="text-[#3182f6]">
                   {platformStats.todayNewListings}개의 기회
                 </span>
                 <span className="text-foreground">가</span>
@@ -532,7 +532,7 @@ export default function HomePage() {
 
               {/* CTA 버튼 */}
               <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12 animate-fade-in-up delay-200">
-                <Link href="/simulate" className="btn-primary btn-lg group shadow-xl shadow-blue-500/30 text-lg px-8">
+                <Link href="/simulate" className="btn-primary btn-lg group text-lg px-8">
                   무료 시뮬레이션 시작
                   <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                 </Link>
@@ -543,7 +543,7 @@ export default function HomePage() {
               </div>
 
               {/* 실시간 알림 배너 */}
-              <div className="inline-flex items-center gap-3 px-5 py-3 bg-gradient-to-r from-green-500/10 to-emerald-500/10 border border-green-500/20 rounded-full animate-fade-in delay-300">
+              <div className="inline-flex items-center gap-3 px-5 py-3 bg-emerald-500/8 rounded-full animate-fade-in delay-300">
                 <span className="flex h-3 w-3 relative">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
                   <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
@@ -566,25 +566,25 @@ export default function HomePage() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
               <div ref={listingCount.ref} className="text-center">
-                <div className="text-4xl md:text-5xl font-bold mb-2 bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
+                <div className="text-4xl md:text-5xl font-bold mb-2 text-[#3182f6]">
                   {listingCount.count.toLocaleString()}
                 </div>
                 <div className="text-white/60 text-sm md:text-base">등록 매물</div>
               </div>
               <div ref={pharmacyCount.ref} className="text-center">
-                <div className="text-4xl md:text-5xl font-bold mb-2 bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+                <div className="text-4xl md:text-5xl font-bold mb-2 text-purple-400">
                   {pharmacyCount.count.toLocaleString()}
                 </div>
                 <div className="text-white/60 text-sm md:text-base">약국 양도 매물</div>
               </div>
               <div ref={matchCount.ref} className="text-center">
-                <div className="text-4xl md:text-5xl font-bold mb-2 bg-gradient-to-r from-green-400 to-emerald-400 bg-clip-text text-transparent">
+                <div className="text-4xl md:text-5xl font-bold mb-2 text-emerald-400">
                   {matchCount.count.toLocaleString()}
                 </div>
                 <div className="text-white/60 text-sm md:text-base">누적 매칭 성사</div>
               </div>
               <div ref={memberCount.ref} className="text-center">
-                <div className="text-4xl md:text-5xl font-bold mb-2 bg-gradient-to-r from-orange-400 to-amber-400 bg-clip-text text-transparent">
+                <div className="text-4xl md:text-5xl font-bold mb-2 text-amber-400">
                   {memberCount.count.toLocaleString()}
                 </div>
                 <div className="text-white/60 text-sm md:text-base">가입 회원</div>
@@ -607,7 +607,8 @@ export default function HomePage() {
               {/* 병원 매물 카드 */}
               <Link
                 href="/buildings"
-                className="group relative bg-card border border-border rounded-2xl p-6 md:p-8 hover:border-blue-500/50 hover:shadow-xl hover:shadow-blue-500/10 transition-all duration-300"
+                className="group relative bg-card rounded-2xl p-6 md:p-8 hover:shadow-lg transition-all duration-200"
+                style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 2px 8px rgba(0,0,0,0.02)' }}
               >
                 <div className="flex items-start gap-4">
                   <TossIcon icon={Building2} color="from-blue-500 to-indigo-600" size="xl" shadow="shadow-blue-500/25" className="flex-shrink-0" />
@@ -629,13 +630,13 @@ export default function HomePage() {
                     </div>
                   </div>
                 </div>
-                <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-blue-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
               </Link>
 
               {/* 약국 매물 카드 */}
               <Link
                 href="/pharmacy-match"
-                className="group relative bg-card border border-border rounded-2xl p-6 md:p-8 hover:border-purple-500/50 hover:shadow-xl hover:shadow-purple-500/10 transition-all duration-300"
+                className="group relative bg-card rounded-2xl p-6 md:p-8 hover:shadow-lg transition-all duration-200"
+                style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 2px 8px rgba(0,0,0,0.02)' }}
               >
                 <div className="flex items-start gap-4">
                   <TossIcon icon={Pill} color="from-purple-500 to-violet-600" size="xl" shadow="shadow-purple-500/25" className="flex-shrink-0" />
@@ -657,7 +658,6 @@ export default function HomePage() {
                     </div>
                   </div>
                 </div>
-                <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-purple-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
               </Link>
             </div>
           </div>
@@ -680,7 +680,7 @@ export default function HomePage() {
             </div>
 
             <div className="max-w-3xl mx-auto">
-              <div className="bg-card border border-border rounded-3xl p-6 md:p-10 shadow-2xl">
+              <div className="bg-card rounded-3xl p-6 md:p-10" style={{ boxShadow: '0 4px 24px rgba(0,0,0,0.06)' }}>
                 {/* 입력 폼 */}
                 <div className="space-y-4 mb-6">
                   <div>
@@ -746,17 +746,17 @@ export default function HomePage() {
                     </div>
 
                     <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
-                      <div className="p-4 bg-gradient-to-br from-blue-500/10 to-cyan-500/10 rounded-2xl border border-blue-500/20">
+                      <div className="p-4 bg-[#3182f6]/5 rounded-2xl">
                         <div className="text-sm text-muted-foreground mb-1">예상 월 매출</div>
-                        <div className="text-2xl font-bold text-blue-600">{demoResults.monthlyRevenue}</div>
+                        <div className="text-2xl font-bold text-[#3182f6]">{demoResults.monthlyRevenue}</div>
                       </div>
-                      <div className="p-4 bg-gradient-to-br from-green-500/10 to-emerald-500/10 rounded-2xl border border-green-500/20">
+                      <div className="p-4 bg-emerald-500/5 rounded-2xl">
                         <div className="text-sm text-muted-foreground mb-1">손익분기점</div>
-                        <div className="text-2xl font-bold text-green-600">{demoResults.breakEven}</div>
+                        <div className="text-2xl font-bold text-emerald-600">{demoResults.breakEven}</div>
                       </div>
-                      <div className="p-4 bg-gradient-to-br from-orange-500/10 to-amber-500/10 rounded-2xl border border-orange-500/20">
+                      <div className="p-4 bg-amber-500/5 rounded-2xl">
                         <div className="text-sm text-muted-foreground mb-1">개원 적합도</div>
-                        <div className="text-2xl font-bold text-orange-600">{demoResults.score}점</div>
+                        <div className="text-2xl font-bold text-amber-600">{demoResults.score}점</div>
                       </div>
                     </div>
 
@@ -809,8 +809,8 @@ export default function HomePage() {
               </div>
 
               {/* After */}
-              <div className="p-8 bg-gradient-to-br from-blue-500/5 to-purple-500/5 rounded-3xl border-2 border-blue-500/30 relative overflow-hidden">
-                <div className="absolute top-4 left-4 px-3 py-1 bg-gradient-to-r from-blue-600 to-purple-600 text-white text-sm font-medium rounded-full">
+              <div className="p-8 bg-[#3182f6]/[0.03] rounded-3xl border border-[#3182f6]/20 relative overflow-hidden">
+                <div className="absolute top-4 left-4 px-3 py-1 bg-[#3182f6] text-white text-sm font-medium rounded-full">
                   메디플라톤
                 </div>
                 <div className="pt-8 space-y-6">
@@ -893,7 +893,7 @@ export default function HomePage() {
             </div>
 
             {/* 건물주 도구 배너 */}
-            <div className="mt-8 p-6 bg-gradient-to-r from-blue-600/10 to-indigo-600/10 border border-blue-500/20 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="mt-8 p-6 bg-[#3182f6]/5 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-4">
               <div className="flex items-center gap-4">
                 <TossIcon icon={Building2} color="from-blue-600 to-indigo-600" size="md" shadow="shadow-blue-500/25" className="flex-shrink-0" />
                 <div>
@@ -991,7 +991,7 @@ export default function HomePage() {
         {/* ===== CTA SECTION ===== */}
         <section className="py-20">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 p-8 md:p-16">
+            <div className="relative overflow-hidden rounded-3xl bg-[#3182f6] p-8 md:p-16">
               <div className="absolute inset-0 -z-10">
                 <div className="absolute top-0 left-0 w-96 h-96 bg-white/10 rounded-full blur-3xl" />
                 <div className="absolute bottom-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl" />
@@ -1025,7 +1025,7 @@ export default function HomePage() {
             <div className="grid md:grid-cols-2 lg:grid-cols-5 gap-8 mb-12">
               <div className="lg:col-span-1">
                 <Link href="/" className="flex items-center gap-2.5 mb-4">
-                  <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center">
+                  <div className="w-9 h-9 rounded-xl bg-[#3182f6] flex items-center justify-center">
                     <span className="text-white font-bold text-lg">M</span>
                   </div>
                   <span className="font-bold text-xl">메디플라톤</span>
