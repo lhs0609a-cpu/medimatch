@@ -183,9 +183,7 @@ export default function EscrowPayPage() {
         {/* Transaction Info */}
         <div className="bg-white rounded-2xl p-6 shadow-sm mb-6">
           <div className="flex items-center gap-4 mb-6">
-            <div className="w-12 h-12 rounded-xl bg-violet-100 flex items-center justify-center">
-              <Building className="w-6 h-6 text-violet-600" />
-            </div>
+            <span className="text-3xl">🏢</span>
             <div>
               <h2 className="font-bold text-gray-900">{transaction.partner_name || '파트너'}</h2>
               <p className="text-sm text-gray-500">{transaction.contract?.title || '에스크로 거래'}</p>

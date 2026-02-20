@@ -30,6 +30,7 @@ import {
   Target,
   TrendingUp,
   Search,
+  Layers,
 } from 'lucide-react'
 
 /* ─── 숫자 카운터 애니메이션 훅 ─── */
@@ -447,7 +448,7 @@ export default function OpeningPackagePage() {
                   { name: '프리미엄', gradient: 'from-orange-500 to-red-500', borderColor: 'border-orange-500/30', color: 'text-orange-600', desc: 'PG + 2개' },
                 ].map((t) => (
                   <div key={t.name} className={`flex flex-col items-center gap-1.5 p-4 rounded-2xl bg-card border ${t.borderColor}`}>
-                    <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${t.gradient} flex items-center justify-center`}>
+                    <div className={`icon-3d w-10 h-10 rounded-2xl bg-gradient-to-br ${t.gradient} flex items-center justify-center shadow-lg`}>
                       <span className="text-white text-xs font-bold">{t.name[0]}</span>
                     </div>
                     <span className={`text-sm font-semibold ${t.color}`}>{t.name}</span>
@@ -463,14 +464,113 @@ export default function OpeningPackagePage() {
           </div>
         </section>
 
-        {/* ===== Section 2: 서비스 기반 등급 설명 ===== */}
+        {/* ===== Section 2: 고민 포인트 ===== */}
+        <section className="py-20">
+          <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-4">
+                개원 준비, 이런 고민 있으시죠?
+              </h2>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-6 mb-12">
+              {[
+                { icon: MapPin, title: '어디에 개원해야 할지 막막', desc: '부동산 말만 믿고 계약했다가 환자가 안 오면? 경쟁 의원 수, 타깃 인구가 충분한지 데이터 없이는 판단할 수 없습니다.', gradient: 'from-orange-500 to-red-500', shadow: 'shadow-orange-500/25' },
+                { icon: Lock, title: 'DSR 규제로 대출 한도 부족', desc: '이미 주담대·학자금이 있으면 추가 대출이 어렵고, 금리도 높아집니다.', gradient: 'from-red-500 to-rose-600', shadow: 'shadow-red-500/25' },
+                { icon: DollarSign, title: '마케팅비 수백~수천만원', desc: '홈페이지 제작, 블로그, 플레이스, SNS, 체험단… 전부 하면 수천만원이 듭니다.', gradient: 'from-purple-500 to-pink-600', shadow: 'shadow-purple-500/25' },
+                { icon: Layers, title: '여러 업체를 따로 관리', desc: '중개, 대출, 마케팅, PG를 각각 다른 업체와 상담하면 시간과 비용 모두 낭비됩니다.', gradient: 'from-amber-500 to-orange-600', shadow: 'shadow-amber-500/25' },
+              ].map((item) => (
+                <div key={item.title} className="bg-card border border-border rounded-2xl p-6 md:p-8">
+                  <div className={`icon-3d w-14 h-14 rounded-2xl bg-gradient-to-br ${item.gradient} shadow-lg ${item.shadow} flex items-center justify-center mb-4`}>
+                    <item.icon className="w-7 h-7 text-white" />
+                  </div>
+                  <h3 className="text-lg font-semibold mb-2">{item.title}</h3>
+                  <p className="text-sm text-muted-foreground">{item.desc}</p>
+                </div>
+              ))}
+            </div>
+
+            <div className="text-center">
+              <div className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 text-white font-medium">
+                <Zap className="w-5 h-5" />
+                이제 한 곳에서, 서비스 추가할수록 무료로
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ===== Section 3: 개원 원스톱 파이프라인 ===== */}
         <section className="py-20 bg-foreground text-background">
+          <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-4">
+                입지 분석부터 마케팅까지, 원스톱
+              </h2>
+              <p className="text-white/60">메디플라톤 하나로 개원 전 과정을 해결합니다</p>
+            </div>
+
+            {/* Desktop: horizontal flow */}
+            <div className="hidden lg:flex items-start justify-between">
+              {[
+                { step: '1', label: '입지 AI 분석', desc: '무료', icon: MapPin, color: 'from-green-500 to-emerald-500' },
+                { step: '2', label: '매물 추천', desc: '470+ 매물', icon: Search, color: 'from-cyan-500 to-blue-500' },
+                { step: '3', label: '개원 중개', desc: '전담 매니저', icon: Building2, color: 'from-blue-500 to-indigo-500' },
+                { step: '4', label: 'PG 설치', desc: '무상 지원', icon: CreditCard, color: 'from-indigo-500 to-purple-500' },
+                { step: '5', label: 'DSR-Free 대출', desc: '5.3%~', icon: DollarSign, color: 'from-purple-500 to-pink-500' },
+                { step: '6', label: '마케팅', desc: '최대 2,580만원', icon: Sparkles, color: 'from-orange-500 to-red-500' },
+              ].map((item, i, arr) => (
+                <div key={item.step} className="flex items-start flex-1">
+                  <div className="flex flex-col items-center text-center flex-1">
+                    <div className={`icon-3d w-14 h-14 rounded-2xl bg-gradient-to-br ${item.color} flex items-center justify-center mb-3 shadow-lg`}>
+                      <item.icon className="w-7 h-7 text-white" />
+                    </div>
+                    <p className="text-sm font-semibold text-white mb-0.5">{item.label}</p>
+                    <p className="text-xs text-white/50">{item.desc}</p>
+                  </div>
+                  {i < arr.length - 1 && (
+                    <ChevronRight className="w-5 h-5 text-white/30 mt-4 flex-shrink-0" />
+                  )}
+                </div>
+              ))}
+            </div>
+
+            {/* Mobile: vertical flow */}
+            <div className="lg:hidden space-y-3">
+              {[
+                { step: '1', label: '입지 AI 분석', desc: '무료', icon: MapPin, color: 'from-green-500 to-emerald-500' },
+                { step: '2', label: '매물 추천', desc: '470+ 매물', icon: Search, color: 'from-cyan-500 to-blue-500' },
+                { step: '3', label: '개원 중개', desc: '전담 매니저', icon: Building2, color: 'from-blue-500 to-indigo-500' },
+                { step: '4', label: 'PG 설치', desc: '무상 지원', icon: CreditCard, color: 'from-indigo-500 to-purple-500' },
+                { step: '5', label: 'DSR-Free 대출', desc: '5.3%~', icon: DollarSign, color: 'from-purple-500 to-pink-500' },
+                { step: '6', label: '마케팅', desc: '최대 2,580만원', icon: Sparkles, color: 'from-orange-500 to-red-500' },
+              ].map((item, i, arr) => (
+                <div key={item.step}>
+                  <div className="flex items-center gap-4">
+                    <div className={`icon-3d w-12 h-12 rounded-2xl bg-gradient-to-br ${item.color} flex items-center justify-center flex-shrink-0 shadow-lg`}>
+                      <item.icon className="w-6 h-6 text-white" />
+                    </div>
+                    <div>
+                      <p className="font-semibold text-white">{item.label}</p>
+                      <p className="text-sm text-white/50">{item.desc}</p>
+                    </div>
+                  </div>
+                  {i < arr.length - 1 && (
+                    <div className="ml-6 h-3 border-l-2 border-dashed border-white/20" />
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ===== Section 4: 서비스 기반 등급 설명 ===== */}
+        <section className="py-20 bg-secondary/50">
           <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-12">
               <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-4">
                 서비스를 추가할수록 마케팅이 무료
               </h2>
-              <p className="text-white/60">PG 설치만으로 시작, 서비스 추가 시 마케팅 혜택 확대</p>
+              <p className="text-muted-foreground">PG 설치만으로 시작, 서비스 추가 시 마케팅 혜택 확대</p>
             </div>
 
             <div>
@@ -481,17 +581,17 @@ export default function OpeningPackagePage() {
                   { tier: '개원 중개', condition: '자유 선택', marketing: ['SNS 마케팅 3개월'], value: '+600만원', icon: Building2, color: 'from-orange-400 to-red-400' },
                 ].map((item, i) => (
                   <div key={item.tier} className="relative">
-                    <div className="bg-white/5 border border-white/10 rounded-2xl p-6 h-full backdrop-blur-sm">
-                      <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${item.color} flex items-center justify-center mb-4`}>
+                    <div className="bg-card border border-border rounded-2xl p-6 h-full">
+                      <div className={`icon-3d w-12 h-12 rounded-2xl bg-gradient-to-br ${item.color} flex items-center justify-center mb-4 shadow-lg`}>
                         <item.icon className="w-6 h-6 text-white" />
                       </div>
-                      <h3 className="text-lg font-bold text-white mb-1">{item.tier}</h3>
-                      <p className="text-sm text-white/60 mb-3">{item.condition}</p>
+                      <h3 className="text-lg font-bold mb-1">{item.tier}</h3>
+                      <p className="text-sm text-muted-foreground mb-3">{item.condition}</p>
                       <div className="space-y-1 mb-4">
                         {item.marketing.map((m) => (
                           <div key={m} className="flex items-center gap-2 text-xs">
-                            <Check className="w-3 h-3 text-green-400 flex-shrink-0" />
-                            <span className="text-white/80">{m}</span>
+                            <Check className="w-3 h-3 text-green-600 flex-shrink-0" />
+                            <span className="text-foreground/80">{m}</span>
                           </div>
                         ))}
                       </div>
@@ -501,19 +601,19 @@ export default function OpeningPackagePage() {
                     </div>
                     {i < 2 && (
                       <div className="hidden md:flex absolute top-1/2 -right-2 -translate-y-1/2 z-10">
-                        <Plus className="w-4 h-4 text-white/30" />
+                        <Plus className="w-4 h-4 text-muted-foreground/50" />
                       </div>
                     )}
                   </div>
                 ))}
               </div>
-              <p className="text-center text-white/40 text-sm mt-4">PG 필수 · 대출/중개는 독립 선택 가능 · 많이 선택할수록 등급 UP</p>
+              <p className="text-center text-muted-foreground text-sm mt-4">PG 필수 · 대출/중개는 독립 선택 가능 · 많이 선택할수록 등급 UP</p>
             </div>
 
           </div>
         </section>
 
-        {/* ===== Section 3: 인터랙티브 혜택 계산기 ===== */}
+        {/* ===== Section 5: 인터랙티브 혜택 계산기 ===== */}
         <section id="calculator" className="py-20">
           <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-12">
@@ -656,40 +756,7 @@ export default function OpeningPackagePage() {
           </div>
         </section>
 
-        {/* ===== Section 4: 고민 포인트 ===== */}
-        <section className="py-20">
-          <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-12">
-              <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-4">
-                개원 준비, 이런 고민 있으시죠?
-              </h2>
-            </div>
-
-            <div className="grid md:grid-cols-2 gap-6 mb-12">
-              {[
-                { emoji: '📍', title: '어디에 개원해야 할지 막막', desc: '부동산 말만 믿고 계약했다가 환자가 안 오면? 경쟁 의원 수, 타깃 인구가 충분한지 데이터 없이는 판단할 수 없습니다.' },
-                { emoji: '🚫', title: 'DSR 규제로 대출 한도 부족', desc: '이미 주담대·학자금이 있으면 추가 대출이 어렵고, 금리도 높아집니다.' },
-                { emoji: '💸', title: '마케팅비 수백~수천만원', desc: '홈페이지 제작, 블로그, 플레이스, SNS, 체험단… 전부 하면 수천만원이 듭니다.' },
-                { emoji: '🔀', title: '여러 업체를 따로 관리', desc: '중개, 대출, 마케팅, PG를 각각 다른 업체와 상담하면 시간과 비용 모두 낭비됩니다.' },
-              ].map((item) => (
-                <div key={item.title} className="bg-card border border-border rounded-2xl p-6 md:p-8">
-                  <span className="text-4xl leading-none block mb-4">{item.emoji}</span>
-                  <h3 className="text-lg font-semibold mb-2">{item.title}</h3>
-                  <p className="text-sm text-muted-foreground">{item.desc}</p>
-                </div>
-              ))}
-            </div>
-
-            <div className="text-center">
-              <div className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 text-white font-medium">
-                <Zap className="w-5 h-5" />
-                이제 한 곳에서, 서비스 추가할수록 무료로
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* ===== Section: 데이터 기반 입지 분석 ===== */}
+        {/* ===== Section 6: 데이터 기반 입지 분석 ===== */}
         <section className="py-20 bg-secondary/50">
           <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-12">
@@ -713,7 +780,7 @@ export default function OpeningPackagePage() {
                 { icon: BarChart3, title: '손익분기점', source: '복합 데이터', desc: '임대료·인건비 대비 BEP 도달 시점', color: 'from-purple-500 to-pink-500' },
               ].map((item) => (
                 <div key={item.title} className="bg-card border border-border rounded-2xl p-6 text-center">
-                  <div className={`w-12 h-12 mx-auto rounded-xl bg-gradient-to-br ${item.color} flex items-center justify-center mb-4`}>
+                  <div className={`icon-3d w-12 h-12 mx-auto rounded-2xl bg-gradient-to-br ${item.color} flex items-center justify-center mb-4 shadow-lg`}>
                     <item.icon className="w-6 h-6 text-white" />
                   </div>
                   <h3 className="font-semibold mb-1">{item.title}</h3>
@@ -762,70 +829,8 @@ export default function OpeningPackagePage() {
           </div>
         </section>
 
-        {/* ===== Section 5: DSR-Free 대출 ===== */}
-        <section className="py-20 bg-secondary/50">
-          <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-12">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-600/10 text-blue-600 text-sm font-medium mb-4">
-                <span className="text-base">🏦</span>
-                신협중앙회 정식 제휴
-              </div>
-              <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-4">
-                DSR 규제에 반영되지 않는
-                <br />
-                <span className="text-blue-600">카드매출 담보대출</span>
-              </h2>
-              <p className="text-muted-foreground max-w-xl mx-auto">
-                기존 대출과 완전히 별개로 진행 · 대출 추가 시 플러스 등급으로 추가 마케팅 무료
-              </p>
-            </div>
-
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-12">
-              {[
-                { label: '금리', value: '5.3%~6.9%', sub: '신용도별 차등', color: 'from-blue-500 to-cyan-500' },
-                { label: '최대 한도', value: '3억원', sub: '최소 1,000만원', color: 'from-green-500 to-emerald-500' },
-                { label: '중도상환 수수료', value: '0원', sub: '언제든 상환 가능', color: 'from-purple-500 to-pink-500' },
-                { label: '대출 기간', value: '365~700일', sub: '평균 3영업일 심사', color: 'from-orange-500 to-amber-500' },
-              ].map((stat) => (
-                <div key={stat.label} className="relative overflow-hidden bg-card border border-border rounded-2xl p-6 text-center">
-                  <div className={`absolute top-0 left-0 right-0 h-1 bg-gradient-to-r ${stat.color}`} />
-                  <p className="text-sm text-muted-foreground mb-1">{stat.label}</p>
-                  <p className="text-2xl md:text-3xl font-bold mb-1">{stat.value}</p>
-                  <p className="text-xs text-muted-foreground">{stat.sub}</p>
-                </div>
-              ))}
-            </div>
-
-            <div className="bg-gradient-to-r from-blue-500/5 to-cyan-500/5 border border-blue-500/20 rounded-2xl p-6 md:p-8 mb-8">
-              <div className="grid md:grid-cols-2 gap-6">
-                {[
-                  { title: '신용점수 영향 없음', desc: '카드매출 담보이므로 개인 신용조회 불필요' },
-                  { title: '기존 대출과 별개', desc: '주담대, 학자금 대출 있어도 별도 실행 가능' },
-                  { title: '고객 부담 수수료 0원', desc: '제휴 금융기관 수수료로 운영, 고객 부담 없음' },
-                  { title: 'PG 설치 후 바로 진행', desc: '카드결제 실적 발생 시 바로 대출 가능' },
-                ].map((item) => (
-                  <div key={item.title} className="flex items-start gap-3">
-                    <CheckCircle2 className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
-                    <div>
-                      <p className="font-semibold mb-0.5">{item.title}</p>
-                      <p className="text-sm text-muted-foreground">{item.desc}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div className="text-center">
-              <button onClick={scrollToForm} className="btn-primary btn-lg">
-                지금 한도 조회하기
-                <ArrowRight className="w-5 h-5" />
-              </button>
-            </div>
-          </div>
-        </section>
-
-        {/* ===== Section 6: PG 단말기 조건 ===== */}
-        <section className="py-20 bg-secondary/50">
+        {/* ===== Section 7: PG 단말기 조건 ===== */}
+        <section className="py-20">
           <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-12">
               <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-4">
@@ -893,71 +898,69 @@ export default function OpeningPackagePage() {
           </div>
         </section>
 
-        {/* ===== Section: 개원 원스톱 파이프라인 ===== */}
-        <section className="py-20 bg-foreground text-background">
+        {/* ===== Section 8: DSR-Free 대출 ===== */}
+        <section className="py-20 bg-secondary/50">
           <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-12">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-600/10 text-blue-600 text-sm font-medium mb-4">
+                <span className="text-base">🏦</span>
+                신협중앙회 정식 제휴
+              </div>
               <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-4">
-                입지 분석부터 마케팅까지, 원스톱
+                DSR 규제에 반영되지 않는
+                <br />
+                <span className="text-blue-600">카드매출 담보대출</span>
               </h2>
-              <p className="text-white/60">메디플라톤 하나로 개원 전 과정을 해결합니다</p>
+              <p className="text-muted-foreground max-w-xl mx-auto">
+                기존 대출과 완전히 별개로 진행 · 대출 추가 시 플러스 등급으로 추가 마케팅 무료
+              </p>
             </div>
 
-            {/* Desktop: horizontal flow */}
-            <div className="hidden lg:flex items-start justify-between">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-12">
               {[
-                { step: '1', label: '입지 AI 분석', desc: '무료', icon: MapPin, color: 'from-green-500 to-emerald-500' },
-                { step: '2', label: '매물 추천', desc: '470+ 매물', icon: Search, color: 'from-cyan-500 to-blue-500' },
-                { step: '3', label: '개원 중개', desc: '전담 매니저', icon: Building2, color: 'from-blue-500 to-indigo-500' },
-                { step: '4', label: 'PG 설치', desc: '무상 지원', icon: CreditCard, color: 'from-indigo-500 to-purple-500' },
-                { step: '5', label: 'DSR-Free 대출', desc: '5.3%~', icon: DollarSign, color: 'from-purple-500 to-pink-500' },
-                { step: '6', label: '마케팅', desc: '최대 2,580만원', icon: Sparkles, color: 'from-orange-500 to-red-500' },
-              ].map((item, i, arr) => (
-                <div key={item.step} className="flex items-start flex-1">
-                  <div className="flex flex-col items-center text-center flex-1">
-                    <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${item.color} flex items-center justify-center mb-3 shadow-lg`}>
-                      <item.icon className="w-7 h-7 text-white" />
-                    </div>
-                    <p className="text-sm font-semibold text-white mb-0.5">{item.label}</p>
-                    <p className="text-xs text-white/50">{item.desc}</p>
-                  </div>
-                  {i < arr.length - 1 && (
-                    <ChevronRight className="w-5 h-5 text-white/30 mt-4 flex-shrink-0" />
-                  )}
+                { label: '금리', value: '5.3%~6.9%', sub: '신용도별 차등', color: 'from-blue-500 to-cyan-500' },
+                { label: '최대 한도', value: '3억원', sub: '최소 1,000만원', color: 'from-green-500 to-emerald-500' },
+                { label: '중도상환 수수료', value: '0원', sub: '언제든 상환 가능', color: 'from-purple-500 to-pink-500' },
+                { label: '대출 기간', value: '365~700일', sub: '평균 3영업일 심사', color: 'from-orange-500 to-amber-500' },
+              ].map((stat) => (
+                <div key={stat.label} className="relative overflow-hidden bg-card border border-border rounded-2xl p-6 text-center">
+                  <div className={`absolute top-0 left-0 right-0 h-1 bg-gradient-to-r ${stat.color}`} />
+                  <p className="text-sm text-muted-foreground mb-1">{stat.label}</p>
+                  <p className="text-2xl md:text-3xl font-bold mb-1">{stat.value}</p>
+                  <p className="text-xs text-muted-foreground">{stat.sub}</p>
                 </div>
               ))}
             </div>
 
-            {/* Mobile: vertical flow */}
-            <div className="lg:hidden space-y-3">
-              {[
-                { step: '1', label: '입지 AI 분석', desc: '무료', icon: MapPin, color: 'from-green-500 to-emerald-500' },
-                { step: '2', label: '매물 추천', desc: '470+ 매물', icon: Search, color: 'from-cyan-500 to-blue-500' },
-                { step: '3', label: '개원 중개', desc: '전담 매니저', icon: Building2, color: 'from-blue-500 to-indigo-500' },
-                { step: '4', label: 'PG 설치', desc: '무상 지원', icon: CreditCard, color: 'from-indigo-500 to-purple-500' },
-                { step: '5', label: 'DSR-Free 대출', desc: '5.3%~', icon: DollarSign, color: 'from-purple-500 to-pink-500' },
-                { step: '6', label: '마케팅', desc: '최대 2,580만원', icon: Sparkles, color: 'from-orange-500 to-red-500' },
-              ].map((item, i, arr) => (
-                <div key={item.step}>
-                  <div className="flex items-center gap-4">
-                    <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${item.color} flex items-center justify-center flex-shrink-0`}>
-                      <item.icon className="w-6 h-6 text-white" />
-                    </div>
+            <div className="bg-gradient-to-r from-blue-500/5 to-cyan-500/5 border border-blue-500/20 rounded-2xl p-6 md:p-8 mb-8">
+              <div className="grid md:grid-cols-2 gap-6">
+                {[
+                  { title: '신용점수 영향 없음', desc: '카드매출 담보이므로 개인 신용조회 불필요' },
+                  { title: '기존 대출과 별개', desc: '주담대, 학자금 대출 있어도 별도 실행 가능' },
+                  { title: '고객 부담 수수료 0원', desc: '제휴 금융기관 수수료로 운영, 고객 부담 없음' },
+                  { title: 'PG 설치 후 바로 진행', desc: '카드결제 실적 발생 시 바로 대출 가능' },
+                ].map((item) => (
+                  <div key={item.title} className="flex items-start gap-3">
+                    <CheckCircle2 className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
                     <div>
-                      <p className="font-semibold text-white">{item.label}</p>
-                      <p className="text-sm text-white/50">{item.desc}</p>
+                      <p className="font-semibold mb-0.5">{item.title}</p>
+                      <p className="text-sm text-muted-foreground">{item.desc}</p>
                     </div>
                   </div>
-                  {i < arr.length - 1 && (
-                    <div className="ml-6 h-3 border-l-2 border-dashed border-white/20" />
-                  )}
-                </div>
-              ))}
+                ))}
+              </div>
+            </div>
+
+            <div className="text-center">
+              <button onClick={scrollToForm} className="btn-primary btn-lg">
+                지금 한도 조회하기
+                <ArrowRight className="w-5 h-5" />
+              </button>
             </div>
           </div>
         </section>
 
-        {/* ===== Section 7: 왜 메디플라톤인가 ===== */}
+        {/* ===== Section 9: 왜 메디플라톤인가 ===== */}
         <section className="py-20">
           <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-12">
@@ -1017,7 +1020,7 @@ export default function OpeningPackagePage() {
           </div>
         </section>
 
-        {/* ===== Section 8: 신뢰/사회적 증거 ===== */}
+        {/* ===== Section 10: 신뢰/사회적 증거 ===== */}
         <section className="py-20 bg-secondary/50">
           <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-12">
@@ -1075,7 +1078,7 @@ export default function OpeningPackagePage() {
           </div>
         </section>
 
-        {/* ===== Section 9: 상담 신청 폼 ===== */}
+        {/* ===== Section 11: 상담 신청 폼 ===== */}
         <section ref={formRef} id="inquiry-form" className="py-20">
           <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="grid lg:grid-cols-5 gap-12">

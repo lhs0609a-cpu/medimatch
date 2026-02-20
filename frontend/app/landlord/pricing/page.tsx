@@ -7,6 +7,7 @@ import {
   TrendingUp, Bell, BarChart3, Star, ChevronRight,
   CreditCard, Gift, Sparkles, Target, Mail, Megaphone
 } from 'lucide-react'
+import { TossIcon } from '@/components/ui/TossIcon'
 
 // 구독 플랜
 const subscriptionPlans = [
@@ -76,12 +77,12 @@ const matchingProducts = [
 
 // 광고 상품
 const adProducts = [
-  { id: 'landlord_boost_top', name: '검색 상위 노출', price: 300000, duration: '1주', icon: TrendingUp },
-  { id: 'landlord_boost_featured', name: '추천 매물 배지', price: 200000, duration: '1주', icon: Star },
-  { id: 'landlord_banner_home', name: '홈 배너 광고', price: 500000, duration: '1주', icon: Megaphone },
-  { id: 'landlord_push_notification', name: '타겟 푸시 알림', price: 100000, duration: '1회', icon: Bell },
-  { id: 'landlord_email_campaign', name: '이메일 마케팅', price: 200000, duration: '1회', icon: Mail },
-  { id: 'landlord_premium_package', name: '프리미엄 패키지', price: 1500000, duration: '1개월', icon: Gift, discount: 30 },
+  { id: 'landlord_boost_top', name: '검색 상위 노출', price: 300000, duration: '1주', icon: TrendingUp, emoji: '📈' },
+  { id: 'landlord_boost_featured', name: '추천 매물 배지', price: 200000, duration: '1주', icon: Star, emoji: '⭐' },
+  { id: 'landlord_banner_home', name: '홈 배너 광고', price: 500000, duration: '1주', icon: Megaphone, emoji: '📢' },
+  { id: 'landlord_push_notification', name: '타겟 푸시 알림', price: 100000, duration: '1회', icon: Bell, emoji: '🔔' },
+  { id: 'landlord_email_campaign', name: '이메일 마케팅', price: 200000, duration: '1회', icon: Mail, emoji: '📧' },
+  { id: 'landlord_premium_package', name: '프리미엄 패키지', price: 1500000, duration: '1개월', icon: Gift, discount: 30, emoji: '🎁' },
 ]
 
 export default function LandlordPricingPage() {
@@ -113,9 +114,7 @@ export default function LandlordPricingPage() {
                 <ArrowLeft className="w-5 h-5" />
               </Link>
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 bg-amber-100 dark:bg-amber-900/50 rounded-lg flex items-center justify-center">
-                  <Building2 className="w-4 h-4 text-amber-600" />
-                </div>
+                <span className="text-xl">🏢</span>
                 <span className="text-lg font-bold text-foreground">건물주 서비스</span>
               </div>
             </div>
@@ -145,13 +144,15 @@ export default function LandlordPricingPage() {
         {/* Stats */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
           {[
-            { label: '등록 의사·약사', value: '18,742명', icon: Users },
-            { label: '평균 매칭 기간', value: '14일', icon: Zap },
-            { label: '입주 성사율', value: '87%', icon: Target },
-            { label: '누적 거래', value: '2,847건', icon: BarChart3 },
+            { label: '등록 의사·약사', value: '18,742명', icon: Users, color: 'from-purple-500 to-pink-500', shadow: 'shadow-purple-500/25' },
+            { label: '평균 매칭 기간', value: '14일', icon: Zap, color: 'from-amber-500 to-orange-500', shadow: 'shadow-amber-500/25' },
+            { label: '입주 성사율', value: '87%', icon: Target, color: 'from-orange-500 to-red-500', shadow: 'shadow-orange-500/25' },
+            { label: '누적 거래', value: '2,847건', icon: BarChart3, color: 'from-cyan-500 to-blue-500', shadow: 'shadow-cyan-500/25' },
           ].map((stat) => (
             <div key={stat.label} className="card p-4 text-center">
-              <stat.icon className="w-6 h-6 text-amber-600 mx-auto mb-2" />
+              <div className="flex justify-center mb-2">
+                <TossIcon icon={stat.icon} color={stat.color} size="sm" shadow={stat.shadow} />
+              </div>
               <p className="text-2xl font-bold text-foreground">{stat.value}</p>
               <p className="text-sm text-muted-foreground">{stat.label}</p>
             </div>
@@ -303,9 +304,21 @@ export default function LandlordPricingPage() {
             {adProducts.map((product) => (
               <div key={product.id} className="card p-5 hover:shadow-md transition-shadow">
                 <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 bg-amber-100 dark:bg-amber-900/30 rounded-xl flex items-center justify-center flex-shrink-0">
-                    <product.icon className="w-6 h-6 text-amber-600" />
-                  </div>
+                  <TossIcon icon={product.icon} color={
+                    product.icon === TrendingUp ? 'from-cyan-500 to-blue-500' :
+                    product.icon === Star ? 'from-amber-500 to-orange-500' :
+                    product.icon === Megaphone ? 'from-orange-500 to-red-500' :
+                    product.icon === Bell ? 'from-amber-500 to-orange-500' :
+                    product.icon === Mail ? 'from-indigo-500 to-purple-500' :
+                    'from-green-500 to-emerald-500'
+                  } size="md" shadow={
+                    product.icon === TrendingUp ? 'shadow-cyan-500/25' :
+                    product.icon === Star ? 'shadow-amber-500/25' :
+                    product.icon === Megaphone ? 'shadow-orange-500/25' :
+                    product.icon === Bell ? 'shadow-amber-500/25' :
+                    product.icon === Mail ? 'shadow-indigo-500/25' :
+                    'shadow-green-500/25'
+                  } />
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-1">
                       <h3 className="font-semibold text-foreground">{product.name}</h3>
@@ -335,9 +348,7 @@ export default function LandlordPricingPage() {
         {/* Success Fee Notice */}
         <div className="card p-6 bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 border-green-200 dark:border-green-800 mb-12">
           <div className="flex items-start gap-4">
-            <div className="w-12 h-12 bg-green-100 dark:bg-green-900/50 rounded-xl flex items-center justify-center flex-shrink-0">
-              <Sparkles className="w-6 h-6 text-green-600" />
-            </div>
+            <TossIcon icon={Sparkles} color="from-amber-500 to-orange-500" size="md" shadow="shadow-amber-500/25" />
             <div>
               <h3 className="text-lg font-bold text-foreground mb-2">입주 성사 수수료 안내</h3>
               <p className="text-muted-foreground mb-4">

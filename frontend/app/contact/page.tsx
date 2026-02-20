@@ -6,6 +6,7 @@ import {
   ArrowLeft, Mail, MapPin, Clock, Send,
   MessageCircle, CheckCircle2
 } from 'lucide-react'
+import { TossIcon } from '@/components/ui/TossIcon'
 import { toast } from 'sonner'
 
 const inquiryTypes = [
@@ -68,8 +69,8 @@ export default function ContactPage() {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="card p-12 max-w-md text-center">
-          <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-            <CheckCircle2 className="w-8 h-8 text-green-600" />
+          <div className="flex justify-center mb-6">
+            <TossIcon icon={CheckCircle2} color="from-green-500 to-emerald-500" size="xl" shadow="shadow-green-500/25" />
           </div>
           <h2 className="text-2xl font-bold text-foreground mb-2">문의가 접수되었습니다</h2>
           <p className="text-muted-foreground mb-6">
@@ -139,9 +140,7 @@ export default function ContactPage() {
             <div className="space-y-4">
               <div className="card p-5">
                 <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center flex-shrink-0">
-                    <Mail className="w-5 h-5 text-blue-600" />
-                  </div>
+                  <TossIcon icon={Mail} color="from-violet-500 to-purple-500" size="sm" shadow="shadow-violet-500/25" />
                   <div>
                     <h3 className="font-medium text-foreground">이메일</h3>
                     <a href="mailto:support@mediplaton.com" className="text-muted-foreground hover:text-foreground">
@@ -153,9 +152,7 @@ export default function ContactPage() {
 
               <div className="card p-5">
                 <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 rounded-lg bg-yellow-100 flex items-center justify-center flex-shrink-0">
-                    <MessageCircle className="w-5 h-5 text-yellow-600" />
-                  </div>
+                  <TossIcon icon={MessageCircle} color="from-violet-500 to-purple-500" size="sm" shadow="shadow-violet-500/25" />
                   <div>
                     <h3 className="font-medium text-foreground">카톡 상담</h3>
                     <a href="https://open.kakao.com/o/sMLX4Zei" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground">
@@ -167,9 +164,7 @@ export default function ContactPage() {
 
               <div className="card p-5">
                 <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 rounded-lg bg-purple-100 flex items-center justify-center flex-shrink-0">
-                    <Clock className="w-5 h-5 text-purple-600" />
-                  </div>
+                  <TossIcon icon={Clock} color="from-slate-500 to-gray-600" size="sm" shadow="shadow-slate-500/25" />
                   <div>
                     <h3 className="font-medium text-foreground">운영시간</h3>
                     <p className="text-muted-foreground">
@@ -182,9 +177,7 @@ export default function ContactPage() {
 
               <div className="card p-5">
                 <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 rounded-lg bg-orange-100 flex items-center justify-center flex-shrink-0">
-                    <MapPin className="w-5 h-5 text-orange-600" />
-                  </div>
+                  <TossIcon icon={MapPin} color="from-orange-500 to-red-500" size="sm" shadow="shadow-orange-500/25" />
                   <div>
                     <h3 className="font-medium text-foreground">주소</h3>
                     <p className="text-muted-foreground">

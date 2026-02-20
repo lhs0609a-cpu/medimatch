@@ -15,6 +15,7 @@ import {
   XCircle,
   Wallet,
 } from 'lucide-react';
+import { TossIcon } from '@/components/ui/TossIcon';
 
 interface CampaignStats {
   sms_balance: number;
@@ -176,9 +177,12 @@ export default function CampaignManagePage() {
     <div className="p-8">
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">아웃바운드 캠페인</h1>
-          <p className="text-gray-500 mt-1">SMS/이메일 캠페인을 관리합니다.</p>
+        <div className="flex items-center gap-3">
+          <TossIcon icon={Send} color="from-blue-400 to-cyan-500" shadow="shadow-blue-500/25" size="md" />
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">아웃바운드 캠페인</h1>
+            <p className="text-gray-500 mt-1">SMS/이메일 캠페인을 관리합니다.</p>
+          </div>
         </div>
         <button
           onClick={() => setShowNewCampaign(true)}
@@ -193,9 +197,7 @@ export default function CampaignManagePage() {
       <div className="grid grid-cols-4 gap-4 mb-8">
         <div className="bg-white rounded-xl p-6 border border-gray-100">
           <div className="flex items-center justify-between mb-4">
-            <div className="w-12 h-12 rounded-xl bg-sky-100 flex items-center justify-center">
-              <Wallet className="w-6 h-6 text-sky-600" />
-            </div>
+            <TossIcon icon={Wallet} color="from-green-500 to-emerald-500" shadow="shadow-green-500/25" size="sm" />
           </div>
           <p className="text-3xl font-bold text-gray-900 mb-1">
             {loading ? '-' : stats?.sms_balance?.toLocaleString() || 0}
@@ -205,9 +207,7 @@ export default function CampaignManagePage() {
 
         <div className="bg-white rounded-xl p-6 border border-gray-100">
           <div className="flex items-center justify-between mb-4">
-            <div className="w-12 h-12 rounded-xl bg-emerald-100 flex items-center justify-center">
-              <CheckCircle className="w-6 h-6 text-emerald-600" />
-            </div>
+            <TossIcon icon={CheckCircle} color="from-emerald-500 to-teal-500" shadow="shadow-emerald-500/25" size="sm" />
           </div>
           <p className="text-3xl font-bold text-gray-900 mb-1">
             {loading ? '-' : stats?.total_sent || 0}
@@ -217,9 +217,7 @@ export default function CampaignManagePage() {
 
         <div className="bg-white rounded-xl p-6 border border-gray-100">
           <div className="flex items-center justify-between mb-4">
-            <div className="w-12 h-12 rounded-xl bg-rose-100 flex items-center justify-center">
-              <TrendingUp className="w-6 h-6 text-rose-600" />
-            </div>
+            <TossIcon icon={TrendingUp} color="from-rose-500 to-pink-500" shadow="shadow-rose-500/25" size="sm" />
           </div>
           <p className="text-3xl font-bold text-gray-900 mb-1">
             {loading ? '-' : stats?.by_grade?.HOT || 0}
@@ -229,9 +227,7 @@ export default function CampaignManagePage() {
 
         <div className="bg-white rounded-xl p-6 border border-gray-100">
           <div className="flex items-center justify-between mb-4">
-            <div className="w-12 h-12 rounded-xl bg-amber-100 flex items-center justify-center">
-              <Clock className="w-6 h-6 text-amber-600" />
-            </div>
+            <TossIcon icon={Clock} color="from-amber-500 to-orange-500" shadow="shadow-amber-500/25" size="sm" />
           </div>
           <p className="text-3xl font-bold text-gray-900 mb-1">0</p>
           <p className="text-sm text-gray-500">예약 대기</p>

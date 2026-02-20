@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { ArrowLeft, Mail, CheckCircle2, Sparkles } from 'lucide-react'
+import { ArrowLeft, Mail, Sparkles } from 'lucide-react'
 import { toast } from 'sonner'
 
 const forgotPasswordSchema = z.object({
@@ -56,8 +56,8 @@ export default function ForgotPasswordPage() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
         <div className="max-w-md w-full bg-white rounded-2xl shadow-lg p-8 text-center">
-          <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-6">
-            <CheckCircle2 className="w-8 h-8 text-emerald-600" />
+          <div className="text-center mx-auto mb-6">
+            <span className="text-4xl">&#x2709;&#xFE0F;</span>
           </div>
           <h2 className="text-2xl font-bold text-gray-900 mb-2">이메일을 확인해주세요</h2>
           <p className="text-gray-500 mb-6">

@@ -2,15 +2,16 @@
 
 import React from 'react'
 import { MapPin, Navigation, Footprints, Building2, Sun, Cloud, Mountain, ParkingCircle, Accessibility, Eye } from 'lucide-react'
+import { TossIcon } from '@/components/ui/TossIcon'
 import { SimulationResponse } from '@/lib/api/client'
 
 interface Props { result: SimulationResponse }
 
-function Card({ icon: Icon, title, color, children }: { icon: any; title: string; color: string; children: React.ReactNode }) {
+function Card({ icon: Icon, title, color, gradient, shadow, children }: { icon: any; title: string; color: string; gradient?: string; shadow?: string; children: React.ReactNode }) {
   return (
     <div className="card p-6">
-      <div className="flex items-center gap-2 mb-4">
-        <Icon className={`w-5 h-5 ${color}`} />
+      <div className="flex items-center gap-3 mb-4">
+        <TossIcon icon={Icon} color={gradient || 'from-blue-500 to-indigo-500'} size="sm" shadow={shadow} />
         <h3 className="font-semibold text-foreground">{title}</h3>
       </div>
       {children}
@@ -24,7 +25,7 @@ export default function LocationPack({ result }: Props) {
   return (
     <>
       {/* 1. 보행자 동선 분석 */}
-      <Card icon={Footprints} title="보행자 동선 · 유동인구 핫스팟" color="text-blue-500">
+      <Card icon={Footprints} title="보행자 동선 · 유동인구 핫스팟" color="text-blue-500" gradient="from-blue-500 to-indigo-500" shadow="shadow-blue-500/25">
         <div className="space-y-2 mb-4">
           {[
             { spot: '지하철 출구 앞', flow: 35000, type: '출퇴근 집중', peak: '08:00-09:00', score: 98 },
@@ -48,7 +49,7 @@ export default function LocationPack({ result }: Props) {
       </Card>
 
       {/* 2. 주차 환경 분석 */}
-      <Card icon={ParkingCircle} title="주차 환경 상세 분석" color="text-gray-600">
+      <Card icon={ParkingCircle} title="주차 환경 상세 분석" color="text-gray-600" gradient="from-slate-500 to-gray-600" shadow="shadow-slate-500/25">
         <div className="grid grid-cols-3 gap-3 mb-4">
           <div className="text-center p-3 bg-secondary/50 rounded-lg">
             <div className="text-xl font-bold text-foreground">15대</div>
@@ -95,7 +96,7 @@ export default function LocationPack({ result }: Props) {
       </Card>
 
       {/* 3. 층별 임대료 비교 */}
-      <Card icon={Building2} title="층별 임대 조건 비교" color="text-violet-500">
+      <Card icon={Building2} title="층별 임대 조건 비교" color="text-violet-500" gradient="from-blue-500 to-indigo-500" shadow="shadow-blue-500/25">
         <div className="space-y-2">
           {[
             { floor: '1층', rent: 350, deposit: 15000, visibility: 98, access: 100, recommend: true },
@@ -134,7 +135,7 @@ export default function LocationPack({ result }: Props) {
       </Card>
 
       {/* 4. 대중교통 접근성 */}
-      <Card icon={Navigation} title="대중교통 접근성 상세" color="text-green-500">
+      <Card icon={Navigation} title="대중교통 접근성 상세" color="text-green-500" gradient="from-blue-500 to-cyan-500" shadow="shadow-blue-500/25">
         <div className="space-y-3">
           {[
             { type: '지하철 2호선 교대역', dist: '180m', time: '도보 3분', daily: '12.5만명', lines: '2, 3호선' },
@@ -162,7 +163,7 @@ export default function LocationPack({ result }: Props) {
       </Card>
 
       {/* 5. 가시성/간판 분석 */}
-      <Card icon={Eye} title="간판 · 가시성 분석" color="text-amber-500">
+      <Card icon={Eye} title="간판 · 가시성 분석" color="text-amber-500" gradient="from-amber-500 to-orange-500" shadow="shadow-amber-500/25">
         <div className="space-y-2 mb-4">
           {[
             { factor: '도로변 노출도', score: 85, desc: '대로변 직접 면함, 보행자 눈높이', weight: 35 },
@@ -192,7 +193,7 @@ export default function LocationPack({ result }: Props) {
       </Card>
 
       {/* 6. 날씨/계절 영향 */}
-      <Card icon={Cloud} title="날씨 · 계절 영향 분석" color="text-sky-500">
+      <Card icon={Cloud} title="날씨 · 계절 영향 분석" color="text-sky-500" gradient="from-sky-400 to-blue-500" shadow="shadow-sky-500/25">
         <div className="grid grid-cols-4 gap-2 mb-4">
           {[
             { season: '봄', rain: 8, temp: '8-18°C', impact: '+12%', icon: '🌸' },
@@ -215,7 +216,7 @@ export default function LocationPack({ result }: Props) {
       </Card>
 
       {/* 7. 소음/환경 */}
-      <Card icon={Mountain} title="소음 · 주변 환경 평가" color="text-emerald-600">
+      <Card icon={Mountain} title="소음 · 주변 환경 평가" color="text-emerald-600" gradient="from-sky-400 to-blue-500" shadow="shadow-sky-500/25">
         <div className="space-y-3">
           {[
             { item: '도로 소음', level: 62, unit: 'dB', grade: 'B', desc: '2차선 도로, 보통 수준', limit: '65dB 이하 권장' },
@@ -244,7 +245,7 @@ export default function LocationPack({ result }: Props) {
       </Card>
 
       {/* 8. 건물 적합성 */}
-      <Card icon={Building2} title="건물 시설 적합성 평가" color="text-rose-500">
+      <Card icon={Building2} title="건물 시설 적합성 평가" color="text-rose-500" gradient="from-rose-500 to-pink-500" shadow="shadow-rose-500/25">
         <div className="space-y-2">
           {[
             { item: '전기 용량', score: 88, requirement: '100kW 이상', current: '150kW', pass: true },
@@ -257,9 +258,7 @@ export default function LocationPack({ result }: Props) {
             { item: '장애인 접근성', score: 70, requirement: '경사로/점자블록', current: '경사로만 (보강 필요)', pass: false },
           ].map((i) => (
             <div key={i.item} className="flex items-center gap-2">
-              <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold ${
-                i.pass ? 'bg-green-100 text-green-600' : 'bg-amber-100 text-amber-600'
-              }`}>{i.pass ? '✓' : '!'}</span>
+              <span className="text-sm">{i.pass ? '✅' : '⚠️'}</span>
               <span className="text-xs text-foreground flex-1">{i.item}</span>
               <span className="text-[10px] text-muted-foreground w-24 text-right">{i.current}</span>
               <div className="w-16 h-2 bg-muted rounded-full overflow-hidden">
@@ -279,7 +278,7 @@ export default function LocationPack({ result }: Props) {
       </Card>
 
       {/* 9. 일/야간 환경 비교 */}
-      <Card icon={Sun} title="주간 · 야간 환경 비교" color="text-yellow-500">
+      <Card icon={Sun} title="주간 · 야간 환경 비교" color="text-yellow-500" gradient="from-sky-400 to-blue-500" shadow="shadow-sky-500/25">
         <div className="grid grid-cols-2 gap-4">
           <div className="p-4 bg-yellow-50 dark:bg-yellow-950/20 rounded-xl">
             <div className="text-sm font-medium text-foreground mb-3">☀️ 주간 (09:00-18:00)</div>
@@ -306,7 +305,7 @@ export default function LocationPack({ result }: Props) {
       </Card>
 
       {/* 10. 장애인/어르신 접근성 */}
-      <Card icon={Accessibility} title="장애인 · 어르신 접근성 평가" color="text-teal-500">
+      <Card icon={Accessibility} title="장애인 · 어르신 접근성 평가" color="text-teal-500" gradient="from-teal-500 to-cyan-500" shadow="shadow-teal-500/25">
         <div className="space-y-2">
           {[
             { item: '건물 출입 경사로', status: '설치됨', score: 90, note: '기울기 1/12 적합' },

@@ -8,6 +8,7 @@ import {
   ChevronRight, Filter, Search, Calendar
 } from 'lucide-react'
 import { slotsService } from '@/lib/api/services'
+import { TossIcon } from '@/components/ui/TossIcon'
 import { PharmacySlot } from '@/lib/api/client'
 
 const statusLabels: Record<string, { label: string; color: string }> = {
@@ -55,9 +56,7 @@ export default function PharmacyPage() {
               <ArrowLeft className="w-5 h-5" />
             </Link>
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-purple-500 rounded-lg flex items-center justify-center">
-                <Pill className="w-4 h-4 text-white" />
-              </div>
+              <TossIcon icon={Pill} color="from-rose-500 to-pink-500" size="xs" shadow="shadow-rose-500/25" />
               <span className="text-xl font-bold text-gray-900">PharmMatch</span>
             </div>
           </div>
@@ -223,8 +222,8 @@ export default function PharmacyPage() {
           <h2 className="text-xl font-bold text-gray-900 mb-6">PharmMatch 입찰 안내</h2>
           <div className="grid md:grid-cols-3 gap-6">
             <div className="text-center">
-              <div className="w-12 h-12 bg-purple-100 text-purple-600 rounded-xl flex items-center justify-center mx-auto mb-3">
-                1
+              <div className="flex justify-center mb-3">
+                <TossIcon icon={MapPin} color="from-orange-500 to-red-500" size="md" shadow="shadow-orange-500/25" />
               </div>
               <h3 className="font-medium text-gray-900 mb-2">자리 탐색</h3>
               <p className="text-sm text-gray-600">
@@ -232,8 +231,8 @@ export default function PharmacyPage() {
               </p>
             </div>
             <div className="text-center">
-              <div className="w-12 h-12 bg-purple-100 text-purple-600 rounded-xl flex items-center justify-center mx-auto mb-3">
-                2
+              <div className="flex justify-center mb-3">
+                <TossIcon icon={TrendingUp} color="from-cyan-500 to-blue-500" size="md" shadow="shadow-cyan-500/25" />
               </div>
               <h3 className="font-medium text-gray-900 mb-2">입찰 참여</h3>
               <p className="text-sm text-gray-600">
@@ -241,8 +240,8 @@ export default function PharmacyPage() {
               </p>
             </div>
             <div className="text-center">
-              <div className="w-12 h-12 bg-purple-100 text-purple-600 rounded-xl flex items-center justify-center mx-auto mb-3">
-                3
+              <div className="flex justify-center mb-3">
+                <TossIcon icon={Building2} color="from-blue-500 to-indigo-500" size="md" shadow="shadow-blue-500/25" />
               </div>
               <h3 className="font-medium text-gray-900 mb-2">계약 진행</h3>
               <p className="text-sm text-gray-600">

@@ -4,8 +4,7 @@ import { Suspense, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import {
-  AlertTriangle, CreditCard, RefreshCw, Home,
-  Copy, CheckCircle2, HelpCircle, Ban, Clock, Shield
+  RefreshCw, Home, Copy, CheckCircle2, Shield
 } from 'lucide-react';
 
 type ErrorCategory = 'user_action' | 'card_issue' | 'limit_exceeded' | 'technical' | 'canceled';
@@ -71,12 +70,12 @@ const DEFAULT_ERROR: ErrorInfo = {
   canRetry: true,
 };
 
-const CATEGORY_STYLES: Record<ErrorCategory, { icon: React.ReactNode; bgColor: string; iconColor: string }> = {
-  user_action: { icon: <HelpCircle className="w-10 h-10" />, bgColor: 'bg-blue-100', iconColor: 'text-blue-600' },
-  card_issue: { icon: <CreditCard className="w-10 h-10" />, bgColor: 'bg-orange-100', iconColor: 'text-orange-600' },
-  limit_exceeded: { icon: <Ban className="w-10 h-10" />, bgColor: 'bg-amber-100', iconColor: 'text-amber-600' },
-  technical: { icon: <AlertTriangle className="w-10 h-10" />, bgColor: 'bg-red-100', iconColor: 'text-red-600' },
-  canceled: { icon: <Clock className="w-10 h-10" />, bgColor: 'bg-gray-100', iconColor: 'text-gray-600' },
+const CATEGORY_EMOJI: Record<ErrorCategory, string> = {
+  user_action: '\u2753',
+  card_issue: '\uD83D\uDCB3',
+  limit_exceeded: '\uD83D\uDEAB',
+  technical: '\u26A0\uFE0F',
+  canceled: '\u23F0',
 };
 
 function FailContent() {
@@ -87,7 +86,7 @@ function FailContent() {
   const errorMessage = searchParams.get('message') || searchParams.get('errorMessage');
 
   const errorInfo = errorCode ? (ERROR_MAP[errorCode] || DEFAULT_ERROR) : DEFAULT_ERROR;
-  const categoryStyle = CATEGORY_STYLES[errorInfo.category];
+  const categoryEmoji = CATEGORY_EMOJI[errorInfo.category];
   const displayDescription = errorMessage || errorInfo.description;
 
   const handleCopyError = () => {
@@ -102,8 +101,8 @@ function FailContent() {
       <div className="max-w-lg mx-auto">
         <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
           <div className="p-6 text-center border-b border-gray-100">
-            <div className={`w-20 h-20 ${categoryStyle.bgColor} rounded-full flex items-center justify-center mx-auto mb-4`}>
-              <span className={categoryStyle.iconColor}>{categoryStyle.icon}</span>
+            <div className="text-center mx-auto mb-4">
+              <span className="text-5xl">{categoryEmoji}</span>
             </div>
             <h1 className="text-2xl font-bold text-gray-900 mb-2">{errorInfo.title}</h1>
             <p className="text-gray-600">{displayDescription}</p>
@@ -127,9 +126,7 @@ function FailContent() {
             <ul className="space-y-2">
               {errorInfo.solutions.map((s, i) => (
                 <li key={i} className="flex items-start gap-2 text-sm text-gray-700">
-                  <span className="w-5 h-5 rounded-full bg-green-100 text-green-600 flex items-center justify-center flex-shrink-0 text-xs font-medium">
-                    {i + 1}
-                  </span>
+                  <span className="flex-shrink-0">{i === 0 ? '1️⃣' : i === 1 ? '2️⃣' : i === 2 ? '3️⃣' : `${i + 1}.`}</span>
                   {s}
                 </li>
               ))}

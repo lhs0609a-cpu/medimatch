@@ -18,6 +18,7 @@ import {
   CreditCard,
   Building2,
 } from 'lucide-react';
+import { TossIcon } from '@/components/ui/TossIcon';
 
 interface UserItem {
   id: string;
@@ -173,9 +174,7 @@ export default function AdminUsersPage() {
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center">
-            <Users className="w-5 h-5 text-blue-600" />
-          </div>
+          <TossIcon icon={Users} color="from-purple-500 to-pink-500" shadow="shadow-purple-500/25" size="md" />
           <div>
             <h1 className="text-2xl font-bold text-gray-900">회원 관리</h1>
             <p className="text-sm text-gray-500">전체 회원 목록 조회 및 관리</p>
@@ -340,9 +339,7 @@ export default function AdminUsersPage() {
                 </div>
                 <div className="px-6 py-5 space-y-4">
                   <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-full bg-violet-100 flex items-center justify-center">
-                      <Users className="w-6 h-6 text-violet-600" />
-                    </div>
+                    <span className="text-3xl">👤</span>
                     <div>
                       <h3 className="text-lg font-bold text-gray-900">{detailModal.full_name}</h3>
                       <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${ROLE_CONFIG[detailModal.role]?.bg} ${ROLE_CONFIG[detailModal.role]?.text}`}>

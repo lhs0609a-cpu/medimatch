@@ -12,6 +12,7 @@ import {
   Users,
   Repeat,
 } from 'lucide-react';
+import { TossIcon } from '@/components/ui/TossIcon';
 
 // ============================================================
 // Types
@@ -171,9 +172,7 @@ export default function AdminPaymentsPage() {
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-emerald-100 flex items-center justify-center">
-            <CreditCard className="w-5 h-5 text-emerald-600" />
-          </div>
+          <TossIcon icon={CreditCard} color="from-indigo-500 to-purple-500" shadow="shadow-indigo-500/25" size="md" />
           <div>
             <h1 className="text-2xl font-bold text-gray-900">결제/구독 관리</h1>
             <p className="text-sm text-gray-500">결제 내역과 구독 현황을 관리합니다</p>

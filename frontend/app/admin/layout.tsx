@@ -18,19 +18,62 @@ import {
   ClipboardCheck,
   CreditCard,
   LogIn,
+  Stethoscope,
+  MessageCircle,
+  Megaphone,
+  HeartHandshake,
+  ShieldCheck,
+  ShoppingCart,
 } from 'lucide-react';
 
-const sidebarItems = [
-  { href: '/admin', label: '대시보드', icon: Home },
-  { href: '/admin/listings', label: '매물 심사', icon: ClipboardCheck },
-  { href: '/admin/pharmacy-listings', label: '약국 매물', icon: Pill },
-  { href: '/admin/users', label: '회원 관리', icon: Users },
-  { href: '/admin/payments', label: '결제/구독', icon: CreditCard },
-  { href: '/admin/realestate', label: '부동산 매물', icon: Building2 },
-  { href: '/admin/prospects', label: '약국 타겟팅', icon: Pill },
-  { href: '/admin/campaigns', label: '아웃바운드 캠페인', icon: Send },
-  { href: '/admin/stats', label: '통계', icon: BarChart3 },
-  { href: '/admin/settings', label: '설정', icon: Settings },
+interface SidebarGroup {
+  title: string;
+  items: { href: string; label: string; icon: React.ComponentType<{ className?: string }> }[];
+}
+
+const sidebarGroups: SidebarGroup[] = [
+  {
+    title: '',
+    items: [
+      { href: '/admin', label: '대시보드', icon: Home },
+    ],
+  },
+  {
+    title: '심사/매물',
+    items: [
+      { href: '/admin/listings', label: '매물 심사', icon: ClipboardCheck },
+      { href: '/admin/pharmacy-listings', label: '약국 매물', icon: Pill },
+      { href: '/admin/realestate', label: '부동산 매물', icon: Building2 },
+    ],
+  },
+  {
+    title: '고객 관리',
+    items: [
+      { href: '/admin/consultations', label: '상담 신청', icon: Stethoscope },
+      { href: '/admin/inquiries', label: '문의 관리', icon: MessageCircle },
+      { href: '/admin/users', label: '회원 관리', icon: Users },
+    ],
+  },
+  {
+    title: '비즈니스',
+    items: [
+      { href: '/admin/banners', label: '배너 광고', icon: Megaphone },
+      { href: '/admin/partners', label: '파트너 관리', icon: HeartHandshake },
+      { href: '/admin/escrow', label: '에스크로/계약', icon: ShieldCheck },
+      { href: '/admin/group-buying', label: '공동구매', icon: ShoppingCart },
+    ],
+  },
+  {
+    title: '분석/운영',
+    items: [
+      { href: '/admin/simulations', label: '시뮬레이션', icon: BarChart3 },
+      { href: '/admin/payments', label: '결제/구독', icon: CreditCard },
+      { href: '/admin/campaigns', label: '캠페인', icon: Send },
+      { href: '/admin/prospects', label: '약국 타겟팅', icon: Pill },
+      { href: '/admin/stats', label: '통계', icon: TrendingUp },
+      { href: '/admin/settings', label: '설정', icon: Settings },
+    ],
+  },
 ];
 
 export default function AdminLayout({
@@ -225,26 +268,35 @@ export default function AdminLayout({
           </div>
 
           {/* Navigation */}
-          <nav className="flex-1 px-4 py-6 space-y-1">
-            {sidebarItems.map((item) => {
-              const isActive = pathname === item.href ||
-                (item.href !== '/admin' && pathname.startsWith(item.href));
+          <nav className="flex-1 px-4 py-4 space-y-4 overflow-y-auto">
+            {sidebarGroups.map((group, gi) => (
+              <div key={gi}>
+                {group.title && (
+                  <p className="px-4 py-1 text-[10px] font-semibold text-gray-400 uppercase tracking-wider">{group.title}</p>
+                )}
+                <div className="space-y-0.5">
+                  {group.items.map((item) => {
+                    const isActive = pathname === item.href ||
+                      (item.href !== '/admin' && pathname.startsWith(item.href));
 
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
-                    isActive
-                      ? 'bg-violet-50 text-violet-700 font-medium'
-                      : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-                  }`}
-                >
-                  <item.icon className={`w-5 h-5 ${isActive ? 'text-violet-600' : ''}`} />
-                  {item.label}
-                </Link>
-              );
-            })}
+                    return (
+                      <Link
+                        key={item.href}
+                        href={item.href}
+                        className={`flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all text-sm ${
+                          isActive
+                            ? 'bg-violet-50 text-violet-700 font-medium'
+                            : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                        }`}
+                      >
+                        <item.icon className={`w-4 h-4 ${isActive ? 'text-violet-600' : ''}`} />
+                        {item.label}
+                      </Link>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
           </nav>
 
           {/* Back to Dashboard */}

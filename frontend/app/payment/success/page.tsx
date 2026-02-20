@@ -3,7 +3,8 @@
 import { useEffect, useState, Suspense } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { CheckCircle, ArrowRight, Home, FileText, TrendingUp, Crown } from 'lucide-react'
+import { CheckCircle, ArrowRight, Home, FileText, TrendingUp, Crown, CheckCircle2 } from 'lucide-react'
+import { TossIcon } from '@/components/ui/TossIcon'
 import { paymentService } from '@/lib/api/services'
 
 type PaymentType = 'simulation_unlock' | 'report_purchase' | 'subscription' | 'matching_request' | 'default'
@@ -153,21 +154,7 @@ function PaymentSuccessContent() {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center p-4">
         <div className="max-w-md w-full text-center">
-          <div className="w-20 h-20 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center mx-auto mb-6">
-            <svg
-              className="w-10 h-10 text-red-600"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M6 18L18 6M6 6l12 12"
-              />
-            </svg>
-          </div>
+          <span className="text-6xl block mx-auto mb-6">❌</span>
           <h1 className="text-2xl font-bold text-foreground mb-4">결제 실패</h1>
           <p className="text-muted-foreground mb-8">{error}</p>
           <div className="space-y-3">
@@ -198,9 +185,9 @@ function PaymentSuccessContent() {
         {/* Success Animation */}
         <div className="text-center mb-8">
           <div className="relative w-24 h-24 mx-auto mb-6">
-            <div className="absolute inset-0 bg-green-100 dark:bg-green-900/30 rounded-full animate-ping opacity-25" />
-            <div className="relative w-24 h-24 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center">
-              <CheckCircle className="w-12 h-12 text-green-600" />
+            <div className="absolute inset-0 bg-green-600/10 rounded-full animate-ping opacity-25" />
+            <div className="relative flex items-center justify-center w-24 h-24">
+              <TossIcon icon={CheckCircle2} color="from-green-500 to-emerald-500" size="xl" shadow="shadow-green-500/25" />
             </div>
           </div>
           <h1 className="text-2xl font-bold text-foreground mb-2">결제 완료!</h1>
@@ -210,9 +197,7 @@ function PaymentSuccessContent() {
         {/* Payment Details Card */}
         <div className="card p-6 mb-6">
           <div className="flex items-center gap-4 mb-4 pb-4 border-b border-border">
-            <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center">
-              <Icon className="w-6 h-6 text-primary" />
-            </div>
+            <TossIcon icon={Icon} color="from-blue-500 to-indigo-500" size="md" shadow="shadow-blue-500/25" />
             <div>
               <h3 className="font-semibold text-foreground">{productInfo.title}</h3>
               <p className="text-sm text-muted-foreground">주문번호: {result?.orderId}</p>

@@ -10,6 +10,7 @@ import {
   ArrowLeft, Building2, TrendingUp,
   ChevronRight, Download, Lock, LogIn, Sparkles, CheckCircle2,
 } from 'lucide-react'
+import { TossIcon } from '@/components/ui/TossIcon'
 import { simulationService } from '@/lib/api/services'
 import { SimulationResponse } from '@/lib/api/client'
 import { toast } from 'sonner'
@@ -226,8 +227,8 @@ export default function SimulatePage() {
         ) : isAuthRequired ? (
           /* Login Required */
           <div className="card p-12 text-center max-w-lg mx-auto">
-            <div className="w-16 h-16 bg-secondary rounded-2xl flex items-center justify-center mx-auto mb-6">
-              <Lock className="w-8 h-8 text-muted-foreground" />
+            <div className="flex justify-center mb-6">
+              <TossIcon icon={Lock} color="from-gray-500 to-slate-600" size="xl" shadow="shadow-gray-500/25" />
             </div>
             <h3 className="text-xl font-semibold text-foreground mb-2">로그인이 필요합니다</h3>
             <p className="text-muted-foreground mb-6">
@@ -361,9 +362,7 @@ export default function SimulatePage() {
             ) : (
               <div className="bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-950/30 dark:to-orange-950/30 border border-amber-200 dark:border-amber-800 rounded-xl p-4">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-amber-100 dark:bg-amber-900 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <Lock className="w-5 h-5 text-amber-600 dark:text-amber-400" />
-                  </div>
+                  <span className="text-2xl flex-shrink-0">🔒</span>
                   <div className="flex-1">
                     <span className="font-medium text-foreground">일부 결과가 잠겨있습니다</span>
                     <span className="text-sm text-muted-foreground ml-2">아래 무료 분석을 먼저 확인해보세요</span>

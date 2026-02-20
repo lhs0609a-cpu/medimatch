@@ -9,6 +9,7 @@ import {
   CheckCircle, Building2, Stethoscope, Package,
   Calculator, ChevronRight, Sparkles, ShieldCheck
 } from 'lucide-react'
+import { TossIcon } from '@/components/ui/TossIcon'
 import { groupBuyingService } from '@/lib/api/services'
 import { CohortStatus, CohortSummary, GroupBuyingCategory } from '@/lib/api/client'
 
@@ -153,11 +154,15 @@ function CohortCard({ cohort }: { cohort: CohortSummary }) {
 // 통계 카드
 function StatCard({
   icon,
+  iconColor,
+  iconShadow,
   label,
   value,
   suffix = ''
 }: {
-  icon: React.ReactNode
+  icon: any
+  iconColor?: string
+  iconShadow?: string
   label: string
   value: number | string
   suffix?: string
@@ -165,9 +170,7 @@ function StatCard({
   return (
     <div className="bg-white rounded-xl border border-gray-200 p-5">
       <div className="flex items-center gap-3 mb-2">
-        <div className="p-2 bg-blue-100 rounded-lg text-blue-600">
-          {icon}
-        </div>
+        <TossIcon icon={icon} color={iconColor || 'from-blue-500 to-indigo-500'} size="sm" shadow={iconShadow} />
         <span className="text-sm text-gray-600">{label}</span>
       </div>
       <div className="text-2xl font-bold text-gray-900">
@@ -230,18 +233,18 @@ export default function GroupBuyingPage() {
           {/* 주요 특징 */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-3xl mx-auto mb-8">
             {[
-              { icon: <Users className="w-5 h-5" />, text: '30명+ 공동 구매력' },
-              { icon: <ShieldCheck className="w-5 h-5" />, text: '검증된 우수 업체' },
-              { icon: <TrendingDown className="w-5 h-5" />, text: '평균 15~30% 절감' },
+              { icon: Users, color: 'from-purple-500 to-pink-500', shadow: 'shadow-purple-500/25', text: '30명+ 공동 구매력' },
+              { icon: ShieldCheck, color: 'from-teal-500 to-cyan-500', shadow: 'shadow-teal-500/25', text: '검증된 우수 업체' },
+              { icon: TrendingDown, color: 'from-red-500 to-rose-500', shadow: 'shadow-red-500/25', text: '평균 15~30% 절감' },
             ].map((item, idx) => (
               <motion.div
                 key={idx}
-                className="flex items-center justify-center gap-2 px-4 py-3 bg-white rounded-xl border border-gray-200 text-gray-700"
+                className="flex items-center justify-center gap-3 px-4 py-3 bg-white rounded-xl border border-gray-200 text-gray-700"
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2 + idx * 0.1 }}
               >
-                <div className="text-blue-600">{item.icon}</div>
+                <TossIcon icon={item.icon} color={item.color} size="xs" shadow={item.shadow} />
                 <span className="font-medium">{item.text}</span>
               </motion.div>
             ))}
@@ -271,25 +274,33 @@ export default function GroupBuyingPage() {
           <div className="max-w-6xl mx-auto">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <StatCard
-                icon={<Users className="w-5 h-5" />}
+                icon={Users}
+                iconColor="from-purple-500 to-pink-500"
+                iconShadow="shadow-purple-500/25"
                 label="총 참여자"
                 value={stats.total_participants}
                 suffix="명"
               />
               <StatCard
-                icon={<TrendingDown className="w-5 h-5" />}
+                icon={TrendingDown}
+                iconColor="from-red-500 to-rose-500"
+                iconShadow="shadow-red-500/25"
                 label="총 절감액"
                 value={(stats.total_savings / 100000000).toFixed(1)}
                 suffix="억원"
               />
               <StatCard
-                icon={<CheckCircle className="w-5 h-5" />}
+                icon={CheckCircle}
+                iconColor="from-green-500 to-emerald-500"
+                iconShadow="shadow-green-500/25"
                 label="완료 코호트"
                 value={stats.total_cohorts_completed}
                 suffix="회"
               />
               <StatCard
-                icon={<Calculator className="w-5 h-5" />}
+                icon={Calculator}
+                iconColor="from-cyan-500 to-blue-500"
+                iconShadow="shadow-cyan-500/25"
                 label="평균 절감액"
                 value={(stats.avg_savings_per_participant / 10000).toFixed(0)}
                 suffix="만원/인"
@@ -377,16 +388,14 @@ export default function GroupBuyingPage() {
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
             {[
-              { step: 1, icon: <Calendar className="w-6 h-6" />, title: '코호트 선택', desc: '개원 예정월에 맞는 코호트를 선택하세요' },
-              { step: 2, icon: <CheckCircle className="w-6 h-6" />, title: '카테고리 선택', desc: '필요한 품목 카테고리를 선택하세요' },
-              { step: 3, icon: <Users className="w-6 h-6" />, title: '참여 신청', desc: '간단한 정보 입력 후 참여 신청을 완료하세요' },
-              { step: 4, icon: <TrendingDown className="w-6 h-6" />, title: '할인 혜택', desc: '인원이 모이면 자동으로 할인이 적용됩니다' },
+              { step: 1, icon: Calendar, color: 'from-blue-400 to-indigo-500', shadow: 'shadow-blue-500/25', title: '코호트 선택', desc: '개원 예정월에 맞는 코호트를 선택하세요' },
+              { step: 2, icon: CheckCircle, color: 'from-green-500 to-emerald-500', shadow: 'shadow-green-500/25', title: '카테고리 선택', desc: '필요한 품목 카테고리를 선택하세요' },
+              { step: 3, icon: Users, color: 'from-purple-500 to-pink-500', shadow: 'shadow-purple-500/25', title: '참여 신청', desc: '간단한 정보 입력 후 참여 신청을 완료하세요' },
+              { step: 4, icon: TrendingDown, color: 'from-red-500 to-rose-500', shadow: 'shadow-red-500/25', title: '할인 혜택', desc: '인원이 모이면 자동으로 할인이 적용됩니다' },
             ].map((item) => (
               <div key={item.step} className="text-center">
                 <div className="relative inline-block mb-4">
-                  <div className="w-16 h-16 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 mx-auto">
-                    {item.icon}
-                  </div>
+                  <TossIcon icon={item.icon} color={item.color} size="md" shadow={item.shadow} />
                   <span className="absolute -top-1 -right-1 w-6 h-6 bg-blue-600 text-white rounded-full text-sm font-bold flex items-center justify-center">
                     {item.step}
                   </span>
@@ -415,9 +424,9 @@ export default function GroupBuyingPage() {
                   key={cat.id}
                   className="bg-white rounded-xl border border-gray-200 p-5 text-center hover:shadow-md transition-shadow"
                 >
-                  <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3 text-2xl">
+                  <span className="text-3xl block mx-auto mb-3">
                     {cat.icon || '📦'}
-                  </div>
+                  </span>
                   <h3 className="font-semibold text-gray-900 mb-1">{cat.name}</h3>
                   <p className="text-sm text-gray-500 mb-2">{cat.description}</p>
                   {cat.base_discount_rate > 0 && (

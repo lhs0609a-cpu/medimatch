@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { Sparkles, CheckCircle2, AlertCircle, Loader2 } from 'lucide-react'
+
 import { useAuth } from '@/lib/hooks/useAuth'
 import { Suspense } from 'react'
 
@@ -84,21 +84,16 @@ function OAuthCallbackContent() {
   return (
     <div className="min-h-screen flex items-center justify-center gradient-bg-soft">
       <div className="bg-white rounded-2xl shadow-xl p-8 max-w-md w-full mx-4 text-center">
-        <div className="mb-6">
-          <div className={`w-20 h-20 rounded-2xl mx-auto flex items-center justify-center ${
-            status === 'loading' ? 'bg-violet-100' :
-            status === 'success' ? 'bg-emerald-100' : 'bg-rose-100'
-          }`}>
-            {status === 'loading' && (
-              <Loader2 className="w-10 h-10 text-violet-600 animate-spin" />
-            )}
-            {status === 'success' && (
-              <CheckCircle2 className="w-10 h-10 text-emerald-600" />
-            )}
-            {status === 'error' && (
-              <AlertCircle className="w-10 h-10 text-rose-600" />
-            )}
-          </div>
+        <div className="mb-6 text-center">
+          {status === 'loading' && (
+            <span className="text-5xl">&#x23F3;</span>
+          )}
+          {status === 'success' && (
+            <span className="text-5xl">&#x2705;</span>
+          )}
+          {status === 'error' && (
+            <span className="text-5xl">&#x26A0;&#xFE0F;</span>
+          )}
         </div>
 
         <h1 className={`text-xl font-bold mb-2 ${
@@ -132,8 +127,8 @@ export default function OAuthCallbackPage() {
     <Suspense fallback={
       <div className="min-h-screen flex items-center justify-center gradient-bg-soft">
         <div className="bg-white rounded-2xl shadow-xl p-8 max-w-md w-full mx-4 text-center">
-          <div className="w-20 h-20 rounded-2xl mx-auto flex items-center justify-center bg-violet-100 mb-6">
-            <Loader2 className="w-10 h-10 text-violet-600 animate-spin" />
+          <div className="text-center mb-6">
+            <span className="text-5xl">&#x23F3;</span>
           </div>
           <h1 className="text-xl font-bold mb-2 text-gray-900">로그인 처리 중</h1>
           <p className="text-gray-500">잠시만 기다려주세요...</p>

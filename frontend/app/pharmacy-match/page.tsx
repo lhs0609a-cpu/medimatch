@@ -11,6 +11,7 @@ import {
 import Image from 'next/image'
 import { generatePharmacyListings, generateActivityFeed, platformStats, recentSuccessStories, memberTestimonials, type PharmacyListing } from '@/lib/data/seedListings'
 import { pharmacyListingImages } from '@/components/BlurredListingImage'
+import { TossIcon } from '@/components/ui/TossIcon'
 
 // 시드 데이터 생성
 const allListings = generatePharmacyListings(80)
@@ -206,9 +207,7 @@ export default function PharmacyMatchPage() {
                 <ArrowLeft className="w-5 h-5" />
               </Link>
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-                  <Pill className="w-4 h-4 text-primary-foreground" />
-                </div>
+                <TossIcon icon={Pill} color="from-rose-500 to-pink-500" size="xs" shadow="shadow-rose-500/25" />
                 <span className="text-lg font-bold text-foreground">익명 약국 매칭</span>
                 <span className="badge-info">
                   {platformStats.activePharmacyListings}+ 매물
@@ -684,14 +683,14 @@ export default function PharmacyMatchPage() {
           <h2 className="text-xl font-bold text-foreground mb-6 text-center">익명 매칭 프로세스</h2>
           <div className="grid md:grid-cols-4 gap-6">
             {[
-              { step: '1', title: '익명 등록', desc: '구 단위 위치와 조건만 공개\n정확한 주소는 비공개' },
-              { step: '2', title: 'AI 매칭', desc: '조건에 맞는 약사를\n자동으로 추천' },
-              { step: '3', title: '상호 관심', desc: '양방향 관심 표시 시\n연락처 자동 공개' },
-              { step: '4', title: '계약 진행', desc: '직접 만나서 협의\n성사 시 수수료 3~5%' },
+              { icon: Lock, color: 'from-slate-500 to-gray-600', shadow: 'shadow-slate-500/25', title: '익명 등록', desc: '구 단위 위치와 조건만 공개\n정확한 주소는 비공개' },
+              { icon: Sparkles, color: 'from-amber-500 to-orange-500', shadow: 'shadow-amber-500/25', title: 'AI 매칭', desc: '조건에 맞는 약사를\n자동으로 추천' },
+              { icon: Heart, color: 'from-rose-500 to-pink-500', shadow: 'shadow-rose-500/25', title: '상호 관심', desc: '양방향 관심 표시 시\n연락처 자동 공개' },
+              { icon: Building2, color: 'from-blue-500 to-indigo-500', shadow: 'shadow-blue-500/25', title: '계약 진행', desc: '직접 만나서 협의\n성사 시 수수료 3~5%' },
             ].map((item) => (
-              <div key={item.step} className="text-center">
-                <div className="w-12 h-12 bg-accent text-primary rounded-xl flex items-center justify-center mx-auto mb-3 text-xl font-bold">
-                  {item.step}
+              <div key={item.title} className="text-center">
+                <div className="flex justify-center mb-3">
+                  <TossIcon icon={item.icon} color={item.color} size="md" shadow={item.shadow} />
                 </div>
                 <h3 className="font-medium text-foreground mb-2">{item.title}</h3>
                 <p className="text-sm text-muted-foreground whitespace-pre-line">
@@ -708,8 +707,8 @@ export default function PharmacyMatchPage() {
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
           <div className="bg-card rounded-2xl max-w-md w-full p-6 animate-scale-in">
             <div className="text-center mb-6">
-              <div className="w-16 h-16 bg-accent rounded-full flex items-center justify-center mx-auto mb-4">
-                <Lock className="w-8 h-8 text-primary" />
+              <div className="text-center mx-auto mb-4">
+                <span className="text-4xl">&#x1F512;</span>
               </div>
               <h3 className="text-xl font-bold text-foreground mb-2">
                 상세 정보 확인

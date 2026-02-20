@@ -18,6 +18,7 @@ import {
   Copy,
   ExternalLink
 } from 'lucide-react';
+import { TossIcon } from '@/components/ui/TossIcon';
 
 // 에러 유형 분류
 type ErrorCategory = 'user_action' | 'card_issue' | 'limit_exceeded' | 'technical' | 'canceled';
@@ -341,8 +342,8 @@ function PaymentFailContent() {
             <ul className="space-y-2">
               {errorInfo.solutions.map((solution, idx) => (
                 <li key={idx} className="flex items-start gap-2 text-sm text-gray-700">
-                  <span className="w-5 h-5 rounded-full bg-green-100 text-green-600 flex items-center justify-center flex-shrink-0 text-xs font-medium">
-                    {idx + 1}
+                  <span className="text-sm flex-shrink-0">
+                    {['1️⃣','2️⃣','3️⃣','4️⃣','5️⃣'][idx] || `${idx+1}`}
                   </span>
                   {solution}
                 </li>
@@ -382,9 +383,9 @@ function PaymentFailContent() {
                   onClick={handleRetry}
                   className="w-full flex items-center gap-4 p-4 border border-gray-200 rounded-xl hover:border-blue-300 hover:bg-blue-50 transition-all text-left"
                 >
-                  <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center text-gray-600">
+                  <span className="text-2xl">
                     {method.icon}
-                  </div>
+                  </span>
                   <div className="flex-1">
                     <p className="font-medium text-gray-900">{method.name}</p>
                     <p className="text-sm text-gray-500">{method.description}</p>
@@ -403,9 +404,7 @@ function PaymentFailContent() {
               href={`mailto:${process.env.NEXT_PUBLIC_SUPPORT_EMAIL || 'support@mediplaton.kr'}`}
               className="flex items-center gap-4 p-4 border border-gray-200 rounded-xl hover:border-blue-300 hover:bg-blue-50 transition-all"
             >
-              <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center text-blue-600">
-                <Phone className="w-5 h-5" />
-              </div>
+              <span className="text-2xl">📞</span>
               <div className="flex-1">
                 <p className="font-medium text-gray-900">고객센터 문의</p>
                 <p className="text-sm text-gray-500">{process.env.NEXT_PUBLIC_SUPPORT_EMAIL || 'support@mediplaton.kr'}</p>
@@ -416,9 +415,7 @@ function PaymentFailContent() {
               href="/faq"
               className="flex items-center gap-4 p-4 border border-gray-200 rounded-xl hover:border-blue-300 hover:bg-blue-50 transition-all"
             >
-              <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center text-green-600">
-                <HelpCircle className="w-5 h-5" />
-              </div>
+              <span className="text-2xl">❓</span>
               <div className="flex-1">
                 <p className="font-medium text-gray-900">자주 묻는 질문</p>
                 <p className="text-sm text-gray-500">결제 관련 FAQ 확인하기</p>
@@ -446,7 +443,3 @@ export default function PaymentFailPage() {
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
       </div>
     }>
-      <PaymentFailContent />
-    </Suspense>
-  );
-}

@@ -21,6 +21,7 @@ import {
   Settings,
   LogOut
 } from 'lucide-react';
+import { TossIcon } from '@/components/ui/TossIcon';
 
 interface DashboardStats {
   totalSimulations: number;
@@ -200,8 +201,8 @@ export default function DashboardPage() {
     return (
       <div className="min-h-screen gradient-bg-soft flex items-center justify-center">
         <div className="text-center">
-          <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center mx-auto mb-4 animate-pulse">
-            <Sparkles className="w-8 h-8 text-white" />
+          <div className="mx-auto mb-4 animate-pulse w-fit">
+            <TossIcon icon={Sparkles} color="from-violet-500 to-indigo-600" size="xl" shadow="shadow-violet-500/25" />
           </div>
           <p className="text-gray-500">로딩 중...</p>
         </div>
@@ -273,8 +274,8 @@ export default function DashboardPage() {
             >
               <div className={`absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-${action.color}-500/10 to-transparent rounded-full blur-2xl`} />
               <div className="relative">
-                <div className={`w-12 h-12 rounded-xl bg-gradient-to-br from-${action.color}-500 to-${action.color}-600 flex items-center justify-center mb-4 shadow-lg shadow-${action.color}-500/20`}>
-                  <action.icon className="w-6 h-6 text-white" />
+                <div className="mb-4">
+                  <TossIcon icon={action.icon} color={`from-${action.color}-500 to-${action.color}-600`} size="md" shadow={`shadow-${action.color}-500/25`} />
                 </div>
                 <h3 className="font-semibold text-gray-900 mb-1">{action.label}</h3>
                 <p className="text-sm text-gray-500">{action.desc}</p>
@@ -288,9 +289,7 @@ export default function DashboardPage() {
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
           <div className="bg-white rounded-2xl p-5 border border-gray-100">
             <div className="flex items-center justify-between mb-4">
-              <div className="w-10 h-10 rounded-xl bg-violet-100 flex items-center justify-center">
-                <BarChart3 className="w-5 h-5 text-violet-600" />
-              </div>
+              <span className="text-2xl">📊</span>
               <span className="text-xs font-medium text-emerald-600 bg-emerald-50 px-2 py-1 rounded-full">
                 +12%
               </span>
@@ -301,9 +300,7 @@ export default function DashboardPage() {
 
           <div className="bg-white rounded-2xl p-5 border border-gray-100">
             <div className="flex items-center justify-between mb-4">
-              <div className="w-10 h-10 rounded-xl bg-emerald-100 flex items-center justify-center">
-                <TrendingUp className="w-5 h-5 text-emerald-600" />
-              </div>
+              <span className="text-2xl">📈</span>
               <span className="text-xs font-medium text-violet-600 bg-violet-50 px-2 py-1 rounded-full">
                 {stats?.totalBids ? Math.round((stats.successfulBids / stats.totalBids) * 100) : 0}%
               </span>
@@ -316,9 +313,7 @@ export default function DashboardPage() {
 
           <div className="bg-white rounded-2xl p-5 border border-gray-100">
             <div className="flex items-center justify-between mb-4">
-              <div className="w-10 h-10 rounded-xl bg-rose-100 flex items-center justify-center">
-                <Bell className="w-5 h-5 text-rose-600" />
-              </div>
+              <span className="text-2xl">🔔</span>
               {(stats?.pendingAlerts || 0) > 0 && (
                 <span className="w-2 h-2 bg-rose-500 rounded-full animate-pulse" />
               )}
@@ -329,9 +324,7 @@ export default function DashboardPage() {
 
           <div className="bg-white rounded-2xl p-5 border border-gray-100">
             <div className="flex items-center justify-between mb-4">
-              <div className="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center">
-                <CreditCard className="w-5 h-5 text-amber-600" />
-              </div>
+              <span className="text-2xl">💳</span>
             </div>
             <p className="text-2xl font-bold text-gray-900 mb-1">{stats?.credits || 0}</p>
             <p className="text-sm text-gray-500">크레딧 잔액</p>
@@ -351,9 +344,7 @@ export default function DashboardPage() {
 
             {activities.length === 0 ? (
               <div className="text-center py-12">
-                <div className="w-16 h-16 rounded-2xl bg-gray-100 flex items-center justify-center mx-auto mb-4">
-                  <Clock className="w-8 h-8 text-gray-400" />
-                </div>
+                <span className="text-5xl block mx-auto mb-4">⏰</span>
                 <p className="text-gray-500 mb-4">아직 활동 내역이 없습니다.</p>
                 <Link href="/simulate" className="btn-primary inline-flex">
                   첫 시뮬레이션 시작

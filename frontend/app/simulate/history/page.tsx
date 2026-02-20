@@ -5,8 +5,9 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import {
   ArrowLeft, BarChart3, Calendar, MapPin, Building2,
-  TrendingUp, Eye, Trash2, ChevronRight, Search
+  TrendingUp, Eye, Trash2, ChevronRight, Search, Target
 } from 'lucide-react'
+import { TossIcon } from '@/components/ui/TossIcon'
 import { useAuth } from '@/lib/hooks/useAuth'
 
 interface SimulationHistory {
@@ -105,8 +106,8 @@ export default function SimulationHistoryPage() {
         {histories.length === 0 ? (
           /* Empty State */
           <div className="card p-12 text-center">
-            <div className="w-20 h-20 bg-gradient-to-br from-blue-100 to-cyan-100 dark:from-blue-900/30 dark:to-cyan-900/30 rounded-full flex items-center justify-center mx-auto mb-6">
-              <BarChart3 className="w-10 h-10 text-primary" />
+            <div className="flex justify-center mb-6">
+              <TossIcon icon={BarChart3} color="from-blue-500 to-indigo-500" size="xl" shadow="shadow-blue-500/25" />
             </div>
             <h2 className="text-xl font-bold text-foreground mb-2">
               아직 시뮬레이션 내역이 없습니다
@@ -128,8 +129,8 @@ export default function SimulationHistoryPage() {
             {/* Feature Highlights */}
             <div className="mt-12 grid sm:grid-cols-3 gap-6 text-left">
               <div className="p-4 rounded-xl bg-secondary/50">
-                <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center mb-3">
-                  <TrendingUp className="w-5 h-5 text-primary" />
+                <div className="mb-3">
+                  <TossIcon icon={TrendingUp} color="from-green-500 to-emerald-500" size="sm" shadow="shadow-green-500/25" />
                 </div>
                 <h3 className="font-medium text-foreground mb-1">수익 예측</h3>
                 <p className="text-sm text-muted-foreground">
@@ -137,8 +138,8 @@ export default function SimulationHistoryPage() {
                 </p>
               </div>
               <div className="p-4 rounded-xl bg-secondary/50">
-                <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center mb-3">
-                  <Building2 className="w-5 h-5 text-primary" />
+                <div className="mb-3">
+                  <TossIcon icon={Building2} color="from-blue-500 to-indigo-500" size="sm" shadow="shadow-blue-500/25" />
                 </div>
                 <h3 className="font-medium text-foreground mb-1">경쟁 분석</h3>
                 <p className="text-sm text-muted-foreground">
@@ -146,8 +147,8 @@ export default function SimulationHistoryPage() {
                 </p>
               </div>
               <div className="p-4 rounded-xl bg-secondary/50">
-                <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center mb-3">
-                  <MapPin className="w-5 h-5 text-primary" />
+                <div className="mb-3">
+                  <TossIcon icon={MapPin} color="from-orange-500 to-red-500" size="sm" shadow="shadow-orange-500/25" />
                 </div>
                 <h3 className="font-medium text-foreground mb-1">입지 점수</h3>
                 <p className="text-sm text-muted-foreground">

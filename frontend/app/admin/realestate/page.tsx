@@ -14,6 +14,7 @@ import {
   ChevronRight,
   X,
 } from 'lucide-react';
+import { TossIcon } from '@/components/ui/TossIcon';
 
 interface Listing {
   id: string;
@@ -379,9 +380,12 @@ export default function RealEstateManagePage() {
     <div className="p-8">
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">부동산 매물 관리</h1>
-          <p className="text-gray-500 mt-1">의료시설 적합 부동산 매물을 관리합니다.</p>
+        <div className="flex items-center gap-3">
+          <TossIcon icon={Building2} color="from-blue-500 to-indigo-500" shadow="shadow-blue-500/25" size="md" />
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">부동산 매물 관리</h1>
+            <p className="text-gray-500 mt-1">의료시설 적합 부동산 매물을 관리합니다.</p>
+          </div>
         </div>
         <div className="flex items-center gap-3">
           <button onClick={triggerCrawl} className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-xl text-gray-700 hover:bg-gray-50">
@@ -543,9 +547,7 @@ export default function RealEstateManagePage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40" onClick={() => setDeleteId(null)}>
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm m-4 p-6" onClick={(e) => e.stopPropagation()}>
             <div className="text-center mb-6">
-              <div className="w-12 h-12 rounded-full bg-rose-100 flex items-center justify-center mx-auto mb-3">
-                <Trash2 className="w-6 h-6 text-rose-600" />
-              </div>
+              <span className="text-3xl block mx-auto mb-3">🏠</span>
               <h3 className="text-lg font-bold text-gray-900">매물 삭제</h3>
               <p className="text-sm text-gray-500 mt-1">이 매물을 삭제하시겠습니까? 되돌릴 수 없습니다.</p>
             </div>

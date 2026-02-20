@@ -5,6 +5,7 @@ import {
   PieChart, Pie, Cell, ResponsiveContainer, Tooltip,
 } from 'recharts'
 import { UserCheck } from 'lucide-react'
+import { TossIcon } from '@/components/ui/TossIcon'
 import { SimulationResponse } from '@/lib/api/client'
 
 interface StaffingPlanProps {
@@ -74,8 +75,8 @@ export default function StaffingPlan({ result }: StaffingPlanProps) {
   return (
     <div className="card p-6">
       {/* Header */}
-      <div className="flex items-center gap-2 mb-5">
-        <UserCheck className="w-5 h-5 text-violet-500" />
+      <div className="flex items-center gap-3 mb-5">
+        <TossIcon icon={UserCheck} color="from-violet-500 to-purple-500" size="sm" shadow="shadow-violet-500/25" />
         <h3 className="font-semibold text-foreground">인력 구성 및 인건비 분석</h3>
         <span className="ml-auto text-[11px] text-muted-foreground">총 {totalStaff}명</span>
       </div>
@@ -186,9 +187,7 @@ export default function StaffingPlan({ result }: StaffingPlanProps) {
           <div className="space-y-1.5">
             {savingTips.map((tip, idx) => (
               <div key={idx} className="flex items-start gap-2 text-xs">
-                <span className="w-4 h-4 rounded-full bg-violet-100 dark:bg-violet-900/30 text-violet-600 dark:text-violet-400 flex items-center justify-center text-[10px] font-medium flex-shrink-0 mt-0.5">
-                  {idx + 1}
-                </span>
+                <span className="text-sm flex-shrink-0 mt-0.5">{['1️⃣','2️⃣','3️⃣','4️⃣','5️⃣','6️⃣','7️⃣','8️⃣','9️⃣','🔟'][idx] || `${idx+1}.`}</span>
                 <span className="text-muted-foreground">{tip}</span>
               </div>
             ))}

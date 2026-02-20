@@ -13,6 +13,7 @@ import {
   Car, Layers, FileText, Phone, Mail, CreditCard, Coins
 } from 'lucide-react'
 import { landlordService, listingSubscriptionService } from '@/lib/api/services'
+import { TossIcon } from '@/components/ui/TossIcon'
 import { toast } from 'sonner'
 
 const listingSchema = z.object({
@@ -472,8 +473,8 @@ export default function LandlordRegisterPage() {
       <div className="min-h-screen bg-gray-50 py-12 px-4">
         <div className="max-w-lg mx-auto">
           <div className="bg-white rounded-2xl shadow-lg p-8 text-center">
-            <div className="w-20 h-20 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <CreditCard className="w-10 h-10 text-amber-600" />
+            <div className="flex justify-center mb-4">
+              <TossIcon icon={CreditCard} color="from-indigo-500 to-purple-500" size="lg" shadow="shadow-indigo-500/25" />
             </div>
             <h1 className="text-2xl font-bold text-gray-900 mb-2">구독이 필요합니다</h1>
             <p className="text-gray-600 mb-2">
@@ -521,9 +522,7 @@ export default function LandlordRegisterPage() {
               <ArrowLeft className="w-5 h-5" />
             </Link>
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-lg flex items-center justify-center">
-                <Building2 className="w-4 h-4 text-white" />
-              </div>
+              <TossIcon icon={Building2} color="from-emerald-500 to-teal-600" size="xs" shadow="shadow-emerald-500/25" />
               <span className="text-xl font-bold text-gray-900">매물 등록</span>
             </div>
           </div>

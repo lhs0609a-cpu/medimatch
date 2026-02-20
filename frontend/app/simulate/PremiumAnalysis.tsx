@@ -9,6 +9,7 @@ import {
   DollarSign, PieChart as PieIcon, TrendingUp, Target, Users, MapPin,
   LineChart as LineIcon, Shield, Brain, ChevronRight, Star, ArrowUpRight,
 } from 'lucide-react'
+import { TossIcon } from '@/components/ui/TossIcon'
 import { SimulationResponse } from '@/lib/api/client'
 import ScoreGauge from './components/ScoreGauge'
 
@@ -29,10 +30,10 @@ function formatShortCurrency(value: number): string {
 
 const CHART_COLORS = ['#3b82f6', '#22c55e', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#06b6d4']
 
-function SectionHeader({ icon, title }: { icon: React.ReactNode; title: string }) {
+function SectionHeader({ icon, title, iconColor, iconShadow }: { icon: any; title: string; iconColor?: string; iconShadow?: string }) {
   return (
-    <div className="flex items-center gap-2 mb-5">
-      {icon}
+    <div className="flex items-center gap-3 mb-5">
+      <TossIcon icon={icon} color={iconColor || 'from-blue-500 to-indigo-500'} size="sm" shadow={iconShadow} />
       <h3 className="text-lg font-semibold text-foreground">{title}</h3>
     </div>
   )
@@ -91,7 +92,7 @@ export default function PremiumAnalysis({ result }: PremiumAnalysisProps) {
       {/* ─── 1. Revenue Detail ─── */}
       {rd && (
         <section className="card p-6">
-          <SectionHeader icon={<DollarSign className="w-5 h-5 text-green-500" />} title="매출 상세 분석" />
+          <SectionHeader icon={DollarSign} title="매출 상세 분석" iconColor="from-green-500 to-emerald-500" iconShadow="shadow-green-500/25" />
 
           <div className="grid md:grid-cols-2 gap-6">
             {/* Revenue Bar Chart */}
@@ -166,7 +167,7 @@ export default function PremiumAnalysis({ result }: PremiumAnalysisProps) {
       {/* ─── 2. Cost Detail ─── */}
       {cd && (
         <section className="card p-6">
-          <SectionHeader icon={<PieIcon className="w-5 h-5 text-orange-500" />} title="비용 구조 분석" />
+          <SectionHeader icon={PieIcon} title="비용 구조 분석" iconColor="from-orange-500 to-red-500" iconShadow="shadow-orange-500/25" />
 
           <div className="grid md:grid-cols-2 gap-6">
             {/* Cost Donut */}
@@ -248,7 +249,7 @@ export default function PremiumAnalysis({ result }: PremiumAnalysisProps) {
       {/* ─── 3. Profitability ─── */}
       {pd && (
         <section className="card p-6">
-          <SectionHeader icon={<TrendingUp className="w-5 h-5 text-blue-500" />} title="수익성 분석" />
+          <SectionHeader icon={TrendingUp} title="수익성 분석" iconColor="from-blue-500 to-indigo-500" iconShadow="shadow-blue-500/25" />
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <StatCard label="영업이익률" value={`${pd.profit_margin_percent}%`} color="text-green-600" />
             <StatCard label="연 ROI" value={`${result.profitability.annual_roi_percent}%`} color="text-blue-600" />
@@ -266,7 +267,7 @@ export default function PremiumAnalysis({ result }: PremiumAnalysisProps) {
       {/* ─── 4. Competition Detail ─── */}
       {compD && (
         <section className="card p-6">
-          <SectionHeader icon={<Target className="w-5 h-5 text-rose-500" />} title="경쟁 심층 분석" />
+          <SectionHeader icon={Target} title="경쟁 심층 분석" iconColor="from-red-500 to-orange-500" iconShadow="shadow-red-500/25" />
 
           {/* Market Indicators */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
@@ -319,7 +320,7 @@ export default function PremiumAnalysis({ result }: PremiumAnalysisProps) {
       {/* ─── 5. Demographics Detail ─── */}
       {dd && (
         <section className="card p-6">
-          <SectionHeader icon={<Users className="w-5 h-5 text-blue-500" />} title="인구 상세 분석" />
+          <SectionHeader icon={Users} title="인구 상세 분석" iconColor="from-purple-500 to-pink-500" iconShadow="shadow-purple-500/25" />
 
           <div className="grid md:grid-cols-2 gap-6">
             {/* Age Distribution Bar */}
@@ -384,7 +385,7 @@ export default function PremiumAnalysis({ result }: PremiumAnalysisProps) {
       {/* ─── 6. Location Analysis ─── */}
       {la && (
         <section className="card p-6">
-          <SectionHeader icon={<MapPin className="w-5 h-5 text-emerald-500" />} title="입지 분석" />
+          <SectionHeader icon={MapPin} title="입지 분석" iconColor="from-orange-500 to-red-500" iconShadow="shadow-orange-500/25" />
 
           {/* 4 Score Gauges */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
@@ -454,7 +455,7 @@ export default function PremiumAnalysis({ result }: PremiumAnalysisProps) {
       {/* ─── 7. Growth Projection ─── */}
       {gp && (
         <section className="card p-6">
-          <SectionHeader icon={<LineIcon className="w-5 h-5 text-violet-500" />} title="3년 성장 전망" />
+          <SectionHeader icon={LineIcon} title="3년 성장 전망" iconColor="from-violet-500 to-purple-500" iconShadow="shadow-violet-500/25" />
 
           <div className="grid md:grid-cols-2 gap-6">
             {/* Revenue/Profit LineChart */}
@@ -517,7 +518,7 @@ export default function PremiumAnalysis({ result }: PremiumAnalysisProps) {
       {/* ─── 8. Risk Analysis ─── */}
       {ra && (
         <section className="card p-6">
-          <SectionHeader icon={<Shield className="w-5 h-5 text-amber-500" />} title="리스크 분석" />
+          <SectionHeader icon={Shield} title="리스크 분석" iconColor="from-amber-500 to-orange-500" iconShadow="shadow-amber-500/25" />
 
           <div className="grid md:grid-cols-2 gap-6">
             {/* Risk Score Gauge + factors */}
@@ -594,7 +595,7 @@ export default function PremiumAnalysis({ result }: PremiumAnalysisProps) {
       {/* ─── 9. AI Insights ─── */}
       {ai && (
         <section className="card p-6">
-          <SectionHeader icon={<Brain className="w-5 h-5 text-indigo-500" />} title="AI 전략 리포트" />
+          <SectionHeader icon={Brain} title="AI 전략 리포트" iconColor="from-indigo-500 to-purple-500" iconShadow="shadow-indigo-500/25" />
 
           {/* Executive Summary */}
           <div className="bg-gradient-to-r from-indigo-50 to-blue-50 dark:from-indigo-950/20 dark:to-blue-950/20 rounded-xl p-4 mb-6">
@@ -630,7 +631,7 @@ export default function PremiumAnalysis({ result }: PremiumAnalysisProps) {
               <div className="space-y-2">
                 {ai.recommended_strategies.map((s, idx) => (
                   <div key={idx} className="flex items-start gap-2 text-sm">
-                    <span className="w-5 h-5 rounded-full bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 flex items-center justify-center text-xs font-medium flex-shrink-0">{idx + 1}</span>
+                    <span className="text-sm flex-shrink-0">{['1️⃣','2️⃣','3️⃣','4️⃣','5️⃣','6️⃣','7️⃣','8️⃣','9️⃣','🔟'][idx] || `${idx+1}.`}</span>
                     <span className="text-foreground">{s}</span>
                   </div>
                 ))}

@@ -244,7 +244,8 @@ export default function ProspectDetailPage() {
 
               {/* Opportunity Score */}
               <div className="flex items-center gap-4">
-                <div className={`w-16 h-16 rounded-full flex items-center justify-center ${getScoreBg(report.opportunity_score)}`}>
+                <div className="flex flex-col items-center">
+                  <span className="text-3xl">&#x1F3AF;</span>
                   <span className={`text-2xl font-bold ${getScoreColor(report.opportunity_score)}`}>
                     {report.opportunity_score}
                   </span>

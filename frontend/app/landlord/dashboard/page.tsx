@@ -6,8 +6,9 @@ import {
   ArrowLeft, Building2, Users, Eye, MessageSquare,
   TrendingUp, Bell, Crown, ChevronRight, Plus,
   Download, Filter, Calendar, Star, Zap, Target,
-  Phone, Mail, MapPin, Clock, CheckCircle, AlertCircle
+  Phone, Mail, MapPin, Clock, CheckCircle, AlertCircle, BarChart3
 } from 'lucide-react'
+import { TossIcon } from '@/components/ui/TossIcon'
 
 // 목업 데이터
 const mockSubscription = {
@@ -146,9 +147,7 @@ export default function LandlordDashboardPage() {
                 <ArrowLeft className="w-5 h-5" />
               </Link>
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 bg-amber-100 dark:bg-amber-900/50 rounded-lg flex items-center justify-center">
-                  <Building2 className="w-4 h-4 text-amber-600" />
-                </div>
+                <span className="text-xl">🏢</span>
                 <span className="text-lg font-bold text-foreground">건물주 대시보드</span>
               </div>
             </div>
@@ -170,9 +169,7 @@ export default function LandlordDashboardPage() {
         <div className="card p-6 mb-6 bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 border-amber-200 dark:border-amber-800">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div className="flex items-center gap-4">
-              <div className="w-14 h-14 bg-amber-100 dark:bg-amber-900/50 rounded-xl flex items-center justify-center">
-                <Crown className="w-7 h-7 text-amber-600" />
-              </div>
+              <TossIcon icon={Crown} color="from-amber-500 to-orange-500" size="md" shadow="shadow-amber-500/25" />
               <div>
                 <div className="flex items-center gap-2">
                   <h2 className="text-xl font-bold text-foreground">{mockSubscription.planName} 플랜</h2>
@@ -232,9 +229,7 @@ export default function LandlordDashboardPage() {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div className="card p-4">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center">
-                    <Eye className="w-5 h-5 text-blue-600" />
-                  </div>
+                  <TossIcon icon={Eye} color="from-sky-500 to-blue-500" size="sm" shadow="shadow-sky-500/25" />
                   <div>
                     <p className="text-2xl font-bold text-foreground">390</p>
                     <p className="text-xs text-muted-foreground">이번 주 조회수</p>
@@ -243,9 +238,7 @@ export default function LandlordDashboardPage() {
               </div>
               <div className="card p-4">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-green-100 dark:bg-green-900/30 rounded-lg flex items-center justify-center">
-                    <MessageSquare className="w-5 h-5 text-green-600" />
-                  </div>
+                  <TossIcon icon={MessageSquare} color="from-green-500 to-emerald-500" size="sm" shadow="shadow-green-500/25" />
                   <div>
                     <p className="text-2xl font-bold text-foreground">20</p>
                     <p className="text-xs text-muted-foreground">이번 주 문의</p>
@@ -254,9 +247,7 @@ export default function LandlordDashboardPage() {
               </div>
               <div className="card p-4">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-purple-100 dark:bg-purple-900/30 rounded-lg flex items-center justify-center">
-                    <Users className="w-5 h-5 text-purple-600" />
-                  </div>
+                  <TossIcon icon={Users} color="from-purple-500 to-pink-500" size="sm" shadow="shadow-purple-500/25" />
                   <div>
                     <p className="text-2xl font-bold text-foreground">3</p>
                     <p className="text-xs text-muted-foreground">보유 리드</p>
@@ -265,9 +256,7 @@ export default function LandlordDashboardPage() {
               </div>
               <div className="card p-4">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-amber-100 dark:bg-amber-900/30 rounded-lg flex items-center justify-center">
-                    <Target className="w-5 h-5 text-amber-600" />
-                  </div>
+                  <TossIcon icon={Target} color="from-orange-500 to-red-500" size="sm" shadow="shadow-orange-500/25" />
                   <div>
                     <p className="text-2xl font-bold text-foreground">2</p>
                     <p className="text-xs text-muted-foreground">관심 표시</p>
@@ -309,9 +298,7 @@ export default function LandlordDashboardPage() {
             <div className="grid md:grid-cols-3 gap-4">
               <Link href="/landlord/pricing" className="card p-4 hover:shadow-md transition-shadow">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
-                    <Users className="w-5 h-5 text-primary" />
-                  </div>
+                  <TossIcon icon={Users} color="from-purple-500 to-pink-500" size="sm" shadow="shadow-purple-500/25" />
                   <div className="flex-1">
                     <p className="font-medium text-foreground">매칭 요청권 구매</p>
                     <p className="text-xs text-muted-foreground">관심 회원에게 매칭 요청</p>
@@ -321,9 +308,7 @@ export default function LandlordDashboardPage() {
               </Link>
               <Link href="/landlord/boost" className="card p-4 hover:shadow-md transition-shadow">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-amber-100 dark:bg-amber-900/30 rounded-lg flex items-center justify-center">
-                    <Zap className="w-5 h-5 text-amber-600" />
-                  </div>
+                  <TossIcon icon={Zap} color="from-amber-500 to-orange-500" size="sm" shadow="shadow-amber-500/25" />
                   <div className="flex-1">
                     <p className="font-medium text-foreground">매물 부스팅</p>
                     <p className="text-xs text-muted-foreground">상위 노출 광고</p>
@@ -333,9 +318,7 @@ export default function LandlordDashboardPage() {
               </Link>
               <Link href="/landlord/analytics" className="card p-4 hover:shadow-md transition-shadow">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-green-100 dark:bg-green-900/30 rounded-lg flex items-center justify-center">
-                    <TrendingUp className="w-5 h-5 text-green-600" />
-                  </div>
+                  <TossIcon icon={BarChart3} color="from-cyan-500 to-blue-500" size="sm" shadow="shadow-cyan-500/25" />
                   <div className="flex-1">
                     <p className="font-medium text-foreground">상세 분석</p>
                     <p className="text-xs text-muted-foreground">통계 및 리포트</p>
@@ -568,9 +551,7 @@ export default function LandlordDashboardPage() {
               <h3 className="font-semibold text-foreground mb-4">현재 진행 중인 광고</h3>
               <div className="bg-amber-50 dark:bg-amber-900/20 rounded-xl p-4 flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-amber-100 dark:bg-amber-900/50 rounded-lg flex items-center justify-center">
-                    <TrendingUp className="w-5 h-5 text-amber-600" />
-                  </div>
+                  <TossIcon icon={TrendingUp} color="from-cyan-500 to-blue-500" size="sm" shadow="shadow-cyan-500/25" />
                   <div>
                     <p className="font-medium text-foreground">강남역 메디컬빌딩 2층 - 검색 상위 노출</p>
                     <p className="text-sm text-muted-foreground">2024.01.20 ~ 2024.01.27 (3일 남음)</p>
@@ -593,9 +574,17 @@ export default function LandlordDashboardPage() {
                 ].map((ad) => (
                   <div key={ad.name} className="border border-border rounded-xl p-4 hover:shadow-md transition-shadow">
                     <div className="flex items-center gap-3 mb-3">
-                      <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
-                        <ad.icon className="w-5 h-5 text-primary" />
-                      </div>
+                      <TossIcon icon={ad.icon} color={
+                        ad.icon === TrendingUp ? 'from-cyan-500 to-blue-500' :
+                        ad.icon === Star ? 'from-amber-500 to-orange-500' :
+                        ad.icon === Bell ? 'from-amber-500 to-orange-500' :
+                        'from-indigo-500 to-purple-500'
+                      } size="sm" shadow={
+                        ad.icon === TrendingUp ? 'shadow-cyan-500/25' :
+                        ad.icon === Star ? 'shadow-amber-500/25' :
+                        ad.icon === Bell ? 'shadow-amber-500/25' :
+                        'shadow-indigo-500/25'
+                      } />
                       <div>
                         <p className="font-medium text-foreground">{ad.name}</p>
                         <p className="text-xs text-muted-foreground">{ad.duration}</p>

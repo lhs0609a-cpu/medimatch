@@ -14,6 +14,7 @@ import {
   ArrowUpRight,
   ArrowDownRight,
 } from 'lucide-react'
+import { TossIcon } from '@/components/ui/TossIcon'
 import { apiClient } from '@/lib/api/client'
 
 interface StatsData {
@@ -165,9 +166,7 @@ export default function AdminStatsPage() {
         {/* 총 매출 */}
         <div className="bg-white rounded-2xl p-6 shadow-sm">
           <div className="flex items-center justify-between mb-4">
-            <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
-              <CreditCard className="w-6 h-6 text-green-600" />
-            </div>
+            <TossIcon icon={CreditCard} color="from-green-500 to-emerald-500" shadow="shadow-green-500/25" size="sm" />
             <div className={`flex items-center gap-1 text-sm font-medium ${
               (stats?.revenue.growth_rate || 0) >= 0 ? 'text-green-600' : 'text-red-600'
             }`}>
@@ -191,9 +190,7 @@ export default function AdminStatsPage() {
         {/* 총 사용자 */}
         <div className="bg-white rounded-2xl p-6 shadow-sm">
           <div className="flex items-center justify-between mb-4">
-            <div className="w-12 h-12 bg-violet-100 rounded-xl flex items-center justify-center">
-              <Users className="w-6 h-6 text-violet-600" />
-            </div>
+            <TossIcon icon={Users} color="from-purple-500 to-pink-500" shadow="shadow-purple-500/25" size="sm" />
             <div className="flex items-center gap-1 text-sm font-medium text-green-600">
               <ArrowUpRight className="w-4 h-4" />
               {stats?.users.growth_rate}%
@@ -211,9 +208,7 @@ export default function AdminStatsPage() {
         {/* 프로스펙트 */}
         <div className="bg-white rounded-2xl p-6 shadow-sm">
           <div className="flex items-center justify-between mb-4">
-            <div className="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center">
-              <Building2 className="w-6 h-6 text-orange-600" />
-            </div>
+            <TossIcon icon={TrendingUp} color="from-emerald-500 to-teal-500" shadow="shadow-emerald-500/25" size="sm" />
             <div className="flex items-center gap-1 text-sm font-medium text-orange-600">
               HOT {stats?.prospects.hot}건
             </div>
@@ -230,9 +225,7 @@ export default function AdminStatsPage() {
         {/* DAU */}
         <div className="bg-white rounded-2xl p-6 shadow-sm">
           <div className="flex items-center justify-between mb-4">
-            <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
-              <TrendingUp className="w-6 h-6 text-blue-600" />
-            </div>
+            <TossIcon icon={BarChart3} color="from-cyan-500 to-blue-500" shadow="shadow-cyan-500/25" size="sm" />
             <div className="text-sm font-medium text-blue-600">
               {stats?.engagement.avg_session_duration}분
             </div>

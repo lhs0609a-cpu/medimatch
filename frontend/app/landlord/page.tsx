@@ -8,6 +8,7 @@ import {
   XCircle, AlertCircle, ChevronRight, BarChart3, Home, CreditCard, Coins
 } from 'lucide-react'
 import { landlordService, listingSubscriptionService } from '@/lib/api/services'
+import { TossIcon } from '@/components/ui/TossIcon'
 
 const statusConfig: Record<string, { label: string; color: string; icon: any }> = {
   DRAFT: { label: '임시저장', color: 'bg-gray-100 text-gray-700', icon: Clock },
@@ -57,9 +58,7 @@ export default function LandlordDashboardPage() {
       <header className="bg-white border-b sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-xl flex items-center justify-center">
-              <Building2 className="w-5 h-5 text-white" />
-            </div>
+            <TossIcon icon={Building2} color="from-emerald-500 to-teal-600" size="sm" shadow="shadow-emerald-500/25" />
             <div>
               <h1 className="text-xl font-bold text-gray-900">건물주 센터</h1>
               <p className="text-sm text-gray-500">매물 등록 및 관리</p>
@@ -100,36 +99,28 @@ export default function LandlordDashboardPage() {
         <div className="grid md:grid-cols-4 gap-4 mb-8">
           <div className="bg-white rounded-xl p-6 border">
             <div className="flex items-center justify-between mb-4">
-              <div className="w-12 h-12 bg-emerald-100 rounded-xl flex items-center justify-center">
-                <Home className="w-6 h-6 text-emerald-600" />
-              </div>
+              <TossIcon icon={Home} color="from-blue-500 to-cyan-500" size="sm" shadow="shadow-blue-500/25" />
               <span className="text-2xl font-bold text-gray-900">{stats?.total_listings || 0}</span>
             </div>
             <p className="text-gray-500">총 등록 매물</p>
           </div>
           <div className="bg-white rounded-xl p-6 border">
             <div className="flex items-center justify-between mb-4">
-              <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
-                <CheckCircle2 className="w-6 h-6 text-green-600" />
-              </div>
+              <TossIcon icon={CheckCircle2} color="from-green-500 to-emerald-500" size="sm" shadow="shadow-green-500/25" />
               <span className="text-2xl font-bold text-gray-900">{stats?.active_listings || 0}</span>
             </div>
             <p className="text-gray-500">공개중 매물</p>
           </div>
           <div className="bg-white rounded-xl p-6 border">
             <div className="flex items-center justify-between mb-4">
-              <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
-                <Eye className="w-6 h-6 text-blue-600" />
-              </div>
+              <TossIcon icon={Eye} color="from-sky-500 to-blue-500" size="sm" shadow="shadow-sky-500/25" />
               <span className="text-2xl font-bold text-gray-900">{stats?.total_views || 0}</span>
             </div>
             <p className="text-gray-500">총 조회수</p>
           </div>
           <div className="bg-white rounded-xl p-6 border">
             <div className="flex items-center justify-between mb-4">
-              <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center">
-                <MessageSquare className="w-6 h-6 text-purple-600" />
-              </div>
+              <TossIcon icon={MessageSquare} color="from-purple-500 to-pink-500" size="sm" shadow="shadow-purple-500/25" />
               <span className="text-2xl font-bold text-gray-900">{stats?.total_inquiries || 0}</span>
             </div>
             <p className="text-gray-500">총 문의수</p>

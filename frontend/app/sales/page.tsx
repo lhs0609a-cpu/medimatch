@@ -5,8 +5,9 @@ import Link from 'next/link'
 import { useQuery } from '@tanstack/react-query'
 import {
   Briefcase, Users, CheckCircle2, XCircle, Clock, DollarSign,
-  Star, TrendingUp, ChevronRight, Plus, AlertCircle
+  ChevronRight, Plus, AlertCircle, TrendingUp, Star
 } from 'lucide-react'
+import { TossIcon } from '@/components/ui/TossIcon'
 import { salesMatchService } from '@/lib/api/services'
 
 const statusConfig: Record<string, { label: string; color: string; icon: any }> = {
@@ -46,9 +47,7 @@ export default function SalesDashboardPage() {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
         <div className="bg-white rounded-2xl border max-w-md w-full p-8 text-center">
-          <div className="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
-            <Briefcase className="w-8 h-8 text-blue-600" />
-          </div>
+          <span className="text-4xl">💼</span>
           <h2 className="text-xl font-bold text-gray-900 mb-2">영업사원 프로필 설정</h2>
           <p className="text-gray-500 mb-6">
             개원의 매칭 서비스를 이용하려면<br />영업사원 프로필을 먼저 설정해주세요.
@@ -71,9 +70,7 @@ export default function SalesDashboardPage() {
       <header className="bg-white border-b sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center">
-              <Briefcase className="w-5 h-5 text-white" />
-            </div>
+            <TossIcon icon={Briefcase} color="from-slate-600 to-gray-700" size="sm" shadow="shadow-slate-500/25" />
             <div>
               <h1 className="text-xl font-bold text-gray-900">영업사원 센터</h1>
               <p className="text-sm text-gray-500">{profile.company}</p>
@@ -94,27 +91,21 @@ export default function SalesDashboardPage() {
         <div className="grid md:grid-cols-4 gap-4 mb-8">
           <div className="bg-white rounded-xl p-6 border">
             <div className="flex items-center justify-between mb-4">
-              <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
-                <Users className="w-6 h-6 text-blue-600" />
-              </div>
+              <TossIcon icon={Users} color="from-purple-500 to-pink-500" size="sm" shadow="shadow-purple-500/25" />
               <span className="text-2xl font-bold text-gray-900">{profile.total_requests || 0}</span>
             </div>
             <p className="text-gray-500">총 매칭 요청</p>
           </div>
           <div className="bg-white rounded-xl p-6 border">
             <div className="flex items-center justify-between mb-4">
-              <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
-                <CheckCircle2 className="w-6 h-6 text-green-600" />
-              </div>
+              <TossIcon icon={CheckCircle2} color="from-green-500 to-emerald-500" size="sm" shadow="shadow-green-500/25" />
               <span className="text-2xl font-bold text-gray-900">{profile.accepted_requests || 0}</span>
             </div>
             <p className="text-gray-500">수락된 요청</p>
           </div>
           <div className="bg-white rounded-xl p-6 border">
             <div className="flex items-center justify-between mb-4">
-              <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center">
-                <TrendingUp className="w-6 h-6 text-purple-600" />
-              </div>
+              <TossIcon icon={TrendingUp} color="from-blue-500 to-indigo-500" size="sm" shadow="shadow-blue-500/25" />
               <span className="text-2xl font-bold text-gray-900">
                 {profile.total_requests > 0
                   ? Math.round((profile.accepted_requests / profile.total_requests) * 100)
@@ -125,9 +116,7 @@ export default function SalesDashboardPage() {
           </div>
           <div className="bg-white rounded-xl p-6 border">
             <div className="flex items-center justify-between mb-4">
-              <div className="w-12 h-12 bg-amber-100 rounded-xl flex items-center justify-center">
-                <Star className="w-6 h-6 text-amber-600" />
-              </div>
+              <TossIcon icon={Star} color="from-amber-500 to-orange-500" size="sm" shadow="shadow-amber-500/25" />
               <span className="text-2xl font-bold text-gray-900">
                 {profile.rating ? profile.rating.toFixed(1) : '-'}
               </span>

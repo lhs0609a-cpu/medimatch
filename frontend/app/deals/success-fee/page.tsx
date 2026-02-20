@@ -5,8 +5,9 @@ import Link from 'next/link'
 import {
   ArrowLeft, Calculator, CreditCard, CheckCircle,
   AlertCircle, FileText, Building2, User, Calendar,
-  TrendingUp, Shield, HelpCircle
+  TrendingUp, Shield, HelpCircle, CheckCircle2
 } from 'lucide-react'
+import { TossIcon } from '@/components/ui/TossIcon'
 
 interface DealInfo {
   dealId: string
@@ -83,8 +84,8 @@ export default function SuccessFeePage() {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center p-4">
         <div className="card max-w-md w-full p-8 text-center">
-          <div className="w-16 h-16 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mx-auto mb-6">
-            <CheckCircle className="w-8 h-8 text-green-600" />
+          <div className="flex justify-center mb-6">
+            <TossIcon icon={CheckCircle2} color="from-green-500 to-emerald-500" size="xl" shadow="shadow-green-500/25" />
           </div>
           <h1 className="text-2xl font-bold text-foreground mb-2">결제 완료</h1>
           <p className="text-muted-foreground mb-6">
@@ -124,9 +125,7 @@ export default function SuccessFeePage() {
                 <ArrowLeft className="w-5 h-5" />
               </Link>
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 bg-amber-100 dark:bg-amber-900/50 rounded-lg flex items-center justify-center">
-                  <TrendingUp className="w-4 h-4 text-amber-600" />
-                </div>
+                <TossIcon icon={TrendingUp} color="from-blue-500 to-indigo-500" size="xs" shadow="shadow-blue-500/25" />
                 <span className="text-lg font-bold text-foreground">성사 보수 결제</span>
               </div>
             </div>
@@ -138,7 +137,7 @@ export default function SuccessFeePage() {
         {/* Deal Summary */}
         <div className="card p-6 mb-6">
           <h2 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
-            <FileText className="w-5 h-5 text-primary" />
+            <TossIcon icon={FileText} color="from-blue-500 to-indigo-500" size="sm" shadow="shadow-blue-500/25" />
             거래 정보
           </h2>
           <div className="grid md:grid-cols-2 gap-4">
@@ -181,7 +180,7 @@ export default function SuccessFeePage() {
         {/* Fee Calculation */}
         <div className="card p-6 mb-6">
           <h2 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
-            <Calculator className="w-5 h-5 text-primary" />
+            <TossIcon icon={Calculator} color="from-cyan-500 to-blue-500" size="sm" shadow="shadow-cyan-500/25" />
             성사 보수 계산
           </h2>
 
@@ -241,7 +240,7 @@ export default function SuccessFeePage() {
         {/* 청구 프로세스 안내 */}
         <div className="card p-6 mb-6">
           <h2 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
-            <Shield className="w-5 h-5 text-primary" />
+            <TossIcon icon={Shield} color="from-teal-500 to-cyan-500" size="sm" shadow="shadow-teal-500/25" />
             성사 보수 청구 프로세스
           </h2>
 
@@ -253,9 +252,7 @@ export default function SuccessFeePage() {
             <div className="space-y-6">
               {/* Step 1 */}
               <div className="flex gap-4">
-                <div className="w-8 h-8 rounded-full bg-green-100 dark:bg-green-900/50 flex items-center justify-center flex-shrink-0 relative z-10">
-                  <CheckCircle className="w-4 h-4 text-green-600" />
-                </div>
+                <span className="text-xl flex-shrink-0 relative z-10">✅</span>
                 <div className="flex-1 pb-2">
                   <h4 className="font-medium text-foreground">1단계: 매물 매칭 및 상담</h4>
                   <p className="text-sm text-muted-foreground mt-1">
@@ -267,9 +264,7 @@ export default function SuccessFeePage() {
 
               {/* Step 2 */}
               <div className="flex gap-4">
-                <div className="w-8 h-8 rounded-full bg-green-100 dark:bg-green-900/50 flex items-center justify-center flex-shrink-0 relative z-10">
-                  <CheckCircle className="w-4 h-4 text-green-600" />
-                </div>
+                <span className="text-xl flex-shrink-0 relative z-10">✅</span>
                 <div className="flex-1 pb-2">
                   <h4 className="font-medium text-foreground">2단계: 양도양수 계약 체결</h4>
                   <p className="text-sm text-muted-foreground mt-1">
@@ -281,9 +276,7 @@ export default function SuccessFeePage() {
 
               {/* Step 3 */}
               <div className="flex gap-4">
-                <div className="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center flex-shrink-0 relative z-10 ring-2 ring-blue-500">
-                  <span className="text-sm font-bold text-blue-600">3</span>
-                </div>
+                <span className="text-xl flex-shrink-0 relative z-10 ring-2 ring-blue-500 rounded-full w-8 h-8 flex items-center justify-center bg-blue-600/10">3️⃣</span>
                 <div className="flex-1 pb-2">
                   <h4 className="font-medium text-foreground">3단계: 계약 확인 및 성사 보수 청구 <span className="text-primary">(현재 단계)</span></h4>
                   <p className="text-sm text-muted-foreground mt-1">
@@ -318,32 +311,26 @@ export default function SuccessFeePage() {
         {/* 환불 및 이의제기 안내 */}
         <div className="card p-6 mb-6 border-2 border-blue-200 dark:border-blue-800">
           <h3 className="font-semibold text-foreground mb-3 flex items-center gap-2">
-            <Shield className="w-5 h-5 text-blue-600" />
+            <TossIcon icon={Shield} color="from-teal-500 to-cyan-500" size="xs" shadow="shadow-teal-500/25" />
             환불 및 이의제기 정책
           </h3>
           <div className="space-y-4 text-sm">
             <div className="flex gap-3">
-              <div className="w-6 h-6 rounded-full bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center flex-shrink-0">
-                <span className="text-xs font-bold text-blue-600">1</span>
-              </div>
+              <span className="text-base flex-shrink-0">1️⃣</span>
               <div>
                 <p className="font-medium text-foreground">계약 무효 시 전액 환불</p>
                 <p className="text-muted-foreground">계약이 법적으로 무효가 된 경우, 증빙 서류 제출 후 전액 환불됩니다.</p>
               </div>
             </div>
             <div className="flex gap-3">
-              <div className="w-6 h-6 rounded-full bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center flex-shrink-0">
-                <span className="text-xs font-bold text-blue-600">2</span>
-              </div>
+              <span className="text-base flex-shrink-0">2️⃣</span>
               <div>
                 <p className="font-medium text-foreground">계약 해제 시 부분 환불</p>
                 <p className="text-muted-foreground">결제일로부터 14일 이내 계약 해제 시 50% 환불됩니다.</p>
               </div>
             </div>
             <div className="flex gap-3">
-              <div className="w-6 h-6 rounded-full bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center flex-shrink-0">
-                <span className="text-xs font-bold text-blue-600">3</span>
-              </div>
+              <span className="text-base flex-shrink-0">3️⃣</span>
               <div>
                 <p className="font-medium text-foreground">이의제기 절차</p>
                 <p className="text-muted-foreground">청구 금액에 이의가 있을 경우, 결제 전 고객센터로 문의해주세요.</p>

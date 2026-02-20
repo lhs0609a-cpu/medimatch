@@ -20,6 +20,7 @@ import {
   Mail,
   AlertTriangle,
 } from 'lucide-react';
+import { TossIcon } from '@/components/ui/TossIcon';
 
 // ============================================================
 // Types
@@ -306,9 +307,7 @@ export default function AdminListingsPage() {
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-orange-100 flex items-center justify-center">
-            <ClipboardCheck className="w-5 h-5 text-orange-600" />
-          </div>
+          <TossIcon icon={ClipboardCheck} color="from-amber-500 to-orange-500" shadow="shadow-amber-500/25" size="md" />
           <div>
             <h1 className="text-2xl font-bold text-gray-900">매물 심사 관리</h1>
             <p className="text-sm text-gray-500">건물주 등록 매물의 심사 및 상태 관리</p>
@@ -697,9 +696,7 @@ export default function AdminListingsPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40" onClick={() => setApproveId(null)}>
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm m-4 p-6" onClick={(e) => e.stopPropagation()}>
             <div className="text-center mb-6">
-              <div className="w-12 h-12 rounded-full bg-emerald-100 flex items-center justify-center mx-auto mb-3">
-                <CheckCircle className="w-6 h-6 text-emerald-600" />
-              </div>
+              <span className="text-3xl block mx-auto mb-3">✅</span>
               <h3 className="text-lg font-bold text-gray-900">매물 승인</h3>
               <p className="text-sm text-gray-500 mt-1">이 매물을 승인하고 공개하시겠습니까?</p>
             </div>
@@ -729,9 +726,7 @@ export default function AdminListingsPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40" onClick={() => { setRejectId(null); setRejectReason(''); }}>
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-md m-4 p-6" onClick={(e) => e.stopPropagation()}>
             <div className="mb-5">
-              <div className="w-12 h-12 rounded-full bg-rose-100 flex items-center justify-center mb-3">
-                <XCircle className="w-6 h-6 text-rose-600" />
-              </div>
+              <span className="text-3xl block mb-3">❌</span>
               <h3 className="text-lg font-bold text-gray-900">매물 거부</h3>
               <p className="text-sm text-gray-500 mt-1">거부 사유를 입력해주세요.</p>
             </div>
