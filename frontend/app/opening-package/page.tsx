@@ -126,8 +126,8 @@ function getTierLabel(
   brokerage: boolean
 ): { label: string; color: string; gradient: string } {
   const extras = (loan ? 1 : 0) + (brokerage ? 1 : 0)
-  if (pg && extras === 2) return { label: '프리미엄', color: 'bg-amber-500', gradient: 'from-amber-500 to-orange-600' }
-  if (pg && extras === 1) return { label: '플러스', color: 'bg-purple-500', gradient: 'from-purple-500 to-violet-600' }
+  if (pg && extras === 2) return { label: '프리미엄', color: 'bg-[#3182f6]', gradient: 'from-blue-500 to-indigo-600' }
+  if (pg && extras === 1) return { label: '플러스', color: 'bg-[#3182f6]', gradient: 'from-blue-500 to-indigo-600' }
   if (pg) return { label: '기본', color: 'bg-[#3182f6]', gradient: 'from-blue-500 to-indigo-600' }
   return { label: '-', color: 'bg-gray-400', gradient: 'from-gray-400 to-gray-500' }
 }
@@ -317,8 +317,8 @@ export default function OpeningPackagePage() {
                     onMouseLeave={() => setServicesOpen(false)}
                   >
                     <div className="space-y-1">
-                      <Link href="/opening-package" className="flex items-center gap-3 p-3 rounded-xl bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800/30 group">
-                        <div className="w-10 h-10 rounded-lg bg-amber-500 flex items-center justify-center">
+                      <Link href="/opening-package" className="flex items-center gap-3 p-3 rounded-xl bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800/30 group">
+                        <div className="w-10 h-10 rounded-lg bg-[#3182f6] flex items-center justify-center">
                           <Sparkles className="w-5 h-5 text-white" />
                         </div>
                         <div className="flex-1">
@@ -339,7 +339,7 @@ export default function OpeningPackagePage() {
                       <Link href="/buildings" className="flex items-center gap-3 p-3 rounded-xl hover:bg-accent transition-colors group">
                         <span className="text-2xl leading-none">🏥</span>
                         <div>
-                          <p className="font-medium text-foreground group-hover:text-green-600">매물 검색</p>
+                          <p className="font-medium text-foreground group-hover:text-[#3182f6]">매물 검색</p>
                           <p className="text-xs text-muted-foreground">개원 적합 공간 찾기</p>
                         </div>
                       </Link>
@@ -408,7 +408,7 @@ export default function OpeningPackagePage() {
 
           {/* 장식 그라데이션 */}
           <div className="absolute top-1/3 right-1/4 w-[500px] h-[500px] bg-[#3182f6]/8 rounded-full blur-[120px] z-[1]" />
-          <div className="absolute bottom-1/4 left-1/4 w-[400px] h-[400px] bg-purple-500/6 rounded-full blur-[100px] z-[1]" />
+          <div className="absolute bottom-1/4 left-1/4 w-[400px] h-[400px] bg-[#3182f6]/6 rounded-full blur-[100px] z-[1]" />
 
           <div className="relative z-20 w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pb-16 pt-32 lg:pt-40">
             {/* 경고 뱃지 */}
@@ -462,7 +462,7 @@ export default function OpeningPackagePage() {
               {[
                 { number: '4.8', unit: '억', label: '평균 개원 비용', color: 'text-red-400', bg: 'bg-red-500/10 border-red-500/20' },
                 { number: '1,000', unit: '+', label: '연간 폐업 의료기관', color: 'text-orange-400', bg: 'bg-orange-500/10 border-orange-500/20' },
-                { number: '150', unit: '+', label: '메디플라톤 성공 사례', color: 'text-emerald-400', bg: 'bg-emerald-500/10 border-emerald-500/20' },
+                { number: '150', unit: '+', label: '메디플라톤 성공 사례', color: 'text-[#3182f6]', bg: 'bg-[#3182f6]/10 border-[#3182f6]/20' },
               ].map((s) => (
                 <div key={s.label} className={`text-center p-4 rounded-2xl border ${s.bg}`}>
                   <div className={`text-2xl md:text-3xl font-black ${s.color}`}>{s.number}<span className="text-base">{s.unit}</span></div>
@@ -486,11 +486,11 @@ export default function OpeningPackagePage() {
                 <p className="text-xs md:text-sm text-white/50 mt-1">8개월 만에 신환 증가</p>
               </div>
               <div>
-                <div className="text-3xl md:text-4xl font-black text-emerald-400">93.3<span className="text-lg">점</span></div>
+                <div className="text-3xl md:text-4xl font-black text-[#3182f6]">93.3<span className="text-lg">점</span></div>
                 <p className="text-xs md:text-sm text-white/50 mt-1">콘텐츠 만족도</p>
               </div>
               <div>
-                <div className="text-3xl md:text-4xl font-black text-amber-400">150<span className="text-lg">+</span></div>
+                <div className="text-3xl md:text-4xl font-black text-[#3182f6]">150<span className="text-lg">+</span></div>
                 <p className="text-xs md:text-sm text-white/50 mt-1">개원 컨설팅 실적</p>
               </div>
             </div>
@@ -508,10 +508,10 @@ export default function OpeningPackagePage() {
 
             <div className="grid md:grid-cols-2 gap-6 mb-12">
               {[
-                { icon: MapPin, title: '어디에 개원해야 할지 막막', desc: '부동산 말만 믿고 계약했다가 환자가 안 오면? 경쟁 의원 수, 타깃 인구가 충분한지 데이터 없이는 판단할 수 없습니다.', gradient: 'from-orange-500 to-red-500', shadow: 'shadow-orange-500/25' },
-                { icon: Lock, title: 'DSR 규제로 대출 한도 부족', desc: '이미 주담대·학자금이 있으면 추가 대출이 어렵고, 금리도 높아집니다.', gradient: 'from-red-500 to-rose-600', shadow: 'shadow-red-500/25' },
-                { icon: DollarSign, title: '마케팅비 수백~수천만원', desc: '홈페이지 제작, 블로그, 플레이스, SNS, 체험단… 전부 하면 수천만원이 듭니다.', gradient: 'from-purple-500 to-pink-600', shadow: 'shadow-purple-500/25' },
-                { icon: Layers, title: '여러 업체를 따로 관리', desc: '중개, 대출, 마케팅, PG를 각각 다른 업체와 상담하면 시간과 비용 모두 낭비됩니다.', gradient: 'from-amber-500 to-orange-600', shadow: 'shadow-amber-500/25' },
+                { icon: MapPin, title: '어디에 개원해야 할지 막막', desc: '부동산 말만 믿고 계약했다가 환자가 안 오면? 경쟁 의원 수, 타깃 인구가 충분한지 데이터 없이는 판단할 수 없습니다.', gradient: 'from-blue-500 to-indigo-600', shadow: 'shadow-blue-500/25' },
+                { icon: Lock, title: 'DSR 규제로 대출 한도 부족', desc: '이미 주담대·학자금이 있으면 추가 대출이 어렵고, 금리도 높아집니다.', gradient: 'from-blue-500 to-indigo-600', shadow: 'shadow-blue-500/25' },
+                { icon: DollarSign, title: '마케팅비 수백~수천만원', desc: '홈페이지 제작, 블로그, 플레이스, SNS, 체험단… 전부 하면 수천만원이 듭니다.', gradient: 'from-blue-500 to-indigo-600', shadow: 'shadow-blue-500/25' },
+                { icon: Layers, title: '여러 업체를 따로 관리', desc: '중개, 대출, 마케팅, PG를 각각 다른 업체와 상담하면 시간과 비용 모두 낭비됩니다.', gradient: 'from-blue-500 to-indigo-600', shadow: 'shadow-blue-500/25' },
               ].map((item) => (
                 <div key={item.title} className="bg-card border border-border rounded-2xl p-6 md:p-8">
                   <div className={`icon-3d w-14 h-14 rounded-2xl bg-gradient-to-br ${item.gradient} shadow-lg ${item.shadow} flex items-center justify-center mb-4`}>
@@ -524,7 +524,7 @@ export default function OpeningPackagePage() {
             </div>
 
             <div className="text-center">
-              <div className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 text-white font-medium">
+              <div className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-medium">
                 <Zap className="w-5 h-5" />
                 이제 한 곳에서, 서비스 추가할수록 무료로
               </div>
@@ -545,12 +545,12 @@ export default function OpeningPackagePage() {
             {/* Desktop: horizontal flow */}
             <div className="hidden lg:flex items-start justify-between">
               {[
-                { step: '1', label: '입지 AI 분석', desc: '무료', icon: MapPin, color: 'from-green-500 to-emerald-500' },
-                { step: '2', label: '매물 추천', desc: '470+ 매물', icon: Search, color: 'from-cyan-500 to-blue-500' },
-                { step: '3', label: '개원 중개', desc: '전담 매니저', icon: Building2, color: 'from-blue-500 to-indigo-500' },
-                { step: '4', label: 'PG 설치', desc: '무상 지원', icon: CreditCard, color: 'from-indigo-500 to-purple-500' },
-                { step: '5', label: 'DSR-Free 대출', desc: '5.3%~', icon: DollarSign, color: 'from-purple-500 to-pink-500' },
-                { step: '6', label: '마케팅', desc: '최대 2,580만원', icon: Sparkles, color: 'from-orange-500 to-red-500' },
+                { step: '1', label: '입지 AI 분석', desc: '무료', icon: MapPin, color: 'from-blue-500 to-indigo-600' },
+                { step: '2', label: '매물 추천', desc: '470+ 매물', icon: Search, color: 'from-blue-500 to-indigo-600' },
+                { step: '3', label: '개원 중개', desc: '전담 매니저', icon: Building2, color: 'from-blue-500 to-indigo-600' },
+                { step: '4', label: 'PG 설치', desc: '무상 지원', icon: CreditCard, color: 'from-blue-500 to-indigo-600' },
+                { step: '5', label: 'DSR-Free 대출', desc: '5.3%~', icon: DollarSign, color: 'from-blue-500 to-indigo-600' },
+                { step: '6', label: '마케팅', desc: '최대 2,580만원', icon: Sparkles, color: 'from-blue-500 to-indigo-600' },
               ].map((item, i, arr) => (
                 <div key={item.step} className="flex items-start flex-1">
                   <div className="flex flex-col items-center text-center flex-1">
@@ -570,12 +570,12 @@ export default function OpeningPackagePage() {
             {/* Mobile: vertical flow */}
             <div className="lg:hidden space-y-3">
               {[
-                { step: '1', label: '입지 AI 분석', desc: '무료', icon: MapPin, color: 'from-green-500 to-emerald-500' },
-                { step: '2', label: '매물 추천', desc: '470+ 매물', icon: Search, color: 'from-cyan-500 to-blue-500' },
-                { step: '3', label: '개원 중개', desc: '전담 매니저', icon: Building2, color: 'from-blue-500 to-indigo-500' },
-                { step: '4', label: 'PG 설치', desc: '무상 지원', icon: CreditCard, color: 'from-indigo-500 to-purple-500' },
-                { step: '5', label: 'DSR-Free 대출', desc: '5.3%~', icon: DollarSign, color: 'from-purple-500 to-pink-500' },
-                { step: '6', label: '마케팅', desc: '최대 2,580만원', icon: Sparkles, color: 'from-orange-500 to-red-500' },
+                { step: '1', label: '입지 AI 분석', desc: '무료', icon: MapPin, color: 'from-blue-500 to-indigo-600' },
+                { step: '2', label: '매물 추천', desc: '470+ 매물', icon: Search, color: 'from-blue-500 to-indigo-600' },
+                { step: '3', label: '개원 중개', desc: '전담 매니저', icon: Building2, color: 'from-blue-500 to-indigo-600' },
+                { step: '4', label: 'PG 설치', desc: '무상 지원', icon: CreditCard, color: 'from-blue-500 to-indigo-600' },
+                { step: '5', label: 'DSR-Free 대출', desc: '5.3%~', icon: DollarSign, color: 'from-blue-500 to-indigo-600' },
+                { step: '6', label: '마케팅', desc: '최대 2,580만원', icon: Sparkles, color: 'from-blue-500 to-indigo-600' },
               ].map((item, i, arr) => (
                 <div key={item.step}>
                   <div className="flex items-center gap-4">
@@ -609,9 +609,9 @@ export default function OpeningPackagePage() {
             <div>
               <div className="grid md:grid-cols-3 gap-4">
                 {[
-                  { tier: 'PG 단말기', condition: '기본 필수', marketing: ['블로그 마케팅 3개월', '플레이스 광고 3개월'], value: '1,230만원', icon: CreditCard, color: 'from-blue-400 to-cyan-400' },
-                  { tier: 'DSR-Free 대출', condition: '자유 선택', marketing: ['카페 바이럴 3개월', '전담 마케터 배정', '홈페이지 제작 (80평+)'], value: '+750만원', icon: DollarSign, color: 'from-purple-400 to-pink-400' },
-                  { tier: '개원 중개', condition: '자유 선택', marketing: ['SNS 마케팅 3개월'], value: '+600만원', icon: Building2, color: 'from-orange-400 to-red-400' },
+                  { tier: 'PG 단말기', condition: '기본 필수', marketing: ['블로그 마케팅 3개월', '플레이스 광고 3개월'], value: '1,230만원', icon: CreditCard, color: 'from-blue-500 to-indigo-600' },
+                  { tier: 'DSR-Free 대출', condition: '자유 선택', marketing: ['카페 바이럴 3개월', '전담 마케터 배정', '홈페이지 제작 (80평+)'], value: '+750만원', icon: DollarSign, color: 'from-blue-500 to-indigo-600' },
+                  { tier: '개원 중개', condition: '자유 선택', marketing: ['SNS 마케팅 3개월'], value: '+600만원', icon: Building2, color: 'from-blue-500 to-indigo-600' },
                 ].map((item, i) => (
                   <div key={item.tier} className="relative">
                     <div className="bg-card border border-border rounded-2xl p-6 h-full">
@@ -623,7 +623,7 @@ export default function OpeningPackagePage() {
                       <div className="space-y-1 mb-4">
                         {item.marketing.map((m) => (
                           <div key={m} className="flex items-center gap-2 text-xs">
-                            <Check className="w-3 h-3 text-green-600 flex-shrink-0" />
+                            <Check className="w-3 h-3 text-[#3182f6] flex-shrink-0" />
                             <span className="text-foreground/80">{m}</span>
                           </div>
                         ))}
@@ -650,7 +650,7 @@ export default function OpeningPackagePage() {
         <section id="calculator" className="py-20">
           <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-12">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-orange-600/10 text-orange-600 text-sm font-medium mb-4">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#3182f6]/10 text-[#3182f6] text-sm font-medium mb-4">
                 <span className="text-base">🧮</span>
                 인터랙티브 계산기
               </div>
@@ -765,7 +765,7 @@ export default function OpeningPackagePage() {
 
                 {/* 총 절약 금액 */}
                 {totalSavings > 0 && (
-                  <div className="bg-gradient-to-r from-blue-600 via-purple-600 to-orange-500 rounded-2xl p-6 text-white text-center mb-6">
+                  <div className="bg-gradient-to-r from-blue-500 to-indigo-600 rounded-2xl p-6 text-white text-center mb-6">
                     <p className="text-sm opacity-80 mb-1">절약 가능 금액</p>
                     <p className="text-4xl md:text-5xl font-bold">
                       {totalSavings.toLocaleString()}<span className="text-xl">만원</span>
@@ -793,7 +793,7 @@ export default function OpeningPackagePage() {
         <section className="py-20 bg-secondary/50">
           <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-12">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-green-600/10 text-green-600 text-sm font-medium mb-4">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#3182f6]/10 text-[#3182f6] text-sm font-medium mb-4">
                 <MapPin className="w-4 h-4" />
                 입지 분석
               </div>
@@ -807,10 +807,10 @@ export default function OpeningPackagePage() {
 
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4 mb-12">
               {[
-                { icon: Target, title: '경쟁 분석', source: '심평원', desc: '반경 내 동일 진료과 의원 수·매출 추정', color: 'from-red-500 to-orange-500' },
-                { icon: Users, title: '인구 분석', source: '국토교통부', desc: '연령대별 인구, 세대수, 유동인구 분석', color: 'from-blue-500 to-cyan-500' },
-                { icon: TrendingUp, title: '매출 예측', source: '소상공인진흥공단', desc: '진료과·지역별 예상 월 매출 산출', color: 'from-green-500 to-emerald-500' },
-                { icon: BarChart3, title: '손익분기점', source: '복합 데이터', desc: '임대료·인건비 대비 BEP 도달 시점', color: 'from-purple-500 to-pink-500' },
+                { icon: Target, title: '경쟁 분석', source: '심평원', desc: '반경 내 동일 진료과 의원 수·매출 추정', color: 'from-blue-500 to-indigo-600' },
+                { icon: Users, title: '인구 분석', source: '국토교통부', desc: '연령대별 인구, 세대수, 유동인구 분석', color: 'from-blue-500 to-indigo-600' },
+                { icon: TrendingUp, title: '매출 예측', source: '소상공인진흥공단', desc: '진료과·지역별 예상 월 매출 산출', color: 'from-blue-500 to-indigo-600' },
+                { icon: BarChart3, title: '손익분기점', source: '복합 데이터', desc: '임대료·인건비 대비 BEP 도달 시점', color: 'from-blue-500 to-indigo-600' },
               ].map((item) => (
                 <div key={item.title} className="bg-card border border-border rounded-2xl p-6 text-center">
                   <div className={`icon-3d w-12 h-12 mx-auto rounded-2xl bg-gradient-to-br ${item.color} flex items-center justify-center mb-4 shadow-lg`}>
@@ -831,7 +831,7 @@ export default function OpeningPackagePage() {
                     <tr>
                       <th className="text-left p-4 bg-card border border-border rounded-tl-xl text-sm font-medium text-muted-foreground">항목</th>
                       <th className="text-center p-4 bg-card border border-border text-sm font-medium">기존 방식</th>
-                      <th className="text-center p-4 bg-gradient-to-r from-green-600 to-emerald-600 border border-green-500/30 rounded-tr-xl text-sm font-medium text-white">메디플라톤</th>
+                      <th className="text-center p-4 bg-gradient-to-r from-blue-500 to-indigo-600 border border-blue-500/30 rounded-tr-xl text-sm font-medium text-white">메디플라톤</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -845,7 +845,7 @@ export default function OpeningPackagePage() {
                       <tr key={row.label}>
                         <td className={`p-4 bg-card border border-border text-sm font-medium ${row.last ? 'rounded-bl-xl' : ''}`}>{row.label}</td>
                         <td className="p-4 bg-card border border-border text-sm text-center text-muted-foreground">{row.old}</td>
-                        <td className={`p-4 border border-green-500/20 text-sm text-center font-semibold bg-green-50 dark:bg-green-900/10 text-green-600 ${row.last ? 'rounded-br-xl' : ''}`}>{row.medi}</td>
+                        <td className={`p-4 border border-[#3182f6]/20 text-sm text-center font-semibold bg-[#3182f6]/5 dark:bg-[#3182f6]/10 text-[#3182f6] ${row.last ? 'rounded-br-xl' : ''}`}>{row.medi}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -874,7 +874,7 @@ export default function OpeningPackagePage() {
 
             {/* 단말기 안내 */}
             <div className="max-w-md mx-auto mb-12">
-              <div className="bg-gradient-to-br from-blue-500/5 to-cyan-500/5 border-2 border-blue-500/30 rounded-2xl p-6 text-center">
+              <div className="bg-gradient-to-br from-blue-500/5 to-indigo-500/5 border-2 border-blue-500/30 rounded-2xl p-6 text-center">
                 <span className="text-4xl leading-none block mb-3">🩺</span>
                 <h4 className="font-semibold mb-1">병의원 · 약국</h4>
                 <p className="text-3xl font-bold text-blue-600 mb-1">무상 지원</p>
@@ -891,7 +891,7 @@ export default function OpeningPackagePage() {
                     <tr>
                       <th className="text-left p-4 bg-card border border-border rounded-tl-xl text-sm font-medium text-muted-foreground">항목</th>
                       <th className="text-center p-4 bg-card border border-border text-sm font-medium">타사</th>
-                      <th className="text-center p-4 bg-gradient-to-r from-blue-600 to-purple-600 border border-blue-500/30 rounded-tr-xl text-sm font-medium text-white">메디플라톤</th>
+                      <th className="text-center p-4 bg-gradient-to-r from-blue-500 to-indigo-600 border border-blue-500/30 rounded-tr-xl text-sm font-medium text-white">메디플라톤</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -904,7 +904,7 @@ export default function OpeningPackagePage() {
                       <tr key={row.label}>
                         <td className={`p-4 bg-card border border-border text-sm font-medium ${row.last ? 'rounded-bl-xl' : ''}`}>{row.label}</td>
                         <td className="p-4 bg-card border border-border text-sm text-center text-muted-foreground">{row.other}</td>
-                        <td className={`p-4 border border-blue-500/20 text-sm text-center font-semibold bg-blue-50 dark:bg-blue-900/10 ${row.mediGreen ? 'text-green-600' : 'text-blue-600'} ${row.last ? 'rounded-br-xl' : ''}`}>{row.medi}</td>
+                        <td className={`p-4 border border-blue-500/20 text-sm text-center font-semibold bg-blue-50 dark:bg-blue-900/10 text-[#3182f6] ${row.last ? 'rounded-br-xl' : ''}`}>{row.medi}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -915,11 +915,11 @@ export default function OpeningPackagePage() {
             <div className="bg-card border border-border rounded-2xl p-6 md:p-8">
               <div className="grid sm:grid-cols-3 gap-6 text-center">
                 <div>
-                  <p className="text-2xl font-bold text-green-600 mb-1">0원</p>
+                  <p className="text-2xl font-bold text-[#3182f6] mb-1">0원</p>
                   <p className="text-sm text-muted-foreground">월 관리비 (전 업종)</p>
                 </div>
                 <div>
-                  <p className="text-2xl font-bold text-green-600 mb-1">당일</p>
+                  <p className="text-2xl font-bold text-[#3182f6] mb-1">당일</p>
                   <p className="text-sm text-muted-foreground">설치 완료</p>
                 </div>
                 <div>
@@ -951,10 +951,10 @@ export default function OpeningPackagePage() {
 
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-12">
               {[
-                { label: '금리', value: '5.3%~6.9%', sub: '신용도별 차등', color: 'from-blue-500 to-cyan-500' },
-                { label: '최대 한도', value: '3억원', sub: '최소 1,000만원', color: 'from-green-500 to-emerald-500' },
-                { label: '중도상환 수수료', value: '0원', sub: '언제든 상환 가능', color: 'from-purple-500 to-pink-500' },
-                { label: '대출 기간', value: '365~700일', sub: '평균 3영업일 심사', color: 'from-orange-500 to-amber-500' },
+                { label: '금리', value: '5.3%~6.9%', sub: '신용도별 차등', color: 'from-blue-500 to-indigo-600' },
+                { label: '최대 한도', value: '3억원', sub: '최소 1,000만원', color: 'from-blue-500 to-indigo-600' },
+                { label: '중도상환 수수료', value: '0원', sub: '언제든 상환 가능', color: 'from-blue-500 to-indigo-600' },
+                { label: '대출 기간', value: '365~700일', sub: '평균 3영업일 심사', color: 'from-blue-500 to-indigo-600' },
               ].map((stat) => (
                 <div key={stat.label} className="relative overflow-hidden bg-card border border-border rounded-2xl p-6 text-center">
                   <div className={`absolute top-0 left-0 right-0 h-1 bg-gradient-to-r ${stat.color}`} />
@@ -965,7 +965,7 @@ export default function OpeningPackagePage() {
               ))}
             </div>
 
-            <div className="bg-gradient-to-r from-blue-500/5 to-cyan-500/5 border border-blue-500/20 rounded-2xl p-6 md:p-8 mb-8">
+            <div className="bg-gradient-to-r from-blue-500/5 to-indigo-500/5 border border-blue-500/20 rounded-2xl p-6 md:p-8 mb-8">
               <div className="grid md:grid-cols-2 gap-6">
                 {[
                   { title: '신용점수 영향 없음', desc: '카드매출 담보이므로 개인 신용조회 불필요' },
@@ -1027,8 +1027,8 @@ export default function OpeningPackagePage() {
                 </div>
               </div>
 
-              <div className="bg-gradient-to-br from-blue-500/5 to-orange-500/5 border-2 border-blue-500/30 rounded-3xl p-8 relative overflow-hidden">
-                <div className="absolute top-4 left-4 px-3 py-1 bg-gradient-to-r from-blue-600 to-purple-600 text-white text-sm font-medium rounded-full">
+              <div className="bg-gradient-to-br from-blue-500/5 to-indigo-500/5 border-2 border-blue-500/30 rounded-3xl p-8 relative overflow-hidden">
+                <div className="absolute top-4 left-4 px-3 py-1 bg-gradient-to-r from-blue-500 to-indigo-600 text-white text-sm font-medium rounded-full">
                   메디플라톤 원스톱
                 </div>
                 <div className="pt-8 space-y-5">
@@ -1076,11 +1076,11 @@ export default function OpeningPackagePage() {
                 <p className="text-sm text-muted-foreground mt-1">누적 상담</p>
               </div>
               <div ref={loanCount.ref} className="text-center">
-                <p className="text-3xl md:text-4xl font-bold text-green-600">{loanCount.count.toLocaleString()}+</p>
+                <p className="text-3xl md:text-4xl font-bold text-[#3182f6]">{loanCount.count.toLocaleString()}+</p>
                 <p className="text-sm text-muted-foreground mt-1">대출 실행</p>
               </div>
               <div ref={approvalRate.ref} className="text-center">
-                <p className="text-3xl md:text-4xl font-bold text-purple-600">{approvalRate.count}%</p>
+                <p className="text-3xl md:text-4xl font-bold text-[#3182f6]">{approvalRate.count}%</p>
                 <p className="text-sm text-muted-foreground mt-1">평균 승인율</p>
               </div>
             </div>
@@ -1104,7 +1104,7 @@ export default function OpeningPackagePage() {
                     </div>
                     <p className="text-sm text-muted-foreground mb-4 leading-relaxed">&ldquo;{review.quote}&rdquo;</p>
                     <div className="flex items-center gap-2">
-                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-white text-xs font-bold">
+                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white text-xs font-bold">
                         {review.name[0]}
                       </div>
                       <div>
