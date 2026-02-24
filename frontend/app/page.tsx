@@ -515,13 +515,13 @@ export default function HomePage() {
 
               {/* 메인 헤드라인 */}
               <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight mb-6 animate-fade-in-up">
-                <span className="text-foreground">2시간마다 한 곳,</span>
+                <span className="text-foreground">매일 3곳이 문을 닫습니다</span>
                 <br />
                 <span className="text-[#3182f6]">당신은 다릅니다</span>
               </h1>
 
               <p className="text-lg md:text-xl text-muted-foreground mb-8 max-w-2xl mx-auto animate-fade-in-up delay-100">
-                연간 <span className="text-foreground font-semibold">4,097개</span> 의료기관이 폐업합니다.
+                연간 <span className="text-foreground font-semibold">1,000개</span> 이상의 의료기관이 폐업합니다.
                 <br className="hidden sm:block" />
                 메디플라톤의 데이터 분석으로 성공하는 개원을 시작하세요.
               </p>

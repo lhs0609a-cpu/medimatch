@@ -427,16 +427,20 @@ export default function OpeningPackagePage() {
             {/* 메인 헤드라인 */}
             <div className="text-center mb-6 animate-fade-in-up">
               <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black tracking-tight leading-[1.08]">
-                <span className="text-white">2시간마다 한 곳 폐업,</span>
+                <span className="text-white">매일 3곳 폐업,</span>
                 <br />
                 <span className="bg-gradient-to-r from-[#3182f6] via-[#5B9CF6] to-[#3182f6] bg-clip-text text-transparent">
-                  지금, 이 글을 보시는 원장님은 달라야 합니다
+                  지금 이 글을 보시는 원장님은
+                </span>
+                <br />
+                <span className="bg-gradient-to-r from-[#3182f6] via-[#5B9CF6] to-[#3182f6] bg-clip-text text-transparent">
+                  달라야 합니다
                 </span>
               </h1>
             </div>
 
             <p className="text-center text-lg md:text-xl text-white/40 mb-10 max-w-2xl mx-auto animate-fade-in-up delay-100 leading-relaxed">
-              연간 <span className="text-white/70 font-semibold">4,097개</span> 의료기관이 폐업합니다.
+              연간 <span className="text-white/70 font-semibold">1,000개</span> 이상의 의료기관이 폐업합니다.
               <br className="hidden sm:block" />
               입지 분석부터 마케팅까지, 데이터로 준비한 개원은 다릅니다.
             </p>
@@ -457,7 +461,7 @@ export default function OpeningPackagePage() {
             <div className="grid grid-cols-3 gap-3 max-w-3xl mx-auto animate-fade-in-up delay-300">
               {[
                 { number: '4.8', unit: '억', label: '평균 개원 비용', color: 'text-red-400', bg: 'bg-red-500/10 border-red-500/20' },
-                { number: '4,097', unit: '개', label: '연간 폐업 의료기관', color: 'text-orange-400', bg: 'bg-orange-500/10 border-orange-500/20' },
+                { number: '1,000', unit: '+', label: '연간 폐업 의료기관', color: 'text-orange-400', bg: 'bg-orange-500/10 border-orange-500/20' },
                 { number: '150', unit: '+', label: '메디플라톤 성공 사례', color: 'text-emerald-400', bg: 'bg-emerald-500/10 border-emerald-500/20' },
               ].map((s) => (
                 <div key={s.label} className={`text-center p-4 rounded-2xl border ${s.bg}`}>
