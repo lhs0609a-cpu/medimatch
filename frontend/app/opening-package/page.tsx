@@ -430,7 +430,7 @@ export default function OpeningPackagePage() {
                 <span className="text-white">2시간마다 한 곳 폐업,</span>
                 <br />
                 <span className="bg-gradient-to-r from-[#3182f6] via-[#5B9CF6] to-[#3182f6] bg-clip-text text-transparent">
-                  이 글을 보시는 원장님은 달라야 합니다
+                  지금, 이 글을 보시는 원장님은 달라야 합니다
                 </span>
               </h1>
             </div>
