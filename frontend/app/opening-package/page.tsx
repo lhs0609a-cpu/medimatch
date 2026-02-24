@@ -411,12 +411,15 @@ export default function OpeningPackagePage() {
           <div className="absolute bottom-1/4 left-1/4 w-[400px] h-[400px] bg-purple-500/6 rounded-full blur-[100px] z-[1]" />
 
           <div className="relative z-20 w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pb-16 pt-32 lg:pt-40">
-            {/* 제휴 뱃지 */}
+            {/* 경고 뱃지 */}
             <div className="flex justify-center mb-8 animate-fade-in">
-              <div className="inline-flex items-center gap-3 px-5 py-2.5 rounded-full bg-white/[0.06] border border-white/[0.08]">
-                <span className="text-base">🏦</span>
-                <span className="text-sm text-white/60">
-                  <span className="text-white font-semibold">신협중앙회</span> · <span className="text-white font-semibold">KB국민카드</span> 정식 제휴
+              <div className="inline-flex items-center gap-2.5 px-5 py-2.5 rounded-full bg-red-500/10 border border-red-500/20">
+                <span className="flex h-2.5 w-2.5 relative">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-400"></span>
+                </span>
+                <span className="text-sm text-red-300 font-medium">
+                  올해만 이미 <span className="text-white font-bold">683곳</span> 폐업
                 </span>
               </div>
             </div>
@@ -424,43 +427,42 @@ export default function OpeningPackagePage() {
             {/* 메인 헤드라인 */}
             <div className="text-center mb-6 animate-fade-in-up">
               <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black tracking-tight leading-[1.08]">
-                <span className="text-white">개원 비용은 줄이고</span>
+                <span className="text-white">2시간마다 한 곳이</span>
                 <br />
-                <span className="bg-gradient-to-r from-[#3182f6] via-[#5B9CF6] to-[#3182f6] bg-clip-text text-transparent">
-                  마케팅은 2,580만원 무료
+                <span className="bg-gradient-to-r from-red-500 via-orange-400 to-red-500 bg-clip-text text-transparent">
+                  문을 닫습니다
                 </span>
               </h1>
             </div>
 
             <p className="text-center text-lg md:text-xl text-white/40 mb-10 max-w-2xl mx-auto animate-fade-in-up delay-100 leading-relaxed">
-              PG 설치만으로 블로그·플레이스 무료 시작
+              연간 <span className="text-white/70 font-semibold">4,097개</span> 의료기관이 폐업합니다.
               <br className="hidden sm:block" />
-              대출·중개 추가 시 <span className="text-orange-400 font-semibold">풀마케팅 무료</span>
+              데이터 없이 개원하면, 당신도 그 중 하나가 됩니다.
             </p>
 
             {/* CTA */}
             <div className="flex flex-col sm:flex-row gap-4 justify-center mb-14 animate-fade-in-up delay-200">
               <button onClick={scrollToForm} className="inline-flex items-center justify-center gap-2.5 px-10 py-4 bg-[#3182f6] text-white rounded-2xl font-semibold text-lg hover:bg-[#2272e6] transition-all shadow-[0_0_40px_rgba(49,130,246,0.3)] hover:shadow-[0_0_60px_rgba(49,130,246,0.4)] group">
-                무료 상담 신청
+                무료 개원 진단받기
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </button>
               <a href="#calculator" className="inline-flex items-center justify-center gap-2.5 px-10 py-4 bg-white/[0.06] text-white/80 border border-white/[0.1] rounded-2xl font-semibold text-lg hover:bg-white/[0.1] hover:text-white transition-all">
                 <Sparkles className="w-5 h-5" />
-                내 혜택 확인하기
+                내 절약 금액 계산하기
               </a>
             </div>
 
-            {/* 3등급 프리뷰 카드 */}
-            <div className="grid grid-cols-3 gap-3 max-w-2xl mx-auto animate-fade-in-up delay-300">
+            {/* 핵심 수치 3개 */}
+            <div className="grid grid-cols-3 gap-3 max-w-3xl mx-auto animate-fade-in-up delay-300">
               {[
-                { name: '기본', color: 'border-[#3182f6]/40 bg-[#3182f6]/10', text: 'text-[#3182f6]', desc: 'PG 설치', value: '1,230만원' },
-                { name: '플러스', color: 'border-purple-500/40 bg-purple-500/10', text: 'text-purple-400', desc: 'PG + 대출 or 중개', value: '+750만원' },
-                { name: '프리미엄', color: 'border-amber-500/40 bg-amber-500/10', text: 'text-amber-400', desc: 'PG + 대출 + 중개', value: '2,580만원' },
-              ].map((t) => (
-                <div key={t.name} className={`flex flex-col items-center gap-1 p-4 rounded-2xl border ${t.color}`}>
-                  <span className={`text-sm font-bold ${t.text}`}>{t.name}</span>
-                  <span className="text-xs text-white/40">{t.desc}</span>
-                  <span className={`text-lg font-bold ${t.text} mt-1`}>{t.value}</span>
+                { number: '4.8', unit: '억', label: '평균 개원 비용', color: 'text-red-400', bg: 'bg-red-500/10 border-red-500/20' },
+                { number: '4,097', unit: '개', label: '연간 폐업 의료기관', color: 'text-orange-400', bg: 'bg-orange-500/10 border-orange-500/20' },
+                { number: '150', unit: '+', label: '메디플라톤 성공 사례', color: 'text-emerald-400', bg: 'bg-emerald-500/10 border-emerald-500/20' },
+              ].map((s) => (
+                <div key={s.label} className={`text-center p-4 rounded-2xl border ${s.bg}`}>
+                  <div className={`text-2xl md:text-3xl font-black ${s.color}`}>{s.number}<span className="text-base">{s.unit}</span></div>
+                  <p className="text-xs text-white/40 mt-1">{s.label}</p>
                 </div>
               ))}
             </div>
