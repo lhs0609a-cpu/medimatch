@@ -427,10 +427,10 @@ export default function OpeningPackagePage() {
             {/* 메인 헤드라인 */}
             <div className="text-center mb-6 animate-fade-in-up">
               <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black tracking-tight leading-[1.08]">
-                <span className="text-white">2시간마다 한 곳이</span>
+                <span className="text-white">2시간마다 한 곳 폐업,</span>
                 <br />
-                <span className="bg-gradient-to-r from-red-500 via-orange-400 to-red-500 bg-clip-text text-transparent">
-                  문을 닫습니다
+                <span className="bg-gradient-to-r from-[#3182f6] via-[#5B9CF6] to-[#3182f6] bg-clip-text text-transparent">
+                  이 글을 보시는 원장님은 달라야 합니다
                 </span>
               </h1>
             </div>
@@ -438,7 +438,7 @@ export default function OpeningPackagePage() {
             <p className="text-center text-lg md:text-xl text-white/40 mb-10 max-w-2xl mx-auto animate-fade-in-up delay-100 leading-relaxed">
               연간 <span className="text-white/70 font-semibold">4,097개</span> 의료기관이 폐업합니다.
               <br className="hidden sm:block" />
-              데이터 없이 개원하면, 당신도 그 중 하나가 됩니다.
+              입지 분석부터 마케팅까지, 데이터로 준비한 개원은 다릅니다.
             </p>
 
             {/* CTA */}
