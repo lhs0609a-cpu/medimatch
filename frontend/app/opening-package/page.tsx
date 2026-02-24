@@ -124,12 +124,12 @@ function getTierLabel(
   pg: boolean,
   loan: boolean,
   brokerage: boolean
-): { label: string; gradient: string } {
+): { label: string; color: string; gradient: string } {
   const extras = (loan ? 1 : 0) + (brokerage ? 1 : 0)
-  if (pg && extras === 2) return { label: '프리미엄', gradient: 'from-orange-500 to-red-500' }
-  if (pg && extras === 1) return { label: '플러스', gradient: 'from-purple-500 to-pink-500' }
-  if (pg) return { label: '기본', gradient: 'from-blue-600 to-purple-600' }
-  return { label: '-', gradient: 'from-gray-400 to-gray-500' }
+  if (pg && extras === 2) return { label: '프리미엄', color: 'bg-amber-500', gradient: 'from-amber-500 to-orange-600' }
+  if (pg && extras === 1) return { label: '플러스', color: 'bg-purple-500', gradient: 'from-purple-500 to-violet-600' }
+  if (pg) return { label: '기본', color: 'bg-[#3182f6]', gradient: 'from-blue-500 to-indigo-600' }
+  return { label: '-', color: 'bg-gray-400', gradient: 'from-gray-400 to-gray-500' }
 }
 
 /* ─── 진료과 옵션 ─── */
@@ -297,11 +297,8 @@ export default function OpeningPackagePage() {
       <header className="fixed top-0 left-0 right-0 z-50 glass" role="banner">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
-            <Link href="/" className="flex items-center gap-2.5">
-              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-500/25">
-                <span className="text-white font-bold text-lg">M</span>
-              </div>
-              <span className="font-bold text-xl text-foreground">메디플라톤</span>
+            <Link href="/" className="flex items-center gap-2">
+              <img src="/assets/logo/mediplaton-horizontal.png" alt="MEDI-PLATON" className="h-8 object-contain" />
             </Link>
 
             <nav className="hidden lg:flex items-center gap-1">
@@ -321,7 +318,7 @@ export default function OpeningPackagePage() {
                   >
                     <div className="space-y-1">
                       <Link href="/opening-package" className="flex items-center gap-3 p-3 rounded-xl bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800/30 group">
-                        <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-orange-500 to-amber-500 flex items-center justify-center">
+                        <div className="w-10 h-10 rounded-lg bg-amber-500 flex items-center justify-center">
                           <Sparkles className="w-5 h-5 text-white" />
                         </div>
                         <div className="flex-1">
@@ -399,15 +396,19 @@ export default function OpeningPackagePage() {
       <main>
         {/* ===== Section 1: Hero ===== */}
         <section ref={heroRef} className="relative min-h-screen flex items-center justify-center overflow-hidden pt-16">
+          {/* 배경 사진 */}
           <div className="absolute inset-0 -z-10">
-            <div className="absolute top-20 left-10 w-72 h-72 bg-blue-500/10 rounded-full blur-3xl" />
-            <div className="absolute bottom-20 right-10 w-96 h-96 bg-orange-500/10 rounded-full blur-3xl" />
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-purple-500/5 rounded-full blur-3xl" />
+            <div className="absolute inset-0 bg-gradient-to-b from-background/90 via-background/70 to-background z-10" />
+            <img
+              src="/assets/hospital/luxury-lobby-1.jpg"
+              alt=""
+              className="w-full h-full object-cover opacity-30"
+            />
           </div>
 
           <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
             <div className="text-center">
-              <div className="inline-flex items-center gap-3 px-4 py-2 rounded-full bg-gradient-to-r from-blue-500/10 to-orange-500/10 border border-blue-500/20 mb-8 animate-fade-in">
+              <div className="inline-flex items-center gap-3 px-4 py-2 rounded-full bg-[#3182f6]/5 border border-[#3182f6]/20 mb-8 animate-fade-in">
                 <span className="text-base">🏦</span>
                 <span className="text-sm font-medium">
                   <span className="text-blue-600 font-semibold">신협중앙회</span> · <span className="text-orange-600 font-semibold">KB국민카드</span> 정식 제휴
@@ -417,7 +418,7 @@ export default function OpeningPackagePage() {
               <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight mb-6 animate-fade-in-up">
                 <span className="text-foreground">PG 하나로 시작해서</span>
                 <br />
-                <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-orange-500 bg-clip-text text-transparent">
+                <span className="text-[#3182f6]">
                   최대 2,580만원 마케팅 무료
                 </span>
               </h1>
@@ -430,7 +431,7 @@ export default function OpeningPackagePage() {
               </p>
 
               <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12 animate-fade-in-up delay-200">
-                <button onClick={scrollToForm} className="btn-primary btn-lg group shadow-xl shadow-blue-500/30 text-lg px-8">
+                <button onClick={scrollToForm} className="btn-primary btn-lg group text-lg px-8">
                   무료 상담 신청
                   <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                 </button>
@@ -443,12 +444,12 @@ export default function OpeningPackagePage() {
               {/* 3등급 프리뷰 */}
               <div className="grid grid-cols-3 gap-3 max-w-2xl mx-auto animate-fade-in-up delay-300">
                 {[
-                  { name: '기본', gradient: 'from-blue-500 to-cyan-500', borderColor: 'border-blue-500/30', color: 'text-blue-600', desc: 'PG 설치' },
-                  { name: '플러스', gradient: 'from-purple-500 to-pink-500', borderColor: 'border-purple-500/30', color: 'text-purple-600', desc: 'PG + 1개' },
-                  { name: '프리미엄', gradient: 'from-orange-500 to-red-500', borderColor: 'border-orange-500/30', color: 'text-orange-600', desc: 'PG + 2개' },
+                  { name: '기본', bg: 'bg-[#3182f6]', borderColor: 'border-[#3182f6]/30', color: 'text-[#3182f6]', desc: 'PG 설치' },
+                  { name: '플러스', bg: 'bg-purple-500', borderColor: 'border-purple-500/30', color: 'text-purple-600', desc: 'PG + 1개' },
+                  { name: '프리미엄', bg: 'bg-amber-500', borderColor: 'border-amber-500/30', color: 'text-amber-600', desc: 'PG + 2개' },
                 ].map((t) => (
                   <div key={t.name} className={`flex flex-col items-center gap-1.5 p-4 rounded-2xl bg-card border ${t.borderColor}`}>
-                    <div className={`icon-3d w-10 h-10 rounded-2xl bg-gradient-to-br ${t.gradient} flex items-center justify-center shadow-lg`}>
+                    <div className={`icon-3d w-10 h-10 rounded-2xl ${t.bg} flex items-center justify-center`}>
                       <span className="text-white text-xs font-bold">{t.name[0]}</span>
                     </div>
                     <span className={`text-sm font-semibold ${t.color}`}>{t.name}</span>
@@ -1078,6 +1079,52 @@ export default function OpeningPackagePage() {
           </div>
         </section>
 
+        {/* ===== 포트폴리오 갤러리 ===== */}
+        <section className="py-20 bg-foreground text-white">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl md:text-4xl font-bold mb-4">
+                메디플라톤이 함께한 <span className="text-[#3182f6]">개원 포트폴리오</span>
+              </h2>
+              <p className="text-white/60">입지 선정부터 인테리어, 개원까지 원스톱으로 완성</p>
+            </div>
+
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              {[
+                { src: '/assets/hospital/luxury-lobby-1.jpg', label: '프리미엄 로비' },
+                { src: '/assets/hospital/treatment-room.jpg', label: '시술실' },
+                { src: '/assets/hospital/treatment-beds.jpg', label: '회복실' },
+                { src: '/assets/hospital/locker-room.jpg', label: '편의시설' },
+                { src: '/assets/consulting/clinic-lobby.jpg', label: '로비 전경' },
+                { src: '/assets/hospital/waiting-room-render.jpg', label: '대기실 설계' },
+                { src: '/assets/consulting/doctor-interview.jpg', label: '원장 인터뷰' },
+                { src: '/assets/consulting/consultation-2.jpg', label: '데이터 분석' },
+              ].map((photo, i) => (
+                <div key={i} className="group relative rounded-xl overflow-hidden aspect-[4/3]">
+                  <img src={photo.src} alt={photo.label} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                  <span className="absolute bottom-2 left-3 text-white text-xs font-medium opacity-0 group-hover:opacity-100 transition-opacity">{photo.label}</span>
+                </div>
+              ))}
+            </div>
+
+            {/* 협력사 로고 */}
+            <div className="mt-12 pt-8 border-t border-white/10">
+              <p className="text-center text-sm text-white/40 mb-6">금융·공공기관 정식 제휴</p>
+              <div className="flex flex-wrap justify-center gap-8 items-center">
+                {[1, 2, 3, 4, 5, 6, 7, 8].map((n) => (
+                  <img
+                    key={n}
+                    src={`/assets/partners/partner-${String(n).padStart(2, '0')}.png`}
+                    alt={`협력사 ${n}`}
+                    className="h-8 object-contain opacity-40 hover:opacity-80 transition-opacity invert"
+                  />
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
+
         {/* ===== Section 11: 상담 신청 폼 ===== */}
         <section ref={formRef} id="inquiry-form" className="py-20">
           <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -1222,11 +1269,8 @@ export default function OpeningPackagePage() {
       <footer className="py-12 border-t border-border">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-            <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center">
-                <span className="text-white font-bold">M</span>
-              </div>
-              <span className="font-bold text-lg">메디플라톤</span>
+            <div className="flex items-center gap-2">
+              <img src="/assets/logo/mediplaton-horizontal.png" alt="MEDI-PLATON" className="h-7 object-contain" />
             </div>
             <div className="flex items-center gap-6 text-sm text-muted-foreground">
               <Link href="/terms" className="hover:text-foreground transition-colors">이용약관</Link>

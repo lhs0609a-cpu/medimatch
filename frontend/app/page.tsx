@@ -254,11 +254,12 @@ export default function HomePage() {
         <header className="fixed top-0 left-0 right-0 z-50 glass" role="banner">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex items-center justify-between h-16">
-              <Link href="/" className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-xl bg-[#3182f6] flex items-center justify-center">
-                  <span className="text-white font-bold text-lg">M</span>
-                </div>
-                <span className="font-bold text-xl text-foreground">메디플라톤</span>
+              <Link href="/" className="flex items-center gap-2">
+                <img
+                  src="/assets/logo/mediplaton-horizontal.png"
+                  alt="MEDI-PLATON"
+                  className="h-8 object-contain"
+                />
               </Link>
 
               <nav className="hidden lg:flex items-center gap-1">
@@ -456,18 +457,22 @@ export default function HomePage() {
           </div>
         </div>
 
-        {/* ===== HERO SECTION - 풀스크린 지도 배경 ===== */}
+        {/* ===== HERO SECTION - 비디오/사진 배경 ===== */}
         <main id="main-content" role="main">
         <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-10 lg:pt-0" aria-label="히어로 섹션">
-          {/* 배경 지도 */}
+          {/* 배경 비디오/사진 */}
           <div className="absolute inset-0 z-0">
-            <div className="absolute inset-0 bg-gradient-to-b from-background/80 via-background/60 to-background z-10" />
-            <KakaoMap
-              center={{ lat: 37.5172, lng: 127.0473 }}
-              level={8}
-              markers={mapMarkers}
-              className="w-full h-full opacity-50"
-            />
+            <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/50 to-background z-10" />
+            <video
+              autoPlay
+              muted
+              loop
+              playsInline
+              poster="/assets/hospital/luxury-lobby-2.jpg"
+              className="w-full h-full object-cover"
+            >
+              <source src="/assets/video/hero-video.mp4" type="video/mp4" />
+            </video>
           </div>
 
           {/* 실시간 활동 피드 - 좌측 (데스크톱) */}
@@ -505,29 +510,30 @@ export default function HomePage() {
           <div className="relative z-20 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-24">
             <div className="text-center">
               {/* 뱃지 */}
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#3182f6]/10 mb-6 animate-fade-in backdrop-blur-sm">
-                <Activity className="w-4 h-4 text-blue-500 animate-pulse" />
-                <span className="text-sm font-medium">
-                  지금 <span className="text-blue-500 font-bold">{platformStats.onlineNow}명</span>이 매물을 탐색 중
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-md mb-6 animate-fade-in border border-white/20">
+                <Activity className="w-4 h-4 text-blue-400 animate-pulse" />
+                <span className="text-sm font-medium text-white/90">
+                  지금 <span className="text-blue-400 font-bold">{platformStats.onlineNow}명</span>이 매물을 탐색 중
                 </span>
               </div>
 
               {/* 메인 헤드라인 */}
               <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight mb-6 animate-fade-in-up">
-                <span className="text-foreground">지금 이 순간에도</span>
+                <span className="text-white">성공적인 개원,</span>
                 <br />
                 <span className="text-[#3182f6]">
-                  {platformStats.todayNewListings}개의 기회
+                  데이터로 시작
                 </span>
-                <span className="text-foreground">가</span>
-                <br />
-                <span className="text-foreground">발생하고 있습니다</span>
+                <span className="text-white">합니다</span>
               </h1>
 
-              <p className="text-lg md:text-xl text-muted-foreground mb-8 max-w-2xl mx-auto animate-fade-in-up delay-100">
-                AI 기반 개원 분석부터 매물 검색, 약국 매칭까지
+              <p className="text-lg md:text-xl text-white/70 mb-4 max-w-2xl mx-auto animate-fade-in-up delay-100">
+                평균 개원 비용 <span className="text-white font-semibold">4억 8천만 원</span>, 연간 <span className="text-white font-semibold">4,097개</span> 의료기관 폐업.
                 <br className="hidden sm:block" />
-                의료 개원의 모든 것을 한 곳에서
+                철저한 분석 없이 개원하면 2시간마다 한 곳이 문을 닫습니다.
+              </p>
+              <p className="text-base md:text-lg text-white/50 mb-8 max-w-xl mx-auto animate-fade-in-up delay-150">
+                AI 기반 개원 분석부터 매물 검색, 약국 매칭까지 — 메디플라톤이 함께합니다
               </p>
 
               {/* CTA 버튼 */}
@@ -543,13 +549,13 @@ export default function HomePage() {
               </div>
 
               {/* 실시간 알림 배너 */}
-              <div className="inline-flex items-center gap-3 px-5 py-3 bg-emerald-500/8 rounded-full animate-fade-in delay-300">
+              <div className="inline-flex items-center gap-3 px-5 py-3 bg-white/10 backdrop-blur-md rounded-full animate-fade-in delay-300 border border-white/20">
                 <span className="flex h-3 w-3 relative">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
                   <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
                 </span>
-                <span className="text-sm">
-                  방금 <span className="font-semibold text-green-600">서울 강남구</span>에서 새 매물이 등록되었습니다
+                <span className="text-sm text-white/90">
+                  방금 <span className="font-semibold text-green-400">서울 강남구</span>에서 새 매물이 등록되었습니다
                 </span>
               </div>
             </div>
@@ -558,6 +564,33 @@ export default function HomePage() {
           {/* 스크롤 인디케이터 */}
           <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 animate-bounce">
             <ChevronDown className="w-6 h-6 text-muted-foreground" />
+          </div>
+        </section>
+
+        {/* ===== 협력사 로고 마키 ===== */}
+        <section className="py-10 bg-card border-y border-border overflow-hidden">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-6">
+            <p className="text-center text-sm font-medium text-muted-foreground">
+              금융·공공기관과 함께하는 신뢰의 파트너십
+            </p>
+          </div>
+          <div className="relative">
+            <div className="absolute left-0 top-0 bottom-0 w-20 bg-gradient-to-r from-card to-transparent z-10" />
+            <div className="absolute right-0 top-0 bottom-0 w-20 bg-gradient-to-l from-card to-transparent z-10" />
+            <div className="flex animate-marquee gap-12 items-center">
+              {[...Array(2)].map((_, setIdx) => (
+                <div key={setIdx} className="flex gap-12 items-center flex-shrink-0">
+                  {Array.from({ length: 22 }, (_, i) => i + 1).map((n) => (
+                    <img
+                      key={`${setIdx}-${n}`}
+                      src={`/assets/partners/partner-${String(n).padStart(2, '0')}.png`}
+                      alt={`협력사 ${n}`}
+                      className="h-10 md:h-12 object-contain opacity-60 hover:opacity-100 transition-opacity flex-shrink-0 grayscale hover:grayscale-0"
+                    />
+                  ))}
+                </div>
+              ))}
+            </div>
           </div>
         </section>
 
@@ -588,6 +621,65 @@ export default function HomePage() {
                   {memberCount.count.toLocaleString()}
                 </div>
                 <div className="text-white/60 text-sm md:text-base">가입 회원</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ===== 실제 성과 섹션 ===== */}
+        <section className="py-20 md:py-28">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-16">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-600/10 text-emerald-600 text-sm font-medium mb-4">
+                <Trophy className="w-4 h-4" />
+                실제 성과로 증명합니다
+              </div>
+              <h2 className="text-3xl md:text-5xl font-bold tracking-tight mb-4">
+                숫자가 말하는 메디플라톤
+              </h2>
+            </div>
+
+            <div className="grid md:grid-cols-3 gap-8">
+              {/* 성과 카드 1 */}
+              <div className="relative group">
+                <div className="bg-card rounded-3xl p-8 border border-border hover:shadow-2xl transition-all duration-300 h-full">
+                  <div className="text-6xl md:text-7xl font-black text-[#3182f6] mb-4">5배</div>
+                  <h3 className="text-xl font-bold mb-2">8개월 만에 신환 5배 증가</h3>
+                  <p className="text-muted-foreground text-sm leading-relaxed">
+                    메디플라톤의 통합 마케팅 전략으로 실제 파트너 병원이 달성한 성과입니다. 블로그, SNS, 플랫폼을 통합 운영하여 지속적인 신규 환자 유입을 실현했습니다.
+                  </p>
+                  <div className="mt-6">
+                    <img src="/assets/marketing/result-5x-growth.png" alt="신환 5배 증가 실적" className="rounded-xl border border-border w-full" />
+                  </div>
+                </div>
+              </div>
+
+              {/* 성과 카드 2 */}
+              <div className="relative group">
+                <div className="bg-card rounded-3xl p-8 border border-border hover:shadow-2xl transition-all duration-300 h-full">
+                  <div className="text-6xl md:text-7xl font-black text-emerald-500 mb-4">93.3<span className="text-3xl">점</span></div>
+                  <h3 className="text-xl font-bold mb-2">병원 블로그 최상급 만족도</h3>
+                  <p className="text-muted-foreground text-sm leading-relaxed">
+                    환자들이 직접 평가한 블로그 콘텐츠 만족도. &ldquo;글이 너무 감동적이어서 믿을 수 있었다&rdquo;는 실제 환자 후기가 증명합니다.
+                  </p>
+                  <div className="mt-6">
+                    <img src="/assets/marketing/blog-satisfaction.png" alt="블로그 만족도 93.3점" className="rounded-xl border border-border w-full" />
+                  </div>
+                </div>
+              </div>
+
+              {/* 성과 카드 3 */}
+              <div className="relative group">
+                <div className="bg-card rounded-3xl p-8 border border-border hover:shadow-2xl transition-all duration-300 h-full">
+                  <div className="text-6xl md:text-7xl font-black text-amber-500 mb-4">150<span className="text-3xl">+</span></div>
+                  <h3 className="text-xl font-bold mb-2">개원 컨설팅 누적 실적</h3>
+                  <p className="text-muted-foreground text-sm leading-relaxed">
+                    입지 선정부터 인테리어, 마케팅, 대출까지 원스톱으로 지원. 각 분야의 최고 전문가가 한 팀으로 개원을 함께합니다.
+                  </p>
+                  <div className="mt-6">
+                    <img src="/assets/marketing/opening-solution.png" alt="개원 솔루션" className="rounded-xl border border-border w-full" />
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -834,6 +926,150 @@ export default function HomePage() {
           </div>
         </section>
 
+        {/* ===== 포트폴리오 갤러리 ===== */}
+        <section className="py-20 md:py-28">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-12">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-violet-600/10 text-violet-600 text-sm font-medium mb-4">
+                <Paintbrush className="w-4 h-4" />
+                실제 개원 사례
+              </div>
+              <h2 className="text-3xl md:text-5xl font-bold tracking-tight mb-4">
+                메디플라톤이 함께한 병원들
+              </h2>
+              <p className="text-muted-foreground max-w-2xl mx-auto">
+                입지 선정부터 인테리어, 마케팅까지 — 실제 개원 컨설팅 포트폴리오입니다
+              </p>
+            </div>
+
+            {/* 사진 그리드 */}
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
+              {[
+                { src: '/assets/hospital/luxury-lobby-1.jpg', label: '프리미엄 로비', span: 'md:col-span-2 md:row-span-2' },
+                { src: '/assets/hospital/treatment-room.jpg', label: '시술실', span: '' },
+                { src: '/assets/hospital/locker-room.jpg', label: '파우더 & 락커룸', span: '' },
+                { src: '/assets/hospital/luxury-lobby-2.jpg', label: '인테리어 디테일', span: '' },
+                { src: '/assets/hospital/treatment-beds.jpg', label: '회복실', span: '' },
+                { src: '/assets/hospital/waiting-room-render.jpg', label: '대기실 3D 설계', span: 'md:col-span-2' },
+                { src: '/assets/hospital/medical-equipment.jpg', label: '최신 장비', span: '' },
+                { src: '/assets/hospital/powder-room.jpg', label: '세면 공간', span: '' },
+              ].map((photo, i) => (
+                <div
+                  key={i}
+                  className={`group relative rounded-2xl overflow-hidden cursor-pointer ${photo.span}`}
+                >
+                  <div className="aspect-[4/3] overflow-hidden">
+                    <img
+                      src={photo.src}
+                      alt={photo.label}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
+                  </div>
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  <div className="absolute bottom-0 left-0 right-0 p-4 translate-y-4 group-hover:translate-y-0 opacity-0 group-hover:opacity-100 transition-all duration-300">
+                    <span className="text-white font-medium text-sm">{photo.label}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ===== 컨설팅 현장 섹션 ===== */}
+        <section className="py-20 bg-foreground text-background">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="grid lg:grid-cols-2 gap-12 items-center">
+              {/* 텍스트 */}
+              <div>
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-white/80 text-sm font-medium mb-6">
+                  <Stethoscope className="w-4 h-4" />
+                  현장에서 직접 뜁니다
+                </div>
+                <h2 className="text-3xl md:text-5xl font-bold text-white mb-6">
+                  오직 한 분의 원장님을 위해<br />
+                  <span className="text-[#3182f6]">최고들이 모였습니다</span>
+                </h2>
+                <p className="text-white/60 text-lg mb-8 leading-relaxed">
+                  메디플라톤은 책상 위의 컨설팅이 아닙니다. 직접 현장을 방문하고, 원장님과 마주 앉아 데이터를 분석하고, 카메라 앞에서 솔직한 이야기를 나눕니다.
+                </p>
+                <div className="grid grid-cols-2 gap-6 mb-8">
+                  <div>
+                    <div className="text-3xl font-bold text-[#3182f6] mb-1">150+</div>
+                    <div className="text-sm text-white/50">컨설팅 누적 건수</div>
+                  </div>
+                  <div>
+                    <div className="text-3xl font-bold text-emerald-400 mb-1">97%</div>
+                    <div className="text-sm text-white/50">고객 만족도</div>
+                  </div>
+                  <div>
+                    <div className="text-3xl font-bold text-amber-400 mb-1">8년</div>
+                    <div className="text-sm text-white/50">의료 컨설팅 경력</div>
+                  </div>
+                  <div>
+                    <div className="text-3xl font-bold text-purple-400 mb-1">30+</div>
+                    <div className="text-sm text-white/50">전문 파트너 네트워크</div>
+                  </div>
+                </div>
+                <Link href="/opening-package" className="btn-primary btn-lg text-lg">
+                  개원 컨설팅 알아보기
+                  <ArrowRight className="w-5 h-5" />
+                </Link>
+              </div>
+
+              {/* 사진 그리드 */}
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-3">
+                  <div className="rounded-2xl overflow-hidden">
+                    <img src="/assets/consulting/doctor-interview.jpg" alt="원장 인터뷰 촬영" className="w-full aspect-[3/4] object-cover" />
+                  </div>
+                  <div className="rounded-2xl overflow-hidden">
+                    <img src="/assets/consulting/consultation-2.jpg" alt="데이터 기반 상담" className="w-full aspect-[4/3] object-cover" />
+                  </div>
+                </div>
+                <div className="space-y-3 pt-6">
+                  <div className="rounded-2xl overflow-hidden">
+                    <img src="/assets/consulting/doctor-meeting.jpg" alt="원장 미팅" className="w-full aspect-[4/3] object-cover" />
+                  </div>
+                  <div className="rounded-2xl overflow-hidden">
+                    <img src="/assets/consulting/clinic-lobby.jpg" alt="병원 로비 촬영" className="w-full aspect-[3/4] object-cover" />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ===== 비디오 섹션 ===== */}
+        <section className="py-20 md:py-28">
+          <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-4">
+                원장님들의 생생한 이야기
+              </h2>
+              <p className="text-muted-foreground">메디플라톤과 함께한 원장님들의 실제 경험담</p>
+            </div>
+
+            <div className="relative rounded-3xl overflow-hidden bg-black aspect-video group cursor-pointer shadow-2xl">
+              <img
+                src="/assets/consulting/consultation-1.jpg"
+                alt="원장 인터뷰 썸네일"
+                className="w-full h-full object-cover opacity-80 group-hover:opacity-60 transition-opacity duration-300"
+              />
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="w-20 h-20 md:w-24 md:h-24 rounded-full bg-white/90 flex items-center justify-center shadow-2xl group-hover:scale-110 transition-transform duration-300">
+                  <svg className="w-8 h-8 md:w-10 md:h-10 text-[#3182f6] ml-1" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M8 5v14l11-7z" />
+                  </svg>
+                </div>
+              </div>
+              <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-black/80 to-transparent">
+                <p className="text-white font-semibold text-lg">&ldquo;마케팅이 없으면 안 되더라&rdquo; — 파트너 원장 인터뷰</p>
+                <p className="text-white/60 text-sm mt-1">개원 8개월 차, 신환 5배 달성까지의 여정</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
         {/* ===== 개원/개국 전문 도구 25종 ===== */}
         <section id="tools" className="py-20">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -988,6 +1224,30 @@ export default function HomePage() {
           </div>
         </section>
 
+        {/* ===== 고객사 로고 그리드 ===== */}
+        <section className="py-16">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-10">
+              <h2 className="text-2xl md:text-3xl font-bold tracking-tight mb-3">
+                전국 <span className="text-[#3182f6]">150+</span> 의료기관이 선택한 파트너
+              </h2>
+              <p className="text-muted-foreground">개원부터 운영까지, 함께 성장하는 병원들</p>
+            </div>
+
+            <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 gap-4 md:gap-6 items-center justify-items-center">
+              {Array.from({ length: 24 }, (_, i) => i + 1).map((n) => (
+                <div key={n} className="flex items-center justify-center p-2 rounded-xl hover:bg-secondary transition-colors">
+                  <img
+                    src={`/assets/clients/client-${String(n).padStart(2, '0')}.png`}
+                    alt={`파트너 병원 ${n}`}
+                    className="h-8 md:h-10 object-contain opacity-50 hover:opacity-100 transition-opacity grayscale hover:grayscale-0"
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
         {/* ===== CTA SECTION ===== */}
         <section className="py-20">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -1024,11 +1284,12 @@ export default function HomePage() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="grid md:grid-cols-2 lg:grid-cols-5 gap-8 mb-12">
               <div className="lg:col-span-1">
-                <Link href="/" className="flex items-center gap-2.5 mb-4">
-                  <div className="w-9 h-9 rounded-xl bg-[#3182f6] flex items-center justify-center">
-                    <span className="text-white font-bold text-lg">M</span>
-                  </div>
-                  <span className="font-bold text-xl">메디플라톤</span>
+                <Link href="/" className="flex items-center gap-2 mb-4">
+                  <img
+                    src="/assets/logo/mediplaton-horizontal.png"
+                    alt="MEDI-PLATON"
+                    className="h-8 object-contain"
+                  />
                 </Link>
                 <p className="text-muted-foreground mb-4 text-sm">
                   의료 개원의 모든 것을 연결하는 데이터 기반 통합 플랫폼

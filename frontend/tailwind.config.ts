@@ -84,6 +84,7 @@ const config: Config = {
         'accordion-down': 'accordionDown 0.2s ease-out',
         'accordion-up': 'accordionUp 0.2s ease-out',
         'count-up': 'countUp 0.6s ease-out forwards',
+        'marquee': 'marquee 40s linear infinite',
       },
       keyframes: {
         fadeIn: {
@@ -176,6 +177,10 @@ const config: Config = {
         countUp: {
           from: { opacity: '0', transform: 'translateY(10px)' },
           to: { opacity: '1', transform: 'translateY(0)' },
+        },
+        marquee: {
+          '0%': { transform: 'translateX(0%)' },
+          '100%': { transform: 'translateX(-50%)' },
         },
       },
       transitionDuration: {

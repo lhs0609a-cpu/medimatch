@@ -58,7 +58,10 @@ export default function LandlordDashboardPage() {
       <header className="bg-white border-b sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <TossIcon icon={Building2} color="from-emerald-500 to-teal-600" size="sm" shadow="shadow-emerald-500/25" />
+            <Link href="/">
+              <img src="/assets/logo/mediplaton-horizontal.png" alt="MEDI-PLATON" className="h-8 object-contain" />
+            </Link>
+            <div className="w-px h-6 bg-gray-200" />
             <div>
               <h1 className="text-xl font-bold text-gray-900">건물주 센터</h1>
               <p className="text-sm text-gray-500">매물 등록 및 관리</p>
@@ -97,30 +100,30 @@ export default function LandlordDashboardPage() {
       <main className="container mx-auto px-4 py-8">
         {/* Stats Cards */}
         <div className="grid md:grid-cols-4 gap-4 mb-8">
-          <div className="bg-white rounded-xl p-6 border">
+          <div className="bg-white rounded-xl p-6 shadow-sm">
             <div className="flex items-center justify-between mb-4">
-              <TossIcon icon={Home} color="from-blue-500 to-cyan-500" size="sm" shadow="shadow-blue-500/25" />
+              <TossIcon icon={Home} color="from-blue-500 to-cyan-500" size="sm" />
               <span className="text-2xl font-bold text-gray-900">{stats?.total_listings || 0}</span>
             </div>
             <p className="text-gray-500">총 등록 매물</p>
           </div>
-          <div className="bg-white rounded-xl p-6 border">
+          <div className="bg-white rounded-xl p-6 shadow-sm">
             <div className="flex items-center justify-between mb-4">
-              <TossIcon icon={CheckCircle2} color="from-green-500 to-emerald-500" size="sm" shadow="shadow-green-500/25" />
+              <TossIcon icon={CheckCircle2} color="from-green-500 to-emerald-500" size="sm" />
               <span className="text-2xl font-bold text-gray-900">{stats?.active_listings || 0}</span>
             </div>
             <p className="text-gray-500">공개중 매물</p>
           </div>
-          <div className="bg-white rounded-xl p-6 border">
+          <div className="bg-white rounded-xl p-6 shadow-sm">
             <div className="flex items-center justify-between mb-4">
-              <TossIcon icon={Eye} color="from-sky-500 to-blue-500" size="sm" shadow="shadow-sky-500/25" />
+              <TossIcon icon={Eye} color="from-sky-500 to-blue-500" size="sm" />
               <span className="text-2xl font-bold text-gray-900">{stats?.total_views || 0}</span>
             </div>
             <p className="text-gray-500">총 조회수</p>
           </div>
-          <div className="bg-white rounded-xl p-6 border">
+          <div className="bg-white rounded-xl p-6 shadow-sm">
             <div className="flex items-center justify-between mb-4">
-              <TossIcon icon={MessageSquare} color="from-purple-500 to-pink-500" size="sm" shadow="shadow-purple-500/25" />
+              <TossIcon icon={MessageSquare} color="from-purple-500 to-pink-500" size="sm" />
               <span className="text-2xl font-bold text-gray-900">{stats?.total_inquiries || 0}</span>
             </div>
             <p className="text-gray-500">총 문의수</p>
@@ -157,7 +160,7 @@ export default function LandlordDashboardPage() {
             <p className="text-gray-500">매물을 불러오는 중...</p>
           </div>
         ) : listings?.items?.length === 0 ? (
-          <div className="bg-white rounded-xl border p-12 text-center">
+          <div className="bg-white rounded-xl shadow-sm p-12 text-center">
             <Building2 className="w-16 h-16 text-gray-300 mx-auto mb-4" />
             <h3 className="text-lg font-semibold text-gray-900 mb-2">등록된 매물이 없습니다</h3>
             <p className="text-gray-500 mb-6">
@@ -182,7 +185,7 @@ export default function LandlordDashboardPage() {
                 <Link
                   key={listing.id}
                   href={`/landlord/listings/${listing.id}`}
-                  className="block bg-white rounded-xl border hover:border-emerald-300 hover:shadow-md transition-all"
+                  className="block bg-white rounded-xl shadow-sm hover:shadow-md transition-all"
                 >
                   <div className="p-6">
                     <div className="flex items-start justify-between mb-4">

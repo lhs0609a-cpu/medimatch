@@ -197,10 +197,7 @@ export default function MapPage() {
         <div className="max-w-full mx-auto px-4 sm:px-6">
           <div className="flex items-center justify-between h-14">
             <Link href="/" className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-foreground flex items-center justify-center">
-                <span className="text-background font-bold text-sm">M</span>
-              </div>
-              <span className="font-semibold text-foreground">메디플라톤</span>
+              <img src="/assets/logo/mediplaton-horizontal.png" alt="MEDI-PLATON" className="h-8 object-contain" />
             </Link>
 
             <nav className="hidden md:flex items-center gap-1">

@@ -146,8 +146,11 @@ export default function LandlordDashboardPage() {
               <Link href="/landlord" className="text-muted-foreground hover:text-foreground transition-colors">
                 <ArrowLeft className="w-5 h-5" />
               </Link>
-              <div className="flex items-center gap-2">
-                <span className="text-xl">🏢</span>
+              <div className="flex items-center gap-3">
+                <Link href="/">
+                  <img src="/assets/logo/mediplaton-horizontal.png" alt="MEDI-PLATON" className="h-8 object-contain" />
+                </Link>
+                <div className="w-px h-6 bg-border" />
                 <span className="text-lg font-bold text-foreground">건물주 대시보드</span>
               </div>
             </div>
@@ -166,10 +169,10 @@ export default function LandlordDashboardPage() {
 
       <main className="max-w-6xl mx-auto px-4 sm:px-6 py-8">
         {/* Subscription Status */}
-        <div className="card p-6 mb-6 bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 border-amber-200 dark:border-amber-800">
+        <div className="card p-6 mb-6 bg-amber-50 dark:bg-amber-900/20 border border-amber-100 dark:border-amber-800/40">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div className="flex items-center gap-4">
-              <TossIcon icon={Crown} color="from-amber-500 to-orange-500" size="md" shadow="shadow-amber-500/25" />
+              <TossIcon icon={Crown} color="from-amber-500 to-orange-500" size="md" />
               <div>
                 <div className="flex items-center gap-2">
                   <h2 className="text-xl font-bold text-foreground">{mockSubscription.planName} 플랜</h2>
@@ -229,7 +232,7 @@ export default function LandlordDashboardPage() {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div className="card p-4">
                 <div className="flex items-center gap-3">
-                  <TossIcon icon={Eye} color="from-sky-500 to-blue-500" size="sm" shadow="shadow-sky-500/25" />
+                  <TossIcon icon={Eye} color="from-sky-500 to-blue-500" size="sm" />
                   <div>
                     <p className="text-2xl font-bold text-foreground">390</p>
                     <p className="text-xs text-muted-foreground">이번 주 조회수</p>
@@ -238,7 +241,7 @@ export default function LandlordDashboardPage() {
               </div>
               <div className="card p-4">
                 <div className="flex items-center gap-3">
-                  <TossIcon icon={MessageSquare} color="from-green-500 to-emerald-500" size="sm" shadow="shadow-green-500/25" />
+                  <TossIcon icon={MessageSquare} color="from-green-500 to-emerald-500" size="sm" />
                   <div>
                     <p className="text-2xl font-bold text-foreground">20</p>
                     <p className="text-xs text-muted-foreground">이번 주 문의</p>
@@ -247,7 +250,7 @@ export default function LandlordDashboardPage() {
               </div>
               <div className="card p-4">
                 <div className="flex items-center gap-3">
-                  <TossIcon icon={Users} color="from-purple-500 to-pink-500" size="sm" shadow="shadow-purple-500/25" />
+                  <TossIcon icon={Users} color="from-purple-500 to-pink-500" size="sm" />
                   <div>
                     <p className="text-2xl font-bold text-foreground">3</p>
                     <p className="text-xs text-muted-foreground">보유 리드</p>
@@ -256,7 +259,7 @@ export default function LandlordDashboardPage() {
               </div>
               <div className="card p-4">
                 <div className="flex items-center gap-3">
-                  <TossIcon icon={Target} color="from-orange-500 to-red-500" size="sm" shadow="shadow-orange-500/25" />
+                  <TossIcon icon={Target} color="from-orange-500 to-red-500" size="sm" />
                   <div>
                     <p className="text-2xl font-bold text-foreground">2</p>
                     <p className="text-xs text-muted-foreground">관심 표시</p>

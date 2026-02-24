@@ -1,5 +1,5 @@
-// 메디플라톤 Service Worker
-const CACHE_NAME = 'mediplatone-v1'
+// MediMatch Service Worker
+const CACHE_NAME = 'medimatch-v2'
 const OFFLINE_URL = '/offline'
 
 // 캐시할 정적 자원
@@ -8,6 +8,8 @@ const STATIC_ASSETS = [
   '/offline',
   '/manifest.json',
   '/favicon.ico',
+  '/emr/dashboard',
+  '/emr/login',
 ]
 
 // 설치 이벤트

@@ -202,7 +202,7 @@ export default function DashboardPage() {
       <div className="min-h-screen gradient-bg-soft flex items-center justify-center">
         <div className="text-center">
           <div className="mx-auto mb-4 animate-pulse w-fit">
-            <TossIcon icon={Sparkles} color="from-violet-500 to-indigo-600" size="xl" shadow="shadow-violet-500/25" />
+            <TossIcon icon={Sparkles} color="from-violet-500 to-indigo-600" size="xl" />
           </div>
           <p className="text-gray-500">로딩 중...</p>
         </div>
@@ -217,10 +217,7 @@ export default function DashboardPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <Link href="/" className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-violet-600 to-indigo-600 flex items-center justify-center">
-                <Sparkles className="w-5 h-5 text-white" />
-              </div>
-              <span className="text-lg font-bold text-gray-900">메디플라톤</span>
+              <img src="/assets/logo/mediplaton-horizontal.png" alt="MEDI-PLATON" className="h-8 object-contain" />
             </Link>
 
             <nav className="hidden md:flex items-center gap-1">
@@ -244,7 +241,7 @@ export default function DashboardPage() {
                   <span className="absolute top-1 right-1 w-2 h-2 bg-rose-500 rounded-full" />
                 )}
               </button>
-              <div className="w-9 h-9 rounded-full bg-gradient-to-br from-violet-400 to-fuchsia-400 flex items-center justify-center text-white font-medium text-sm">
+              <div className="w-9 h-9 rounded-full bg-violet-500 flex items-center justify-center text-white font-medium text-sm">
                 {userName.charAt(0)}
               </div>
             </div>
@@ -270,9 +267,9 @@ export default function DashboardPage() {
             <Link
               key={action.href}
               href={action.href}
-              className="group relative p-5 bg-white rounded-2xl border border-gray-100 hover:border-gray-200 hover:shadow-lg transition-all duration-300 overflow-hidden"
+              className="group relative p-5 bg-white rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden"
             >
-              <div className={`absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-${action.color}-500/10 to-transparent rounded-full blur-2xl`} />
+              <div className={`absolute top-0 right-0 w-24 h-24 bg-${action.color}-500/10 rounded-full blur-2xl`} />
               <div className="relative">
                 <div className="mb-4">
                   <TossIcon icon={action.icon} color={`from-${action.color}-500 to-${action.color}-600`} size="md" shadow={`shadow-${action.color}-500/25`} />
