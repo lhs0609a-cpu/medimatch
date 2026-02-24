@@ -935,10 +935,10 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* ===== 포트폴리오 갤러리 ===== */}
-        <section className="py-20 md:py-28">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-12">
+        {/* ===== 함께한 병원 로고 마키 ===== */}
+        <section className="py-20 md:py-28 overflow-hidden">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-12">
+            <div className="text-center">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-violet-600/10 text-violet-600 text-sm font-medium mb-4">
                 <Paintbrush className="w-4 h-4" />
                 실제 개원 사례
@@ -947,37 +947,57 @@ export default function HomePage() {
                 메디플라톤이 함께한 병원들
               </h2>
               <p className="text-muted-foreground max-w-2xl mx-auto">
-                입지 선정부터 인테리어, 마케팅까지 — 실제 개원 컨설팅 포트폴리오입니다
+                입지 선정부터 인테리어, 마케팅까지 — 150곳 이상의 병원이 메디플라톤과 함께했습니다
               </p>
             </div>
+          </div>
 
-            {/* 사진 그리드 */}
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
-              {[
-                { src: '/assets/hospital/luxury-lobby-1.jpg', label: '프리미엄 로비', span: 'md:col-span-2 md:row-span-2' },
-                { src: '/assets/hospital/treatment-room.jpg', label: '시술실', span: '' },
-                { src: '/assets/hospital/locker-room.jpg', label: '파우더 & 락커룸', span: '' },
-                { src: '/assets/hospital/luxury-lobby-2.jpg', label: '인테리어 디테일', span: '' },
-                { src: '/assets/hospital/treatment-beds.jpg', label: '회복실', span: '' },
-                { src: '/assets/hospital/waiting-room-render.jpg', label: '대기실 3D 설계', span: 'md:col-span-2' },
-                { src: '/assets/hospital/medical-equipment.jpg', label: '최신 장비', span: '' },
-                { src: '/assets/hospital/powder-room.jpg', label: '세면 공간', span: '' },
-              ].map((photo, i) => (
-                <div
-                  key={i}
-                  className={`group relative rounded-2xl overflow-hidden cursor-pointer ${photo.span}`}
-                >
-                  <div className="aspect-[4/3] overflow-hidden">
-                    <img
-                      src={photo.src}
-                      alt={photo.label}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                    />
-                  </div>
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                  <div className="absolute bottom-0 left-0 right-0 p-4 translate-y-4 group-hover:translate-y-0 opacity-0 group-hover:opacity-100 transition-all duration-300">
-                    <span className="text-white font-medium text-sm">{photo.label}</span>
-                  </div>
+          {/* 1열: 왼쪽으로 흐르는 로고 */}
+          <div className="relative mb-6">
+            <div className="absolute left-0 top-0 bottom-0 w-32 bg-gradient-to-r from-background to-transparent z-10" />
+            <div className="absolute right-0 top-0 bottom-0 w-32 bg-gradient-to-l from-background to-transparent z-10" />
+            <div className="flex animate-marquee w-max">
+              {[...Array(2)].map((_, setIdx) => (
+                <div key={setIdx} className="flex items-center gap-8 px-4">
+                  {Array.from({ length: 20 }, (_, i) => i + 1).map((n) => (
+                    <div
+                      key={`r1-${setIdx}-${n}`}
+                      className="flex-shrink-0 w-28 h-16 md:w-36 md:h-20 bg-card rounded-xl border border-border/50 flex items-center justify-center p-3 hover:border-[#3182f6]/30 hover:shadow-lg transition-all duration-300"
+                    >
+                      <img
+                        src={`/assets/clients/client-${String(n).padStart(2, '0')}.png`}
+                        alt={`파트너 병원 ${n}`}
+                        className="max-w-full max-h-full object-contain opacity-70 hover:opacity-100 transition-opacity"
+                      />
+                    </div>
+                  ))}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* 2열: 오른쪽으로 흐르는 로고 (역방향) */}
+          <div className="relative">
+            <div className="absolute left-0 top-0 bottom-0 w-32 bg-gradient-to-r from-background to-transparent z-10" />
+            <div className="absolute right-0 top-0 bottom-0 w-32 bg-gradient-to-l from-background to-transparent z-10" />
+            <div className="flex animate-marquee-reverse w-max">
+              {[...Array(2)].map((_, setIdx) => (
+                <div key={setIdx} className="flex items-center gap-8 px-4">
+                  {Array.from({ length: 19 }, (_, i) => i + 21).map((n) => {
+                    const ext = n >= 36 ? 'jpg' : 'png'
+                    return (
+                      <div
+                        key={`r2-${setIdx}-${n}`}
+                        className="flex-shrink-0 w-28 h-16 md:w-36 md:h-20 bg-card rounded-xl border border-border/50 flex items-center justify-center p-3 hover:border-[#3182f6]/30 hover:shadow-lg transition-all duration-300"
+                      >
+                        <img
+                          src={`/assets/clients/client-${String(n).padStart(2, '0')}.${ext}`}
+                          alt={`파트너 병원 ${n}`}
+                          className="max-w-full max-h-full object-contain opacity-70 hover:opacity-100 transition-opacity"
+                        />
+                      </div>
+                    )
+                  })}
                 </div>
               ))}
             </div>
