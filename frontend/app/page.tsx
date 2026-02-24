@@ -457,113 +457,93 @@ export default function HomePage() {
           </div>
         </div>
 
-        {/* ===== HERO SECTION - 비디오/사진 배경 ===== */}
+        {/* ===== HERO SECTION ===== */}
         <main id="main-content" role="main">
-        <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-10 lg:pt-0" aria-label="히어로 섹션">
-          {/* 배경 비디오/사진 */}
+        <section className="relative min-h-screen flex items-end overflow-hidden" aria-label="히어로 섹션">
+          {/* 배경 — 거의 풀 다크 + 사진 살짝 */}
           <div className="absolute inset-0 z-0">
-            <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/50 to-background z-10" />
+            <div className="absolute inset-0 bg-[#0a0a0a] z-10" />
             <video
               autoPlay
               muted
               loop
               playsInline
               poster="/assets/hospital/luxury-lobby-2.jpg"
-              className="w-full h-full object-cover"
+              className="w-full h-full object-cover opacity-[0.15]"
             >
               <source src="/assets/video/hero-video.mp4" type="video/mp4" />
             </video>
           </div>
 
-          {/* 실시간 활동 피드 - 좌측 (데스크톱) */}
-          <div className="absolute left-4 top-1/2 -translate-y-1/2 z-20 hidden lg:block">
-            <div className="bg-card/90 backdrop-blur-xl border border-border rounded-2xl p-4 w-72 shadow-2xl">
-              <div className="flex items-center gap-2 mb-4">
-                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-                <span className="text-xs font-medium text-muted-foreground">실시간 활동</span>
-              </div>
-              <div className="space-y-3 max-h-80 overflow-hidden">
-                {liveFeed.slice(0, 6).map((item, index) => {
-                  const Icon = item.icon
-                  return (
-                    <div
-                      key={item.id}
-                      className={`flex items-start gap-3 p-2 rounded-lg transition-all duration-500 ${
-                        index === currentFeedIndex % 6 ? 'bg-accent scale-[1.02]' : 'opacity-60'
-                      }`}
-                    >
-                      <div className={`w-8 h-8 rounded-lg bg-secondary flex items-center justify-center flex-shrink-0 ${item.color}`}>
-                        <Icon className="w-4 h-4" />
-                      </div>
-                      <div className="min-w-0">
-                        <p className="text-sm font-medium text-foreground truncate">{item.message}</p>
-                        <p className="text-xs text-muted-foreground">{item.location} · {item.time}</p>
-                      </div>
-                    </div>
-                  )
-                })}
-              </div>
-            </div>
-          </div>
+          {/* 장식 그라데이션 오브 */}
+          <div className="absolute top-1/4 right-1/4 w-[600px] h-[600px] bg-[#3182f6]/10 rounded-full blur-[120px] z-[1]" />
+          <div className="absolute bottom-0 left-1/3 w-[400px] h-[400px] bg-purple-500/8 rounded-full blur-[100px] z-[1]" />
 
           {/* 메인 콘텐츠 */}
-          <div className="relative z-20 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-24">
-            <div className="text-center">
-              {/* 뱃지 */}
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-md mb-6 animate-fade-in border border-white/20">
-                <Activity className="w-4 h-4 text-blue-400 animate-pulse" />
-                <span className="text-sm font-medium text-white/90">
-                  지금 <span className="text-blue-400 font-bold">{platformStats.onlineNow}명</span>이 매물을 탐색 중
-                </span>
-              </div>
-
-              {/* 메인 헤드라인 */}
-              <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight mb-6 animate-fade-in-up">
-                <span className="text-white">성공적인 개원,</span>
-                <br />
-                <span className="text-[#3182f6]">
-                  데이터로 시작
-                </span>
-                <span className="text-white">합니다</span>
-              </h1>
-
-              <p className="text-lg md:text-xl text-white/70 mb-4 max-w-2xl mx-auto animate-fade-in-up delay-100">
-                평균 개원 비용 <span className="text-white font-semibold">4억 8천만 원</span>, 연간 <span className="text-white font-semibold">4,097개</span> 의료기관 폐업.
-                <br className="hidden sm:block" />
-                철저한 분석 없이 개원하면 2시간마다 한 곳이 문을 닫습니다.
-              </p>
-              <p className="text-base md:text-lg text-white/50 mb-8 max-w-xl mx-auto animate-fade-in-up delay-150">
-                AI 기반 개원 분석부터 매물 검색, 약국 매칭까지 — 메디플라톤이 함께합니다
-              </p>
-
-              {/* CTA 버튼 */}
-              <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12 animate-fade-in-up delay-200">
-                <Link href="/simulate" className="btn-primary btn-lg group text-lg px-8">
-                  무료 시뮬레이션 시작
-                  <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                </Link>
-                <Link href="/buildings" className="btn-outline btn-lg text-lg px-8">
-                  <Eye className="w-5 h-5" />
-                  매물 {platformStats.totalListings}개 보기
-                </Link>
-              </div>
-
-              {/* 실시간 알림 배너 */}
-              <div className="inline-flex items-center gap-3 px-5 py-3 bg-white/10 backdrop-blur-md rounded-full animate-fade-in delay-300 border border-white/20">
-                <span className="flex h-3 w-3 relative">
+          <div className="relative z-20 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16 pt-32 lg:pt-40">
+            {/* 상단 뱃지 */}
+            <div className="flex justify-center mb-8 animate-fade-in">
+              <div className="inline-flex items-center gap-2.5 px-5 py-2.5 rounded-full bg-white/[0.06] border border-white/[0.08]">
+                <span className="flex h-2.5 w-2.5 relative">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
+                  <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-green-400"></span>
                 </span>
-                <span className="text-sm text-white/90">
-                  방금 <span className="font-semibold text-green-400">서울 강남구</span>에서 새 매물이 등록되었습니다
+                <span className="text-sm text-white/60">
+                  지금 <span className="text-white font-semibold">{platformStats.onlineNow}명</span>이 매물을 탐색 중
                 </span>
+              </div>
+            </div>
+
+            {/* 메인 헤드라인 */}
+            <div className="text-center mb-8 animate-fade-in-up">
+              <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-[5.5rem] font-black tracking-tight leading-[1.05]">
+                <span className="text-white">2시간마다 한 곳,</span>
+                <br />
+                <span className="bg-gradient-to-r from-[#3182f6] via-[#5B9CF6] to-[#3182f6] bg-clip-text text-transparent">
+                  당신은 다릅니다
+                </span>
+              </h1>
+            </div>
+
+            {/* 서브 텍스트 */}
+            <p className="text-center text-lg md:text-xl text-white/40 mb-10 max-w-2xl mx-auto animate-fade-in-up delay-100 leading-relaxed">
+              연간 <span className="text-white/70 font-medium">4,097개</span> 의료기관이 폐업합니다.
+              <br className="hidden sm:block" />
+              메디플라톤의 데이터 분석으로 성공하는 개원을 시작하세요.
+            </p>
+
+            {/* CTA 버튼 */}
+            <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16 animate-fade-in-up delay-200">
+              <Link href="/simulate" className="inline-flex items-center justify-center gap-2.5 px-10 py-4.5 bg-[#3182f6] text-white rounded-2xl font-semibold text-lg hover:bg-[#2272e6] transition-all shadow-[0_0_40px_rgba(49,130,246,0.3)] hover:shadow-[0_0_60px_rgba(49,130,246,0.4)] group">
+                무료 시뮬레이션 시작
+                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              </Link>
+              <Link href="/buildings" className="inline-flex items-center justify-center gap-2.5 px-10 py-4.5 bg-white/[0.06] text-white/80 border border-white/[0.1] rounded-2xl font-semibold text-lg hover:bg-white/[0.1] hover:text-white transition-all">
+                <Eye className="w-5 h-5" />
+                매물 {platformStats.totalListings}개 보기
+              </Link>
+            </div>
+
+            {/* 핵심 수치 카드 3개 */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-3xl mx-auto animate-fade-in-up delay-300">
+              <div className="text-center p-5 rounded-2xl bg-white/[0.04] border border-white/[0.06] backdrop-blur-sm">
+                <div className="text-3xl md:text-4xl font-black text-[#3182f6] mb-1">4.8<span className="text-xl">억</span></div>
+                <div className="text-xs text-white/40">평균 개원 비용</div>
+              </div>
+              <div className="text-center p-5 rounded-2xl bg-white/[0.04] border border-white/[0.06] backdrop-blur-sm">
+                <div className="text-3xl md:text-4xl font-black text-red-400 mb-1">4,097<span className="text-xl">개</span></div>
+                <div className="text-xs text-white/40">연간 폐업 의료기관</div>
+              </div>
+              <div className="text-center p-5 rounded-2xl bg-white/[0.04] border border-white/[0.06] backdrop-blur-sm">
+                <div className="text-3xl md:text-4xl font-black text-emerald-400 mb-1">97<span className="text-xl">%</span></div>
+                <div className="text-xs text-white/40">컨설팅 고객 만족도</div>
               </div>
             </div>
           </div>
 
           {/* 스크롤 인디케이터 */}
-          <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 animate-bounce">
-            <ChevronDown className="w-6 h-6 text-muted-foreground" />
+          <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 animate-bounce">
+            <ChevronDown className="w-5 h-5 text-white/20" />
           </div>
         </section>
 
@@ -627,7 +607,7 @@ export default function HomePage() {
         </section>
 
         {/* ===== 실제 성과 섹션 ===== */}
-        <section className="py-20 md:py-28">
+        <section className="py-20 md:py-28 bg-secondary/50">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-16">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-600/10 text-emerald-600 text-sm font-medium mb-4">
@@ -639,48 +619,77 @@ export default function HomePage() {
               </h2>
             </div>
 
-            <div className="grid md:grid-cols-3 gap-8">
-              {/* 성과 카드 1 */}
-              <div className="relative group">
-                <div className="bg-card rounded-3xl p-8 border border-border hover:shadow-2xl transition-all duration-300 h-full">
-                  <div className="text-6xl md:text-7xl font-black text-[#3182f6] mb-4">5배</div>
-                  <h3 className="text-xl font-bold mb-2">8개월 만에 신환 5배 증가</h3>
-                  <p className="text-muted-foreground text-sm leading-relaxed">
-                    메디플라톤의 통합 마케팅 전략으로 실제 파트너 병원이 달성한 성과입니다. 블로그, SNS, 플랫폼을 통합 운영하여 지속적인 신규 환자 유입을 실현했습니다.
-                  </p>
-                  <div className="mt-6">
-                    <img src="/assets/marketing/result-5x-growth.png" alt="신환 5배 증가 실적" className="rounded-xl border border-border w-full" />
-                  </div>
-                </div>
-              </div>
+            {/* 성과 카드 — 통일된 디자인 */}
+            <div className="grid md:grid-cols-3 gap-6">
+              {[
+                {
+                  number: '5',
+                  unit: '배',
+                  color: 'text-[#3182f6]',
+                  bgGlow: 'bg-[#3182f6]/5',
+                  borderColor: 'border-[#3182f6]/20',
+                  iconBg: 'bg-[#3182f6]',
+                  icon: TrendingUp,
+                  title: '8개월 만에 신환 5배 증가',
+                  desc: '통합 마케팅(블로그·플레이스·카페) 전략으로 실제 파트너 병원이 달성한 신규 환자 유입 성과',
+                  detail: '블로그 4,275명 구독자 확보',
+                },
+                {
+                  number: '93.3',
+                  unit: '점',
+                  color: 'text-emerald-500',
+                  bgGlow: 'bg-emerald-500/5',
+                  borderColor: 'border-emerald-500/20',
+                  iconBg: 'bg-emerald-500',
+                  icon: Star,
+                  title: '콘텐츠 만족도 최상급',
+                  desc: '500명 대상 설문에서 "글이 감동적이어서 신뢰가 갔다"는 실제 환자 후기로 검증된 품질',
+                  detail: '경쟁사 대비 만족도 1위',
+                },
+                {
+                  number: '150',
+                  unit: '+',
+                  color: 'text-amber-500',
+                  bgGlow: 'bg-amber-500/5',
+                  borderColor: 'border-amber-500/20',
+                  iconBg: 'bg-amber-500',
+                  icon: Building2,
+                  title: '개원 컨설팅 누적 실적',
+                  desc: '입지 선정부터 인테리어·마케팅·대출까지 원스톱으로 지원. 각 분야 최고 전문가 네트워크',
+                  detail: '전국 30+ 전문 파트너',
+                },
+              ].map((item, i) => {
+                const Icon = item.icon
+                return (
+                  <div key={i} className={`bg-card rounded-3xl p-8 border ${item.borderColor} hover:shadow-xl transition-all duration-300`}>
+                    {/* 아이콘 + 숫자 */}
+                    <div className="flex items-start justify-between mb-6">
+                      <div className={`w-12 h-12 rounded-2xl ${item.iconBg} flex items-center justify-center shadow-lg`}>
+                        <Icon className="w-6 h-6 text-white" />
+                      </div>
+                      <div className={`px-3 py-1 rounded-full ${item.bgGlow} ${item.color} text-xs font-semibold`}>
+                        검증된 성과
+                      </div>
+                    </div>
 
-              {/* 성과 카드 2 */}
-              <div className="relative group">
-                <div className="bg-card rounded-3xl p-8 border border-border hover:shadow-2xl transition-all duration-300 h-full">
-                  <div className="text-6xl md:text-7xl font-black text-emerald-500 mb-4">93.3<span className="text-3xl">점</span></div>
-                  <h3 className="text-xl font-bold mb-2">병원 블로그 최상급 만족도</h3>
-                  <p className="text-muted-foreground text-sm leading-relaxed">
-                    환자들이 직접 평가한 블로그 콘텐츠 만족도. &ldquo;글이 너무 감동적이어서 믿을 수 있었다&rdquo;는 실제 환자 후기가 증명합니다.
-                  </p>
-                  <div className="mt-6">
-                    <img src="/assets/marketing/blog-satisfaction.png" alt="블로그 만족도 93.3점" className="rounded-xl border border-border w-full" />
-                  </div>
-                </div>
-              </div>
+                    {/* 핵심 숫자 */}
+                    <div className="mb-4">
+                      <span className={`text-6xl font-black ${item.color}`}>{item.number}</span>
+                      <span className={`text-2xl font-bold ${item.color}`}>{item.unit}</span>
+                    </div>
 
-              {/* 성과 카드 3 */}
-              <div className="relative group">
-                <div className="bg-card rounded-3xl p-8 border border-border hover:shadow-2xl transition-all duration-300 h-full">
-                  <div className="text-6xl md:text-7xl font-black text-amber-500 mb-4">150<span className="text-3xl">+</span></div>
-                  <h3 className="text-xl font-bold mb-2">개원 컨설팅 누적 실적</h3>
-                  <p className="text-muted-foreground text-sm leading-relaxed">
-                    입지 선정부터 인테리어, 마케팅, 대출까지 원스톱으로 지원. 각 분야의 최고 전문가가 한 팀으로 개원을 함께합니다.
-                  </p>
-                  <div className="mt-6">
-                    <img src="/assets/marketing/opening-solution.png" alt="개원 솔루션" className="rounded-xl border border-border w-full" />
+                    {/* 설명 */}
+                    <h3 className="text-lg font-bold mb-2">{item.title}</h3>
+                    <p className="text-muted-foreground text-sm leading-relaxed mb-4">{item.desc}</p>
+
+                    {/* 하단 디테일 */}
+                    <div className={`flex items-center gap-2 pt-4 border-t ${item.borderColor}`}>
+                      <CheckCircle2 className={`w-4 h-4 ${item.color} flex-shrink-0`} />
+                      <span className="text-sm font-medium">{item.detail}</span>
+                    </div>
                   </div>
-                </div>
-              </div>
+                )
+              })}
             </div>
           </div>
         </section>
