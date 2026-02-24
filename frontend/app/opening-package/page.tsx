@@ -394,74 +394,100 @@ export default function OpeningPackagePage() {
       </header>
 
       <main>
-        {/* ===== Section 1: Hero ===== */}
-        <section ref={heroRef} className="relative min-h-screen flex items-center justify-center overflow-hidden pt-16">
-          {/* 배경 사진 */}
-          <div className="absolute inset-0 -z-10">
-            <div className="absolute inset-0 bg-gradient-to-b from-background/90 via-background/70 to-background z-10" />
+        {/* ===== Section 1: Hero — 다크 임팩트 ===== */}
+        <section ref={heroRef} className="relative min-h-screen flex items-end overflow-hidden">
+          {/* 배경: 컨설팅 현장 사진 + 다크 오버레이 */}
+          <div className="absolute inset-0 z-0">
+            <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/80 to-[#0a0a0a]/60 z-10" />
             <img
-              src="/assets/hospital/luxury-lobby-1.jpg"
+              src="/assets/consulting/consultation-1.jpg"
               alt=""
               className="w-full h-full object-cover opacity-30"
             />
           </div>
 
-          <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-            <div className="text-center">
-              <div className="inline-flex items-center gap-3 px-4 py-2 rounded-full bg-[#3182f6]/5 border border-[#3182f6]/20 mb-8 animate-fade-in">
+          {/* 장식 그라데이션 */}
+          <div className="absolute top-1/3 right-1/4 w-[500px] h-[500px] bg-[#3182f6]/8 rounded-full blur-[120px] z-[1]" />
+          <div className="absolute bottom-1/4 left-1/4 w-[400px] h-[400px] bg-purple-500/6 rounded-full blur-[100px] z-[1]" />
+
+          <div className="relative z-20 w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pb-16 pt-32 lg:pt-40">
+            {/* 제휴 뱃지 */}
+            <div className="flex justify-center mb-8 animate-fade-in">
+              <div className="inline-flex items-center gap-3 px-5 py-2.5 rounded-full bg-white/[0.06] border border-white/[0.08]">
                 <span className="text-base">🏦</span>
-                <span className="text-sm font-medium">
-                  <span className="text-blue-600 font-semibold">신협중앙회</span> · <span className="text-orange-600 font-semibold">KB국민카드</span> 정식 제휴
+                <span className="text-sm text-white/60">
+                  <span className="text-white font-semibold">신협중앙회</span> · <span className="text-white font-semibold">KB국민카드</span> 정식 제휴
                 </span>
               </div>
+            </div>
 
-              <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight mb-6 animate-fade-in-up">
-                <span className="text-foreground">PG 하나로 시작해서</span>
+            {/* 메인 헤드라인 */}
+            <div className="text-center mb-6 animate-fade-in-up">
+              <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black tracking-tight leading-[1.08]">
+                <span className="text-white">개원 비용은 줄이고</span>
                 <br />
-                <span className="text-[#3182f6]">
-                  최대 2,580만원 마케팅 무료
+                <span className="bg-gradient-to-r from-[#3182f6] via-[#5B9CF6] to-[#3182f6] bg-clip-text text-transparent">
+                  마케팅은 2,580만원 무료
                 </span>
               </h1>
+            </div>
 
-              <p className="text-lg md:text-xl text-muted-foreground mb-4 max-w-2xl mx-auto animate-fade-in-up delay-100">
-                서비스를 추가할수록 마케팅 혜택이 늘어나는 구조
-              </p>
-              <p className="text-base text-muted-foreground mb-10 max-w-xl mx-auto animate-fade-in-up delay-150">
-                PG 설치만으로 블로그·플레이스 무료, 대출·중개 추가 시 <span className="text-orange-600 font-semibold">풀마케팅 무료</span>
-              </p>
+            <p className="text-center text-lg md:text-xl text-white/40 mb-10 max-w-2xl mx-auto animate-fade-in-up delay-100 leading-relaxed">
+              PG 설치만으로 블로그·플레이스 무료 시작
+              <br className="hidden sm:block" />
+              대출·중개 추가 시 <span className="text-orange-400 font-semibold">풀마케팅 무료</span>
+            </p>
 
-              <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12 animate-fade-in-up delay-200">
-                <button onClick={scrollToForm} className="btn-primary btn-lg group text-lg px-8">
-                  무료 상담 신청
-                  <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                </button>
-                <a href="#calculator" className="btn-outline btn-lg text-lg px-8">
-                  <Sparkles className="w-5 h-5" />
-                  내 혜택 확인하기
-                </a>
-              </div>
+            {/* CTA */}
+            <div className="flex flex-col sm:flex-row gap-4 justify-center mb-14 animate-fade-in-up delay-200">
+              <button onClick={scrollToForm} className="inline-flex items-center justify-center gap-2.5 px-10 py-4 bg-[#3182f6] text-white rounded-2xl font-semibold text-lg hover:bg-[#2272e6] transition-all shadow-[0_0_40px_rgba(49,130,246,0.3)] hover:shadow-[0_0_60px_rgba(49,130,246,0.4)] group">
+                무료 상담 신청
+                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              </button>
+              <a href="#calculator" className="inline-flex items-center justify-center gap-2.5 px-10 py-4 bg-white/[0.06] text-white/80 border border-white/[0.1] rounded-2xl font-semibold text-lg hover:bg-white/[0.1] hover:text-white transition-all">
+                <Sparkles className="w-5 h-5" />
+                내 혜택 확인하기
+              </a>
+            </div>
 
-              {/* 3등급 프리뷰 */}
-              <div className="grid grid-cols-3 gap-3 max-w-2xl mx-auto animate-fade-in-up delay-300">
-                {[
-                  { name: '기본', bg: 'bg-[#3182f6]', borderColor: 'border-[#3182f6]/30', color: 'text-[#3182f6]', desc: 'PG 설치' },
-                  { name: '플러스', bg: 'bg-purple-500', borderColor: 'border-purple-500/30', color: 'text-purple-600', desc: 'PG + 1개' },
-                  { name: '프리미엄', bg: 'bg-amber-500', borderColor: 'border-amber-500/30', color: 'text-amber-600', desc: 'PG + 2개' },
-                ].map((t) => (
-                  <div key={t.name} className={`flex flex-col items-center gap-1.5 p-4 rounded-2xl bg-card border ${t.borderColor}`}>
-                    <div className={`icon-3d w-10 h-10 rounded-2xl ${t.bg} flex items-center justify-center`}>
-                      <span className="text-white text-xs font-bold">{t.name[0]}</span>
-                    </div>
-                    <span className={`text-sm font-semibold ${t.color}`}>{t.name}</span>
-                    <span className="text-xs text-muted-foreground">{t.desc}</span>
-                  </div>
-                ))}
-              </div>
+            {/* 3등급 프리뷰 카드 */}
+            <div className="grid grid-cols-3 gap-3 max-w-2xl mx-auto animate-fade-in-up delay-300">
+              {[
+                { name: '기본', color: 'border-[#3182f6]/40 bg-[#3182f6]/10', text: 'text-[#3182f6]', desc: 'PG 설치', value: '1,230만원' },
+                { name: '플러스', color: 'border-purple-500/40 bg-purple-500/10', text: 'text-purple-400', desc: 'PG + 대출 or 중개', value: '+750만원' },
+                { name: '프리미엄', color: 'border-amber-500/40 bg-amber-500/10', text: 'text-amber-400', desc: 'PG + 대출 + 중개', value: '2,580만원' },
+              ].map((t) => (
+                <div key={t.name} className={`flex flex-col items-center gap-1 p-4 rounded-2xl border ${t.color}`}>
+                  <span className={`text-sm font-bold ${t.text}`}>{t.name}</span>
+                  <span className="text-xs text-white/40">{t.desc}</span>
+                  <span className={`text-lg font-bold ${t.text} mt-1`}>{t.value}</span>
+                </div>
+              ))}
             </div>
           </div>
 
-          <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce">
-            <ChevronDown className="w-6 h-6 text-muted-foreground" />
+          <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 animate-bounce">
+            <ChevronDown className="w-5 h-5 text-white/20" />
+          </div>
+        </section>
+
+        {/* ===== 실제 성과 바 ===== */}
+        <section className="py-10 bg-foreground text-background border-b border-white/10">
+          <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="grid grid-cols-3 gap-6 text-center">
+              <div>
+                <div className="text-3xl md:text-4xl font-black text-[#3182f6]">5<span className="text-lg">배</span></div>
+                <p className="text-xs md:text-sm text-white/50 mt-1">8개월 만에 신환 증가</p>
+              </div>
+              <div>
+                <div className="text-3xl md:text-4xl font-black text-emerald-400">93.3<span className="text-lg">점</span></div>
+                <p className="text-xs md:text-sm text-white/50 mt-1">콘텐츠 만족도</p>
+              </div>
+              <div>
+                <div className="text-3xl md:text-4xl font-black text-amber-400">150<span className="text-lg">+</span></div>
+                <p className="text-xs md:text-sm text-white/50 mt-1">개원 컨설팅 실적</p>
+              </div>
+            </div>
           </div>
         </section>
 
@@ -1024,6 +1050,7 @@ export default function OpeningPackagePage() {
         {/* ===== Section 10: 신뢰/사회적 증거 ===== */}
         <section className="py-20 bg-secondary/50">
           <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+            {/* 제휴 파트너 */}
             <div className="text-center mb-12">
               <p className="text-sm text-muted-foreground mb-6">정식 제휴 파트너</p>
               <div className="flex flex-wrap items-center justify-center gap-4 mb-12">
@@ -1036,6 +1063,7 @@ export default function OpeningPackagePage() {
               </div>
             </div>
 
+            {/* 숫자 카운터 */}
             <div className="grid grid-cols-3 gap-6 mb-16">
               <div ref={consultCount.ref} className="text-center">
                 <p className="text-3xl md:text-4xl font-bold text-blue-600">{consultCount.count.toLocaleString()}+</p>
@@ -1051,26 +1079,32 @@ export default function OpeningPackagePage() {
               </div>
             </div>
 
+            {/* 후기 카드 — 실제 사진 포함 */}
             <div className="grid md:grid-cols-3 gap-6">
               {[
-                { name: '김○○ 원장님', specialty: '내과', quote: 'PG만 바꿨을 뿐인데 블로그·플레이스가 무료로 돌아가고, 대출까지 하니 카페 바이럴과 전담 마케터까지 배정됐어요. 개원 초기 비용이 크게 줄었습니다.', rating: 5 },
-                { name: '박○○ 원장님', specialty: '피부과', quote: '중개까지 맡기니 프리미엄 등급이 되면서 SNS 마케팅도 무료! 전담 매니저가 한 번에 처리해줘서 정말 편했습니다.', rating: 5 },
-                { name: '최○○ 원장님', specialty: '치과', quote: 'PG만 설치했을 뿐인데 블로그·플레이스가 바로 무료로 시작되고, 대출까지 추가하니 홈페이지까지 무료로 만들어줬어요. 원스톱이라 정말 편합니다.', rating: 5 },
+                { name: '김○○ 원장님', specialty: '내과', photo: '/assets/consulting/doctor-meeting.jpg', quote: 'PG만 바꿨을 뿐인데 블로그·플레이스가 무료로 돌아가고, 대출까지 하니 카페 바이럴과 전담 마케터까지 배정됐어요. 개원 초기 비용이 크게 줄었습니다.', rating: 5 },
+                { name: '박○○ 원장님', specialty: '피부과', photo: '/assets/consulting/interview-setup.jpg', quote: '중개까지 맡기니 프리미엄 등급이 되면서 SNS 마케팅도 무료! 전담 매니저가 한 번에 처리해줘서 정말 편했습니다.', rating: 5 },
+                { name: '최○○ 원장님', specialty: '치과', photo: '/assets/consulting/clinic-lobby.jpg', quote: 'PG만 설치했을 뿐인데 블로그·플레이스가 바로 무료로 시작되고, 대출까지 추가하니 홈페이지까지 무료로 만들어줬어요. 원스톱이라 정말 편합니다.', rating: 5 },
               ].map((review) => (
-                <div key={review.name} className="bg-card border border-border rounded-2xl p-6">
-                  <div className="flex items-center gap-1 mb-3">
-                    {Array.from({ length: review.rating }).map((_, i) => (
-                      <Star key={i} className="w-4 h-4 fill-amber-400 text-amber-400" />
-                    ))}
+                <div key={review.name} className="bg-card border border-border rounded-2xl overflow-hidden">
+                  <div className="aspect-[16/9] overflow-hidden">
+                    <img src={review.photo} alt={review.name} className="w-full h-full object-cover" />
                   </div>
-                  <p className="text-sm text-muted-foreground mb-4 leading-relaxed">&ldquo;{review.quote}&rdquo;</p>
-                  <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-white text-xs font-bold">
-                      {review.name[0]}
+                  <div className="p-6">
+                    <div className="flex items-center gap-1 mb-3">
+                      {Array.from({ length: review.rating }).map((_, i) => (
+                        <Star key={i} className="w-4 h-4 fill-amber-400 text-amber-400" />
+                      ))}
                     </div>
-                    <div>
-                      <p className="text-sm font-medium">{review.name}</p>
-                      <p className="text-xs text-muted-foreground">{review.specialty}</p>
+                    <p className="text-sm text-muted-foreground mb-4 leading-relaxed">&ldquo;{review.quote}&rdquo;</p>
+                    <div className="flex items-center gap-2">
+                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-white text-xs font-bold">
+                        {review.name[0]}
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium">{review.name}</p>
+                        <p className="text-xs text-muted-foreground">{review.specialty}</p>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -1079,26 +1113,27 @@ export default function OpeningPackagePage() {
           </div>
         </section>
 
-        {/* ===== 포트폴리오 갤러리 ===== */}
+        {/* ===== 컨설팅 현장 + 실제 사진 ===== */}
         <section className="py-20 bg-foreground text-white">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-12">
               <h2 className="text-3xl md:text-4xl font-bold mb-4">
-                메디플라톤이 함께한 <span className="text-[#3182f6]">개원 포트폴리오</span>
+                책상 위의 컨설팅이 <span className="text-[#3182f6]">아닙니다</span>
               </h2>
-              <p className="text-white/60">입지 선정부터 인테리어, 개원까지 원스톱으로 완성</p>
+              <p className="text-white/60">직접 현장을 방문하고, 데이터를 분석하고, 카메라 앞에서 이야기합니다</p>
             </div>
 
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            {/* 현장 사진 그리드 */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-16">
               {[
+                { src: '/assets/consulting/consultation-1.jpg', label: '1:1 컨설팅' },
+                { src: '/assets/consulting/doctor-interview.jpg', label: '원장 인터뷰' },
+                { src: '/assets/consulting/team-filming.jpg', label: '촬영 현장' },
+                { src: '/assets/consulting/consultation-2.jpg', label: '데이터 분석' },
                 { src: '/assets/hospital/luxury-lobby-1.jpg', label: '프리미엄 로비' },
                 { src: '/assets/hospital/treatment-room.jpg', label: '시술실' },
+                { src: '/assets/hospital/waiting-room-render.jpg', label: '3D 설계' },
                 { src: '/assets/hospital/treatment-beds.jpg', label: '회복실' },
-                { src: '/assets/hospital/locker-room.jpg', label: '편의시설' },
-                { src: '/assets/consulting/clinic-lobby.jpg', label: '로비 전경' },
-                { src: '/assets/hospital/waiting-room-render.jpg', label: '대기실 설계' },
-                { src: '/assets/consulting/doctor-interview.jpg', label: '원장 인터뷰' },
-                { src: '/assets/consulting/consultation-2.jpg', label: '데이터 분석' },
               ].map((photo, i) => (
                 <div key={i} className="group relative rounded-xl overflow-hidden aspect-[4/3]">
                   <img src={photo.src} alt={photo.label} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
@@ -1108,18 +1143,46 @@ export default function OpeningPackagePage() {
               ))}
             </div>
 
-            {/* 협력사 로고 */}
-            <div className="mt-12 pt-8 border-t border-white/10">
-              <p className="text-center text-sm text-white/40 mb-6">금융·공공기관 정식 제휴</p>
-              <div className="flex flex-wrap justify-center gap-8 items-center">
-                {[1, 2, 3, 4, 5, 6, 7, 8].map((n) => (
-                  <img
-                    key={n}
-                    src={`/assets/partners/partner-${String(n).padStart(2, '0')}.png`}
-                    alt={`협력사 ${n}`}
-                    className="h-8 object-contain opacity-40 hover:opacity-80 transition-opacity invert"
-                  />
-                ))}
+            {/* 함께한 병원 로고 마키 */}
+            <div className="pt-12 border-t border-white/10">
+              <h3 className="text-center text-lg font-semibold mb-2">메디플라톤이 함께한 병원들</h3>
+              <p className="text-center text-sm text-white/40 mb-8">150곳 이상의 병원이 메디플라톤과 함께했습니다</p>
+
+              {/* 1열 */}
+              <div className="relative mb-4">
+                <div className="absolute left-0 top-0 bottom-0 w-24 bg-gradient-to-r from-foreground to-transparent z-10" />
+                <div className="absolute right-0 top-0 bottom-0 w-24 bg-gradient-to-l from-foreground to-transparent z-10" />
+                <div className="flex animate-marquee w-max">
+                  {[...Array(2)].map((_, setIdx) => (
+                    <div key={setIdx} className="flex items-center gap-6 px-3">
+                      {Array.from({ length: 20 }, (_, i) => i + 1).map((n) => (
+                        <div key={`r1-${setIdx}-${n}`} className="flex-shrink-0 w-24 h-14 md:w-32 md:h-16 bg-white/[0.06] rounded-lg border border-white/[0.08] flex items-center justify-center p-2.5">
+                          <img src={`/assets/clients/client-${String(n).padStart(2, '0')}.png`} alt={`파트너 병원 ${n}`} className="max-w-full max-h-full object-contain opacity-60 hover:opacity-100 transition-opacity invert" />
+                        </div>
+                      ))}
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* 2열 (역방향) */}
+              <div className="relative">
+                <div className="absolute left-0 top-0 bottom-0 w-24 bg-gradient-to-r from-foreground to-transparent z-10" />
+                <div className="absolute right-0 top-0 bottom-0 w-24 bg-gradient-to-l from-foreground to-transparent z-10" />
+                <div className="flex animate-marquee-reverse w-max">
+                  {[...Array(2)].map((_, setIdx) => (
+                    <div key={setIdx} className="flex items-center gap-6 px-3">
+                      {Array.from({ length: 19 }, (_, i) => i + 21).map((n) => {
+                        const ext = n >= 36 ? 'jpg' : 'png'
+                        return (
+                          <div key={`r2-${setIdx}-${n}`} className="flex-shrink-0 w-24 h-14 md:w-32 md:h-16 bg-white/[0.06] rounded-lg border border-white/[0.08] flex items-center justify-center p-2.5">
+                            <img src={`/assets/clients/client-${String(n).padStart(2, '0')}.${ext}`} alt={`파트너 병원 ${n}`} className="max-w-full max-h-full object-contain opacity-60 hover:opacity-100 transition-opacity invert" />
+                          </div>
+                        )
+                      })}
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
           </div>
