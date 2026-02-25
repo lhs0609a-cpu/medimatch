@@ -129,38 +129,38 @@ function generateLiveFeed(): ActivityItem[] {
 const TOOL_CATS = ['전체', '재무/분석', '개원 준비', '운영/마케팅', '약국 전용', '법률/계약'] as const
 
 const ALL_TOOLS: { name: string; href: string; cat: string; desc: string; icon: typeof BarChart3; gradient: string; shadow: string }[] = [
-  // 재무/분석 (8)
-  { name: '개원 비용 계산기', href: '/cost-calculator', cat: '재무/분석', desc: '진료과별 초기비용 산출', icon: DollarSign, gradient: 'from-blue-500 to-indigo-600', shadow: 'shadow-blue-500/25' },
-  { name: 'BEP 분석기', href: '/bep-analyzer', cat: '재무/분석', desc: '손익분기점 시뮬레이션', icon: TrendingUp, gradient: 'from-blue-500 to-indigo-600', shadow: 'shadow-blue-500/25' },
-  { name: '진료과별 트렌드', href: '/trend-report', cat: '재무/분석', desc: '6년 개원 트렌드 분석', icon: BarChart3, gradient: 'from-blue-500 to-indigo-600', shadow: 'shadow-blue-500/25' },
-  { name: '상권 인구통계', href: '/demographics', cat: '재무/분석', desc: '연령·소득·인구 분석', icon: Users, gradient: 'from-blue-500 to-indigo-600', shadow: 'shadow-blue-500/25' },
-  { name: '개원 vs 인수', href: '/open-vs-acquire', cat: '재무/분석', desc: '비용/리스크 비교', icon: Scale, gradient: 'from-blue-500 to-indigo-600', shadow: 'shadow-blue-500/25' },
-  { name: '대출/금융 비교', href: '/loan-compare', cat: '재무/분석', desc: '20+ 금융상품 비교', icon: CreditCard, gradient: 'from-blue-500 to-indigo-600', shadow: 'shadow-blue-500/25' },
-  { name: '보험 비교', href: '/insurance-compare', cat: '재무/분석', desc: '의료인 보험 비교', icon: Shield, gradient: 'from-blue-500 to-indigo-600', shadow: 'shadow-blue-500/25' },
-  { name: '병원 벤치마크', href: '/benchmark', cat: '재무/분석', desc: '매출/환자수 비교', icon: Trophy, gradient: 'from-blue-500 to-indigo-600', shadow: 'shadow-blue-500/25' },
-  // 개원 준비 (7)
-  { name: '개원 체크리스트', href: '/checklist', cat: '개원 준비', desc: '단계별 타임라인', icon: CheckCircle2, gradient: 'from-blue-500 to-indigo-600', shadow: 'shadow-blue-500/25' },
-  { name: '인허가 가이드', href: '/license-guide', cat: '개원 준비', desc: '의원 개설 절차 안내', icon: ClipboardList, gradient: 'from-blue-500 to-indigo-600', shadow: 'shadow-blue-500/25' },
-  { name: '동선 설계', href: '/floor-plan', cat: '개원 준비', desc: '진료과별 평면 설계', icon: PenTool, gradient: 'from-blue-500 to-indigo-600', shadow: 'shadow-blue-500/25' },
-  { name: 'EMR 비교', href: '/emr-compare', cat: '개원 준비', desc: '전자차트 시스템 비교', icon: Monitor, gradient: 'from-blue-500 to-indigo-600', shadow: 'shadow-blue-500/25' },
-  { name: '의료기기 비교', href: '/equipment', cat: '개원 준비', desc: '장비 견적/중고 매물', icon: Microscope, gradient: 'from-blue-500 to-indigo-600', shadow: 'shadow-blue-500/25' },
-  { name: '인테리어 견적', href: '/interior', cat: '개원 준비', desc: '진료과별 비용 산출', icon: Paintbrush, gradient: 'from-blue-500 to-indigo-600', shadow: 'shadow-blue-500/25' },
-  { name: '세무/회계사 매칭', href: '/tax-advisor', cat: '개원 준비', desc: '의료 전문 세무사', icon: Receipt, gradient: 'from-blue-500 to-indigo-600', shadow: 'shadow-blue-500/25' },
-  // 운영/마케팅 (5)
-  { name: '마케팅 패키지', href: '/marketing', cat: '운영/마케팅', desc: '개원 마케팅 전략', icon: Megaphone, gradient: 'from-blue-500 to-indigo-600', shadow: 'shadow-blue-500/25' },
-  { name: '보험 청구 최적화', href: '/insurance-billing', cat: '운영/마케팅', desc: '건강보험 삭감 방지', icon: HeartPulse, gradient: 'from-blue-500 to-indigo-600', shadow: 'shadow-blue-500/25' },
-  { name: '리뷰/평판 관리', href: '/reputation', cat: '운영/마케팅', desc: '온라인 평판 모니터링', icon: Star, gradient: 'from-blue-500 to-indigo-600', shadow: 'shadow-blue-500/25' },
-  { name: '수가 시뮬레이터', href: '/fee-simulator', cat: '운영/마케팅', desc: '진료과별 수가 계산', icon: Calculator, gradient: 'from-blue-500 to-indigo-600', shadow: 'shadow-blue-500/25' },
-  { name: '경영 모니터링', href: '/operations', cat: '운영/마케팅', desc: '매출/환자 갭 분석', icon: LineChart, gradient: 'from-blue-500 to-indigo-600', shadow: 'shadow-blue-500/25' },
-  // 약국 전용 (5)
-  { name: '처방전 유입 예측', href: '/pharmacy-forecast', cat: '약국 전용', desc: '인근 병원 기반 추정', icon: Stethoscope, gradient: 'from-blue-500 to-indigo-600', shadow: 'shadow-blue-500/25' },
-  { name: '약국 개국 비용', href: '/pharmacy-cost', cat: '약국 전용', desc: '입지별 초기비용 산출', icon: Wallet, gradient: 'from-blue-500 to-indigo-600', shadow: 'shadow-blue-500/25' },
-  { name: '도매상 가격 비교', href: '/wholesale-compare', cat: '약국 전용', desc: '40+ 약품 가격 비교', icon: Search, gradient: 'from-blue-500 to-indigo-600', shadow: 'shadow-blue-500/25' },
-  { name: 'OTC/건기식 전략', href: '/otc-strategy', cat: '약국 전용', desc: '비처방 매출 전략', icon: Pill, gradient: 'from-blue-500 to-indigo-600', shadow: 'shadow-blue-500/25' },
-  { name: '약국 벤치마크', href: '/pharmacy-benchmark', cat: '약국 전용', desc: '규모별 경영 비교', icon: Activity, gradient: 'from-blue-500 to-indigo-600', shadow: 'shadow-blue-500/25' },
-  // 법률/계약 (2)
-  { name: '법률 Q&A', href: '/legal', cat: '법률/계약', desc: '의료법/노동법 자문', icon: Scale, gradient: 'from-blue-500 to-indigo-600', shadow: 'shadow-blue-500/25' },
-  { name: '계약서 템플릿', href: '/contract-templates', cat: '법률/계약', desc: '임대/동업/근로 계약서', icon: FileText, gradient: 'from-blue-500 to-indigo-600', shadow: 'shadow-blue-500/25' },
+  // 재무/분석 (8) — 브랜드 블루
+  { name: '개원 비용 계산기', href: '/cost-calculator', cat: '재무/분석', desc: '진료과별 초기비용 산출', icon: DollarSign, gradient: 'from-blue-500 to-blue-600', shadow: 'shadow-blue-500/25' },
+  { name: 'BEP 분석기', href: '/bep-analyzer', cat: '재무/분석', desc: '손익분기점 시뮬레이션', icon: TrendingUp, gradient: 'from-blue-500 to-blue-600', shadow: 'shadow-blue-500/25' },
+  { name: '진료과별 트렌드', href: '/trend-report', cat: '재무/분석', desc: '6년 개원 트렌드 분석', icon: BarChart3, gradient: 'from-blue-500 to-blue-600', shadow: 'shadow-blue-500/25' },
+  { name: '상권 인구통계', href: '/demographics', cat: '재무/분석', desc: '연령·소득·인구 분석', icon: Users, gradient: 'from-blue-500 to-blue-600', shadow: 'shadow-blue-500/25' },
+  { name: '개원 vs 인수', href: '/open-vs-acquire', cat: '재무/분석', desc: '비용/리스크 비교', icon: Scale, gradient: 'from-blue-500 to-blue-600', shadow: 'shadow-blue-500/25' },
+  { name: '대출/금융 비교', href: '/loan-compare', cat: '재무/분석', desc: '20+ 금융상품 비교', icon: CreditCard, gradient: 'from-blue-500 to-blue-600', shadow: 'shadow-blue-500/25' },
+  { name: '보험 비교', href: '/insurance-compare', cat: '재무/분석', desc: '의료인 보험 비교', icon: Shield, gradient: 'from-blue-500 to-blue-600', shadow: 'shadow-blue-500/25' },
+  { name: '병원 벤치마크', href: '/benchmark', cat: '재무/분석', desc: '매출/환자수 비교', icon: Trophy, gradient: 'from-blue-500 to-blue-600', shadow: 'shadow-blue-500/25' },
+  // 개원 준비 (7) — 인디고
+  { name: '개원 체크리스트', href: '/checklist', cat: '개원 준비', desc: '단계별 타임라인', icon: CheckCircle2, gradient: 'from-indigo-500 to-indigo-600', shadow: 'shadow-indigo-500/25' },
+  { name: '인허가 가이드', href: '/license-guide', cat: '개원 준비', desc: '의원 개설 절차 안내', icon: ClipboardList, gradient: 'from-indigo-500 to-indigo-600', shadow: 'shadow-indigo-500/25' },
+  { name: '동선 설계', href: '/floor-plan', cat: '개원 준비', desc: '진료과별 평면 설계', icon: PenTool, gradient: 'from-indigo-500 to-indigo-600', shadow: 'shadow-indigo-500/25' },
+  { name: 'EMR 비교', href: '/emr-compare', cat: '개원 준비', desc: '전자차트 시스템 비교', icon: Monitor, gradient: 'from-indigo-500 to-indigo-600', shadow: 'shadow-indigo-500/25' },
+  { name: '의료기기 비교', href: '/equipment', cat: '개원 준비', desc: '장비 견적/중고 매물', icon: Microscope, gradient: 'from-indigo-500 to-indigo-600', shadow: 'shadow-indigo-500/25' },
+  { name: '인테리어 견적', href: '/interior', cat: '개원 준비', desc: '진료과별 비용 산출', icon: Paintbrush, gradient: 'from-indigo-500 to-indigo-600', shadow: 'shadow-indigo-500/25' },
+  { name: '세무/회계사 매칭', href: '/tax-advisor', cat: '개원 준비', desc: '의료 전문 세무사', icon: Receipt, gradient: 'from-indigo-500 to-indigo-600', shadow: 'shadow-indigo-500/25' },
+  // 운영/마케팅 (5) — 스카이
+  { name: '마케팅 패키지', href: '/marketing', cat: '운영/마케팅', desc: '개원 마케팅 전략', icon: Megaphone, gradient: 'from-sky-500 to-blue-500', shadow: 'shadow-sky-500/25' },
+  { name: '보험 청구 최적화', href: '/insurance-billing', cat: '운영/마케팅', desc: '건강보험 삭감 방지', icon: HeartPulse, gradient: 'from-sky-500 to-blue-500', shadow: 'shadow-sky-500/25' },
+  { name: '리뷰/평판 관리', href: '/reputation', cat: '운영/마케팅', desc: '온라인 평판 모니터링', icon: Star, gradient: 'from-sky-500 to-blue-500', shadow: 'shadow-sky-500/25' },
+  { name: '수가 시뮬레이터', href: '/fee-simulator', cat: '운영/마케팅', desc: '진료과별 수가 계산', icon: Calculator, gradient: 'from-sky-500 to-blue-500', shadow: 'shadow-sky-500/25' },
+  { name: '경영 모니터링', href: '/operations', cat: '운영/마케팅', desc: '매출/환자 갭 분석', icon: LineChart, gradient: 'from-sky-500 to-blue-500', shadow: 'shadow-sky-500/25' },
+  // 약국 전용 (5) — 틸
+  { name: '처방전 유입 예측', href: '/pharmacy-forecast', cat: '약국 전용', desc: '인근 병원 기반 추정', icon: Stethoscope, gradient: 'from-teal-500 to-cyan-600', shadow: 'shadow-teal-500/25' },
+  { name: '약국 개국 비용', href: '/pharmacy-cost', cat: '약국 전용', desc: '입지별 초기비용 산출', icon: Wallet, gradient: 'from-teal-500 to-cyan-600', shadow: 'shadow-teal-500/25' },
+  { name: '도매상 가격 비교', href: '/wholesale-compare', cat: '약국 전용', desc: '40+ 약품 가격 비교', icon: Search, gradient: 'from-teal-500 to-cyan-600', shadow: 'shadow-teal-500/25' },
+  { name: 'OTC/건기식 전략', href: '/otc-strategy', cat: '약국 전용', desc: '비처방 매출 전략', icon: Pill, gradient: 'from-teal-500 to-cyan-600', shadow: 'shadow-teal-500/25' },
+  { name: '약국 벤치마크', href: '/pharmacy-benchmark', cat: '약국 전용', desc: '규모별 경영 비교', icon: Activity, gradient: 'from-teal-500 to-cyan-600', shadow: 'shadow-teal-500/25' },
+  // 법률/계약 (2) — 슬레이트
+  { name: '법률 Q&A', href: '/legal', cat: '법률/계약', desc: '의료법/노동법 자문', icon: Scale, gradient: 'from-slate-500 to-slate-600', shadow: 'shadow-slate-500/25' },
+  { name: '계약서 템플릿', href: '/contract-templates', cat: '법률/계약', desc: '임대/동업/근로 계약서', icon: FileText, gradient: 'from-slate-500 to-slate-600', shadow: 'shadow-slate-500/25' },
 ]
 
 export default function HomePage() {
@@ -595,19 +595,19 @@ export default function HomePage() {
                 <div className="text-white/60 text-sm md:text-base">등록 매물</div>
               </div>
               <div ref={pharmacyCount.ref} className="text-center">
-                <div className="text-4xl md:text-5xl font-bold mb-2 text-[#3182f6]">
+                <div className="text-4xl md:text-5xl font-bold mb-2 text-sky-400">
                   {pharmacyCount.count.toLocaleString()}
                 </div>
                 <div className="text-white/60 text-sm md:text-base">약국 양도 매물</div>
               </div>
               <div ref={matchCount.ref} className="text-center">
-                <div className="text-4xl md:text-5xl font-bold mb-2 text-[#3182f6]">
+                <div className="text-4xl md:text-5xl font-bold mb-2 text-indigo-400">
                   {matchCount.count.toLocaleString()}
                 </div>
                 <div className="text-white/60 text-sm md:text-base">누적 매칭 성사</div>
               </div>
               <div ref={memberCount.ref} className="text-center">
-                <div className="text-4xl md:text-5xl font-bold mb-2 text-[#3182f6]">
+                <div className="text-4xl md:text-5xl font-bold mb-2 text-teal-400">
                   {memberCount.count.toLocaleString()}
                 </div>
                 <div className="text-white/60 text-sm md:text-base">가입 회원</div>
@@ -647,10 +647,10 @@ export default function HomePage() {
                 {
                   number: '93.3',
                   unit: '점',
-                  color: 'text-[#3182f6]',
-                  bgGlow: 'bg-[#3182f6]/5',
-                  borderColor: 'border-[#3182f6]/20',
-                  iconBg: 'bg-[#3182f6]',
+                  color: 'text-sky-500',
+                  bgGlow: 'bg-sky-500/5',
+                  borderColor: 'border-sky-500/20',
+                  iconBg: 'bg-sky-500',
                   icon: Star,
                   title: '콘텐츠 만족도 최상급',
                   desc: '500명 대상 설문에서 "글이 감동적이어서 신뢰가 갔다"는 실제 환자 후기로 검증된 품질',
@@ -659,10 +659,10 @@ export default function HomePage() {
                 {
                   number: '150',
                   unit: '+',
-                  color: 'text-[#3182f6]',
-                  bgGlow: 'bg-[#3182f6]/5',
-                  borderColor: 'border-[#3182f6]/20',
-                  iconBg: 'bg-[#3182f6]',
+                  color: 'text-indigo-500',
+                  bgGlow: 'bg-indigo-500/5',
+                  borderColor: 'border-indigo-500/20',
+                  iconBg: 'bg-indigo-500',
                   icon: Building2,
                   title: '개원 컨설팅 누적 실적',
                   desc: '입지 선정부터 인테리어·마케팅·대출까지 원스톱으로 지원. 각 분야 최고 전문가 네트워크',
@@ -861,13 +861,13 @@ export default function HomePage() {
                         <div className="text-sm text-muted-foreground mb-1">예상 월 매출</div>
                         <div className="text-2xl font-bold text-[#3182f6]">{demoResults.monthlyRevenue}</div>
                       </div>
-                      <div className="p-4 bg-[#3182f6]/5 rounded-2xl">
+                      <div className="p-4 bg-teal-500/5 rounded-2xl">
                         <div className="text-sm text-muted-foreground mb-1">손익분기점</div>
-                        <div className="text-2xl font-bold text-[#3182f6]">{demoResults.breakEven}</div>
+                        <div className="text-2xl font-bold text-teal-600">{demoResults.breakEven}</div>
                       </div>
-                      <div className="p-4 bg-[#3182f6]/5 rounded-2xl">
+                      <div className="p-4 bg-indigo-500/5 rounded-2xl">
                         <div className="text-sm text-muted-foreground mb-1">개원 적합도</div>
-                        <div className="text-2xl font-bold text-[#3182f6]">{demoResults.score}점</div>
+                        <div className="text-2xl font-bold text-indigo-600">{demoResults.score}점</div>
                       </div>
                     </div>
 
@@ -926,10 +926,10 @@ export default function HomePage() {
                 </div>
                 <div className="pt-8 space-y-6">
                   {[
-                    { icon: Sparkles, title: '3분 AI 분석', desc: '빅데이터 기반 즉시 분석', gradient: 'from-blue-500 to-indigo-600', shadow: 'shadow-blue-500/25' },
-                    { icon: CheckCircle2, title: '시뮬레이션 무료', desc: '기본 분석 완전 무료 제공', gradient: 'from-blue-500 to-indigo-600', shadow: 'shadow-blue-500/25' },
-                    { icon: BarChart3, title: '데이터 기반 예측', desc: '건강보험공단 데이터 활용', gradient: 'from-blue-500 to-indigo-600', shadow: 'shadow-blue-500/25' },
-                    { icon: Building2, title: `${platformStats.totalListings}+ 매물 접근`, desc: '실시간 매물 정보 제공', gradient: 'from-blue-500 to-indigo-600', shadow: 'shadow-blue-500/25' },
+                    { icon: Sparkles, title: '3분 AI 분석', desc: '빅데이터 기반 즉시 분석', gradient: 'from-blue-500 to-blue-600', shadow: 'shadow-blue-500/25' },
+                    { icon: CheckCircle2, title: '시뮬레이션 무료', desc: '기본 분석 완전 무료 제공', gradient: 'from-sky-500 to-blue-500', shadow: 'shadow-sky-500/25' },
+                    { icon: BarChart3, title: '데이터 기반 예측', desc: '건강보험공단 데이터 활용', gradient: 'from-indigo-500 to-indigo-600', shadow: 'shadow-indigo-500/25' },
+                    { icon: Building2, title: `${platformStats.totalListings}+ 매물 접근`, desc: '실시간 매물 정보 제공', gradient: 'from-teal-500 to-cyan-600', shadow: 'shadow-teal-500/25' },
                   ].map((item) => (
                     <div key={item.title} className="flex items-start gap-4">
                       <TossIcon icon={item.icon} color={item.gradient} size="sm" shadow={item.shadow} className="flex-shrink-0" />
@@ -1037,15 +1037,15 @@ export default function HomePage() {
                     <div className="text-sm text-white/50">컨설팅 누적 건수</div>
                   </div>
                   <div>
-                    <div className="text-3xl font-bold text-[#3182f6] mb-1">97%</div>
+                    <div className="text-3xl font-bold text-sky-400 mb-1">97%</div>
                     <div className="text-sm text-white/50">고객 만족도</div>
                   </div>
                   <div>
-                    <div className="text-3xl font-bold text-[#3182f6] mb-1">8년</div>
+                    <div className="text-3xl font-bold text-indigo-400 mb-1">8년</div>
                     <div className="text-sm text-white/50">의료 컨설팅 경력</div>
                   </div>
                   <div>
-                    <div className="text-3xl font-bold text-[#3182f6] mb-1">30+</div>
+                    <div className="text-3xl font-bold text-teal-400 mb-1">30+</div>
                     <div className="text-sm text-white/50">전문 파트너 네트워크</div>
                   </div>
                 </div>
