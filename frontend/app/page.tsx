@@ -43,6 +43,10 @@ import {
   FileText,
   Scale,
   CreditCard,
+  Zap,
+  Wrench,
+  Settings,
+  Map,
 } from 'lucide-react'
 import { TossIcon } from '@/components/ui/TossIcon'
 
@@ -316,25 +320,55 @@ export default function HomePage() {
                           </div>
                         </div>
                         <div>
-                          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">개원 도구</p>
+                          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">제작 서비스</p>
                           <div className="space-y-1">
-                            <Link href="/cost-calculator" className="flex items-center gap-3 p-3 rounded-xl hover:bg-accent transition-colors">
-                              <span className="text-lg">🧮</span>
-                              <span className="text-sm">개원 비용 계산기</span>
+                            <Link href="/services/homepage" className="flex items-center gap-3 p-3 rounded-xl hover:bg-accent transition-colors group">
+                              <TossIcon icon={Globe} color="from-sky-500 to-blue-600" size="xs" shadow="shadow-sky-500/25" className="flex-shrink-0" />
+                              <div className="flex-1">
+                                <div className="flex items-center gap-2">
+                                  <span className="text-sm font-medium group-hover:text-blue-600">홈페이지 무료제작</span>
+                                  <span className="px-1.5 py-0.5 text-[10px] font-bold bg-blue-600/10 text-blue-600 rounded">NEW</span>
+                                </div>
+                                <p className="text-xs text-muted-foreground">제작비 0원, 전환형 홈페이지</p>
+                              </div>
                             </Link>
-                            <Link href="/bep-analyzer" className="flex items-center gap-3 p-3 rounded-xl hover:bg-accent transition-colors">
-                              <span className="text-lg">📈</span>
-                              <span className="text-sm">BEP 분석기</span>
+                            <Link href="/services/program" className="flex items-center gap-3 p-3 rounded-xl hover:bg-accent transition-colors group">
+                              <TossIcon icon={Settings} color="from-slate-500 to-slate-600" size="xs" shadow="shadow-slate-500/25" className="flex-shrink-0" />
+                              <div className="flex-1">
+                                <div className="flex items-center gap-2">
+                                  <span className="text-sm font-medium group-hover:text-blue-600">프로그램 무료제작</span>
+                                  <span className="px-1.5 py-0.5 text-[10px] font-bold bg-blue-600/10 text-blue-600 rounded">NEW</span>
+                                </div>
+                                <p className="text-xs text-muted-foreground">업무 자동화 월 30만원</p>
+                              </div>
                             </Link>
-                            <Link href="/checklist" className="flex items-center gap-3 p-3 rounded-xl hover:bg-accent transition-colors">
-                              <span className="text-lg">✅</span>
-                              <span className="text-sm">개원 체크리스트</span>
+                            <Link href="/services/emr" className="flex items-center gap-3 p-3 rounded-xl hover:bg-accent transition-colors group">
+                              <TossIcon icon={Stethoscope} color="from-teal-500 to-cyan-600" size="xs" shadow="shadow-teal-500/25" className="flex-shrink-0" />
+                              <div className="flex-1">
+                                <div className="flex items-center gap-2">
+                                  <span className="text-sm font-medium group-hover:text-blue-600">클라우드 EMR</span>
+                                  <span className="px-1.5 py-0.5 text-[10px] font-bold bg-blue-600/10 text-blue-600 rounded">NEW</span>
+                                </div>
+                                <p className="text-xs text-muted-foreground">AI 차트, 클라우드 네이티브</p>
+                              </div>
                             </Link>
-                            <Link href="/#tools" className="flex items-center gap-3 p-3 rounded-xl hover:bg-accent transition-colors">
-                              <span className="text-lg">🛠️</span>
-                              <span className="text-sm">전체 도구 27종 보기</span>
-                              <span className="px-1.5 py-0.5 text-[10px] font-bold bg-indigo-600/10 text-indigo-600 rounded">NEW</span>
-                            </Link>
+                          </div>
+                          <div className="border-t border-border mt-3 pt-3">
+                            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">개원 도구</p>
+                            <div className="space-y-1">
+                              <Link href="/cost-calculator" className="flex items-center gap-3 p-2 rounded-lg hover:bg-accent transition-colors">
+                                <Calculator className="w-4 h-4 text-blue-500 flex-shrink-0" />
+                                <span className="text-xs">개원 비용 계산기</span>
+                              </Link>
+                              <Link href="/bep-analyzer" className="flex items-center gap-3 p-2 rounded-lg hover:bg-accent transition-colors">
+                                <TrendingUp className="w-4 h-4 text-indigo-500 flex-shrink-0" />
+                                <span className="text-xs">BEP 분석기</span>
+                              </Link>
+                              <Link href="/#tools" className="flex items-center gap-3 p-2 rounded-lg hover:bg-accent transition-colors">
+                                <Wrench className="w-4 h-4 text-slate-500 flex-shrink-0" />
+                                <span className="text-xs">전체 도구 보기</span>
+                              </Link>
+                            </div>
                           </div>
                         </div>
                       </div>
@@ -380,32 +414,36 @@ export default function HomePage() {
             <nav id="mobile-menu" className="lg:hidden border-t border-border bg-background animate-fade-in-down" aria-label="모바일 메뉴">
               <div className="px-4 py-4 space-y-2">
                 <Link href="/simulate" className="flex items-center gap-3 p-3 rounded-xl hover:bg-accent" onClick={() => setMobileMenuOpen(false)}>
-                  <span className="text-lg">📊</span>
+                  <TossIcon icon={BarChart3} color="from-blue-500 to-indigo-600" size="xs" shadow="shadow-blue-500/25" className="flex-shrink-0" />
                   <span>OpenSim - 개원 시뮬레이터</span>
                 </Link>
                 <Link href="/buildings" className="flex items-center gap-3 p-3 rounded-xl hover:bg-accent" onClick={() => setMobileMenuOpen(false)}>
-                  <span className="text-lg">🏥</span>
+                  <TossIcon icon={Building2} color="from-green-500 to-emerald-600" size="xs" shadow="shadow-green-500/25" className="flex-shrink-0" />
                   <span>매물 검색</span>
                 </Link>
                 <Link href="/pharmacy-match" className="flex items-center gap-3 p-3 rounded-xl hover:bg-accent" onClick={() => setMobileMenuOpen(false)}>
-                  <span className="text-lg">💊</span>
+                  <TossIcon icon={Pill} color="from-blue-500 to-indigo-600" size="xs" shadow="shadow-blue-500/25" className="flex-shrink-0" />
                   <span>PharmMatch - 약국 매칭</span>
                 </Link>
                 <Link href="/map" className="flex items-center gap-3 p-3 rounded-xl hover:bg-accent" onClick={() => setMobileMenuOpen(false)}>
-                  <span className="text-lg">🗺️</span>
+                  <TossIcon icon={Map} color="from-emerald-500 to-teal-600" size="xs" shadow="shadow-emerald-500/25" className="flex-shrink-0" />
                   <span>지도</span>
                 </Link>
+                <Link href="/services/emr" className="flex items-center gap-3 p-3 rounded-xl hover:bg-accent" onClick={() => setMobileMenuOpen(false)}>
+                  <TossIcon icon={Stethoscope} color="from-teal-500 to-cyan-600" size="xs" shadow="shadow-teal-500/25" className="flex-shrink-0" />
+                  <span className="flex items-center gap-2">클라우드 EMR <span className="px-1.5 py-0.5 text-[10px] font-bold bg-blue-600/10 text-blue-600 rounded">NEW</span></span>
+                </Link>
                 <Link href="/cost-calculator" className="flex items-center gap-3 p-3 rounded-xl hover:bg-accent" onClick={() => setMobileMenuOpen(false)}>
-                  <span className="text-lg">🧮</span>
+                  <TossIcon icon={Calculator} color="from-blue-500 to-blue-600" size="xs" shadow="shadow-blue-500/25" className="flex-shrink-0" />
                   <span>개원 비용 계산기</span>
                 </Link>
                 <Link href="/opening-package" className="flex items-center gap-3 p-3 rounded-xl bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800/30" onClick={() => setMobileMenuOpen(false)}>
-                  <span className="text-lg">✨</span>
+                  <TossIcon icon={Sparkles} color="from-orange-500 to-amber-500" size="xs" shadow="shadow-orange-500/25" className="flex-shrink-0" />
                   <span>개원의 패키지</span>
                   <span className="px-1.5 py-0.5 text-[10px] font-bold bg-red-500 text-white rounded">HOT</span>
                 </Link>
                 <Link href="/#tools" className="flex items-center gap-3 p-3 rounded-xl hover:bg-accent" onClick={() => setMobileMenuOpen(false)}>
-                  <span className="text-lg">🛠️</span>
+                  <TossIcon icon={Wrench} color="from-indigo-500 to-indigo-600" size="xs" shadow="shadow-indigo-500/25" className="flex-shrink-0" />
                   <span>전체 도구 27종</span>
                   <span className="px-1.5 py-0.5 text-[10px] font-bold bg-indigo-600/10 text-indigo-600 rounded">NEW</span>
                 </Link>
@@ -629,7 +667,7 @@ export default function HomePage() {
               </h2>
             </div>
 
-            {/* 성과 카드 — 통일된 디자인 */}
+            {/* 성과 카드 — 실사 사진 + 숫자 */}
             <div className="grid md:grid-cols-3 gap-6">
               {[
                 {
@@ -638,8 +676,7 @@ export default function HomePage() {
                   color: 'text-[#3182f6]',
                   bgGlow: 'bg-[#3182f6]/5',
                   borderColor: 'border-[#3182f6]/20',
-                  iconBg: 'bg-[#3182f6]',
-                  icon: TrendingUp,
+                  photo: '/assets/marketing/result-5x-growth.png',
                   title: '8개월 만에 신환 5배 증가',
                   desc: '통합 마케팅(블로그·플레이스·카페) 전략으로 실제 파트너 병원이 달성한 신규 환자 유입 성과',
                   detail: '블로그 4,275명 구독자 확보',
@@ -650,8 +687,7 @@ export default function HomePage() {
                   color: 'text-sky-500',
                   bgGlow: 'bg-sky-500/5',
                   borderColor: 'border-sky-500/20',
-                  iconBg: 'bg-sky-500',
-                  icon: Star,
+                  photo: '/assets/marketing/blog-satisfaction.png',
                   title: '콘텐츠 만족도 최상급',
                   desc: '500명 대상 설문에서 "글이 감동적이어서 신뢰가 갔다"는 실제 환자 후기로 검증된 품질',
                   detail: '경쟁사 대비 만족도 1위',
@@ -662,44 +698,41 @@ export default function HomePage() {
                   color: 'text-indigo-500',
                   bgGlow: 'bg-indigo-500/5',
                   borderColor: 'border-indigo-500/20',
-                  iconBg: 'bg-indigo-500',
-                  icon: Building2,
+                  photo: '/assets/consulting/doctor-meeting.jpg',
                   title: '개원 컨설팅 누적 실적',
                   desc: '입지 선정부터 인테리어·마케팅·대출까지 원스톱으로 지원. 각 분야 최고 전문가 네트워크',
                   detail: '전국 30+ 전문 파트너',
                 },
-              ].map((item, i) => {
-                const Icon = item.icon
-                return (
-                  <div key={i} className={`bg-card rounded-3xl p-8 border ${item.borderColor} hover:shadow-xl transition-all duration-300`}>
-                    {/* 아이콘 + 숫자 */}
-                    <div className="flex items-start justify-between mb-6">
-                      <div className={`w-12 h-12 rounded-2xl ${item.iconBg} flex items-center justify-center shadow-lg`}>
-                        <Icon className="w-6 h-6 text-white" />
+              ].map((item, i) => (
+                  <div key={i} className={`bg-card rounded-3xl overflow-hidden border ${item.borderColor} hover:shadow-xl transition-all duration-300`}>
+                    {/* 실사 사진 */}
+                    <div className="relative h-48 overflow-hidden">
+                      <img
+                        src={item.photo}
+                        alt={item.title}
+                        className="w-full h-full object-cover"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-card via-card/20 to-transparent" />
+                      <div className={`absolute bottom-4 left-6`}>
+                        <span className={`text-5xl font-black ${item.color}`}>{item.number}</span>
+                        <span className={`text-xl font-bold ${item.color}`}>{item.unit}</span>
                       </div>
-                      <div className={`px-3 py-1 rounded-full ${item.bgGlow} ${item.color} text-xs font-semibold`}>
+                      <div className={`absolute top-4 right-4 px-3 py-1 rounded-full ${item.bgGlow} ${item.color} text-xs font-semibold backdrop-blur-sm`}>
                         검증된 성과
                       </div>
                     </div>
 
-                    {/* 핵심 숫자 */}
-                    <div className="mb-4">
-                      <span className={`text-6xl font-black ${item.color}`}>{item.number}</span>
-                      <span className={`text-2xl font-bold ${item.color}`}>{item.unit}</span>
-                    </div>
-
                     {/* 설명 */}
-                    <h3 className="text-lg font-bold mb-2">{item.title}</h3>
-                    <p className="text-muted-foreground text-sm leading-relaxed mb-4">{item.desc}</p>
-
-                    {/* 하단 디테일 */}
-                    <div className={`flex items-center gap-2 pt-4 border-t ${item.borderColor}`}>
-                      <CheckCircle2 className={`w-4 h-4 ${item.color} flex-shrink-0`} />
-                      <span className="text-sm font-medium">{item.detail}</span>
+                    <div className="p-6">
+                      <h3 className="text-lg font-bold mb-2">{item.title}</h3>
+                      <p className="text-muted-foreground text-sm leading-relaxed mb-4">{item.desc}</p>
+                      <div className={`flex items-center gap-2 pt-4 border-t ${item.borderColor}`}>
+                        <CheckCircle2 className={`w-4 h-4 ${item.color} flex-shrink-0`} />
+                        <span className="text-sm font-medium">{item.detail}</span>
+                      </div>
                     </div>
                   </div>
-                )
-              })}
+              ))}
             </div>
           </div>
         </section>
@@ -718,27 +751,30 @@ export default function HomePage() {
               {/* 병원 매물 카드 */}
               <Link
                 href="/buildings"
-                className="group relative bg-card rounded-2xl p-6 md:p-8 hover:shadow-lg transition-all duration-200"
+                className="group relative bg-card rounded-2xl overflow-hidden hover:shadow-lg transition-all duration-200"
                 style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 2px 8px rgba(0,0,0,0.02)' }}
               >
-                <div className="flex items-start gap-4">
-                  <TossIcon icon={Building2} color="from-blue-500 to-indigo-600" size="xl" shadow="shadow-blue-500/25" className="flex-shrink-0" />
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1">
-                      <h3 className="text-xl font-bold text-foreground group-hover:text-blue-600 transition-colors">
-                        병원 매물
-                      </h3>
-                      <span className="px-2 py-0.5 text-xs font-semibold bg-blue-600/10 text-blue-600 rounded-full">
-                        {platformStats.activeBuildingListings}개
-                      </span>
-                    </div>
-                    <p className="text-sm text-muted-foreground mb-4">
-                      메디컬빌딩, 상가, 의원급 개원 공간
-                    </p>
-                    <div className="flex items-center gap-2 text-sm font-medium text-blue-600">
-                      <span>매물 보러가기</span>
-                      <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                    </div>
+                <div className="relative h-40 overflow-hidden">
+                  <img
+                    src="/assets/hospital/luxury-lobby-1.jpg"
+                    alt="병원 로비"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-card via-card/30 to-transparent" />
+                  <span className="absolute top-3 right-3 px-2.5 py-1 text-xs font-semibold bg-blue-600 text-white rounded-full shadow-lg">
+                    {platformStats.activeBuildingListings}개
+                  </span>
+                </div>
+                <div className="p-6">
+                  <h3 className="text-xl font-bold text-foreground group-hover:text-blue-600 transition-colors mb-1">
+                    병원 매물
+                  </h3>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    메디컬빌딩, 상가, 의원급 개원 공간
+                  </p>
+                  <div className="flex items-center gap-2 text-sm font-medium text-blue-600">
+                    <span>매물 보러가기</span>
+                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                   </div>
                 </div>
               </Link>
@@ -746,27 +782,30 @@ export default function HomePage() {
               {/* 약국 매물 카드 */}
               <Link
                 href="/pharmacy-match"
-                className="group relative bg-card rounded-2xl p-6 md:p-8 hover:shadow-lg transition-all duration-200"
+                className="group relative bg-card rounded-2xl overflow-hidden hover:shadow-lg transition-all duration-200"
                 style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 2px 8px rgba(0,0,0,0.02)' }}
               >
-                <div className="flex items-start gap-4">
-                  <TossIcon icon={Pill} color="from-blue-500 to-indigo-600" size="xl" shadow="shadow-blue-500/25" className="flex-shrink-0" />
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1">
-                      <h3 className="text-xl font-bold text-foreground group-hover:text-[#3182f6] transition-colors">
-                        약국 매물
-                      </h3>
-                      <span className="px-2 py-0.5 text-xs font-semibold bg-[#3182f6]/10 text-[#3182f6] rounded-full">
-                        {platformStats.activePharmacyListings}개
-                      </span>
-                    </div>
-                    <p className="text-sm text-muted-foreground mb-4">
-                      약국 양도양수, 권리금 매물 정보
-                    </p>
-                    <div className="flex items-center gap-2 text-sm font-medium text-[#3182f6]">
-                      <span>매물 보러가기</span>
-                      <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                    </div>
+                <div className="relative h-40 overflow-hidden">
+                  <img
+                    src="/assets/hospital/medical-equipment.jpg"
+                    alt="약국 내부"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-card via-card/30 to-transparent" />
+                  <span className="absolute top-3 right-3 px-2.5 py-1 text-xs font-semibold bg-[#3182f6] text-white rounded-full shadow-lg">
+                    {platformStats.activePharmacyListings}개
+                  </span>
+                </div>
+                <div className="p-6">
+                  <h3 className="text-xl font-bold text-foreground group-hover:text-[#3182f6] transition-colors mb-1">
+                    약국 매물
+                  </h3>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    약국 양도양수, 권리금 매물 정보
+                  </p>
+                  <div className="flex items-center gap-2 text-sm font-medium text-[#3182f6]">
+                    <span>매물 보러가기</span>
+                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                   </div>
                 </div>
               </Link>
@@ -779,7 +818,7 @@ export default function HomePage() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-12">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-600/10 text-blue-600 text-sm font-medium mb-4">
-                <span className="text-base">⚡</span>
+                <Zap className="w-4 h-4" />
                 3분 만에 결과 확인
               </div>
               <h2 className="text-3xl md:text-5xl font-bold tracking-tight mb-4">
@@ -897,11 +936,15 @@ export default function HomePage() {
 
             <div className="grid lg:grid-cols-2 gap-8">
               {/* Before */}
-              <div className="p-8 bg-card rounded-3xl border border-border relative overflow-hidden">
-                <div className="absolute top-4 left-4 px-3 py-1 bg-red-100 dark:bg-red-900/30 text-red-600 text-sm font-medium rounded-full">
-                  기존 방식
+              <div className="bg-card rounded-3xl border border-border relative overflow-hidden">
+                <div className="relative h-44 overflow-hidden">
+                  <img src="/assets/hospital/waiting-room-render.jpg" alt="기존 방식" className="w-full h-full object-cover grayscale opacity-60" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-card to-transparent" />
+                  <div className="absolute top-4 left-4 px-3 py-1 bg-red-100 dark:bg-red-900/30 text-red-600 text-sm font-medium rounded-full">
+                    기존 방식
+                  </div>
                 </div>
-                <div className="pt-8 space-y-6">
+                <div className="p-8 space-y-6">
                   {[
                     { icon: Activity, title: '6개월 이상 정보 수집', desc: '발품 팔아 직접 상권 분석', gradient: 'from-gray-400 to-gray-500' },
                     { icon: DollarSign, title: '중개 수수료 500만원+', desc: '부동산 중개, 컨설팅 비용', gradient: 'from-gray-400 to-gray-500' },
@@ -920,11 +963,15 @@ export default function HomePage() {
               </div>
 
               {/* After */}
-              <div className="p-8 bg-[#3182f6]/[0.03] rounded-3xl border border-[#3182f6]/20 relative overflow-hidden">
-                <div className="absolute top-4 left-4 px-3 py-1 bg-[#3182f6] text-white text-sm font-medium rounded-full">
-                  메디플라톤
+              <div className="bg-[#3182f6]/[0.03] rounded-3xl border border-[#3182f6]/20 relative overflow-hidden">
+                <div className="relative h-44 overflow-hidden">
+                  <img src="/assets/consulting/consultation-1.jpg" alt="메디플라톤 컨설팅" className="w-full h-full object-cover" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#f8faff] dark:from-[#0a1628] to-transparent" />
+                  <div className="absolute top-4 left-4 px-3 py-1 bg-[#3182f6] text-white text-sm font-medium rounded-full">
+                    메디플라톤
+                  </div>
                 </div>
-                <div className="pt-8 space-y-6">
+                <div className="p-8 space-y-6">
                   {[
                     { icon: Sparkles, title: '3분 AI 분석', desc: '빅데이터 기반 즉시 분석', gradient: 'from-blue-500 to-blue-600', shadow: 'shadow-blue-500/25' },
                     { icon: CheckCircle2, title: '시뮬레이션 무료', desc: '기본 분석 완전 무료 제공', gradient: 'from-sky-500 to-blue-500', shadow: 'shadow-sky-500/25' },
@@ -1114,7 +1161,7 @@ export default function HomePage() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-10">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-600/10 text-indigo-600 text-sm font-medium mb-4">
-                <span className="text-base">🛠️</span>
+                <Wrench className="w-4 h-4" />
                 27개 전문 도구 무료 제공
               </div>
               <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-4">
@@ -1247,7 +1294,12 @@ export default function HomePage() {
               {recentSuccessStories.slice(0, 8).map((story, i) => (
                 <div key={i} className="bg-card rounded-2xl border border-border p-5 hover:shadow-lg transition-all">
                   <div className="flex items-center gap-2 mb-3">
-                    <span className="text-xl leading-none">{story.type === '약국' ? '💊' : '🏥'}</span>
+                    <TossIcon
+                      icon={story.type === '약국' ? Pill : Building2}
+                      color={story.type === '약국' ? 'from-blue-500 to-indigo-600' : 'from-green-500 to-emerald-600'}
+                      size="xs"
+                      className="flex-shrink-0"
+                    />
                     <div>
                       <p className="font-medium text-sm">{story.region}</p>
                       <p className="text-xs text-muted-foreground">{story.type}</p>
@@ -1342,8 +1394,10 @@ export default function HomePage() {
                   <li><Link href="/buildings" className="hover:text-foreground transition-colors">매물 검색</Link></li>
                   <li><Link href="/pharmacy-match" className="hover:text-foreground transition-colors">PharmMatch</Link></li>
                   <li><Link href="/map" className="hover:text-foreground transition-colors">지도</Link></li>
-                  <li><Link href="/landlord-simulator" className="hover:text-foreground transition-colors">입점 확률 분석</Link></li>
                   <li><Link href="/opening-package" className="hover:text-foreground transition-colors">개원의 패키지</Link></li>
+                  <li><Link href="/services/homepage" className="hover:text-foreground transition-colors flex items-center gap-1">홈페이지 무료제작 <span className="text-[10px] font-bold text-blue-600 bg-blue-100 px-1 rounded">NEW</span></Link></li>
+                  <li><Link href="/services/program" className="hover:text-foreground transition-colors flex items-center gap-1">프로그램 무료제작 <span className="text-[10px] font-bold text-blue-600 bg-blue-100 px-1 rounded">NEW</span></Link></li>
+                  <li><Link href="/services/emr" className="hover:text-foreground transition-colors flex items-center gap-1">클라우드 EMR <span className="text-[10px] font-bold text-blue-600 bg-blue-100 px-1 rounded">NEW</span></Link></li>
                 </ul>
               </div>
 
