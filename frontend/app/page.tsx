@@ -543,48 +543,60 @@ export default function HomePage() {
           {/* 메인 콘텐츠 */}
           <div className="relative z-20 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-24">
             <div className="text-center">
-              {/* 뱃지 */}
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#3182f6]/10 mb-6 animate-fade-in backdrop-blur-sm">
-                <Activity className="w-4 h-4 text-blue-500 animate-pulse" />
-                <span className="text-sm font-medium">
-                  지금 <span className="text-blue-500 font-bold">{platformStats.onlineNow}명</span>이 매물을 탐색 중
+              {/* 경고 뱃지 */}
+              <div className="inline-flex items-center gap-2.5 px-5 py-2.5 rounded-full bg-red-500/10 border border-red-500/20 mb-6 animate-fade-in backdrop-blur-sm">
+                <span className="flex h-2.5 w-2.5 relative">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-400"></span>
+                </span>
+                <span className="text-sm font-medium text-red-600 dark:text-red-300">
+                  올해만 이미 <span className="text-foreground dark:text-white font-bold">683곳</span> 폐업
                 </span>
               </div>
 
               {/* 메인 헤드라인 */}
-              <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight mb-6 animate-fade-in-up">
-                <span className="text-foreground">매일 3곳이 문을 닫습니다</span>
+              <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black tracking-tight leading-[1.08] mb-6 animate-fade-in-up">
+                <span className="text-foreground">매일 3곳 폐업,</span>
                 <br />
-                <span className="text-[#3182f6]">당신은 다릅니다</span>
+                <span className="text-[#3182f6]">
+                  지금 이 글을 보시는 원장님은
+                </span>
+                <br />
+                <span className="text-[#3182f6]">
+                  달라야 합니다
+                </span>
               </h1>
 
-              <p className="text-lg md:text-xl text-muted-foreground mb-8 max-w-2xl mx-auto animate-fade-in-up delay-100">
+              <p className="text-lg md:text-xl text-muted-foreground mb-10 max-w-2xl mx-auto animate-fade-in-up delay-100 leading-relaxed">
                 연간 <span className="text-foreground font-semibold">1,000개</span> 이상의 의료기관이 폐업합니다.
                 <br className="hidden sm:block" />
-                메디플라톤의 데이터 분석으로 성공하는 개원을 시작하세요.
+                입지 분석부터 마케팅까지, 데이터로 준비한 개원은 다릅니다.
               </p>
 
               {/* CTA 버튼 */}
               <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12 animate-fade-in-up delay-200">
-                <Link href="/simulate" className="btn-primary btn-lg group text-lg px-8">
-                  무료 시뮬레이션 시작
+                <Link href="/opening-package" className="btn-primary btn-lg group text-lg px-10">
+                  무료 개원 진단받기
                   <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                 </Link>
-                <Link href="/buildings" className="btn-outline btn-lg text-lg px-8">
+                <Link href="/buildings" className="btn-outline btn-lg text-lg px-10">
                   <Eye className="w-5 h-5" />
                   매물 {platformStats.totalListings}개 보기
                 </Link>
               </div>
 
-              {/* 실시간 알림 배너 */}
-              <div className="inline-flex items-center gap-3 px-5 py-3 bg-emerald-500/8 rounded-full animate-fade-in delay-300 backdrop-blur-sm">
-                <span className="flex h-3 w-3 relative">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
-                </span>
-                <span className="text-sm">
-                  방금 <span className="font-semibold text-green-600 dark:text-green-400">서울 강남구</span>에서 새 매물이 등록되었습니다
-                </span>
+              {/* 핵심 수치 3개 */}
+              <div className="grid grid-cols-3 gap-3 max-w-3xl mx-auto animate-fade-in-up delay-300">
+                {[
+                  { number: '4.8', unit: '억', label: '평균 개원 비용', color: 'text-red-500', bg: 'bg-red-500/10 border-red-500/20' },
+                  { number: '1,000', unit: '+', label: '연간 폐업 의료기관', color: 'text-orange-500', bg: 'bg-orange-500/10 border-orange-500/20' },
+                  { number: '150', unit: '+', label: '메디플라톤 성공 사례', color: 'text-[#3182f6]', bg: 'bg-[#3182f6]/10 border-[#3182f6]/20' },
+                ].map((s) => (
+                  <div key={s.label} className={`text-center p-4 rounded-2xl border backdrop-blur-sm ${s.bg}`}>
+                    <div className={`text-2xl md:text-3xl font-black ${s.color}`}>{s.number}<span className="text-base">{s.unit}</span></div>
+                    <p className="text-xs text-muted-foreground mt-1">{s.label}</p>
+                  </div>
+                ))}
               </div>
             </div>
           </div>

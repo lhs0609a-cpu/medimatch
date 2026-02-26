@@ -31,6 +31,12 @@ import {
   TrendingUp,
   Search,
   Layers,
+  Home,
+  Landmark,
+  Clock,
+  Smartphone,
+  Calculator,
+  Shield,
 } from 'lucide-react'
 
 /* ─── 숫자 카운터 애니메이션 훅 ─── */
@@ -330,14 +336,18 @@ export default function OpeningPackagePage() {
                         </div>
                       </Link>
                       <Link href="/simulate" className="flex items-center gap-3 p-3 rounded-xl hover:bg-accent transition-colors group">
-                        <span className="text-2xl leading-none">📊</span>
+                        <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center flex-shrink-0">
+                          <BarChart3 className="w-5 h-5 text-white" />
+                        </div>
                         <div>
                           <p className="font-medium text-foreground group-hover:text-blue-600">OpenSim</p>
                           <p className="text-xs text-muted-foreground">AI 개원 시뮬레이터</p>
                         </div>
                       </Link>
                       <Link href="/buildings" className="flex items-center gap-3 p-3 rounded-xl hover:bg-accent transition-colors group">
-                        <span className="text-2xl leading-none">🏥</span>
+                        <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center flex-shrink-0">
+                          <Building2 className="w-5 h-5 text-white" />
+                        </div>
                         <div>
                           <p className="font-medium text-foreground group-hover:text-[#3182f6]">매물 검색</p>
                           <p className="text-xs text-muted-foreground">개원 적합 공간 찾기</p>
@@ -372,15 +382,15 @@ export default function OpeningPackagePage() {
           <nav className="lg:hidden border-t border-border bg-background animate-fade-in-down">
             <div className="px-4 py-4 space-y-2">
               <Link href="/" className="flex items-center gap-3 p-3 rounded-xl hover:bg-accent" onClick={() => setMobileMenuOpen(false)}>
-                <span className="text-lg">🏠</span>
+                <Home className="w-5 h-5 text-muted-foreground" />
                 <span>홈</span>
               </Link>
               <Link href="/buildings" className="flex items-center gap-3 p-3 rounded-xl hover:bg-accent" onClick={() => setMobileMenuOpen(false)}>
-                <span className="text-lg">🏥</span>
+                <Building2 className="w-5 h-5 text-green-500" />
                 <span>매물 검색</span>
               </Link>
               <Link href="/simulate" className="flex items-center gap-3 p-3 rounded-xl hover:bg-accent" onClick={() => setMobileMenuOpen(false)}>
-                <span className="text-lg">📊</span>
+                <BarChart3 className="w-5 h-5 text-blue-500" />
                 <span>OpenSim</span>
               </Link>
               <div className="pt-4 border-t border-border">
@@ -508,17 +518,23 @@ export default function OpeningPackagePage() {
 
             <div className="grid md:grid-cols-2 gap-6 mb-12">
               {[
-                { icon: MapPin, title: '어디에 개원해야 할지 막막', desc: '부동산 말만 믿고 계약했다가 환자가 안 오면? 경쟁 의원 수, 타깃 인구가 충분한지 데이터 없이는 판단할 수 없습니다.', gradient: 'from-blue-500 to-blue-600', shadow: 'shadow-blue-500/25' },
-                { icon: Lock, title: 'DSR 규제로 대출 한도 부족', desc: '이미 주담대·학자금이 있으면 추가 대출이 어렵고, 금리도 높아집니다.', gradient: 'from-indigo-500 to-indigo-600', shadow: 'shadow-indigo-500/25' },
-                { icon: DollarSign, title: '마케팅비 수백~수천만원', desc: '홈페이지 제작, 블로그, 플레이스, SNS, 체험단… 전부 하면 수천만원이 듭니다.', gradient: 'from-sky-500 to-blue-500', shadow: 'shadow-sky-500/25' },
-                { icon: Layers, title: '여러 업체를 따로 관리', desc: '중개, 대출, 마케팅, PG를 각각 다른 업체와 상담하면 시간과 비용 모두 낭비됩니다.', gradient: 'from-slate-500 to-slate-600', shadow: 'shadow-slate-500/25' },
+                { icon: MapPin, title: '어디에 개원해야 할지 막막', desc: '부동산 말만 믿고 계약했다가 환자가 안 오면? 경쟁 의원 수, 타깃 인구가 충분한지 데이터 없이는 판단할 수 없습니다.', gradient: 'from-blue-500 to-blue-600', shadow: 'shadow-blue-500/25', photo: '/assets/hospital/luxury-lobby-2.jpg' },
+                { icon: Lock, title: 'DSR 규제로 대출 한도 부족', desc: '이미 주담대·학자금이 있으면 추가 대출이 어렵고, 금리도 높아집니다.', gradient: 'from-indigo-500 to-indigo-600', shadow: 'shadow-indigo-500/25', photo: '/assets/consulting/consultation-2.jpg' },
+                { icon: DollarSign, title: '마케팅비 수백~수천만원', desc: '홈페이지 제작, 블로그, 플레이스, SNS, 체험단… 전부 하면 수천만원이 듭니다.', gradient: 'from-sky-500 to-blue-500', shadow: 'shadow-sky-500/25', photo: '/assets/marketing/opening-solution.png' },
+                { icon: Layers, title: '여러 업체를 따로 관리', desc: '중개, 대출, 마케팅, PG를 각각 다른 업체와 상담하면 시간과 비용 모두 낭비됩니다.', gradient: 'from-slate-500 to-slate-600', shadow: 'shadow-slate-500/25', photo: '/assets/consulting/doctor-meeting.jpg' },
               ].map((item) => (
-                <div key={item.title} className="bg-card border border-border rounded-2xl p-6 md:p-8">
-                  <div className={`icon-3d w-14 h-14 rounded-2xl bg-gradient-to-br ${item.gradient} shadow-lg ${item.shadow} flex items-center justify-center mb-4`}>
-                    <item.icon className="w-7 h-7 text-white" />
+                <div key={item.title} className="bg-card border border-border rounded-2xl overflow-hidden">
+                  <div className="relative h-36 overflow-hidden">
+                    <img src={item.photo} alt={item.title} className="w-full h-full object-cover" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-card via-card/40 to-transparent" />
+                    <div className={`absolute bottom-3 left-4 icon-3d w-12 h-12 rounded-2xl bg-gradient-to-br ${item.gradient} shadow-lg ${item.shadow} flex items-center justify-center`}>
+                      <item.icon className="w-6 h-6 text-white" />
+                    </div>
                   </div>
-                  <h3 className="text-lg font-semibold mb-2">{item.title}</h3>
-                  <p className="text-sm text-muted-foreground">{item.desc}</p>
+                  <div className="p-6">
+                    <h3 className="text-lg font-semibold mb-2">{item.title}</h3>
+                    <p className="text-sm text-muted-foreground">{item.desc}</p>
+                  </div>
                 </div>
               ))}
             </div>
@@ -651,7 +667,7 @@ export default function OpeningPackagePage() {
           <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-12">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#3182f6]/10 text-[#3182f6] text-sm font-medium mb-4">
-                <span className="text-base">🧮</span>
+                <Calculator className="w-4 h-4" />
                 인터랙티브 계산기
               </div>
               <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-4">
@@ -936,7 +952,7 @@ export default function OpeningPackagePage() {
           <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-12">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-600/10 text-blue-600 text-sm font-medium mb-4">
-                <span className="text-base">🏦</span>
+                <Landmark className="w-4 h-4" />
                 신협중앙회 정식 제휴
               </div>
               <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-4">
@@ -1040,7 +1056,7 @@ export default function OpeningPackagePage() {
                     { label: '원스톱 관리', value: '모든 서비스 한 곳에서' },
                   ].map((item) => (
                     <div key={item.label} className="flex items-center gap-3">
-                      <span className="text-base flex-shrink-0">✅</span>
+                      <CheckCircle2 className="w-5 h-5 text-blue-500 flex-shrink-0" />
                       <div>
                         <span className="font-medium">{item.label}</span>
                         <span className="text-sm text-blue-600 dark:text-blue-400 ml-2 font-semibold">{item.value}</span>
@@ -1062,7 +1078,7 @@ export default function OpeningPackagePage() {
               <div className="flex flex-wrap items-center justify-center gap-4 mb-12">
                 {['신협중앙회', 'KB국민카드', '신한카드', '우리카드', '하나카드'].map((partner) => (
                   <div key={partner} className="flex items-center gap-2 px-5 py-2.5 bg-card border border-border rounded-xl">
-                    <span className="text-base">🏦</span>
+                    <Landmark className="w-4 h-4 text-blue-500" />
                     <span className="font-medium text-sm">{partner}</span>
                   </div>
                 ))}
@@ -1201,7 +1217,7 @@ export default function OpeningPackagePage() {
               <div className="lg:col-span-2">
                 <div className="sticky top-24">
                   <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-600/10 text-blue-600 text-sm font-medium mb-4">
-                    <span className="text-base">📞</span>
+                    <Phone className="w-4 h-4" />
                     무료 상담
                   </div>
                   <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-4">
@@ -1216,12 +1232,12 @@ export default function OpeningPackagePage() {
                   </p>
                   <div className="space-y-4">
                     {[
-                      { emoji: '⏱️', text: '평균 응답 시간 4시간' },
-                      { emoji: '🔒', text: '개인정보 안전하게 보호' },
-                      { emoji: '📱', text: '전화 또는 카카오톡 상담' },
+                      { icon: Clock, text: '평균 응답 시간 4시간', color: 'text-blue-500' },
+                      { icon: Shield, text: '개인정보 안전하게 보호', color: 'text-green-500' },
+                      { icon: Smartphone, text: '전화 또는 카카오톡 상담', color: 'text-indigo-500' },
                     ].map((item) => (
                       <div key={item.text} className="flex items-center gap-3">
-                        <span className="text-xl leading-none">{item.emoji}</span>
+                        <item.icon className={`w-5 h-5 ${item.color} flex-shrink-0`} />
                         <span className="text-sm">{item.text}</span>
                       </div>
                     ))}
@@ -1232,7 +1248,9 @@ export default function OpeningPackagePage() {
               <div className="lg:col-span-3">
                 {formSubmitted ? (
                   <div className="bg-card border border-border rounded-3xl p-8 md:p-12 text-center">
-                    <span className="text-6xl leading-none block mb-6">✅</span>
+                    <div className="w-20 h-20 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center mx-auto mb-6">
+                      <CheckCircle2 className="w-10 h-10 text-green-500" />
+                    </div>
                     <h3 className="text-2xl font-bold mb-3">상담 신청 완료!</h3>
                     <p className="text-muted-foreground mb-6">
                       전문 상담사가 1영업일 이내에 연락드리겠습니다.
