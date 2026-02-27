@@ -1,0 +1,10 @@
+export { default as ServiceHero } from './ServiceHero';
+export { default as ServiceProblemSection } from './ServiceProblemSection';
+export { default as ServiceSolutionSection } from './ServiceSolutionSection';
+export { default as ServiceComparisonTable } from './ServiceComparisonTable';
+export { default as ServiceProcessSteps } from './ServiceProcessSteps';
+export { default as ServicePricingCards } from './ServicePricingCards';
+export { default as ServiceTestimonials } from './ServiceTestimonials';
+export { default as ServiceFAQ } from './ServiceFAQ';
+export { default as ServiceConsultationForm } from './ServiceConsultationForm';
+export { default as ServiceStickyHeader } from './ServiceStickyHeader';

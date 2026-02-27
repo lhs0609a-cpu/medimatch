@@ -14,6 +14,7 @@ from app.core.security import get_current_user
 from app.models.user import User, UserRole
 from app.models.payment import Payment, Subscription, UsageCredit, PaymentStatus
 from app.models.listing_subscription import ListingSubscription, ListingSubStatus
+from app.models.service_subscription import ServiceSubscription, ServiceSubStatus, ServiceType
 
 router = APIRouter()
 
@@ -585,9 +586,141 @@ async def admin_list_subscriptions(
     start = (page - 1) * page_size
     paged_items = items[start:start + page_size]
 
+    # 서비스 구독 (ServiceSubscription 모델)
+    if sub_type in (None, "service"):
+        svc_query = select(ServiceSubscription, User.email, User.full_name).join(User, ServiceSubscription.user_id == User.id)
+        svc_result = await db.execute(svc_query.order_by(ServiceSubscription.created_at.desc()))
+        for row in svc_result.all():
+            svc = row[0]
+            items.append({
+                "id": svc.id,
+                "type": f"service_{svc.service_type.value.lower()}",
+                "user_email": row[1],
+                "user_name": row[2],
+                "plan": f"{svc.service_type.value} {svc.tier.value}",
+                "status": svc.status.value,
+                "started_at": svc.current_period_start.isoformat() if svc.current_period_start else None,
+                "expires_at": svc.current_period_end.isoformat() if svc.current_period_end else None,
+                "is_auto_renew": svc.status == ServiceSubStatus.ACTIVE,
+                "amount": svc.monthly_amount,
+                "next_billing_date": svc.next_billing_date.isoformat() if svc.next_billing_date else None,
+                "card_info": f"{svc.card_company} {svc.card_number}" if svc.card_company else None,
+                "company_name": svc.company_name,
+            })
+
+    # 간단한 페이지네이션
+    total = len(items)
+    start = (page - 1) * page_size
+    paged_items = items[start:start + page_size]
+
     return {
         "items": paged_items,
         "total": total,
         "page": page,
         "page_size": page_size,
     }
+
+
+# ===== 서비스 구독 관리 (Admin) =====
+
+@router.get("/service-subscriptions")
+async def admin_list_service_subscriptions(
+    page: int = 1,
+    page_size: int = 20,
+    service_type: Optional[str] = None,
+    status: Optional[str] = None,
+    db: AsyncSession = Depends(get_db),
+    admin: User = Depends(require_admin),
+):
+    """서비스 구독 목록 조회 (필터: type, status)"""
+    query = select(ServiceSubscription, User.email, User.full_name).join(
+        User, ServiceSubscription.user_id == User.id
+    )
+
+    if service_type:
+        query = query.where(ServiceSubscription.service_type == service_type)
+    if status:
+        query = query.where(ServiceSubscription.status == status)
+
+    query = query.order_by(ServiceSubscription.created_at.desc())
+    result = await db.execute(query)
+
+    items = []
+    for row in result.all():
+        svc = row[0]
+        items.append({
+            "id": svc.id,
+            "user_id": str(svc.user_id),
+            "user_email": row[1],
+            "user_name": row[2],
+            "service_type": svc.service_type.value,
+            "tier": svc.tier.value,
+            "status": svc.status.value,
+            "monthly_amount": svc.monthly_amount,
+            "company_name": svc.company_name,
+            "contact_person": svc.contact_person,
+            "contact_phone": svc.contact_phone,
+            "current_period_start": svc.current_period_start.isoformat() if svc.current_period_start else None,
+            "current_period_end": svc.current_period_end.isoformat() if svc.current_period_end else None,
+            "next_billing_date": svc.next_billing_date.isoformat() if svc.next_billing_date else None,
+            "card_info": f"{svc.card_company} {svc.card_number}" if svc.card_company else None,
+            "retry_count": svc.retry_count,
+            "canceled_at": svc.canceled_at.isoformat() if svc.canceled_at else None,
+            "created_at": svc.created_at.isoformat() if svc.created_at else None,
+        })
+
+    total = len(items)
+    start = (page - 1) * page_size
+    paged_items = items[start:start + page_size]
+
+    return {
+        "items": paged_items,
+        "total": total,
+        "page": page,
+        "page_size": page_size,
+    }
+
+
+@router.post("/service-subscriptions/{sub_id}/suspend")
+async def admin_suspend_service_subscription(
+    sub_id: int,
+    db: AsyncSession = Depends(get_db),
+    admin: User = Depends(require_admin),
+):
+    """서비스 구독 수동 중지"""
+    result = await db.execute(
+        select(ServiceSubscription).where(ServiceSubscription.id == sub_id)
+    )
+    sub = result.scalar_one_or_none()
+    if not sub:
+        raise HTTPException(status_code=404, detail="구독을 찾을 수 없습니다.")
+
+    sub.status = ServiceSubStatus.SUSPENDED
+    sub.updated_at = datetime.utcnow()
+    await db.commit()
+
+    return {"message": "구독이 중지되었습니다.", "status": sub.status.value}
+
+
+@router.post("/service-subscriptions/{sub_id}/activate")
+async def admin_activate_service_subscription(
+    sub_id: int,
+    db: AsyncSession = Depends(get_db),
+    admin: User = Depends(require_admin),
+):
+    """서비스 구독 수동 활성화"""
+    result = await db.execute(
+        select(ServiceSubscription).where(ServiceSubscription.id == sub_id)
+    )
+    sub = result.scalar_one_or_none()
+    if not sub:
+        raise HTTPException(status_code=404, detail="구독을 찾을 수 없습니다.")
+
+    sub.status = ServiceSubStatus.ACTIVE
+    sub.retry_count = 0
+    sub.canceled_at = None
+    sub.cancel_reason = None
+    sub.updated_at = datetime.utcnow()
+    await db.commit()
+
+    return {"message": "구독이 활성화되었습니다.", "status": sub.status.value}

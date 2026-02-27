@@ -1662,6 +1662,20 @@ export const pharmacyTransferService = {
   },
 }
 
+// Demographics Service (인구통계 분석)
+export const demographicsService = {
+  analyze: async (address: string) => {
+    const API_URL = process.env.NEXT_PUBLIC_API_URL || '';
+    const res = await fetch(`${API_URL}/api/v1/demographics/analyze`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ address }),
+    });
+    if (!res.ok) throw new Error('분석에 실패했습니다');
+    return res.json();
+  },
+}
+
 // Listing Subscription Service (매물 등록 정기구독)
 export const listingSubscriptionService = {
   getConfig: async () => {
@@ -1691,6 +1705,264 @@ export const listingSubscriptionService = {
 
   getBillingHistory: async () => {
     const response = await apiClient.get('/listing-subscription/billing-history')
+    return response.data
+  },
+}
+
+// Service Subscription Service (서비스 구독 - 홈페이지/프로그램)
+export const serviceSubscriptionService = {
+  getConfig: async (serviceType: string, tier: string) => {
+    const response = await apiClient.get('/service-subscription/config', {
+      params: { service_type: serviceType, tier },
+    })
+    return response.data
+  },
+
+  activate: async (data: {
+    auth_key?: string;
+    customer_key?: string;
+    service_type: string;
+    tier: string;
+    company_name?: string;
+    contact_person?: string;
+    contact_phone?: string;
+  }) => {
+    const response = await apiClient.post('/service-subscription/activate', data)
+    return response.data
+  },
+
+  getStatus: async (serviceType: string) => {
+    const response = await apiClient.get('/service-subscription/status', {
+      params: { service_type: serviceType },
+    })
+    return response.data
+  },
+
+  cancel: async (serviceType: string, reason?: string) => {
+    const response = await apiClient.post('/service-subscription/cancel', {
+      service_type: serviceType,
+      reason,
+    })
+    return response.data
+  },
+
+  reactivate: async (serviceType: string) => {
+    const response = await apiClient.post('/service-subscription/reactivate', null, {
+      params: { service_type: serviceType },
+    })
+    return response.data
+  },
+
+  getBillingHistory: async (serviceType: string) => {
+    const response = await apiClient.get('/service-subscription/billing-history', {
+      params: { service_type: serviceType },
+    })
+    return response.data
+  },
+
+  submitInquiry: async (data: {
+    service_type: string;
+    company_name: string;
+    contact_person: string;
+    contact_phone: string;
+    message?: string;
+    preferred_tier?: string;
+  }) => {
+    const response = await apiClient.post('/service-subscription/inquiry', data)
+    return response.data
+  },
+}
+
+// EMR Dashboard Service (비즈니스 분석)
+export const emrDashboardService = {
+  getSummary: async () => {
+    const response = await apiClient.get('/emr-dashboard/summary')
+    return response.data
+  },
+
+  getRevenueTrend: async (days = 90) => {
+    const response = await apiClient.get('/emr-dashboard/revenue-trend', {
+      params: { days },
+    })
+    return response.data
+  },
+
+  getPatientTrend: async (days = 90) => {
+    const response = await apiClient.get('/emr-dashboard/patient-trend', {
+      params: { days },
+    })
+    return response.data
+  },
+
+  getInsuranceBreakdown: async () => {
+    const response = await apiClient.get('/emr-dashboard/insurance-breakdown')
+    return response.data
+  },
+
+  getRegionalBenchmark: async () => {
+    const response = await apiClient.get('/emr-dashboard/regional-benchmark')
+    return response.data
+  },
+}
+
+// Broker Service (중개인 포털)
+export const brokerService = {
+  getDashboard: async () => {
+    const response = await apiClient.get('/broker/dashboard')
+    return response.data
+  },
+  getDeals: async (params?: { status?: string; page?: number; page_size?: number }) => {
+    const response = await apiClient.get('/broker/deals', { params })
+    return response.data
+  },
+  getDeal: async (id: string) => {
+    const response = await apiClient.get(`/broker/deals/${id}`)
+    return response.data
+  },
+  updateDealStatus: async (id: string, data: { new_status: string; note?: string; close_reason?: string }) => {
+    const response = await apiClient.post(`/broker/deals/${id}/update-status`, data)
+    return response.data
+  },
+  addDealLog: async (id: string, note: string) => {
+    const response = await apiClient.post(`/broker/deals/${id}/log`, { note })
+    return response.data
+  },
+  getListings: async (params?: { region?: string; page?: number; page_size?: number }) => {
+    const response = await apiClient.get('/broker/listings', { params })
+    return response.data
+  },
+  claimDeal: async (data: {
+    listing_id: string; doctor_id?: string; title: string;
+    description?: string; expected_commission?: number; lead_source?: string;
+  }) => {
+    const response = await apiClient.post('/broker/deals/claim', data)
+    return response.data
+  },
+  getBoardPosts: async (params?: { category?: string; page?: number; page_size?: number }) => {
+    const response = await apiClient.get('/broker/board', { params })
+    return response.data
+  },
+  createBoardPost: async (data: { category?: string; title: string; content: string }) => {
+    const response = await apiClient.post('/broker/board', data)
+    return response.data
+  },
+  getBoardPost: async (id: number) => {
+    const response = await apiClient.get(`/broker/board/${id}`)
+    return response.data
+  },
+  createComment: async (postId: number, data: { content: string; parent_id?: number }) => {
+    const response = await apiClient.post(`/broker/board/${postId}/comments`, data)
+    return response.data
+  },
+  getCalculation: async (params: Record<string, number>) => {
+    const response = await apiClient.get('/broker/calculator', { params })
+    return response.data
+  },
+  getPerformance: async () => {
+    const response = await apiClient.get('/broker/performance')
+    return response.data
+  },
+}
+
+// Admin Broker Service (관리자 중개 관리)
+export const adminBrokerService = {
+  // 중개사
+  getBrokers: async (params?: { status?: string; search?: string; page?: number; page_size?: number }) => {
+    const response = await apiClient.get('/admin/broker/brokers', { params })
+    return response.data
+  },
+  createBroker: async (data: {
+    user_id: string; display_name: string; phone?: string; email?: string;
+    license_number?: string; assigned_regions?: string[]; tier?: string; commission_rate?: number;
+  }) => {
+    const response = await apiClient.post('/admin/broker/brokers', data)
+    return response.data
+  },
+  getBroker: async (id: number) => {
+    const response = await apiClient.get(`/admin/broker/brokers/${id}`)
+    return response.data
+  },
+  updateBroker: async (id: number, data: Record<string, any>) => {
+    const response = await apiClient.patch(`/admin/broker/brokers/${id}`, data)
+    return response.data
+  },
+  getBrokerPerformance: async (id: number, period?: string) => {
+    const response = await apiClient.get(`/admin/broker/brokers/${id}/performance`, { params: { period } })
+    return response.data
+  },
+  // 딜
+  getDeals: async (params?: { broker?: number; status?: string; page?: number; page_size?: number }) => {
+    const response = await apiClient.get('/admin/broker/deals', { params })
+    return response.data
+  },
+  getDeal: async (id: string) => {
+    const response = await apiClient.get(`/admin/broker/deals/${id}`)
+    return response.data
+  },
+  assignDeal: async (dealId: string, brokerId: number) => {
+    const response = await apiClient.patch(`/admin/broker/deals/${dealId}/assign`, { broker_id: brokerId })
+    return response.data
+  },
+  flagCircumvention: async (dealId: string, reason: string) => {
+    const response = await apiClient.post(`/admin/broker/deals/${dealId}/flag-circumvention`, { reason })
+    return response.data
+  },
+  // 파이프라인 & 커미션
+  getPipeline: async () => {
+    const response = await apiClient.get('/admin/broker/pipeline')
+    return response.data
+  },
+  getCommissions: async (params?: { status?: string; broker_id?: number; page?: number }) => {
+    const response = await apiClient.get('/admin/broker/commissions', { params })
+    return response.data
+  },
+  approveCommission: async (id: number) => {
+    const response = await apiClient.post(`/admin/broker/commissions/${id}/approve`)
+    return response.data
+  },
+  payCommission: async (id: number) => {
+    const response = await apiClient.post(`/admin/broker/commissions/${id}/pay`)
+    return response.data
+  },
+  cancelCommission: async (id: number) => {
+    const response = await apiClient.post(`/admin/broker/commissions/${id}/cancel`)
+    return response.data
+  },
+  // 컨트롤타워
+  getControlTower: async () => {
+    const response = await apiClient.get('/admin/broker/control-tower')
+    return response.data
+  },
+  // 개원 추적
+  getOpeningDoctors: async (params?: { status?: string; region?: string; specialty?: string; page?: number }) => {
+    const response = await apiClient.get('/admin/broker/doctors/opening-status', { params })
+    return response.data
+  },
+  // 우회거래
+  getSuspiciousActivities: async (params?: { resolved?: boolean; severity?: string; page?: number }) => {
+    const response = await apiClient.get('/admin/broker/suspicious-activities', { params })
+    return response.data
+  },
+  resolveSuspicious: async (id: number, resolution_note: string) => {
+    const response = await apiClient.post(`/admin/broker/suspicious-activities/${id}/resolve`, { resolution_note })
+    return response.data
+  },
+  // 게시판
+  createBoardPost: async (data: { category: string; title: string; content: string; is_pinned?: boolean }) => {
+    const response = await apiClient.post('/admin/broker/board', data)
+    return response.data
+  },
+  deleteBoardPost: async (id: number) => {
+    const response = await apiClient.delete(`/admin/broker/board/${id}`)
+    return response.data
+  },
+  togglePin: async (id: number) => {
+    const response = await apiClient.post(`/admin/broker/board/${id}/pin`)
+    return response.data
+  },
+  // 정산 리포트
+  getSettlementReport: async (params?: { month?: string; broker_id?: number }) => {
+    const response = await apiClient.get('/admin/broker/settlement-report', { params })
     return response.data
   },
 }

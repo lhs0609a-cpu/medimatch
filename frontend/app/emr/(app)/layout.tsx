@@ -49,6 +49,7 @@ const sidebarLinks = [
   { href: '/emr/smart-booking', label: '스마트 예약 QR', icon: QrCode },
   { href: '/emr/bridge', label: '약국 브릿지', icon: ArrowLeftRight },
   { href: '/emr/reports', label: '통합 리포트', icon: BarChart3 },
+  { href: '/emr-dashboard', label: '비즈니스 분석', icon: BarChart3, accent: false },
   { href: '/emr/ai-consulting', label: 'AI 경영컨설팅', icon: Brain },
   { href: '/emr/reviews', label: '만족도/리뷰', icon: Star },
   { href: '/emr/billing', label: '수납/결제', icon: CreditCard },

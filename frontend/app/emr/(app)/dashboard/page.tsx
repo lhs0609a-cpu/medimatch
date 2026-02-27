@@ -302,6 +302,23 @@ export default function EMRDashboardPage() {
         </div>
       </div>
 
+      {/* ───── 비즈니스 분석 배너 ───── */}
+      <Link
+        href="/emr-dashboard"
+        className="block card p-5 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border border-blue-200 dark:border-blue-800 hover:shadow-md transition-all group"
+      >
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <TossIcon icon={BarChart3} color="from-blue-500 to-indigo-600" size="sm" />
+            <div>
+              <div className="font-bold text-sm">비즈니스 분석 대시보드</div>
+              <div className="text-xs text-muted-foreground">매출 추이, 환자 분석, 보험 비율, 지역 벤치마크를 한눈에</div>
+            </div>
+          </div>
+          <ArrowRight className="w-5 h-5 text-blue-500 group-hover:translate-x-1 transition-transform" />
+        </div>
+      </Link>
+
       {/* ───── 하단: 주간 매출 + 최근 차트 ───── */}
       <div className="grid lg:grid-cols-2 gap-6">
         {/* 주간 매출 그래프 */}

@@ -352,6 +352,16 @@ export default function HomePage() {
                                 <p className="text-xs text-muted-foreground">AI 차트, 클라우드 네이티브</p>
                               </div>
                             </Link>
+                            <Link href="/emr-dashboard" className="flex items-center gap-3 p-3 rounded-xl hover:bg-accent transition-colors group">
+                              <TossIcon icon={BarChart3} color="from-cyan-500 to-blue-600" size="xs" shadow="shadow-cyan-500/25" className="flex-shrink-0" />
+                              <div className="flex-1">
+                                <div className="flex items-center gap-2">
+                                  <span className="text-sm font-medium group-hover:text-blue-600">EMR 비즈니스 분석</span>
+                                  <span className="px-1.5 py-0.5 text-[10px] font-bold bg-cyan-600/10 text-cyan-600 rounded">NEW</span>
+                                </div>
+                                <p className="text-xs text-muted-foreground">매출·환자·지역 벤치마크</p>
+                              </div>
+                            </Link>
                           </div>
                           <div className="border-t border-border mt-3 pt-3">
                             <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">개원 도구</p>
@@ -1410,6 +1420,7 @@ export default function HomePage() {
                   <li><Link href="/services/homepage" className="hover:text-foreground transition-colors flex items-center gap-1">홈페이지 무료제작 <span className="text-[10px] font-bold text-blue-600 bg-blue-100 px-1 rounded">NEW</span></Link></li>
                   <li><Link href="/services/program" className="hover:text-foreground transition-colors flex items-center gap-1">프로그램 무료제작 <span className="text-[10px] font-bold text-blue-600 bg-blue-100 px-1 rounded">NEW</span></Link></li>
                   <li><Link href="/services/emr" className="hover:text-foreground transition-colors flex items-center gap-1">클라우드 EMR <span className="text-[10px] font-bold text-blue-600 bg-blue-100 px-1 rounded">NEW</span></Link></li>
+                  <li><Link href="/emr-dashboard" className="hover:text-foreground transition-colors flex items-center gap-1">EMR 비즈니스 분석 <span className="text-[10px] font-bold text-cyan-600 bg-cyan-100 px-1 rounded">NEW</span></Link></li>
                 </ul>
               </div>
 

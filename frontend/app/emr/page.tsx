@@ -494,6 +494,7 @@ export default function EMRLandingPage() {
                 color: 'from-cyan-500 to-blue-600',
                 title: '경영 대시보드',
                 desc: '매출, 환자수, 삭감률을 한눈에. AI가 공백 시간대, 미방문 환자, 재고 이슈를 자동 분석합니다.',
+                link: '/emr-dashboard',
               },
               {
                 icon: Bell,
@@ -513,18 +514,25 @@ export default function EMRLandingPage() {
                 title: '데이터 주권 보장',
                 desc: '원장님 데이터는 원장님 것. 언제든 전체 Export 무료, 타사 전환 시 무료 마이그레이션 지원.',
               },
-            ].map((f, i) => (
-              <div key={i} className="feature-card group">
-                <div className="flex items-start justify-between mb-5">
-                  <TossIcon icon={f.icon} color={f.color} size="lg" />
-                  {f.badge && (
-                    <span className="badge-primary text-2xs">{f.badge}</span>
-                  )}
-                </div>
-                <h3 className="text-xl font-bold mb-2">{f.title}</h3>
-                <p className="text-muted-foreground text-sm leading-relaxed">{f.desc}</p>
-              </div>
-            ))}
+            ].map((f, i) => {
+              const Wrapper = f.link ? Link : 'div'
+              const wrapperProps = f.link ? { href: f.link } : {}
+              return (
+                <Wrapper key={i} {...wrapperProps as any} className={`feature-card group ${f.link ? 'cursor-pointer' : ''}`}>
+                  <div className="flex items-start justify-between mb-5">
+                    <TossIcon icon={f.icon} color={f.color} size="lg" />
+                    {f.badge && (
+                      <span className="badge-primary text-2xs">{f.badge}</span>
+                    )}
+                    {f.link && (
+                      <span className="badge-primary text-2xs">체험하기 →</span>
+                    )}
+                  </div>
+                  <h3 className="text-xl font-bold mb-2">{f.title}</h3>
+                  <p className="text-muted-foreground text-sm leading-relaxed">{f.desc}</p>
+                </Wrapper>
+              )
+            })}
           </div>
         </div>
       </section>

@@ -34,6 +34,19 @@ from .group_buying import (
 from .favorite import Favorite, FavoriteType
 from .listing_subscription import ListingSubscription, ListingSubStatus
 from .pharmacy_transfer import PharmacyTransferListing, PharmTransferStatus
+from .service_subscription import (
+    ServiceSubscription, ServiceType, ServiceTier, ServiceSubStatus, SERVICE_PRICING
+)
+from .broker import (
+    Broker, BrokerageDeal, DealCommission, SuspiciousActivity,
+    BrokerStatus, BrokerTier, DealStatus, DealCloseReason,
+    CommissionType, CommissionPaymentStatus, SuspiciousActivityType,
+    DEAL_STATUS_ORDER,
+)
+from .broker_board import (
+    BrokerBoardPost, BrokerBoardComment, BoardCategory,
+)
+from .emr_analytics import EMRDailyMetrics
 
 __all__ = [
     "User",
@@ -124,4 +137,28 @@ __all__ = [
     # 약국 양도 매물
     "PharmacyTransferListing",
     "PharmTransferStatus",
+    # 서비스 구독 (홈페이지/프로그램)
+    "ServiceSubscription",
+    "ServiceType",
+    "ServiceTier",
+    "ServiceSubStatus",
+    "SERVICE_PRICING",
+    # 부동산 중개 시스템
+    "Broker",
+    "BrokerageDeal",
+    "DealCommission",
+    "SuspiciousActivity",
+    "BrokerStatus",
+    "BrokerTier",
+    "DealStatus",
+    "DealCloseReason",
+    "CommissionType",
+    "CommissionPaymentStatus",
+    "SuspiciousActivityType",
+    "DEAL_STATUS_ORDER",
+    "BrokerBoardPost",
+    "BrokerBoardComment",
+    "BoardCategory",
+    # EMR 비즈니스 분석
+    "EMRDailyMetrics",
 ]

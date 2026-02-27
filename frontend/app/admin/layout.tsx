@@ -24,6 +24,13 @@ import {
   HeartHandshake,
   ShieldCheck,
   ShoppingCart,
+  Globe,
+  LayoutDashboard,
+  UserCog,
+  GitBranch,
+  Calculator,
+  Target,
+  MessageSquarePlus,
 } from 'lucide-react';
 
 interface SidebarGroup {
@@ -64,10 +71,22 @@ const sidebarGroups: SidebarGroup[] = [
     ],
   },
   {
+    title: '부동산 중개',
+    items: [
+      { href: '/admin/broker-control', label: '컨트롤타워', icon: LayoutDashboard },
+      { href: '/admin/brokers', label: '중개사 관리', icon: UserCog },
+      { href: '/admin/broker-deals', label: '딜 파이프라인', icon: GitBranch },
+      { href: '/admin/broker-calculator', label: '수수료 계산기', icon: Calculator },
+      { href: '/admin/opening-tracker', label: '개원 추적', icon: Target },
+      { href: '/admin/broker-board', label: '게시판', icon: MessageSquarePlus },
+    ],
+  },
+  {
     title: '분석/운영',
     items: [
       { href: '/admin/simulations', label: '시뮬레이션', icon: BarChart3 },
       { href: '/admin/payments', label: '결제/구독', icon: CreditCard },
+      { href: '/admin/service-subscriptions', label: '서비스 구독', icon: Globe },
       { href: '/admin/campaigns', label: '캠페인', icon: Send },
       { href: '/admin/prospects', label: '약국 타겟팅', icon: Pill },
       { href: '/admin/stats', label: '통계', icon: TrendingUp },

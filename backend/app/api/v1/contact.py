@@ -16,7 +16,7 @@ class ContactRequest(BaseModel):
     name: str = Field(..., min_length=1, max_length=100)
     email: EmailStr
     phone: Optional[str] = Field(None, max_length=20)
-    type: str = Field(..., pattern="^(general|simulation|matching|payment|partnership|bug|other)$")
+    type: str = Field(..., pattern="^(general|simulation|matching|payment|partnership|bug|other|homepage_consultation|program_consultation)$")
     subject: str = Field(..., min_length=1, max_length=200)
     message: str = Field(..., min_length=1, max_length=5000)
 

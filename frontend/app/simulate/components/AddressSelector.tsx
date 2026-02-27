@@ -7,9 +7,10 @@ import { KOREA_REGIONS } from '../data/korea-regions'
 interface AddressSelectorProps {
   onChange: (address: string) => void
   error?: string
+  label?: string
 }
 
-export default function AddressSelector({ onChange, error }: AddressSelectorProps) {
+export default function AddressSelector({ onChange, error, label = '개원 예정 주소 *' }: AddressSelectorProps) {
   const [sido, setSido] = useState('')
   const [sigungu, setSigungu] = useState('')
   const [dong, setDong] = useState('')
@@ -39,7 +40,7 @@ export default function AddressSelector({ onChange, error }: AddressSelectorProp
 
   return (
     <div>
-      <label className="label mb-2 block">개원 예정 주소 *</label>
+      <label className="label mb-2 block">{label}</label>
       <div className="grid grid-cols-3 gap-2">
         {/* 시/도 */}
         <div className="relative">

@@ -28,6 +28,11 @@ from .favorites import router as favorites_router
 from .contact import router as contact_router
 from .listing_subscription import router as listing_subscription_router
 from .pharmacy_transfer import router as pharmacy_transfer_router
+from .service_subscription import router as service_subscription_router
+from .demographics import router as demographics_router
+from .emr_dashboard import router as emr_dashboard_router
+from .broker import router as broker_router
+from .admin_broker import router as admin_broker_router
 
 api_router = APIRouter()
 
@@ -60,3 +65,8 @@ api_router.include_router(favorites_router, prefix="/favorites", tags=["Favorite
 api_router.include_router(contact_router, prefix="/contact", tags=["Contact - 문의"])
 api_router.include_router(listing_subscription_router, prefix="/listing-subscription", tags=["Listing Subscription - 매물 등록 구독"])
 api_router.include_router(pharmacy_transfer_router, prefix="/pharmacy-transfer", tags=["Pharmacy Transfer - 약국 양도"])
+api_router.include_router(service_subscription_router, prefix="/service-subscription", tags=["Service Subscription - 서비스 구독"])
+api_router.include_router(demographics_router, prefix="/demographics", tags=["Demographics - 인구통계 분석"])
+api_router.include_router(emr_dashboard_router, prefix="/emr-dashboard", tags=["EMR Dashboard - 비즈니스 분석"])
+api_router.include_router(broker_router, prefix="/broker", tags=["Broker - 부동산 중개인"])
+api_router.include_router(admin_broker_router, prefix="/admin/broker", tags=["Admin Broker - 중개 관리"])

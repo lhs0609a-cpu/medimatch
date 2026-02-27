@@ -22,6 +22,8 @@ celery_app = Celery(
         "app.tasks.campaign_tasks",
         "app.tasks.sales_match_tasks",
         "app.tasks.listing_subscription_tasks",
+        "app.tasks.service_subscription_tasks",
+        "app.tasks.broker_tasks",
     ]
 )
 
@@ -115,5 +117,29 @@ celery_app.conf.beat_schedule = {
     "listing-subscription-expire": {
         "task": "app.tasks.listing_subscription_tasks.expire_canceled_subscriptions",
         "schedule": crontab(hour=0, minute=0),
+    },
+
+    # ===== 서비스 구독 (홈페이지/프로그램) =====
+    # 매일 오전 6:30: 서비스 구독 자동갱신 결제
+    "service-subscription-renewals": {
+        "task": "app.tasks.service_subscription_tasks.process_service_renewals",
+        "schedule": crontab(hour=6, minute=30),
+    },
+    # 매일 00:30: 취소된 서비스 구독 만료 처리
+    "service-subscription-expire": {
+        "task": "app.tasks.service_subscription_tasks.expire_canceled_service_subscriptions",
+        "schedule": crontab(hour=0, minute=30),
+    },
+
+    # ===== 부동산 중개 =====
+    # 매일 새벽 1시: 우회거래 자동 탐지
+    "broker-circumvention-detect": {
+        "task": "app.tasks.broker_tasks.detect_circumvention",
+        "schedule": crontab(hour=1, minute=0),
+    },
+    # 매일 새벽 5시: 브로커 성과 캐시 갱신
+    "broker-stats-refresh": {
+        "task": "app.tasks.broker_tasks.refresh_broker_stats",
+        "schedule": crontab(hour=5, minute=0),
     },
 }
