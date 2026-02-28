@@ -47,6 +47,76 @@ from .broker_board import (
     BrokerBoardPost, BrokerBoardComment, BoardCategory,
 )
 from .emr_analytics import EMRDailyMetrics
+from .insurance_claim import (
+    InsuranceClaim, ClaimItem, ClaimBatch,
+    ClaimStatus, RiskLevel, ClaimItemType,
+)
+from .tax_correction import (
+    TaxCorrection, TaxDeduction,
+    TaxCorrectionStatus, DeductionCategory,
+)
+# HIRA 코드 레지스트리
+from .hira_code import (
+    HIRAFeeCode, HIRADiseaseCode, HIRADrugCode, HIRACodeChangeLog,
+    HIRACodeType, CodeChangeType,
+)
+# DUR 약물 안전성
+from .dur_check import (
+    DURCheckLog, DrugInteraction,
+    DURSeverity, DURCheckType, InteractionType,
+)
+# AI 분석 결과
+from .claims_ai import (
+    ClaimAnalysisResult, RejectionPattern, PeerBenchmark,
+    AnalysisStatus,
+)
+# 이의신청
+from .claim_appeal import (
+    ClaimAppeal, AppealType, AppealStatus,
+)
+# EDI 로그
+from .edi_log import (
+    EDIMessageLog, EDIDirection, EDIMessageType,
+)
+# 청구 감사 로그
+from .claim_audit import (
+    ClaimAuditLog, ClaimAuditAction,
+)
+# 세금 신고 이력
+from .tax_filing import (
+    TaxFilingHistory, FilingType, FilingSyncStatus,
+)
+# AI 세금 스캔
+from .tax_scan import (
+    TaxScanResult, TaxScanStatus, FindingSeverity,
+)
+# 증빙 서류
+from .tax_document import (
+    TaxDocument, DocumentType, DocumentStatus,
+)
+# 수수료 정산
+from .tax_fee import (
+    TaxFeeSettlement, FeeSettlementStatus,
+    FEE_TIERS, VAT_RATE, calculate_progressive_fee,
+)
+# 세법 레퍼런스
+from .tax_regulation import (
+    TaxRegulationReference, TaxPeerBenchmark,
+)
+# 세무 감사 & 홈택스 인증
+from .tax_audit import (
+    TaxAuditLog, HometaxCredential,
+    TaxAuditAction, HometaxAuthType,
+)
+# 비용 최적화
+from .staff_cost import StaffCost
+from .fixed_cost import FixedCostEntry
+from .supply_price import MedicalSupplyItem, VendorPriceQuote
+from .marketing_roi import MarketingSpend
+# 환자 관리
+from .patient import Patient, InboundStatus, ConsentStatus, DBQuality
+# 개원 프로젝트
+from .opening_project import OpeningProject, OpeningProjectTask, ProjectStatus
 
 __all__ = [
     "User",
@@ -161,4 +231,86 @@ __all__ = [
     "BoardCategory",
     # EMR 비즈니스 분석
     "EMRDailyMetrics",
+    # 보험청구 시스템
+    "InsuranceClaim",
+    "ClaimItem",
+    "ClaimBatch",
+    "ClaimStatus",
+    "RiskLevel",
+    "ClaimItemType",
+    # 세무 경정청구
+    "TaxCorrection",
+    "TaxDeduction",
+    "TaxCorrectionStatus",
+    "DeductionCategory",
+    # HIRA 코드 레지스트리
+    "HIRAFeeCode",
+    "HIRADiseaseCode",
+    "HIRADrugCode",
+    "HIRACodeChangeLog",
+    "HIRACodeType",
+    "CodeChangeType",
+    # DUR 약물 안전성
+    "DURCheckLog",
+    "DrugInteraction",
+    "DURSeverity",
+    "DURCheckType",
+    "InteractionType",
+    # AI 분석 결과
+    "ClaimAnalysisResult",
+    "RejectionPattern",
+    "PeerBenchmark",
+    "AnalysisStatus",
+    # 이의신청
+    "ClaimAppeal",
+    "AppealType",
+    "AppealStatus",
+    # EDI 로그
+    "EDIMessageLog",
+    "EDIDirection",
+    "EDIMessageType",
+    # 청구 감사 로그
+    "ClaimAuditLog",
+    "ClaimAuditAction",
+    # 세금 신고 이력
+    "TaxFilingHistory",
+    "FilingType",
+    "FilingSyncStatus",
+    # AI 세금 스캔
+    "TaxScanResult",
+    "TaxScanStatus",
+    "FindingSeverity",
+    # 증빙 서류
+    "TaxDocument",
+    "DocumentType",
+    "DocumentStatus",
+    # 수수료 정산
+    "TaxFeeSettlement",
+    "FeeSettlementStatus",
+    "FEE_TIERS",
+    "VAT_RATE",
+    "calculate_progressive_fee",
+    # 세법 레퍼런스
+    "TaxRegulationReference",
+    "TaxPeerBenchmark",
+    # 세무 감사 & 홈택스 인증
+    "TaxAuditLog",
+    "HometaxCredential",
+    "TaxAuditAction",
+    "HometaxAuthType",
+    # 비용 최적화
+    "StaffCost",
+    "FixedCostEntry",
+    "MedicalSupplyItem",
+    "VendorPriceQuote",
+    "MarketingSpend",
+    # 환자 관리
+    "Patient",
+    "InboundStatus",
+    "ConsentStatus",
+    "DBQuality",
+    # 개원 프로젝트
+    "OpeningProject",
+    "OpeningProjectTask",
+    "ProjectStatus",
 ]

@@ -14,7 +14,9 @@ import {
   GroupBuyingCategory, CohortSummary, CohortDetail, CohortStats,
   CohortParticipant, JoinCohortResponse,
   GroupBuyingTotalStats, SavingsCalculation, CohortListResponse,
-  MyParticipationsResponse, CohortStatus
+  MyParticipationsResponse, CohortStatus,
+  // Opening Project Types
+  OpeningProject,
 } from './client'
 
 // Auth Services
@@ -1665,14 +1667,8 @@ export const pharmacyTransferService = {
 // Demographics Service (인구통계 분석)
 export const demographicsService = {
   analyze: async (address: string) => {
-    const API_URL = process.env.NEXT_PUBLIC_API_URL || '';
-    const res = await fetch(`${API_URL}/api/v1/demographics/analyze`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ address }),
-    });
-    if (!res.ok) throw new Error('분석에 실패했습니다');
-    return res.json();
+    const response = await apiClient.post('/demographics/analyze', { address });
+    return response.data;
   },
 }
 
@@ -1963,6 +1959,45 @@ export const adminBrokerService = {
   // 정산 리포트
   getSettlementReport: async (params?: { month?: string; broker_id?: number }) => {
     const response = await apiClient.get('/admin/broker/settlement-report', { params })
+    return response.data
+  },
+}
+
+// ============================================================
+// Opening Project Service (개원 프로젝트)
+// ============================================================
+
+export const openingProjectService = {
+  create: async (data: Partial<OpeningProject>): Promise<OpeningProject> => {
+    const response = await apiClient.post('/opening-projects', data)
+    return response.data
+  },
+  list: async (): Promise<{ items: OpeningProject[] }> => {
+    const response = await apiClient.get('/opening-projects')
+    return response.data
+  },
+  get: async (id: string): Promise<OpeningProject> => {
+    const response = await apiClient.get(`/opening-projects/${id}`)
+    return response.data
+  },
+  update: async (id: string, data: Partial<OpeningProject>): Promise<OpeningProject> => {
+    const response = await apiClient.put(`/opening-projects/${id}`, data)
+    return response.data
+  },
+  toggleTask: async (id: string, subtaskId: string, data: { is_completed: boolean; actual_cost?: number; memo?: string }) => {
+    const response = await apiClient.patch(`/opening-projects/${id}/tasks/${subtaskId}`, data)
+    return response.data
+  },
+  syncFromLocal: async (id: string, data: {
+    title?: string; specialty?: string; target_date?: string;
+    budget_total?: number; location_address?: string; notes?: string;
+    tasks: Array<{ subtask_id: string; is_completed: boolean; actual_cost?: number; memo?: string }>
+  }): Promise<OpeningProject> => {
+    const response = await apiClient.patch(`/opening-projects/${id}/sync`, data)
+    return response.data
+  },
+  delete: async (id: string) => {
+    const response = await apiClient.delete(`/opening-projects/${id}`)
     return response.data
   },
 }

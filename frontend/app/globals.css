@@ -748,3 +748,15 @@
 .no-print {
   /* visible on screen, hidden in print media */
 }
+
+/* ===== TOUCH DEVICE OPTIMIZATION ===== */
+@media (pointer: coarse) {
+  .btn-sm {
+    min-height: 36px;
+  }
+
+  .btn-icon {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}

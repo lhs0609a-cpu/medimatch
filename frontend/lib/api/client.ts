@@ -918,3 +918,37 @@ export interface MyParticipationsResponse {
   participations: MyParticipation[]
   total: number
 }
+
+// ============================================================
+// Opening Project (개원 프로젝트) Types
+// ============================================================
+
+export type ProjectStatus = 'PLANNING' | 'LICENSING' | 'CONSTRUCTION' | 'EQUIPMENT' | 'HIRING' | 'MARKETING' | 'OPENING' | 'COMPLETED'
+
+export interface OpeningProjectTask {
+  id: string
+  phase_id: number
+  subtask_id: string
+  is_completed: boolean
+  completed_at?: string
+  actual_cost?: number
+  memo?: string
+}
+
+export interface OpeningProject {
+  id: string
+  title?: string
+  specialty?: string
+  target_date?: string
+  status: ProjectStatus
+  budget_total?: number
+  budget_spent: number
+  location_address?: string
+  notes?: string
+  progress: number
+  completed_count: number
+  total_tasks: number
+  created_at?: string
+  updated_at?: string
+  tasks: OpeningProjectTask[]
+}

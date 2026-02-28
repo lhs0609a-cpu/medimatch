@@ -41,6 +41,11 @@ venv/
 .venv/
 *.egg-info/
 
+# Large media files
+*.mp4
+*.mov
+*.avi
+
 # Vercel
 .vercel
 nul

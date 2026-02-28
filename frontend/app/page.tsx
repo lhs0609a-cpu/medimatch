@@ -149,7 +149,6 @@ const ALL_TOOLS: { name: string; href: string; cat: string; desc: string; icon: 
   { name: 'EMR 비교', href: '/emr-compare', cat: '개원 준비', desc: '전자차트 시스템 비교', icon: Monitor, gradient: 'from-indigo-500 to-indigo-600', shadow: 'shadow-indigo-500/25' },
   { name: '의료기기 비교', href: '/equipment', cat: '개원 준비', desc: '장비 견적/중고 매물', icon: Microscope, gradient: 'from-indigo-500 to-indigo-600', shadow: 'shadow-indigo-500/25' },
   { name: '인테리어 견적', href: '/interior', cat: '개원 준비', desc: '진료과별 비용 산출', icon: Paintbrush, gradient: 'from-indigo-500 to-indigo-600', shadow: 'shadow-indigo-500/25' },
-  { name: '세무/회계사 매칭', href: '/tax-advisor', cat: '개원 준비', desc: '의료 전문 세무사', icon: Receipt, gradient: 'from-indigo-500 to-indigo-600', shadow: 'shadow-indigo-500/25' },
   // 운영/마케팅 (5) — 스카이
   { name: '마케팅 패키지', href: '/marketing', cat: '운영/마케팅', desc: '개원 마케팅 전략', icon: Megaphone, gradient: 'from-sky-500 to-blue-500', shadow: 'shadow-sky-500/25' },
   { name: '보험 청구 최적화', href: '/insurance-billing', cat: '운영/마케팅', desc: '건강보험 삭감 방지', icon: HeartPulse, gradient: 'from-sky-500 to-blue-500', shadow: 'shadow-sky-500/25' },
@@ -507,7 +506,7 @@ export default function HomePage() {
 
         {/* ===== HERO SECTION ===== */}
         <main id="main-content" role="main">
-        <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-10 lg:pt-0" aria-label="히어로 섹션">
+        <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-20 lg:pt-0" aria-label="히어로 섹션">
           {/* 배경 지도 */}
           <div className="absolute inset-0 z-0">
             <div className="absolute inset-0 bg-gradient-to-b from-background/80 via-background/60 to-background z-10" />
@@ -565,7 +564,7 @@ export default function HomePage() {
               </div>
 
               {/* 메인 헤드라인 */}
-              <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black tracking-tight leading-[1.08] mb-6 animate-fade-in-up">
+              <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-black tracking-tight leading-[1.08] mb-6 animate-fade-in-up">
                 <span className="text-foreground">매일 3곳 폐업,</span>
                 <br />
                 <span className="text-[#3182f6]">
@@ -596,7 +595,7 @@ export default function HomePage() {
               </div>
 
               {/* 핵심 수치 3개 */}
-              <div className="grid grid-cols-3 gap-3 max-w-3xl mx-auto animate-fade-in-up delay-300">
+              <div className="grid grid-cols-3 gap-2 sm:gap-3 max-w-3xl mx-auto animate-fade-in-up delay-300">
                 {[
                   { number: '4.8', unit: '억', label: '평균 개원 비용', color: 'text-red-500', bg: 'bg-red-500/10 border-red-500/20' },
                   { number: '1,000', unit: '+', label: '연간 폐업 의료기관', color: 'text-orange-500', bg: 'bg-orange-500/10 border-orange-500/20' },
@@ -630,7 +629,7 @@ export default function HomePage() {
             <div className="flex animate-marquee gap-12 items-center">
               {[...Array(2)].map((_, setIdx) => (
                 <div key={setIdx} className="flex gap-12 items-center flex-shrink-0">
-                  {Array.from({ length: 22 }, (_, i) => i + 1).map((n) => (
+                  {[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,21,22,23].map((n) => (
                     <img
                       key={`${setIdx}-${n}`}
                       src={`/assets/partners/partner-${String(n).padStart(2, '0')}.png`}
@@ -875,7 +874,7 @@ export default function HomePage() {
                         <button
                           key={spec}
                           onClick={() => setDemoSpecialty(spec)}
-                          className={`py-3 px-4 rounded-xl text-sm font-medium transition-all ${
+                          className={`py-2.5 px-2 sm:py-3 sm:px-4 rounded-xl text-sm font-medium transition-all ${
                             demoSpecialty === spec
                               ? 'bg-blue-600 text-white shadow-lg'
                               : 'bg-secondary hover:bg-accent'
@@ -1195,7 +1194,7 @@ export default function HomePage() {
             </div>
 
             {/* Category Tabs */}
-            <div className="flex gap-2 justify-center mb-8 overflow-x-auto pb-2 scrollbar-hide">
+            <div className="flex gap-2 sm:justify-center mb-8 overflow-x-auto pb-2 scrollbar-hide">
               {TOOL_CATS.map((cat) => (
                 <button
                   key={cat}
@@ -1420,7 +1419,10 @@ export default function HomePage() {
                   <li><Link href="/services/homepage" className="hover:text-foreground transition-colors flex items-center gap-1">홈페이지 무료제작 <span className="text-[10px] font-bold text-blue-600 bg-blue-100 px-1 rounded">NEW</span></Link></li>
                   <li><Link href="/services/program" className="hover:text-foreground transition-colors flex items-center gap-1">프로그램 무료제작 <span className="text-[10px] font-bold text-blue-600 bg-blue-100 px-1 rounded">NEW</span></Link></li>
                   <li><Link href="/services/emr" className="hover:text-foreground transition-colors flex items-center gap-1">클라우드 EMR <span className="text-[10px] font-bold text-blue-600 bg-blue-100 px-1 rounded">NEW</span></Link></li>
+                  <li><Link href="/emr" className="hover:text-foreground transition-colors flex items-center gap-1">PlatonEMR 프로그램 <span className="text-[10px] font-bold text-emerald-600 bg-emerald-100 px-1 rounded">LIVE</span></Link></li>
                   <li><Link href="/emr-dashboard" className="hover:text-foreground transition-colors flex items-center gap-1">EMR 비즈니스 분석 <span className="text-[10px] font-bold text-cyan-600 bg-cyan-100 px-1 rounded">NEW</span></Link></li>
+                  <li><Link href="/emr/claims" className="hover:text-foreground transition-colors flex items-center gap-1">AI 보험청구 <span className="text-[10px] font-bold text-emerald-600 bg-emerald-100 px-1 rounded">NEW</span></Link></li>
+                  <li><Link href="/emr/tax-correction" className="hover:text-foreground transition-colors flex items-center gap-1">AI 경정청구 <span className="text-[10px] font-bold text-emerald-600 bg-emerald-100 px-1 rounded">NEW</span></Link></li>
                 </ul>
               </div>
 

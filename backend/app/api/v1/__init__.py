@@ -33,6 +33,21 @@ from .demographics import router as demographics_router
 from .emr_dashboard import router as emr_dashboard_router
 from .broker import router as broker_router
 from .admin_broker import router as admin_broker_router
+from .claims import router as claims_router
+from .claims_ai import router as claims_ai_router
+from .claims_edi import router as claims_edi_router
+from .claims_appeal import router as claims_appeal_router
+from .claims_analytics import router as claims_analytics_router
+from .dur import router as dur_router
+from .hira_codes import router as hira_codes_router
+from .tax_correction import router as tax_correction_router
+from .tax import router as tax_v2_router
+from .staff_cost import router as staff_cost_router
+from .fixed_cost import router as fixed_cost_router
+from .supply_price import router as supply_price_router
+from .marketing_roi import router as marketing_roi_router
+from .patients import router as patients_router
+from .opening_project import router as opening_project_router
 
 api_router = APIRouter()
 
@@ -70,3 +85,18 @@ api_router.include_router(demographics_router, prefix="/demographics", tags=["De
 api_router.include_router(emr_dashboard_router, prefix="/emr-dashboard", tags=["EMR Dashboard - 비즈니스 분석"])
 api_router.include_router(broker_router, prefix="/broker", tags=["Broker - 부동산 중개인"])
 api_router.include_router(admin_broker_router, prefix="/admin/broker", tags=["Admin Broker - 중개 관리"])
+api_router.include_router(claims_router, prefix="/claims", tags=["Claims - 보험청구"])
+api_router.include_router(claims_ai_router, prefix="/claims", tags=["Claims AI - AI 분석"])
+api_router.include_router(claims_edi_router, prefix="/claims", tags=["Claims EDI - 심평원 EDI"])
+api_router.include_router(claims_appeal_router, prefix="/appeals", tags=["Claims Appeal - 이의신청"])
+api_router.include_router(claims_analytics_router, prefix="/claims-analytics", tags=["Claims Analytics - 청구 분석"])
+api_router.include_router(dur_router, prefix="/dur", tags=["DUR - 약물 안전성"])
+api_router.include_router(hira_codes_router, prefix="/hira-codes", tags=["HIRA Codes - 코드 검색"])
+api_router.include_router(tax_correction_router, prefix="/tax-correction", tags=["Tax Correction - 경정청구"])
+api_router.include_router(tax_v2_router, prefix="/tax-correction", tags=["Tax Correction v2 - 경정청구 확장"])
+api_router.include_router(staff_cost_router, prefix="/emr/staff-cost", tags=["EMR Staff Cost - 인건비 최적화"])
+api_router.include_router(fixed_cost_router, prefix="/emr/fixed-cost", tags=["EMR Fixed Cost - 고정비 절감"])
+api_router.include_router(supply_price_router, prefix="/emr/supply-price", tags=["EMR Supply Price - 소모품/약가 비교"])
+api_router.include_router(marketing_roi_router, prefix="/emr/marketing-roi", tags=["EMR Marketing ROI - 마케팅 ROI"])
+api_router.include_router(patients_router, prefix="/emr/patients", tags=["EMR Patients - 환자 관리"])
+api_router.include_router(opening_project_router, prefix="/opening-projects", tags=["Opening Project - 개원 프로젝트"])

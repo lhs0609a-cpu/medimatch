@@ -4,7 +4,7 @@ import { useState } from 'react';
 import Image from 'next/image';
 import {
   BarChart3, Building2, CreditCard, Megaphone,
-  ClipboardCheck, MapPin,
+  ClipboardCheck, MapPin, Shield, Calculator,
   CheckCircle2, Circle, ArrowRight,
   Send, Loader2, Phone, User, MessageSquare,
   Stethoscope, Calendar, MapPinned, Hospital,
@@ -31,6 +31,8 @@ function OpeningChecklist() {
     { label: 'PG 단말기', badge: '무료 설치', solved: true },
     { label: '개원 대출', badge: '제휴 금융사 연결', solved: true },
     { label: '마케팅', badge: '6개월 무상 지원', solved: true },
+    { label: '보험청구', badge: 'AI 삭감 방지', solved: true },
+    { label: '세무 절세', badge: '경정청구 대행', solved: true },
   ];
   const solvedCount = items.filter((i) => i.solved).length;
 
@@ -65,7 +67,7 @@ function OpeningChecklist() {
                 )}
                 <span className="font-medium text-gray-900 flex-1">{item.label}</span>
                 <span
-                  className={`text-xs font-medium px-3 py-1 rounded-full ${
+                  className={`text-xs font-medium px-2 sm:px-3 py-1 rounded-full whitespace-nowrap ${
                     item.solved
                       ? 'bg-blue-100 text-blue-700'
                       : 'bg-gray-100 text-gray-500'
@@ -112,6 +114,7 @@ function CostSavingsSection() {
     { label: '상가 중개수수료', cost: '₩300~450만' },
     { label: 'PG 설치비', cost: '₩50~100만' },
     { label: '마케팅 6개월', cost: '₩900~3,000만' },
+    { label: '경정청구 세무사 수수료', cost: '₩100~200만' },
   ];
 
   return (
@@ -533,6 +536,28 @@ export default function OpeningPackagePage() {
                 '전담 마케터 1:1 배정',
               ],
             },
+            {
+              icon: Shield,
+              title: '보험청구 AI 자동화',
+              description:
+                '심평원 청구 전 AI가 삭감 위험을 분석합니다. 코드 조합 패턴을 사전 점검하여 평균 삭감률 50% 감소.',
+              highlights: [
+                'AI 삭감 리스크 사전 분석',
+                '일괄 심평원 전송',
+                '코드별 통과율 예측',
+              ],
+            },
+            {
+              icon: Calculator,
+              title: '경정청구 세금환급',
+              description:
+                'AI가 놓친 공제를 찾아 세금을 돌려받습니다. 보험청구 데이터 기반 의료비 세액공제를 자동 스캔. 성공 보수제(환급액의 10~15%)로 부담 없이.',
+              highlights: [
+                'AI 자동 공제 스캔',
+                '성공 보수제 (10~15%)',
+                '환급 실패 시 수수료 0원',
+              ],
+            },
           ]}
         />
       </div>
@@ -559,6 +584,8 @@ export default function OpeningPackagePage() {
               values: ['별도 계약 (월 150~500만원)', '6개월 무상 (최대 2,580만원)'],
             },
             { label: '개원 대출', values: ['직접 알아봄', '제휴 금융사 연결'] },
+            { label: '보험청구', values: ['수작업 (삭감률 5%+)', 'AI 자동화 (삭감률 2%)'] },
+            { label: '세무 절세', values: ['세무사 별도 (20~30% 수수료)', 'AI 자동 스캔 (10~15%)'] },
             { label: '전담 매니저', values: [false, true] },
             { label: '성과 리포트', values: [false, true] },
           ]}
@@ -624,6 +651,9 @@ export default function OpeningPackagePage() {
                 { text: '네이버 플레이스 기본 세팅', included: true },
                 { text: '블로그 마케팅 3개월', included: true },
                 { text: '기본 SEO 최적화', included: true },
+                { text: 'EMR 기본 (STARTER 무료)', included: true },
+                { text: 'AI 청구 분석', included: false },
+                { text: '경정청구 대행', included: false },
                 { text: '상권분석 리포트', included: false },
                 { text: '입지 중개 수수료 면제', included: false },
                 { text: '전담 마케터 배정', included: false },
@@ -646,6 +676,9 @@ export default function OpeningPackagePage() {
                 { text: '입지 중개 수수료 0원', included: true },
                 { text: '블로그 + SNS 마케팅 6개월', included: true },
                 { text: '전담 마케터 1:1 배정', included: true },
+                { text: 'EMR 기본', included: true },
+                { text: 'AI 청구 분석', included: true },
+                { text: '경정청구 대행', included: false },
                 { text: '월간 성과 리포트', included: true },
                 { text: '개원 대출 연결', included: false },
                 { text: '홈페이지 제작', included: false },
@@ -660,6 +693,9 @@ export default function OpeningPackagePage() {
               description: '올인원 (PG + 중개 + 대출 + 마케팅 + 홈페이지)',
               features: [
                 { text: '플러스 패키지 전체 포함', included: true },
+                { text: 'EMR 기본', included: true },
+                { text: 'AI 청구 분석', included: true },
+                { text: '경정청구 대행', included: true },
                 { text: '제휴 금융사 개원 대출 연결', included: true },
                 { text: '병원 홈페이지 제작 (₩300만 상당)', included: true },
                 { text: '카페 프로필 세팅', included: true },
@@ -751,6 +787,16 @@ export default function OpeningPackagePage() {
             question: '마케팅 6개월 후에는 어떻게 되나요?',
             answer:
               '6개월 안정화 이후에도 원하시면 유료 마케팅 서비스를 연장할 수 있습니다. 대부분 6개월이면 자연검색 유입이 안정화되어 별도 마케팅 없이도 환자가 유지됩니다.',
+          },
+          {
+            question: '보험청구 자동화는 어떻게 작동하나요?',
+            answer:
+              'EMR에서 진료 기록을 작성하면, AI가 자동으로 상병코드와 수가코드 조합을 분석하여 삭감 위험을 사전에 감지합니다. 고위험 항목은 수정 제안과 함께 알려드리고, 안전한 청구 건은 심평원에 일괄 전송할 수 있습니다. 평균 삭감률이 50% 이상 감소합니다.',
+          },
+          {
+            question: '경정청구 수수료는 얼마인가요?',
+            answer:
+              '성공 보수제로, 환급 성공 시에만 수수료가 발생합니다. 환급액 100만원 미만은 15%, 100~500만원은 12%, 500만원 이상은 10%입니다. 환급 실패 시 수수료는 0원입니다. 일반 세무사 수수료(20~30%)보다 저렴합니다.',
           },
         ]}
       />

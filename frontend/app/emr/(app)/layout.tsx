@@ -36,20 +36,31 @@ import {
   Clock,
   Star,
   QrCode,
+  Users2,
+  Landmark,
+  ShoppingCart,
+  TrendingUp,
+  Rocket,
 } from 'lucide-react'
 
 const sidebarLinks = [
   { href: '/emr/dashboard', label: '대시보드', icon: LayoutDashboard },
+  { href: '/emr/opening', label: '개원 준비', icon: Rocket, badge: '진행중' },
   { href: '/emr/appointments', label: '예약/접수', icon: CalendarCheck },
   { href: '/emr/patients', label: '환자 관리', icon: Users },
   { href: '/emr/chart/new', label: 'AI 진료차트', icon: Mic, accent: true },
   { href: '/emr/claims', label: '보험청구', icon: Receipt },
+  { href: '/emr/tax-correction', label: '경정청구', icon: Shield },
   { href: '/emr/telemedicine', label: '비대면 진료', icon: Video },
   { href: '/emr/waiting', label: '대기/동선', icon: Clock },
   { href: '/emr/smart-booking', label: '스마트 예약 QR', icon: QrCode },
   { href: '/emr/bridge', label: '약국 브릿지', icon: ArrowLeftRight },
   { href: '/emr/reports', label: '통합 리포트', icon: BarChart3 },
   { href: '/emr-dashboard', label: '비즈니스 분석', icon: BarChart3, accent: false },
+  { href: '/emr/cost/staff', label: '인건비 최적화', icon: Users2 },
+  { href: '/emr/cost/fixed', label: '고정비 절감', icon: Landmark },
+  { href: '/emr/cost/supplies', label: '소모품/약가 비교', icon: ShoppingCart },
+  { href: '/emr/cost/marketing', label: '마케팅 ROI', icon: TrendingUp },
   { href: '/emr/ai-consulting', label: 'AI 경영컨설팅', icon: Brain },
   { href: '/emr/reviews', label: '만족도/리뷰', icon: Star },
   { href: '/emr/billing', label: '수납/결제', icon: CreditCard },
@@ -68,6 +79,7 @@ export default function EMRAppLayout({
   const pathname = usePathname()
   const [collapsed, setCollapsed] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
+  const [mobileSearchOpen, setMobileSearchOpen] = useState(false)
 
   return (
     <div className="min-h-screen bg-background flex">
@@ -136,6 +148,11 @@ export default function EMRAppLayout({
                   link.accent && isActive ? 'text-red-500' : ''
                 }`} />
                 {!collapsed && <span>{link.label}</span>}
+                {'badge' in link && link.badge && !collapsed && (
+                  <span className="ml-auto text-[10px] font-semibold bg-primary/10 text-primary px-1.5 py-0.5 rounded-md">
+                    {link.badge}
+                  </span>
+                )}
                 {link.accent && !collapsed && (
                   <span className="ml-auto w-2 h-2 rounded-full bg-red-500 animate-pulse" />
                 )}
@@ -189,6 +206,15 @@ export default function EMRAppLayout({
               <Menu className="w-5 h-5" />
             </button>
 
+            {/* 모바일 검색 버튼 */}
+            <button
+              className="sm:hidden btn-icon"
+              onClick={() => setMobileSearchOpen(true)}
+              aria-label="환자 검색"
+            >
+              <Search className="w-5 h-5" />
+            </button>
+
             {/* 검색 */}
             <div className="hidden sm:flex items-center gap-2 bg-secondary/50 rounded-xl px-4 py-2 w-72">
               <Search className="w-4 h-4 text-muted-foreground" />
@@ -232,6 +258,39 @@ export default function EMRAppLayout({
           {children}
         </main>
       </div>
+
+      {/* 모바일 풀스크린 검색 오버레이 */}
+      {mobileSearchOpen && (
+        <div className="fixed inset-0 z-[60] bg-background sm:hidden animate-fade-in">
+          <div className="flex items-center gap-3 px-4 h-16 border-b border-border">
+            <Search className="w-5 h-5 text-muted-foreground flex-shrink-0" />
+            <input
+              type="text"
+              placeholder="환자 검색 (이름, 차트번호, 연락처)"
+              className="bg-transparent text-base outline-none w-full placeholder:text-muted-foreground"
+              autoFocus
+            />
+            <button
+              onClick={() => setMobileSearchOpen(false)}
+              className="btn-icon flex-shrink-0"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+          <div className="p-4 text-center text-sm text-muted-foreground">
+            환자 이름, 차트번호, 연락처로 검색하세요
+          </div>
+        </div>
+      )}
+
+      {/* AI 차트 플로팅 액션 버튼 (모바일) */}
+      <Link
+        href="/emr/chart/new"
+        className="sm:hidden fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full bg-primary text-primary-foreground shadow-lg flex items-center justify-center active:scale-95 transition-transform"
+        aria-label="AI 차트"
+      >
+        <Mic className="w-6 h-6" />
+      </Link>
     </div>
   )
 }

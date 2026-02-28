@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import {
   Receipt,
@@ -30,91 +30,222 @@ import {
   AlertCircle,
   Info,
   Check,
+  Loader2,
 } from 'lucide-react'
 import { TossIcon } from '@/components/ui/TossIcon'
 
 /* ─── 타입 ─── */
-type ClaimStatus = 'draft' | 'ready' | 'submitted' | 'accepted' | 'rejected' | 'partial'
-type RiskLevel = 'low' | 'medium' | 'high'
+type ClaimStatus = 'DRAFT' | 'READY' | 'AI_REVIEWING' | 'SUBMITTED' | 'EDI_RECEIVED' | 'UNDER_REVIEW' | 'ACCEPTED' | 'REJECTED' | 'PARTIAL' | 'APPEALING' | 'APPEAL_ACCEPTED' | 'APPEAL_REJECTED'
+type RiskLevel = 'LOW' | 'MEDIUM' | 'HIGH'
 
-interface Claim {
-  id: number
-  date: string
-  patientName: string
-  chartNo: string
-  dxCodes: string[]
-  txCodes: string[]
-  amount: number
-  status: ClaimStatus
-  riskLevel: RiskLevel
-  riskReason?: string
-  submittedAt?: string
-  resultAmount?: number
+interface ClaimItem {
+  code: string
+  name: string
+  item_type: string
+  quantity: number
+  unit_price: number
+  total_price: number
+  risk_level: RiskLevel
+  pass_rate: number
+  issues: string[]
 }
 
-/* ─── 더미 데이터 ─── */
-const claims: Claim[] = [
-  { id: 1, date: '2025-02-21', patientName: '오수현', chartNo: 'C-20240118', dxCodes: ['M81.0'], txCodes: ['AA157', 'B0010'], amount: 45200, status: 'ready', riskLevel: 'low' },
-  { id: 2, date: '2025-02-21', patientName: '윤재민', chartNo: 'C-20230415', dxCodes: ['I10'], txCodes: ['AA157', 'F1010'], amount: 32800, status: 'ready', riskLevel: 'low' },
-  { id: 3, date: '2025-02-21', patientName: '서미래', chartNo: 'C-20241105', dxCodes: ['M54.5'], txCodes: ['AA157', 'MM042', 'B0020'], amount: 58900, status: 'draft', riskLevel: 'medium', riskReason: 'M54.5 + MM042 조합 삭감률 12% (최근 6개월 기준)' },
-  { id: 4, date: '2025-02-21', patientName: '강도윤', chartNo: 'C-20230712', dxCodes: ['E11.9'], txCodes: ['AA157', 'D2200', 'D2240'], amount: 67400, status: 'submitted', riskLevel: 'low', submittedAt: '2025-02-21 12:30' },
-  { id: 5, date: '2025-02-20', patientName: '김영수', chartNo: 'C-20230101', dxCodes: ['I10'], txCodes: ['AA157', 'F1010'], amount: 32800, status: 'accepted', riskLevel: 'low', resultAmount: 32800 },
-  { id: 6, date: '2025-02-20', patientName: '최은지', chartNo: 'C-20230518', dxCodes: ['E11.9', 'I10'], txCodes: ['AA157', 'D2200', 'F1010'], amount: 78600, status: 'accepted', riskLevel: 'low', resultAmount: 78600 },
-  { id: 7, date: '2025-02-19', patientName: '임하준', chartNo: 'C-20250210', dxCodes: ['J06.9'], txCodes: ['AA157', 'HA010'], amount: 28500, status: 'partial', riskLevel: 'high', riskReason: 'HA010 처치료 삭감 (진단 부적합)', resultAmount: 22100 },
-  { id: 8, date: '2025-02-19', patientName: '노은채', chartNo: 'C-20240920', dxCodes: ['K21.0'], txCodes: ['AA157', 'E7070'], amount: 42300, status: 'accepted', riskLevel: 'low', resultAmount: 42300 },
-  { id: 9, date: '2025-02-18', patientName: '백시연', chartNo: 'C-20250110', dxCodes: ['G43.9'], txCodes: ['AA157', 'HA010', 'B0030'], amount: 55700, status: 'rejected', riskLevel: 'high', riskReason: 'HA010 투약기준 미충족, B0030 횟수 초과', resultAmount: 38200 },
-]
+interface Claim {
+  id: string
+  claim_number: string
+  claim_date: string
+  service_date: string
+  patient_name_masked: string
+  patient_chart_no: string
+  patient_age?: number
+  patient_gender?: string
+  total_amount: number
+  insurance_amount: number
+  copay_amount: number
+  approved_amount?: number | null
+  rejected_amount: number
+  status: ClaimStatus
+  risk_level: RiskLevel
+  risk_score: number
+  risk_reason?: string | null
+  ai_analyzed: boolean
+  ai_analysis_result: { issues: string[]; suggestions: string[] }
+  submitted_at?: string | null
+  items?: ClaimItem[]
+  is_demo?: boolean
+}
+
+interface ClaimStats {
+  pending_count: number
+  pending_amount: number
+  total_claimed: number
+  total_accepted: number
+  rejected_amount: number
+  rejection_rate: number
+  risk_count: number
+  acceptance_rate: number
+  total_claims: number
+  is_demo: boolean
+}
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL || ''
+
+async function fetchApi(path: string, options?: RequestInit) {
+  const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null
+  const res = await fetch(`${API_URL}/api/v1${path}`, {
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      ...(options?.headers || {}),
+    },
+  })
+  if (!res.ok) throw new Error(`API error ${res.status}`)
+  return res.json()
+}
 
 const statusConfig: Record<ClaimStatus, { label: string; color: string; bg: string }> = {
-  draft: { label: '작성중', color: 'text-slate-600 dark:text-slate-400', bg: 'bg-slate-50 dark:bg-slate-900/20' },
-  ready: { label: '청구대기', color: 'text-amber-600 dark:text-amber-400', bg: 'bg-amber-50 dark:bg-amber-900/20' },
-  submitted: { label: '전송완료', color: 'text-blue-600 dark:text-blue-400', bg: 'bg-blue-50 dark:bg-blue-900/20' },
-  accepted: { label: '인정', color: 'text-emerald-600 dark:text-emerald-400', bg: 'bg-emerald-50 dark:bg-emerald-900/20' },
-  rejected: { label: '삭감', color: 'text-red-600 dark:text-red-400', bg: 'bg-red-50 dark:bg-red-900/20' },
-  partial: { label: '일부삭감', color: 'text-orange-600 dark:text-orange-400', bg: 'bg-orange-50 dark:bg-orange-900/20' },
+  DRAFT: { label: '작성중', color: 'text-slate-600 dark:text-slate-400', bg: 'bg-slate-50 dark:bg-slate-900/20' },
+  READY: { label: '청구대기', color: 'text-amber-600 dark:text-amber-400', bg: 'bg-amber-50 dark:bg-amber-900/20' },
+  AI_REVIEWING: { label: 'AI분석중', color: 'text-purple-600 dark:text-purple-400', bg: 'bg-purple-50 dark:bg-purple-900/20' },
+  SUBMITTED: { label: '전송완료', color: 'text-blue-600 dark:text-blue-400', bg: 'bg-blue-50 dark:bg-blue-900/20' },
+  EDI_RECEIVED: { label: '접수완료', color: 'text-cyan-600 dark:text-cyan-400', bg: 'bg-cyan-50 dark:bg-cyan-900/20' },
+  UNDER_REVIEW: { label: '심사중', color: 'text-indigo-600 dark:text-indigo-400', bg: 'bg-indigo-50 dark:bg-indigo-900/20' },
+  ACCEPTED: { label: '인정', color: 'text-emerald-600 dark:text-emerald-400', bg: 'bg-emerald-50 dark:bg-emerald-900/20' },
+  REJECTED: { label: '삭감', color: 'text-red-600 dark:text-red-400', bg: 'bg-red-50 dark:bg-red-900/20' },
+  PARTIAL: { label: '일부삭감', color: 'text-orange-600 dark:text-orange-400', bg: 'bg-orange-50 dark:bg-orange-900/20' },
+  APPEALING: { label: '이의신청중', color: 'text-violet-600 dark:text-violet-400', bg: 'bg-violet-50 dark:bg-violet-900/20' },
+  APPEAL_ACCEPTED: { label: '이의인정', color: 'text-teal-600 dark:text-teal-400', bg: 'bg-teal-50 dark:bg-teal-900/20' },
+  APPEAL_REJECTED: { label: '이의기각', color: 'text-rose-600 dark:text-rose-400', bg: 'bg-rose-50 dark:bg-rose-900/20' },
 }
 
 const riskConfig: Record<RiskLevel, { label: string; color: string; icon: typeof CheckCircle2 }> = {
-  low: { label: '안전', color: 'text-emerald-500', icon: CheckCircle2 },
-  medium: { label: '주의', color: 'text-amber-500', icon: AlertTriangle },
-  high: { label: '위험', color: 'text-red-500', icon: AlertCircle },
+  LOW: { label: '안전', color: 'text-emerald-500', icon: CheckCircle2 },
+  MEDIUM: { label: '주의', color: 'text-amber-500', icon: AlertTriangle },
+  HIGH: { label: '위험', color: 'text-red-500', icon: AlertCircle },
 }
 
 export default function ClaimsPage() {
+  const [claims, setClaims] = useState<Claim[]>([])
+  const [stats, setStats] = useState<ClaimStats | null>(null)
+  const [isDemo, setIsDemo] = useState(false)
+  const [loading, setLoading] = useState(true)
+  const [submitting, setSubmitting] = useState(false)
+
   const [filterStatus, setFilterStatus] = useState<ClaimStatus | 'all'>('all')
   const [searchQuery, setSearchQuery] = useState('')
-  const [selectedClaims, setSelectedClaims] = useState<number[]>([])
-  const [expandedClaim, setExpandedClaim] = useState<number | null>(null)
+  const [selectedClaims, setSelectedClaims] = useState<string[]>([])
+  const [expandedClaim, setExpandedClaim] = useState<string | null>(null)
+
+  useEffect(() => {
+    loadData()
+  }, [])
+
+  async function loadData() {
+    setLoading(true)
+    try {
+      const [claimsRes, statsRes] = await Promise.all([
+        fetchApi('/claims/'),
+        fetchApi('/claims/stats'),
+      ])
+      setClaims(claimsRes.data || [])
+      setStats(statsRes)
+      setIsDemo(claimsRes.is_demo || statsRes.is_demo)
+    } catch {
+      // Fallback: use empty
+      setClaims([])
+      setStats(null)
+    } finally {
+      setLoading(false)
+    }
+  }
 
   const filteredClaims = claims
     .filter((c) => filterStatus === 'all' || c.status === filterStatus)
     .filter((c) => {
       if (!searchQuery) return true
       const q = searchQuery.toLowerCase()
-      return c.patientName.includes(q) || c.chartNo.toLowerCase().includes(q)
+      return (c.patient_name_masked || '').includes(q) || (c.patient_chart_no || '').toLowerCase().includes(q)
     })
 
-  // 통계
-  const totalClaimed = claims.filter(c => ['accepted', 'partial', 'rejected'].includes(c.status)).reduce((s, c) => s + c.amount, 0)
-  const totalAccepted = claims.filter(c => ['accepted', 'partial'].includes(c.status)).reduce((s, c) => s + (c.resultAmount || 0), 0)
-  const rejectedAmount = totalClaimed - totalAccepted
-  const rejectionRate = totalClaimed > 0 ? ((rejectedAmount / totalClaimed) * 100).toFixed(1) : '0'
-  const readyClaims = claims.filter(c => c.status === 'ready')
-  const riskClaims = claims.filter(c => c.riskLevel !== 'low' && !['accepted'].includes(c.status))
+  const readyClaims = claims.filter(c => c.status === 'READY')
+  const riskClaims = claims.filter(c => c.risk_level !== 'LOW' && !['ACCEPTED'].includes(c.status))
 
-  const toggleSelect = (id: number) => {
+  const toggleSelect = (id: string) => {
     setSelectedClaims((prev) =>
       prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
     )
   }
 
   const selectAllReady = () => {
-    const readyIds = readyClaims.map(c => c.id)
-    setSelectedClaims(readyIds)
+    setSelectedClaims(readyClaims.map(c => c.id))
   }
+
+  const handleBatchSubmit = async () => {
+    const ids = selectedClaims.length > 0 ? selectedClaims : readyClaims.map(c => c.id)
+    if (ids.length === 0) return
+    setSubmitting(true)
+    try {
+      await fetchApi('/claims/batch-submit', {
+        method: 'POST',
+        body: JSON.stringify({ claim_ids: ids }),
+      })
+      setSelectedClaims([])
+      await loadData()
+    } catch {
+      // handle error
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    )
+  }
+
+  const rejectionRate = stats ? stats.rejection_rate.toFixed(1) : '0'
 
   return (
     <div className="max-w-[1400px] mx-auto space-y-6">
+      {/* 데모 배너 */}
+      {isDemo && (
+        <div className="flex items-center gap-2 p-3 rounded-xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800">
+          <Info className="w-4 h-4 text-amber-600 flex-shrink-0" />
+          <span className="text-sm text-amber-700 dark:text-amber-300">
+            데모 데이터를 표시 중입니다. EMR에서 실제 청구를 생성하면 실 데이터로 전환됩니다.
+          </span>
+        </div>
+      )}
+
+      {/* ───── 서브 네비게이션 ───── */}
+      <div className="flex items-center gap-2 overflow-x-auto hide-scrollbar pb-1">
+        {[
+          { href: '/emr/claims', label: '대시보드', active: true },
+          { href: '/emr/claims/new', label: '청구 작성' },
+          { href: '/emr/claims/batch', label: '일괄 전송' },
+          { href: '/emr/claims/defense', label: 'AI 삭감방어' },
+          { href: '/emr/claims/simulation', label: 'AI 모의심사' },
+          { href: '/emr/claims/results', label: '심사결과' },
+          { href: '/emr/claims/appeals', label: '이의신청' },
+          { href: '/emr/claims/analytics', label: '분석 리포트' },
+          { href: '/emr/claims/codes', label: 'HIRA 코드' },
+        ].map((nav) => (
+          <Link
+            key={nav.href}
+            href={nav.href}
+            className={`px-3 py-1.5 text-xs font-semibold rounded-lg whitespace-nowrap transition-colors ${
+              nav.active ? 'bg-primary text-white' : 'bg-secondary text-muted-foreground hover:text-foreground'
+            }`}
+          >
+            {nav.label}
+          </Link>
+        ))}
+      </div>
+
       {/* ───── 헤더 ───── */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
@@ -124,20 +255,24 @@ export default function ClaimsPage() {
           </p>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
+          <Link href="/emr/claims/new" className="btn-primary btn-sm">
+            <FileText className="w-3.5 h-3.5" />
+            새 청구
+          </Link>
           <button className="btn-outline btn-sm">
             <Download className="w-3.5 h-3.5" />
             내보내기
           </button>
           {selectedClaims.length > 0 && (
-            <button className="btn-primary btn-sm">
-              <Send className="w-3.5 h-3.5" />
+            <button onClick={handleBatchSubmit} disabled={submitting} className="btn-primary btn-sm">
+              {submitting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Send className="w-3.5 h-3.5" />}
               {selectedClaims.length}건 심평원 전송
             </button>
           )}
           {selectedClaims.length === 0 && readyClaims.length > 0 && (
-            <button onClick={selectAllReady} className="btn-primary btn-sm">
-              <Send className="w-3.5 h-3.5" />
+            <button onClick={handleBatchSubmit} disabled={submitting} className="btn-primary btn-sm">
+              {submitting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Send className="w-3.5 h-3.5" />}
               대기 {readyClaims.length}건 일괄 전송
             </button>
           )}
@@ -151,9 +286,9 @@ export default function ClaimsPage() {
             <span className="text-xs text-muted-foreground">청구 대기</span>
             <Clock className="w-4 h-4 text-amber-500" />
           </div>
-          <div className="text-2xl font-bold">{readyClaims.length}<span className="text-sm text-muted-foreground">건</span></div>
+          <div className="text-2xl font-bold">{stats?.pending_count ?? readyClaims.length}<span className="text-sm text-muted-foreground">건</span></div>
           <div className="text-xs text-muted-foreground mt-1">
-            {(readyClaims.reduce((s, c) => s + c.amount, 0) / 10000).toFixed(1)}만원
+            {((stats?.pending_amount ?? readyClaims.reduce((s, c) => s + c.total_amount, 0)) / 10000).toFixed(1)}만원
           </div>
         </div>
 
@@ -162,7 +297,7 @@ export default function ClaimsPage() {
             <span className="text-xs text-muted-foreground">청구 금액</span>
             <DollarSign className="w-4 h-4 text-blue-500" />
           </div>
-          <div className="text-2xl font-bold">{(totalClaimed / 10000).toFixed(0)}<span className="text-sm text-muted-foreground">만원</span></div>
+          <div className="text-2xl font-bold">{((stats?.total_claimed ?? 0) / 10000).toFixed(0)}<span className="text-sm text-muted-foreground">만원</span></div>
         </div>
 
         <div className="card p-4">
@@ -170,7 +305,7 @@ export default function ClaimsPage() {
             <span className="text-xs text-muted-foreground">인정 금액</span>
             <CheckCircle2 className="w-4 h-4 text-emerald-500" />
           </div>
-          <div className="text-2xl font-bold text-emerald-500">{(totalAccepted / 10000).toFixed(0)}<span className="text-sm text-muted-foreground">만원</span></div>
+          <div className="text-2xl font-bold text-emerald-500">{((stats?.total_accepted ?? 0) / 10000).toFixed(0)}<span className="text-sm text-muted-foreground">만원</span></div>
         </div>
 
         <div className="card p-4">
@@ -187,12 +322,12 @@ export default function ClaimsPage() {
           </div>
         </div>
 
-        <div className="card p-4">
+        <div className="card p-4 col-span-2 lg:col-span-1">
           <div className="flex items-center justify-between mb-2">
             <span className="text-xs text-muted-foreground">AI 위험 감지</span>
             <AlertTriangle className="w-4 h-4 text-amber-500" />
           </div>
-          <div className="text-2xl font-bold text-amber-500">{riskClaims.length}<span className="text-sm text-muted-foreground">건</span></div>
+          <div className="text-2xl font-bold text-amber-500">{stats?.risk_count ?? riskClaims.length}<span className="text-sm text-muted-foreground">건</span></div>
           <Link href="#" className="text-xs text-primary font-semibold mt-1 hover:underline block">확인하기 →</Link>
         </div>
       </div>
@@ -209,14 +344,14 @@ export default function ClaimsPage() {
             {riskClaims.map((claim) => (
               <div key={claim.id} className="flex items-start gap-3 p-3 bg-card rounded-xl">
                 <AlertTriangle className={`w-4 h-4 flex-shrink-0 mt-0.5 ${
-                  claim.riskLevel === 'high' ? 'text-red-500' : 'text-amber-500'
+                  claim.risk_level === 'HIGH' ? 'text-red-500' : 'text-amber-500'
                 }`} />
                 <div className="flex-1">
                   <div className="text-sm">
-                    <strong>{claim.patientName}</strong> ({claim.date}) - {claim.dxCodes.join(', ')}
+                    <strong>{claim.patient_name_masked}</strong> ({claim.claim_date})
                   </div>
-                  {claim.riskReason && (
-                    <div className="text-xs text-muted-foreground mt-0.5">{claim.riskReason}</div>
+                  {claim.risk_reason && (
+                    <div className="text-xs text-muted-foreground mt-0.5">{claim.risk_reason}</div>
                   )}
                 </div>
                 <button className="btn-outline btn-sm text-xs flex-shrink-0">
@@ -244,14 +379,14 @@ export default function ClaimsPage() {
           </div>
 
           <div className="flex items-center gap-1 overflow-x-auto hide-scrollbar">
-            {[
+            {([
               { key: 'all' as const, label: '전체' },
-              { key: 'ready' as const, label: '대기' },
-              { key: 'submitted' as const, label: '전송' },
-              { key: 'accepted' as const, label: '인정' },
-              { key: 'rejected' as const, label: '삭감' },
-              { key: 'partial' as const, label: '일부삭감' },
-            ].map((f) => (
+              { key: 'READY' as const, label: '대기' },
+              { key: 'SUBMITTED' as const, label: '전송' },
+              { key: 'ACCEPTED' as const, label: '인정' },
+              { key: 'REJECTED' as const, label: '삭감' },
+              { key: 'PARTIAL' as const, label: '일부삭감' },
+            ]).map((f) => (
               <button
                 key={f.key}
                 onClick={() => setFilterStatus(f.key)}
@@ -280,18 +415,17 @@ export default function ClaimsPage() {
           </div>
           <div className="col-span-1">날짜</div>
           <div className="col-span-2">환자</div>
-          <div className="col-span-2">진단코드</div>
-          <div className="col-span-2">수가코드</div>
-          <div className="col-span-1">청구액</div>
+          <div className="col-span-2">청구번호</div>
+          <div className="col-span-2">청구액</div>
           <div className="col-span-1">위험도</div>
           <div className="col-span-1">상태</div>
-          <div className="col-span-1"></div>
+          <div className="col-span-2"></div>
         </div>
 
         <div className="divide-y divide-border">
           {filteredClaims.map((claim) => {
-            const st = statusConfig[claim.status]
-            const risk = riskConfig[claim.riskLevel]
+            const st = statusConfig[claim.status] || statusConfig.DRAFT
+            const risk = riskConfig[claim.risk_level] || riskConfig.LOW
             const RiskIcon = risk.icon
 
             return (
@@ -305,17 +439,17 @@ export default function ClaimsPage() {
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
                         <RiskIcon className={`w-4 h-4 ${risk.color}`} />
-                        <span className="font-semibold text-sm">{claim.patientName}</span>
+                        <span className="font-semibold text-sm">{claim.patient_name_masked}</span>
                         <span className={`text-2xs px-2 py-0.5 rounded-lg ${st.color} ${st.bg}`}>{st.label}</span>
                       </div>
-                      <span className="font-bold text-sm">{claim.amount.toLocaleString()}원</span>
+                      <span className="font-bold text-sm">{claim.total_amount.toLocaleString()}원</span>
                     </div>
-                    <div className="text-xs text-muted-foreground">{claim.date} · {claim.dxCodes.join(', ')}</div>
+                    <div className="text-xs text-muted-foreground">{claim.claim_date} · {claim.claim_number}</div>
                   </div>
 
                   {/* 데스크톱 */}
                   <div className="hidden md:flex col-span-1 items-center">
-                    {claim.status === 'ready' && (
+                    {claim.status === 'READY' && (
                       <input
                         type="checkbox"
                         className="rounded"
@@ -328,26 +462,19 @@ export default function ClaimsPage() {
                     )}
                   </div>
                   <div className="hidden md:block col-span-1 text-xs text-muted-foreground">
-                    {new Date(claim.date).toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' })}
+                    {new Date(claim.claim_date).toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' })}
                   </div>
                   <div className="hidden md:block col-span-2">
-                    <div className="text-sm font-semibold">{claim.patientName}</div>
-                    <div className="text-xs text-muted-foreground font-mono">{claim.chartNo}</div>
+                    <div className="text-sm font-semibold">{claim.patient_name_masked}</div>
+                    <div className="text-xs text-muted-foreground font-mono">{claim.patient_chart_no}</div>
                   </div>
-                  <div className="hidden md:flex col-span-2 gap-1 flex-wrap">
-                    {claim.dxCodes.map((code) => (
-                      <span key={code} className="px-1.5 py-0.5 bg-primary/10 text-primary rounded text-2xs font-mono">{code}</span>
-                    ))}
+                  <div className="hidden md:block col-span-2">
+                    <span className="text-xs text-muted-foreground font-mono">{claim.claim_number}</span>
                   </div>
-                  <div className="hidden md:flex col-span-2 gap-1 flex-wrap">
-                    {claim.txCodes.map((code) => (
-                      <span key={code} className="px-1.5 py-0.5 bg-secondary text-muted-foreground rounded text-2xs font-mono">{code}</span>
-                    ))}
-                  </div>
-                  <div className="hidden md:block col-span-1 text-sm font-semibold">
-                    {(claim.amount / 10000).toFixed(1)}만
-                    {claim.resultAmount !== undefined && claim.resultAmount !== claim.amount && (
-                      <div className="text-2xs text-red-500">→ {(claim.resultAmount / 10000).toFixed(1)}만</div>
+                  <div className="hidden md:block col-span-2 text-sm font-semibold">
+                    {(claim.total_amount / 10000).toFixed(1)}만
+                    {claim.approved_amount != null && claim.approved_amount !== claim.total_amount && (
+                      <div className="text-2xs text-red-500">→ {(claim.approved_amount / 10000).toFixed(1)}만</div>
                     )}
                   </div>
                   <div className="hidden md:flex col-span-1 items-center gap-1">
@@ -357,7 +484,7 @@ export default function ClaimsPage() {
                   <div className="hidden md:block col-span-1">
                     <span className={`text-2xs px-2.5 py-1 rounded-lg font-semibold ${st.color} ${st.bg}`}>{st.label}</span>
                   </div>
-                  <div className="hidden md:flex col-span-1 justify-end">
+                  <div className="hidden md:flex col-span-2 justify-end">
                     <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform ${expandedClaim === claim.id ? 'rotate-180' : ''}`} />
                   </div>
                 </div>
@@ -366,16 +493,16 @@ export default function ClaimsPage() {
                 {expandedClaim === claim.id && (
                   <div className="px-4 pb-4 animate-fade-in-down">
                     <div className="bg-secondary/30 rounded-xl p-4 space-y-3">
-                      {claim.riskReason && (
+                      {claim.risk_reason && (
                         <div className={`flex items-start gap-2 p-3 rounded-lg ${
-                          claim.riskLevel === 'high' ? 'bg-red-50 dark:bg-red-900/20' : 'bg-amber-50 dark:bg-amber-900/20'
+                          claim.risk_level === 'HIGH' ? 'bg-red-50 dark:bg-red-900/20' : 'bg-amber-50 dark:bg-amber-900/20'
                         }`}>
                           <AlertTriangle className={`w-4 h-4 flex-shrink-0 mt-0.5 ${
-                            claim.riskLevel === 'high' ? 'text-red-500' : 'text-amber-500'
+                            claim.risk_level === 'HIGH' ? 'text-red-500' : 'text-amber-500'
                           }`} />
                           <div>
                             <div className="text-sm font-semibold">AI 삭감 위험 분석</div>
-                            <div className="text-xs text-muted-foreground mt-0.5">{claim.riskReason}</div>
+                            <div className="text-xs text-muted-foreground mt-0.5">{claim.risk_reason}</div>
                           </div>
                         </div>
                       )}
@@ -383,39 +510,51 @@ export default function ClaimsPage() {
                       <div className="grid grid-cols-2 gap-4 text-sm">
                         <div>
                           <span className="text-xs text-muted-foreground">청구 금액</span>
-                          <div className="font-semibold">{claim.amount.toLocaleString()}원</div>
+                          <div className="font-semibold">{claim.total_amount.toLocaleString()}원</div>
                         </div>
-                        {claim.resultAmount !== undefined && (
+                        {claim.approved_amount != null && (
                           <div>
                             <span className="text-xs text-muted-foreground">인정 금액</span>
-                            <div className={`font-semibold ${claim.resultAmount < claim.amount ? 'text-red-500' : 'text-emerald-500'}`}>
-                              {claim.resultAmount.toLocaleString()}원
-                              {claim.resultAmount < claim.amount && (
-                                <span className="text-xs ml-1">(-{(claim.amount - claim.resultAmount).toLocaleString()}원)</span>
+                            <div className={`font-semibold ${claim.approved_amount < claim.total_amount ? 'text-red-500' : 'text-emerald-500'}`}>
+                              {claim.approved_amount.toLocaleString()}원
+                              {claim.approved_amount < claim.total_amount && (
+                                <span className="text-xs ml-1">(-{(claim.total_amount - claim.approved_amount).toLocaleString()}원)</span>
                               )}
                             </div>
                           </div>
                         )}
                       </div>
 
+                      {/* AI 분석 결과 */}
+                      {claim.ai_analysis_result?.suggestions?.length > 0 && (
+                        <div className="p-3 rounded-lg bg-blue-50 dark:bg-blue-900/10">
+                          <div className="flex items-center gap-1.5 text-xs font-semibold text-blue-600 mb-1">
+                            <Brain className="w-3.5 h-3.5" /> AI 제안
+                          </div>
+                          {claim.ai_analysis_result.suggestions.map((s, i) => (
+                            <div key={i} className="text-xs text-blue-700 dark:text-blue-300">{s}</div>
+                          ))}
+                        </div>
+                      )}
+
                       <div className="flex items-center gap-2 pt-2">
                         <Link href={`/emr/patients/${claim.id}`} className="btn-outline btn-sm text-xs">
                           <Eye className="w-3 h-3" />
                           차트 보기
                         </Link>
-                        {claim.status === 'draft' && (
+                        {claim.status === 'DRAFT' && (
                           <button className="btn-outline btn-sm text-xs">
                             <Edit3 className="w-3 h-3" />
                             수정
                           </button>
                         )}
-                        {claim.status === 'ready' && (
+                        {claim.status === 'READY' && (
                           <button className="btn-primary btn-sm text-xs">
                             <Send className="w-3 h-3" />
                             전송
                           </button>
                         )}
-                        {['rejected', 'partial'].includes(claim.status) && (
+                        {['REJECTED', 'PARTIAL'].includes(claim.status) && (
                           <button className="btn-primary btn-sm text-xs bg-amber-500 hover:bg-amber-600">
                             <RefreshCw className="w-3 h-3" />
                             이의신청

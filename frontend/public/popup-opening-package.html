@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>메디플라톤 개원의 패키지 팝업</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    background: #f0f0f0;
+    font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, sans-serif;
+  }
+
+  .popup {
+    width: 600px;
+    height: 880px;
+    background: #ffffff;
+    border-radius: 24px;
+    overflow: hidden;
+    box-shadow: 0 25px 50px rgba(0,0,0,0.15);
+    display: flex;
+    flex-direction: column;
+    position: relative;
+  }
+
+  /* ─── Header Gradient ─── */
+  .popup-header {
+    background: linear-gradient(135deg, #2563eb 0%, #7c3aed 50%, #ea580c 100%);
+    padding: 30px 32px 24px;
+    color: white;
+    text-align: center;
+    position: relative;
+  }
+  .popup-header::after {
+    content: '';
+    position: absolute;
+    bottom: -20px;
+    left: 0;
+    right: 0;
+    height: 40px;
+    background: white;
+    border-radius: 24px 24px 0 0;
+  }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    background: rgba(255,255,255,0.2);
+    border: 1px solid rgba(255,255,255,0.3);
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+    margin-bottom: 16px;
+    backdrop-filter: blur(4px);
+  }
+
+  .popup-header h1 {
+    font-size: 28px;
+    font-weight: 800;
+    line-height: 1.3;
+    margin-bottom: 8px;
+    letter-spacing: -0.5px;
+  }
+  .popup-header h1 .highlight {
+    background: linear-gradient(90deg, #fbbf24, #f97316);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .popup-header p {
+    font-size: 14px;
+    opacity: 0.85;
+  }
+
+  /* ─── Body ─── */
+  .popup-body {
+    padding: 12px 28px 20px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* ─── Tier Cards ─── */
+  .tiers {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  .tier-card {
+    flex: 1;
+    border-radius: 16px;
+    padding: 16px 12px;
+    text-align: center;
+    border: 2px solid;
+  }
+  .tier-card.basic {
+    border-color: #3b82f6;
+    background: #eff6ff;
+  }
+  .tier-card.plus {
+    border-color: #a855f7;
+    background: #faf5ff;
+  }
+  .tier-card.premium {
+    border-color: #f97316;
+    background: #fff7ed;
+    position: relative;
+  }
+  .tier-card .tier-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 8px;
+    font-size: 14px;
+    font-weight: 800;
+    color: white;
+  }
+  .tier-card.basic .tier-icon { background: linear-gradient(135deg, #3b82f6, #06b6d4); }
+  .tier-card.plus .tier-icon { background: linear-gradient(135deg, #a855f7, #ec4899); }
+  .tier-card.premium .tier-icon { background: linear-gradient(135deg, #f97316, #ef4444); }
+  .tier-card .tier-name {
+    font-size: 15px;
+    font-weight: 700;
+    margin-bottom: 2px;
+  }
+  .tier-card.basic .tier-name { color: #2563eb; }
+  .tier-card.plus .tier-name { color: #9333ea; }
+  .tier-card.premium .tier-name { color: #ea580c; }
+  .tier-card .tier-desc {
+    font-size: 11px;
+    color: #6b7280;
+  }
+  .tier-card .tier-value {
+    font-size: 13px;
+    font-weight: 700;
+    margin-top: 6px;
+  }
+  .tier-card.basic .tier-value { color: #2563eb; }
+  .tier-card.plus .tier-value { color: #9333ea; }
+  .tier-card.premium .tier-value { color: #ea580c; }
+
+  .hot-badge {
+    position: absolute;
+    top: -8px;
+    right: -6px;
+    background: #ef4444;
+    color: white;
+    font-size: 10px;
+    font-weight: 800;
+    padding: 2px 8px;
+    border-radius: 999px;
+  }
+
+  /* ─── Benefits List ─── */
+  .benefits-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: #111827;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .benefits-title .dot {
+    width: 6px;
+    height: 6px;
+    background: #2563eb;
+    border-radius: 50%;
+  }
+
+  .benefits {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+  .benefit-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 12px;
+    background: #f9fafb;
+    border-radius: 12px;
+    border: 1px solid #e5e7eb;
+  }
+  .benefit-check {
+    width: 20px;
+    height: 20px;
+    background: linear-gradient(135deg, #22c55e, #16a34a);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .benefit-check svg {
+    width: 12px;
+    height: 12px;
+    fill: none;
+    stroke: white;
+    stroke-width: 3;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .benefit-text {
+    font-size: 12px;
+    font-weight: 600;
+    color: #374151;
+    line-height: 1.3;
+  }
+  .benefit-text .sub {
+    font-size: 10px;
+    font-weight: 400;
+    color: #9ca3af;
+    display: block;
+  }
+
+  /* ─── Trust ─── */
+  .trust {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 16px;
+    padding: 12px;
+    background: #f0f9ff;
+    border-radius: 12px;
+    border: 1px solid #bfdbfe;
+  }
+  .trust-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #1e40af;
+  }
+  .trust-divider {
+    width: 1px;
+    height: 16px;
+    background: #93c5fd;
+  }
+
+  /* ─── CTA ─── */
+  .cta-area {
+    margin-top: auto;
+  }
+  .cta-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    padding: 16px;
+    background: linear-gradient(135deg, #2563eb, #7c3aed);
+    color: white;
+    border: none;
+    border-radius: 16px;
+    font-size: 17px;
+    font-weight: 700;
+    cursor: pointer;
+    letter-spacing: -0.3px;
+    box-shadow: 0 4px 14px rgba(37, 99, 235, 0.4);
+  }
+  .cta-button svg {
+    width: 20px;
+    height: 20px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .cta-sub {
+    text-align: center;
+    font-size: 11px;
+    color: #9ca3af;
+    margin-top: 10px;
+  }
+
+  /* ─── Savings Banner ─── */
+  .savings {
+    background: linear-gradient(135deg, #2563eb, #7c3aed, #ea580c);
+    border-radius: 14px;
+    padding: 14px 20px;
+    color: white;
+    text-align: center;
+    margin-bottom: 16px;
+  }
+  .savings .label {
+    font-size: 12px;
+    opacity: 0.8;
+    margin-bottom: 2px;
+  }
+  .savings .amount {
+    font-size: 32px;
+    font-weight: 800;
+    letter-spacing: -1px;
+  }
+  .savings .amount span {
+    font-size: 16px;
+    font-weight: 600;
+  }
+  .savings .note {
+    font-size: 11px;
+    opacity: 0.7;
+    margin-top: 2px;
+  }
+</style>
+</head>
+<body>
+
+<div class="popup">
+  <!-- Header -->
+  <div class="popup-header">
+    <div class="badge">
+      <span>🏦</span>
+      신협중앙회 · KB국민카드 정식 제휴
+    </div>
+    <h1>
+      PG 하나로 시작해서<br>
+      <span class="highlight">최대 2,580만원</span> 마케팅 무료
+    </h1>
+    <p>서비스를 추가할수록 마케팅 혜택이 늘어나는 구조</p>
+  </div>
+
+  <!-- Body -->
+  <div class="popup-body">
+
+    <!-- Tier Cards -->
+    <div class="tiers">
+      <div class="tier-card basic">
+        <div class="tier-icon">기</div>
+        <div class="tier-name">기본</div>
+        <div class="tier-desc">PG 설치</div>
+        <div class="tier-value">1,230만원</div>
+      </div>
+      <div class="tier-card plus">
+        <div class="tier-icon">플</div>
+        <div class="tier-name">플러스</div>
+        <div class="tier-desc">PG + 대출 or 중개</div>
+        <div class="tier-value">+750만원</div>
+      </div>
+      <div class="tier-card premium">
+        <div class="hot-badge">HOT</div>
+        <div class="tier-icon">프</div>
+        <div class="tier-name">프리미엄</div>
+        <div class="tier-desc">PG + 대출 + 중개</div>
+        <div class="tier-value">+600만원</div>
+      </div>
+    </div>
+
+    <!-- Savings Banner -->
+    <div class="savings">
+      <div class="label">프리미엄 등급 시 절약 금액</div>
+      <div class="amount">2,580<span>만원</span></div>
+      <div class="note">상당의 마케팅을 무료로 지원</div>
+    </div>
+
+    <!-- Benefits -->
+    <div class="benefits-title">
+      <span class="dot"></span>
+      무료 마케팅 혜택 항목
+    </div>
+    <div class="benefits">
+      <div class="benefit-item">
+        <div class="benefit-check">
+          <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <div class="benefit-text">
+          블로그 마케팅
+          <span class="sub">3개월 (440만원)</span>
+        </div>
+      </div>
+      <div class="benefit-item">
+        <div class="benefit-check">
+          <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <div class="benefit-text">
+          플레이스 광고
+          <span class="sub">3개월 (790만원)</span>
+        </div>
+      </div>
+      <div class="benefit-item">
+        <div class="benefit-check">
+          <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <div class="benefit-text">
+          카페 바이럴
+          <span class="sub">3개월 (450만원)</span>
+        </div>
+      </div>
+      <div class="benefit-item">
+        <div class="benefit-check">
+          <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <div class="benefit-text">
+          전담 마케터
+          <span class="sub">1:1 배정</span>
+        </div>
+      </div>
+      <div class="benefit-item">
+        <div class="benefit-check">
+          <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <div class="benefit-text">
+          홈페이지 제작
+          <span class="sub">80평+ (300만원)</span>
+        </div>
+      </div>
+      <div class="benefit-item">
+        <div class="benefit-check">
+          <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <div class="benefit-text">
+          SNS 마케팅
+          <span class="sub">3개월 (600만원)</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Trust -->
+    <div class="trust">
+      <div class="trust-item">🏦 신협중앙회</div>
+      <div class="trust-divider"></div>
+      <div class="trust-item">💳 KB국민카드</div>
+      <div class="trust-divider"></div>
+      <div class="trust-item">🏥 병의원 무상 PG</div>
+    </div>
+
+    <!-- CTA -->
+    <div class="cta-area">
+      <button class="cta-button" onclick="window.open('https://medi.brandplaton.com/opening-package','_blank')">
+        무료 상담 신청하기
+        <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      </button>
+      <div class="cta-sub">medi.brandplaton.com | 전문 상담사가 1영업일 이내 연락</div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

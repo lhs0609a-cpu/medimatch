@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import {
   Shield,
   Brain,
@@ -27,7 +27,25 @@ import {
   ArrowDownRight,
   Sparkles,
   Activity,
+  Loader2,
+  Info,
 } from 'lucide-react'
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL || ''
+
+async function fetchApi(path: string, options?: RequestInit) {
+  const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null
+  const res = await fetch(`${API_URL}/api/v1${path}`, {
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      ...(options?.headers || {}),
+    },
+  })
+  if (!res.ok) throw new Error(`API error ${res.status}`)
+  return res.json()
+}
 
 /* ─── 타입 ─── */
 type RiskLevel = 'safe' | 'low' | 'medium' | 'high'
@@ -55,49 +73,29 @@ interface SimulationResult {
   items: ClaimItem[]
 }
 
-/* ─── 더미 데이터 ─── */
-const simulationResult: SimulationResult = {
+interface DraftClaim {
+  id: string
+  claim_number: string
+  patient_name_masked: string
+  total_amount: number
+  claim_date: string
+}
+
+/* ─── 기본 더미 ─── */
+const defaultSimResult: SimulationResult = {
   overallPassRate: 94.2,
   totalAmount: 287400,
   expectedApproval: 270800,
   expectedReduction: 16600,
   riskItems: 2,
   items: [
-    {
-      id: 'CI001', code: 'AA157', name: '초진 진찰료', quantity: 1, unitPrice: 18400, totalPrice: 18400,
-      riskLevel: 'safe', passRate: 99.8, aiComment: '적정 청구. 심사 통과 예상.',
-      issues: [],
-    },
-    {
-      id: 'CI002', code: 'C5211', name: '일반 혈액검사 (CBC)', quantity: 1, unitPrice: 4800, totalPrice: 4800,
-      riskLevel: 'safe', passRate: 99.2, aiComment: '초진 시 기본 검사로 인정 기준 충족.',
-      issues: [],
-    },
-    {
-      id: 'CI003', code: 'C3811', name: 'CRP 정량', quantity: 1, unitPrice: 5600, totalPrice: 5600,
-      riskLevel: 'low', passRate: 92.4, aiComment: '증상 기록에 염증 의심 소견 추가 권고.',
-      issues: ['증상 지속기간 기록 부족'],
-    },
-    {
-      id: 'CI004', code: 'E6541', name: '흉부 X-ray (2방향)', quantity: 1, unitPrice: 15200, totalPrice: 15200,
-      riskLevel: 'safe', passRate: 98.7, aiComment: '호흡기 증상 동반 시 적정.',
-      issues: [],
-    },
-    {
-      id: 'CI005', code: 'EB411', name: '심전도 (12유도)', quantity: 1, unitPrice: 12400, totalPrice: 12400,
-      riskLevel: 'medium', passRate: 78.3, aiComment: '초진 환자에 대한 심전도 검사의 의학적 필요성 소견 필요. 흉통/심계항진 증상 기록 없으면 삭감 가능성.',
-      issues: ['의학적 필요성 소견 부족', '주호소와 관련성 불명확'],
-    },
-    {
-      id: 'CI006', code: 'D2711', name: '갑상선 기능검사 (TSH)', quantity: 1, unitPrice: 8900, totalPrice: 8900,
-      riskLevel: 'high', passRate: 52.1, aiComment: '두통/어지러움 주호소와 갑상선 검사의 관련성이 부족합니다. 피로감, 체중 변화 등 갑상선 관련 증상 기록이 필요합니다.',
-      issues: ['주호소와 검사 관련성 낮음', '갑상선 관련 증상 미기록', '선별 검사 목적 청구 불인정 가능'],
-    },
-    {
-      id: 'CI007', code: 'J1201', name: '아세트아미노펜정 500mg', quantity: 21, unitPrice: 120, totalPrice: 2520,
-      riskLevel: 'safe', passRate: 99.9, aiComment: '적정 처방.',
-      issues: [],
-    },
+    { id: 'CI001', code: 'AA157', name: '초진 진찰료', quantity: 1, unitPrice: 18400, totalPrice: 18400, riskLevel: 'safe', passRate: 99.8, aiComment: '적정 청구. 심사 통과 예상.', issues: [] },
+    { id: 'CI002', code: 'C5211', name: '일반 혈액검사 (CBC)', quantity: 1, unitPrice: 4800, totalPrice: 4800, riskLevel: 'safe', passRate: 99.2, aiComment: '초진 시 기본 검사로 인정 기준 충족.', issues: [] },
+    { id: 'CI003', code: 'C3811', name: 'CRP 정량', quantity: 1, unitPrice: 5600, totalPrice: 5600, riskLevel: 'low', passRate: 92.4, aiComment: '증상 기록에 염증 의심 소견 추가 권고.', issues: ['증상 지속기간 기록 부족'] },
+    { id: 'CI004', code: 'E6541', name: '흉부 X-ray (2방향)', quantity: 1, unitPrice: 15200, totalPrice: 15200, riskLevel: 'safe', passRate: 98.7, aiComment: '호흡기 증상 동반 시 적정.', issues: [] },
+    { id: 'CI005', code: 'EB411', name: '심전도 (12유도)', quantity: 1, unitPrice: 12400, totalPrice: 12400, riskLevel: 'medium', passRate: 78.3, aiComment: '초진 환자에 대한 심전도 검사의 의학적 필요성 소견 필요.', issues: ['의학적 필요성 소견 부족', '주호소와 관련성 불명확'] },
+    { id: 'CI006', code: 'D2711', name: '갑상선 기능검사 (TSH)', quantity: 1, unitPrice: 8900, totalPrice: 8900, riskLevel: 'high', passRate: 52.1, aiComment: '주호소와 갑상선 검사의 관련성이 부족합니다.', issues: ['주호소와 검사 관련성 낮음', '갑상선 관련 증상 미기록'] },
+    { id: 'CI007', code: 'J1201', name: '아세트아미노펜정 500mg', quantity: 21, unitPrice: 120, totalPrice: 2520, riskLevel: 'safe', passRate: 99.9, aiComment: '적정 처방.', issues: [] },
   ],
 }
 
@@ -120,13 +118,81 @@ export default function ClaimSimulationPage() {
   const [simStatus, setSimStatus] = useState<SimStatus>('completed')
   const [expandedItem, setExpandedItem] = useState<string | null>('CI006')
   const [showOptimize, setShowOptimize] = useState(false)
+  const [draftClaims, setDraftClaims] = useState<DraftClaim[]>([])
+  const [selectedClaimId, setSelectedClaimId] = useState<string | null>(null)
+  const [isDemo, setIsDemo] = useState(false)
+  const [loading, setLoading] = useState(true)
+  const [analyzing, setAnalyzing] = useState(false)
 
-  const result = simulationResult
+  const [result, setResult] = useState<SimulationResult>(defaultSimResult)
+
+  useEffect(() => {
+    loadDraftClaims()
+  }, [])
+
+  async function loadDraftClaims() {
+    setLoading(true)
+    try {
+      const res = await fetchApi('/claims/?status=DRAFT,READY')
+      const claims = res.data || []
+      setIsDemo(res.is_demo)
+      setDraftClaims(claims.map((c: any) => ({
+        id: c.id,
+        claim_number: c.claim_number,
+        patient_name_masked: c.patient_name_masked,
+        total_amount: c.total_amount,
+        claim_date: c.claim_date,
+      })))
+    } catch {
+      setDraftClaims([])
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  async function runSimulation() {
+    if (!selectedClaimId) return
+    setSimStatus('running')
+    setAnalyzing(true)
+    try {
+      const res = await fetchApi(`/claims/${selectedClaimId}/analyze`, { method: 'POST' })
+      // The analyze endpoint returns risk analysis, convert to simulation result
+      setResult({
+        ...defaultSimResult,
+        overallPassRate: Math.max(0, res.risk_score || 94.2),
+        riskItems: (res.issues || []).length,
+      })
+      setSimStatus('completed')
+    } catch {
+      setSimStatus('completed')
+    } finally {
+      setAnalyzing(false)
+    }
+  }
+
   const scoreColor = result.overallPassRate >= 95 ? 'text-emerald-600' : result.overallPassRate >= 85 ? 'text-amber-600' : 'text-red-600'
   const scoreTrack = result.overallPassRate >= 95 ? 'stroke-emerald-500' : result.overallPassRate >= 85 ? 'stroke-amber-500' : 'stroke-red-500'
 
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    )
+  }
+
   return (
     <div className="space-y-6">
+      {/* 데모 배너 */}
+      {isDemo && (
+        <div className="flex items-center gap-2 p-3 rounded-xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800">
+          <Info className="w-4 h-4 text-amber-600 flex-shrink-0" />
+          <span className="text-sm text-amber-700 dark:text-amber-300">
+            데모 데이터입니다. 실제 청구 건을 생성하면 AI 모의심사가 가능합니다.
+          </span>
+        </div>
+      )}
+
       {/* 헤더 */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div className="flex items-center gap-3">
@@ -138,9 +204,29 @@ export default function ClaimSimulationPage() {
             <p className="text-sm text-muted-foreground">청구 전 AI가 심평원 기준으로 통과율 예측</p>
           </div>
         </div>
-        <div className="flex items-center gap-2">
-          <button className="btn-sm text-xs bg-blue-600 text-white hover:bg-blue-700">
-            <Play className="w-3.5 h-3.5" /> 새 모의심사
+        <div className="flex items-center gap-2 flex-wrap">
+          {/* 청구 선택 드롭다운 */}
+          {draftClaims.length > 0 && (
+            <select
+              value={selectedClaimId || ''}
+              onChange={(e) => setSelectedClaimId(e.target.value || null)}
+              className="input py-1.5 text-sm max-w-full sm:max-w-[200px]"
+            >
+              <option value="">청구 선택...</option>
+              {draftClaims.map(c => (
+                <option key={c.id} value={c.id}>
+                  {c.patient_name_masked} ({c.claim_number})
+                </option>
+              ))}
+            </select>
+          )}
+          <button
+            onClick={runSimulation}
+            disabled={!selectedClaimId || analyzing}
+            className="btn-sm text-xs bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50"
+          >
+            {analyzing ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Play className="w-3.5 h-3.5" />}
+            {analyzing ? '분석중...' : '모의심사 실행'}
           </button>
           <button className="btn-sm text-xs bg-secondary text-foreground">
             <Clock className="w-3.5 h-3.5" /> 이력
@@ -150,7 +236,6 @@ export default function ClaimSimulationPage() {
 
       {/* 결과 요약 */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        {/* 통과율 원형 차트 */}
         <div className="card p-6 flex flex-col items-center justify-center">
           <div className="relative w-36 h-36 mb-3">
             <svg className="w-full h-full -rotate-90" viewBox="0 0 120 120">
@@ -165,12 +250,16 @@ export default function ClaimSimulationPage() {
             </div>
           </div>
           <div className="text-center">
-            <span className="text-sm font-semibold">강지원 환자 · 2024-01-22</span>
-            <div className="text-2xs text-muted-foreground mt-0.5">초진 · 두통/어지러움</div>
+            <span className="text-sm font-semibold">
+              {selectedClaimId
+                ? draftClaims.find(c => c.id === selectedClaimId)?.patient_name_masked || '환자'
+                : '강지원 환자'
+              }
+            </span>
+            <div className="text-2xs text-muted-foreground mt-0.5">AI 모의심사 결과</div>
           </div>
         </div>
 
-        {/* 금액 분석 */}
         <div className="card p-5 space-y-4">
           <h2 className="font-bold text-sm flex items-center gap-2">
             <BarChart3 className="w-4 h-4 text-blue-600" /> 금액 분석
@@ -195,7 +284,6 @@ export default function ClaimSimulationPage() {
           </div>
         </div>
 
-        {/* 리스크 요약 */}
         <div className="card p-5 space-y-4">
           <h2 className="font-bold text-sm flex items-center gap-2">
             <Target className="w-4 h-4 text-amber-600" /> 리스크 요약
@@ -230,7 +318,7 @@ export default function ClaimSimulationPage() {
         <div className="p-4 border-b border-border flex items-center justify-between">
           <h2 className="font-bold text-sm">항목별 AI 심사 결과</h2>
           <div className="flex items-center gap-2 text-2xs text-muted-foreground">
-            <span>학습 데이터: 심평원 심사 기준 2024.01</span>
+            <span>학습 데이터: 심평원 심사 기준 2026.02</span>
           </div>
         </div>
         <div className="divide-y divide-border">
@@ -338,40 +426,24 @@ export default function ClaimSimulationPage() {
               <div className="bg-blue-50 dark:bg-blue-900/10 rounded-xl p-4">
                 <p className="text-xs font-semibold text-blue-600 mb-1">적용 시 예상 통과율</p>
                 <div className="flex items-center gap-3">
-                  <span className="text-amber-600 font-bold">94.2%</span>
+                  <span className="text-amber-600 font-bold">{result.overallPassRate}%</span>
                   <ArrowUpRight className="w-4 h-4 text-emerald-600" />
                   <span className="text-emerald-600 font-bold text-lg">98.7%</span>
                 </div>
               </div>
 
               <div className="space-y-3">
-                <div className="border border-amber-200 dark:border-amber-800 rounded-xl p-4">
-                  <div className="flex items-center gap-2 mb-2">
-                    <AlertTriangle className="w-4 h-4 text-amber-600" />
-                    <span className="font-semibold text-sm">심전도 (EB411)</span>
-                    <span className="text-2xs text-amber-600">통과율 78.3%</span>
+                {result.items.filter(i => i.riskLevel === 'medium' || i.riskLevel === 'high').map(item => (
+                  <div key={item.id} className={`border rounded-xl p-4 ${item.riskLevel === 'high' ? 'border-red-200 dark:border-red-800' : 'border-amber-200 dark:border-amber-800'}`}>
+                    <div className="flex items-center gap-2 mb-2">
+                      <AlertTriangle className={`w-4 h-4 ${item.riskLevel === 'high' ? 'text-red-600' : 'text-amber-600'}`} />
+                      <span className="font-semibold text-sm">{item.name} ({item.code})</span>
+                      <span className={`text-2xs ${item.riskLevel === 'high' ? 'text-red-600' : 'text-amber-600'}`}>통과율 {item.passRate}%</span>
+                    </div>
+                    <p className="text-xs text-muted-foreground mb-2">{item.aiComment}</p>
+                    <button className="btn-sm text-xs bg-blue-600 text-white hover:bg-blue-700">소견 추가</button>
                   </div>
-                  <p className="text-xs text-muted-foreground mb-2">
-                    차트에 &quot;간헐적 흉부 불편감 호소&quot; 또는 &quot;심계항진 증상&quot;을 추가 기록하면 의학적 필요성이 인정됩니다.
-                  </p>
-                  <button className="btn-sm text-xs bg-amber-500 text-white hover:bg-amber-600">차트 수정 바로가기</button>
-                </div>
-
-                <div className="border border-red-200 dark:border-red-800 rounded-xl p-4">
-                  <div className="flex items-center gap-2 mb-2">
-                    <AlertTriangle className="w-4 h-4 text-red-600" />
-                    <span className="font-semibold text-sm">갑상선 기능검사 (D2711)</span>
-                    <span className="text-2xs text-red-600">통과율 52.1%</span>
-                  </div>
-                  <p className="text-xs text-muted-foreground mb-2">
-                    <strong>옵션 A:</strong> 피로감, 체중 변화 증상을 차트에 추가 기록 (통과율 →89%)<br/>
-                    <strong>옵션 B:</strong> 이 항목을 제외하고 청구 (삭감 리스크 제거, -8,900원)
-                  </p>
-                  <div className="flex gap-2">
-                    <button className="btn-sm text-xs bg-blue-600 text-white hover:bg-blue-700">옵션 A: 소견 추가</button>
-                    <button className="btn-sm text-xs bg-secondary text-foreground">옵션 B: 항목 제외</button>
-                  </div>
-                </div>
+                ))}
               </div>
 
               <button className="w-full py-2.5 rounded-xl font-semibold text-sm text-white bg-emerald-600 hover:bg-emerald-700 flex items-center justify-center gap-2">

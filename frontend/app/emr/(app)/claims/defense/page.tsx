@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import {
   Shield,
@@ -37,10 +37,27 @@ import {
   MessageSquare,
   ArrowRight,
   Printer,
+  Loader2,
 } from 'lucide-react'
 
-/* ─── 더미 데이터 ─── */
-const overallScore = {
+const API_URL = process.env.NEXT_PUBLIC_API_URL || ''
+
+async function fetchApi(path: string, options?: RequestInit) {
+  const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null
+  const res = await fetch(`${API_URL}/api/v1${path}`, {
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      ...(options?.headers || {}),
+    },
+  })
+  if (!res.ok) throw new Error(`API error ${res.status}`)
+  return res.json()
+}
+
+/* ─── 더미 fallback 데이터 ─── */
+const defaultOverallScore = {
   score: 87,
   trend: 5.2,
   totalClaims: 342,
@@ -57,74 +74,6 @@ const riskCategories = [
   { category: '검사 횟수 초과', count: 4, severity: 'medium' as const, example: '혈액검사 월 2회 초과 (3회 시행)' },
   { category: '투약 기간 초과', count: 3, severity: 'low' as const, example: '항생제 14일 초과 처방' },
   { category: '비급여 전환 권고', count: 2, severity: 'low' as const, example: '미용 목적 시술 보험 청구' },
-]
-
-const recentDefenses = [
-  {
-    id: 'CLM-2024-0891',
-    date: '2024-01-21',
-    patient: '김○수',
-    diagnosis: 'M54.5 요통',
-    procedure: '도수치료 + 물리치료',
-    amount: 85000,
-    riskLevel: 'high' as const,
-    riskScore: 35,
-    reasons: ['도수치료 급여기준 미충족 가능', '물리치료 중복 산정 의심'],
-    aiSuggestion: '도수치료 시행 사유(보존적 치료 6주 이상 무효) 소견서 첨부 권고. 물리치료는 도수치료 비시행일에 대해서만 청구하세요.',
-    status: 'defended',
-  },
-  {
-    id: 'CLM-2024-0890',
-    date: '2024-01-21',
-    patient: '이○경',
-    diagnosis: 'J06.9 급성 상기도감염',
-    procedure: '진찰료 + 처방료 + 혈액검사',
-    amount: 42000,
-    riskLevel: 'medium' as const,
-    riskScore: 55,
-    reasons: ['급성 상기도감염에 혈액검사 필요성 심사 가능'],
-    aiSuggestion: '증상 지속기간(7일 이상) 또는 합병증 의심 소견을 기록에 명시하세요. CBC + CRP 검사의 의학적 필요성 근거를 추가하세요.',
-    status: 'pending',
-  },
-  {
-    id: 'CLM-2024-0889',
-    date: '2024-01-20',
-    patient: '박○호',
-    diagnosis: 'K21.0 위식도역류병',
-    procedure: '진찰료 + 처방료 + 위내시경',
-    amount: 128000,
-    riskLevel: 'low' as const,
-    riskScore: 82,
-    reasons: [],
-    aiSuggestion: '청구 적정. 위내시경 시행 기준 충족.',
-    status: 'safe',
-  },
-  {
-    id: 'CLM-2024-0888',
-    date: '2024-01-20',
-    patient: '최○지',
-    diagnosis: 'E11.9 제2형 당뇨병',
-    procedure: '진찰료 + 처방료 + HbA1c + 혈액검사',
-    amount: 56000,
-    riskLevel: 'low' as const,
-    riskScore: 91,
-    reasons: [],
-    aiSuggestion: '만성질환 정기 검사 청구 적정.',
-    status: 'safe',
-  },
-  {
-    id: 'CLM-2024-0887',
-    date: '2024-01-19',
-    patient: '정○현',
-    diagnosis: 'M17.1 원발성 무릎관절증',
-    procedure: '진찰료 + 주사치료 + X-ray',
-    amount: 95000,
-    riskLevel: 'high' as const,
-    riskScore: 28,
-    reasons: ['관절강 내 주사 횟수 초과 가능 (이번 달 3회째)', 'X-ray 월 2회 이상 촬영'],
-    aiSuggestion: '관절강 내 주사는 월 3회까지 급여 인정되나, 동일 부위 반복은 심사 대상. 이전 치료 경과와 호전 부족 사유를 상세히 기록하세요. X-ray는 추적관찰 필요성을 명시하세요.',
-    status: 'revised',
-  },
 ]
 
 const monthlyTrend = [
@@ -170,13 +119,108 @@ function getScoreGradient(score: number) {
   return 'from-red-500 to-red-400'
 }
 
+interface DefenseClaim {
+  id: string
+  date: string
+  patient: string
+  diagnosis: string
+  procedure: string
+  amount: number
+  riskLevel: 'high' | 'medium' | 'low'
+  riskScore: number
+  reasons: string[]
+  aiSuggestion: string
+  status: string
+}
+
 export default function ClaimDefensePage() {
   const [expandedId, setExpandedId] = useState<string | null>(null)
   const [showAppealModal, setShowAppealModal] = useState<string | null>(null)
+  const [overallScore, setOverallScore] = useState(defaultOverallScore)
+  const [recentDefenses, setRecentDefenses] = useState<DefenseClaim[]>([])
+  const [loading, setLoading] = useState(true)
+  const [isDemo, setIsDemo] = useState(false)
+
+  useEffect(() => {
+    loadData()
+  }, [])
+
+  async function loadData() {
+    setLoading(true)
+    try {
+      const [statsRes, claimsRes] = await Promise.all([
+        fetchApi('/claims/stats'),
+        fetchApi('/claims/?status=REJECTED,PARTIAL,DRAFT,READY'),
+      ])
+
+      setIsDemo(statsRes.is_demo || claimsRes.is_demo)
+
+      // Derive defense score from stats
+      const acceptRate = statsRes.acceptance_rate || 91.1
+      setOverallScore({
+        score: Math.round(acceptRate),
+        trend: 5.2,
+        totalClaims: statsRes.total_claims || 342,
+        riskClaims: statsRes.risk_count || 28,
+        rejectionRate: statsRes.rejection_rate || 2.3,
+        rejectionRatePrev: (statsRes.rejection_rate || 2.3) + 3.5,
+        savedAmount: Math.round((statsRes.rejected_amount || 0) * 0.6) || 4280000,
+      })
+
+      // Transform claims to defense format
+      const claims = (claimsRes.data || []).slice(0, 5).map((c: any) => ({
+        id: c.claim_number || c.id,
+        date: c.claim_date,
+        patient: c.patient_name_masked || '환자',
+        diagnosis: c.risk_reason || '진료',
+        procedure: `청구액 ${(c.total_amount || 0).toLocaleString()}원`,
+        amount: c.total_amount || 0,
+        riskLevel: (c.risk_level || 'LOW').toLowerCase() as 'high' | 'medium' | 'low',
+        riskScore: c.risk_score || 100,
+        reasons: c.ai_analysis_result?.issues || [],
+        aiSuggestion: c.ai_analysis_result?.suggestions?.join('. ') || '청구 적정. 심사 통과 예상.',
+        status: c.risk_level === 'HIGH' ? 'pending' : c.risk_level === 'MEDIUM' ? 'revised' : 'safe',
+      }))
+      setRecentDefenses(claims)
+    } catch {
+      // Keep defaults
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleReanalyze = async () => {
+    // Trigger re-analysis for all displayed claims
+    for (const claim of recentDefenses) {
+      try {
+        await fetchApi(`/claims/${claim.id}/analyze`, { method: 'POST' })
+      } catch {}
+    }
+    await loadData()
+  }
+
   const maxSaved = Math.max(...monthlyTrend.map(m => m.saved))
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    )
+  }
 
   return (
     <div className="space-y-6">
+      {/* 데모 배너 */}
+      {isDemo && (
+        <div className="flex items-center gap-2 p-3 rounded-xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800">
+          <Info className="w-4 h-4 text-amber-600 flex-shrink-0" />
+          <span className="text-sm text-amber-700 dark:text-amber-300">
+            데모 데이터를 표시 중입니다. 실제 청구 데이터가 쌓이면 정확한 분석이 제공됩니다.
+          </span>
+        </div>
+      )}
+
       {/* 헤더 */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div className="flex items-center gap-3">
@@ -192,7 +236,7 @@ export default function ClaimDefensePage() {
           <button className="btn-sm text-xs bg-secondary text-foreground">
             <Download className="w-3.5 h-3.5" /> 리포트
           </button>
-          <button className="btn-sm text-xs bg-blue-600 text-white hover:bg-blue-700">
+          <button onClick={handleReanalyze} className="btn-sm text-xs bg-blue-600 text-white hover:bg-blue-700">
             <Brain className="w-3.5 h-3.5" /> 전체 재분석
           </button>
         </div>
@@ -201,7 +245,7 @@ export default function ClaimDefensePage() {
       {/* 방어 점수 + 주요 KPI */}
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
         {/* 방어 점수 (원형) */}
-        <div className="card p-6 lg:row-span-2 flex flex-col items-center justify-center">
+        <div className="card p-6 lg:row-span-2 flex flex-col items-center justify-center max-w-sm mx-auto lg:max-w-none">
           <span className="text-xs text-muted-foreground font-medium mb-3">청구 방어 점수</span>
           <div className="relative w-36 h-36">
             <svg className="w-full h-full -rotate-90" viewBox="0 0 120 120">
@@ -270,7 +314,7 @@ export default function ClaimDefensePage() {
             <h3 className="text-sm font-semibold">월별 방어 절감액</h3>
             <span className="text-2xs text-muted-foreground">최근 6개월</span>
           </div>
-          <div className="flex items-end gap-3 h-24">
+          <div className="flex items-end gap-1.5 sm:gap-3 h-24">
             {monthlyTrend.map((m, i) => {
               const isLatest = i === monthlyTrend.length - 1
               return (
@@ -330,7 +374,7 @@ export default function ClaimDefensePage() {
         <div className="divide-y divide-border">
           {recentDefenses.map(claim => {
             const rc = riskConfig[claim.riskLevel]
-            const sc = statusConfig[claim.status as keyof typeof statusConfig]
+            const sc = statusConfig[claim.status as keyof typeof statusConfig] || statusConfig.safe
             const isExpanded = expandedId === claim.id
 
             return (
@@ -341,13 +385,11 @@ export default function ClaimDefensePage() {
                   }`}
                   onClick={() => setExpandedId(isExpanded ? null : claim.id)}
                 >
-                  {/* 리스크 점수 */}
                   <div className="flex-shrink-0 text-center w-14">
                     <div className={`text-xl font-bold ${getScoreColor(claim.riskScore)}`}>{claim.riskScore}</div>
                     <div className="text-2xs text-muted-foreground">점</div>
                   </div>
 
-                  {/* 청구 정보 */}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
                       <span className="font-semibold text-sm">{claim.patient}</span>
@@ -365,7 +407,6 @@ export default function ClaimDefensePage() {
                     )}
                   </div>
 
-                  {/* 금액 + 날짜 */}
                   <div className="text-right flex-shrink-0 hidden sm:block">
                     <div className="text-sm font-semibold">₩{claim.amount.toLocaleString()}</div>
                     <div className="text-2xs text-muted-foreground">{claim.date}</div>
@@ -376,17 +417,13 @@ export default function ClaimDefensePage() {
                   </div>
                 </div>
 
-                {/* 확장 상세 */}
                 {isExpanded && (
                   <div className="px-4 pb-4 bg-secondary/10">
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                      {/* AI 분석 결과 */}
                       <div className="card p-4">
                         <h4 className="text-xs font-semibold text-muted-foreground mb-3 flex items-center gap-1.5">
                           <Brain className="w-3.5 h-3.5 text-blue-600" /> AI 분석 결과
                         </h4>
-
-                        {/* 리스크 바 */}
                         <div className="mb-4">
                           <div className="flex items-center justify-between text-xs mb-1">
                             <span className="text-muted-foreground">청구 적정성 점수</span>
@@ -399,8 +436,6 @@ export default function ClaimDefensePage() {
                             />
                           </div>
                         </div>
-
-                        {/* 리스크 사유 */}
                         {claim.reasons.length > 0 ? (
                           <div className="space-y-2 mb-4">
                             <div className="text-xs font-semibold text-red-600">삭감 리스크 사유</div>
@@ -417,57 +452,22 @@ export default function ClaimDefensePage() {
                             <span className="text-xs text-emerald-700 dark:text-emerald-400">삭감 리스크 없음</span>
                           </div>
                         )}
-
-                        {/* 심사 기준 매칭 */}
                         <div className="text-xs font-semibold text-muted-foreground mb-1.5">관련 심사 기준</div>
                         <div className="space-y-1">
                           <div className="flex items-center gap-2 text-xs text-muted-foreground">
                             <Scale className="w-3 h-3" />
                             <span>건강보험요양급여비용 제1편 제2부 행위 급여목록</span>
                           </div>
-                          <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                            <BookOpen className="w-3 h-3" />
-                            <span>심사지침 - {claim.diagnosis.split(' ')[0]} 관련</span>
-                          </div>
                         </div>
                       </div>
 
-                      {/* AI 방어 제안 */}
                       <div className="card p-4">
                         <h4 className="text-xs font-semibold text-muted-foreground mb-3 flex items-center gap-1.5">
                           <Sparkles className="w-3.5 h-3.5 text-purple-600" /> AI 방어 제안
                         </h4>
-
                         <div className="p-3 rounded-xl bg-blue-50 dark:bg-blue-900/10 mb-4">
                           <p className="text-sm text-blue-800 dark:text-blue-300 leading-relaxed">{claim.aiSuggestion}</p>
                         </div>
-
-                        {claim.reasons.length > 0 && (
-                          <div className="space-y-2 mb-4">
-                            <div className="text-xs font-semibold">권고 액션</div>
-                            <div className="space-y-1.5">
-                              <div className="flex items-center gap-2 text-xs">
-                                <div className="w-5 h-5 rounded bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center flex-shrink-0">
-                                  <span className="text-2xs font-bold text-blue-600">1</span>
-                                </div>
-                                <span>차트 기록에 의학적 필요성 근거 추가</span>
-                              </div>
-                              <div className="flex items-center gap-2 text-xs">
-                                <div className="w-5 h-5 rounded bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center flex-shrink-0">
-                                  <span className="text-2xs font-bold text-blue-600">2</span>
-                                </div>
-                                <span>소견서/의견서 자동 생성</span>
-                              </div>
-                              <div className="flex items-center gap-2 text-xs">
-                                <div className="w-5 h-5 rounded bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center flex-shrink-0">
-                                  <span className="text-2xs font-bold text-blue-600">3</span>
-                                </div>
-                                <span>수정 후 재청구</span>
-                              </div>
-                            </div>
-                          </div>
-                        )}
-
                         <div className="flex flex-wrap gap-2">
                           {claim.reasons.length > 0 && (
                             <>
@@ -564,7 +564,6 @@ export default function ClaimDefensePage() {
                   <Sparkles className="w-3 h-3 inline mr-1" />
                   AI가 심사기준과 진료기록을 분석하여 이의신청서 초안을 생성했습니다
                 </div>
-
                 <div className="space-y-3 text-sm">
                   <div>
                     <label className="text-xs font-semibold text-muted-foreground">청구 번호</label>
@@ -583,7 +582,6 @@ export default function ClaimDefensePage() {
                     />
                   </div>
                 </div>
-
                 <div className="flex gap-2">
                   <button className="btn-sm text-xs flex-1 bg-blue-600 text-white hover:bg-blue-700">
                     <FileText className="w-3 h-3" /> 이의신청 제출

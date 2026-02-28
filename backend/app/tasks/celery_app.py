@@ -24,6 +24,7 @@ celery_app = Celery(
         "app.tasks.listing_subscription_tasks",
         "app.tasks.service_subscription_tasks",
         "app.tasks.broker_tasks",
+        "app.tasks.claims_tasks",
     ]
 )
 
@@ -141,5 +142,76 @@ celery_app.conf.beat_schedule = {
     "broker-stats-refresh": {
         "task": "app.tasks.broker_tasks.refresh_broker_stats",
         "schedule": crontab(hour=5, minute=0),
+    },
+
+    # ===== 보험청구 + 경정청구 =====
+    # 매일 새벽 2시: DRAFT/READY 청구 AI 재분석
+    "claims-reanalyze-pending": {
+        "task": "app.tasks.claims_tasks.reanalyze_pending_claims",
+        "schedule": crontab(hour=2, minute=0),
+    },
+    # 매월 1일 새벽 3시: 전체 DOCTOR 유저 세무 스캔
+    "claims-monthly-tax-scan": {
+        "task": "app.tasks.claims_tasks.monthly_tax_scan",
+        "schedule": crontab(day_of_month=1, hour=3, minute=0),
+    },
+
+    # ===== 보험청구 v2 =====
+    # 매일 새벽 3시: HIRA 코드 동기화
+    "claims-sync-hira-codes": {
+        "task": "app.tasks.claims_tasks.sync_hira_codes",
+        "schedule": crontab(hour=3, minute=0),
+    },
+    # 2시간마다 08-20시: 심사결과 수신
+    "claims-poll-hira-results": {
+        "task": "app.tasks.claims_tasks.poll_hira_results",
+        "schedule": crontab(hour="8-20/2", minute=30),
+    },
+    # 매월 2일 04:00: 동료 벤치마크 집계
+    "claims-aggregate-benchmarks": {
+        "task": "app.tasks.claims_tasks.aggregate_peer_benchmarks",
+        "schedule": crontab(day_of_month=2, hour=4, minute=0),
+    },
+    # 매주 일요일 05:00: 삭감 패턴 업데이트
+    "claims-update-rejection-patterns": {
+        "task": "app.tasks.claims_tasks.update_rejection_patterns",
+        "schedule": crontab(day_of_week=0, hour=5, minute=0),
+    },
+    # 매월 1일 07:00: 월간 리포트
+    "claims-monthly-report": {
+        "task": "app.tasks.claims_tasks.generate_monthly_report",
+        "schedule": crontab(day_of_month=1, hour=7, minute=0),
+    },
+    # 매주 월요일 04:00: 약물 상호작용 동기화
+    "claims-sync-drug-interactions": {
+        "task": "app.tasks.claims_tasks.sync_drug_interactions",
+        "schedule": crontab(day_of_week=1, hour=4, minute=0),
+    },
+
+    # ===== 경정청구 v2 =====
+    # 매월 1일 03:30: 전체 유저 AI 세금 스캔 (기존 monthly_tax_scan 강화)
+    "tax-monthly-full-scan": {
+        "task": "app.tasks.claims_tasks.monthly_full_tax_scan",
+        "schedule": crontab(day_of_month=1, hour=3, minute=30),
+    },
+    # 6시간마다: 경정청구 결과 조회
+    "tax-poll-nts-status": {
+        "task": "app.tasks.claims_tasks.poll_nts_status",
+        "schedule": crontab(hour="*/6", minute=15),
+    },
+    # 매주 일요일: 세법 변경 모니터링
+    "tax-update-regulations": {
+        "task": "app.tasks.claims_tasks.update_tax_regulations",
+        "schedule": crontab(day_of_week=0, hour=6, minute=0),
+    },
+    # 매월 2일 04:30: 세무 동종 벤치마크
+    "tax-generate-peer-benchmarks": {
+        "task": "app.tasks.claims_tasks.generate_tax_peer_benchmarks",
+        "schedule": crontab(day_of_month=2, hour=4, minute=30),
+    },
+    # 매일 10:00: 수수료 정산
+    "tax-process-fee-settlement": {
+        "task": "app.tasks.claims_tasks.process_fee_settlement",
+        "schedule": crontab(hour=10, minute=0),
     },
 }

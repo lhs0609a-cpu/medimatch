@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { apiClient } from '@/lib/api/client';
 import {
   BarChart3,
   TrendingUp,
@@ -19,7 +20,9 @@ import {
   Plus,
   Search,
   Settings,
-  LogOut
+  LogOut,
+  Menu,
+  X,
 } from 'lucide-react';
 import { TossIcon } from '@/components/ui/TossIcon';
 
@@ -48,6 +51,7 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [userRole, setUserRole] = useState<string>('DOCTOR');
   const [userName, setUserName] = useState<string>('사용자');
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     fetchDashboardData();
@@ -61,37 +65,15 @@ export default function DashboardPage() {
         return;
       }
 
-      const apiBase = process.env.NEXT_PUBLIC_API_URL;
-      if (!apiBase) {
-        console.error('NEXT_PUBLIC_API_URL is not configured');
-        setLoading(false);
-        return;
-      }
-
-      const userResponse = await fetch(`${apiBase}/auth/me`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      if (!userResponse.ok) {
-        if (userResponse.status === 401) {
-          localStorage.removeItem('access_token');
-          localStorage.removeItem('refresh_token');
-          window.location.href = '/login';
-          return;
-        }
-        throw new Error('Failed to fetch user data');
-      }
-
-      const userData = await userResponse.json();
+      // Use apiClient (handles baseURL, auth token, and error interceptors)
+      const userResponse = await apiClient.get('/auth/me');
+      const userData = userResponse.data;
       setUserRole(userData.role || 'DOCTOR');
       setUserName(userData.full_name || '사용자');
 
-      const statsResponse = await fetch(`${apiBase}/dashboard/stats`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      if (statsResponse.ok) {
-        const statsData = await statsResponse.json();
+      try {
+        const statsResponse = await apiClient.get('/dashboard/stats');
+        const statsData = statsResponse.data;
         setStats({
           totalSimulations: statsData.total_simulations || 0,
           totalBids: statsData.total_bids || 0,
@@ -101,7 +83,7 @@ export default function DashboardPage() {
           subscriptionStatus: statsData.subscription_status || 'INACTIVE',
           subscriptionExpires: statsData.subscription_expires || null,
         });
-      } else {
+      } catch {
         setStats({
           totalSimulations: 0,
           totalBids: 0,
@@ -113,12 +95,9 @@ export default function DashboardPage() {
         });
       }
 
-      const activitiesResponse = await fetch(`${apiBase}/dashboard/activities?limit=5`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      if (activitiesResponse.ok) {
-        const activitiesData = await activitiesResponse.json();
+      try {
+        const activitiesResponse = await apiClient.get('/dashboard/activities', { params: { limit: 5 } });
+        const activitiesData = activitiesResponse.data;
         setActivities(
           activitiesData.items?.map((item: any) => ({
             id: item.id,
@@ -129,10 +108,16 @@ export default function DashboardPage() {
             status: item.status,
           })) || []
         );
-      } else {
+      } catch {
         setActivities([]);
       }
-    } catch (err) {
+    } catch (err: any) {
+      if (err?.response?.status === 401) {
+        localStorage.removeItem('access_token');
+        localStorage.removeItem('refresh_token');
+        window.location.href = '/login';
+        return;
+      }
       setStats({
         totalSimulations: 0,
         totalBids: 0,
@@ -244,9 +229,36 @@ export default function DashboardPage() {
               <div className="w-9 h-9 rounded-full bg-violet-500 flex items-center justify-center text-white font-medium text-sm">
                 {userName.charAt(0)}
               </div>
+              <button
+                className="md:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors"
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                aria-label={mobileMenuOpen ? '메뉴 닫기' : '메뉴 열기'}
+              >
+                {mobileMenuOpen ? <X className="w-5 h-5 text-gray-600" /> : <Menu className="w-5 h-5 text-gray-600" />}
+              </button>
             </div>
           </div>
         </div>
+
+        {/* Mobile Menu */}
+        {mobileMenuOpen && (
+          <nav className="md:hidden border-t border-gray-100 bg-white/95 backdrop-blur-xl animate-fade-in-down">
+            <div className="px-4 py-3 space-y-1">
+              {['대시보드', '지도', '알림', '설정'].map((item, i) => (
+                <Link
+                  key={item}
+                  href={['/', '/map', '/alerts', '/mypage'][i]}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className={`block px-4 py-3 text-sm font-medium rounded-lg transition-colors ${
+                    i === 0 ? 'text-violet-600 bg-violet-50' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+                  }`}
+                >
+                  {item}
+                </Link>
+              ))}
+            </div>
+          </nav>
+        )}
       </header>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -333,7 +345,7 @@ export default function DashboardPage() {
           <div className="lg:col-span-2 bg-white rounded-2xl border border-gray-100 p-6">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-lg font-semibold text-gray-900">최근 활동</h2>
-              <Link href="/activities" className="text-sm text-violet-600 hover:text-violet-700 font-medium flex items-center gap-1">
+              <Link href="/dashboard" className="text-sm text-violet-600 hover:text-violet-700 font-medium flex items-center gap-1">
                 전체 보기
                 <ChevronRight className="w-4 h-4" />
               </Link>
@@ -364,7 +376,7 @@ export default function DashboardPage() {
                       {getActivityIcon(activity.type)}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-1">
+                      <div className="flex items-center gap-2 mb-1 flex-wrap">
                         <h4 className="font-medium text-gray-900 truncate">{activity.title}</h4>
                         <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
                           activity.status === 'completed' ? 'bg-emerald-100 text-emerald-700' :
