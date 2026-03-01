@@ -8,7 +8,7 @@
 import enum
 from sqlalchemy import (
     Column, Integer, String, Boolean, DateTime, Text, Enum,
-    ForeignKey, Index, BigInteger,
+    ForeignKey, Index, BigInteger, JSON,
 )
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
@@ -46,6 +46,11 @@ class OpeningProject(Base):
     budget_spent = Column(BigInteger, default=0)
     location_address = Column(String(500))
     notes = Column(Text)
+
+    wizard_completed = Column(Boolean, default=False)
+    template_applied = Column(String(50))
+    phase_deadlines = Column(JSON)
+    region_code = Column(String(20))
 
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)

@@ -945,10 +945,33 @@ export interface OpeningProject {
   budget_spent: number
   location_address?: string
   notes?: string
+  wizard_completed?: boolean
+  template_applied?: string
+  phase_deadlines?: Record<number, string>
+  region_code?: string
   progress: number
   completed_count: number
   total_tasks: number
   created_at?: string
   updated_at?: string
   tasks: OpeningProjectTask[]
+}
+
+export interface OpeningProjectAnalytics {
+  phase_progress: Record<number, { completed: number; total: number; percent: number; actual_cost: number }>
+  total_completed: number
+  total_tasks: number
+  total_progress: number
+  budget_total?: number
+  budget_spent: number
+  weekly_velocity: number
+  remaining_tasks: number
+  estimated_weeks_remaining?: number
+  target_date?: string
+}
+
+export interface WeeklyTaskItem {
+  subtask_id: string
+  phase_id: number
+  title: string
 }

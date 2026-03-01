@@ -7,7 +7,7 @@ import {
   ClipboardCheck, MapPin, Shield, Calculator,
   CheckCircle2, Circle, ArrowRight,
   Send, Loader2, Phone, User, MessageSquare,
-  Stethoscope, Calendar, MapPinned, Hospital,
+  Stethoscope, Calendar, MapPinned,
 } from 'lucide-react';
 import {
   ServiceHero,
@@ -271,7 +271,7 @@ function OpeningConsultationForm() {
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
                 <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-1">
-                  <Hospital className="w-4 h-4" />
+                  <Building2 className="w-4 h-4" />
                   병원명 (예정)
                 </label>
                 <input

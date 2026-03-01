@@ -222,7 +222,7 @@ export default function DocumentsPage() {
     .filter(d => filterStatus === 'all' || d.status === filterStatus)
     .filter(d => !searchQuery || d.file_name.toLowerCase().includes(searchQuery.toLowerCase()) || (d.doc_type_label || '').includes(searchQuery))
 
-  const uniqueYears = [...new Set(documents.map(d => d.tax_year))].sort((a, b) => b - a)
+  const uniqueYears = Array.from(new Set(documents.map(d => d.tax_year))).sort((a, b) => b - a)
 
   if (loading) {
     return (

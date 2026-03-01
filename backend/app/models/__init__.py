@@ -117,6 +117,8 @@ from .marketing_roi import MarketingSpend
 from .patient import Patient, InboundStatus, ConsentStatus, DBQuality
 # 개원 프로젝트
 from .opening_project import OpeningProject, OpeningProjectTask, ProjectStatus
+# 문의/상담
+from .contact_inquiry import ContactInquiry, ContactStatus
 
 __all__ = [
     "User",
@@ -313,4 +315,7 @@ __all__ = [
     "OpeningProject",
     "OpeningProjectTask",
     "ProjectStatus",
+    # 문의/상담
+    "ContactInquiry",
+    "ContactStatus",
 ]

@@ -202,7 +202,7 @@ export default function TaxCorrectionPage() {
   const completedCount = corrections.filter(c => c.status === 'COMPLETED').length
 
   const filteredCorrections = corrections.filter(c => filterYear === 'all' || c.tax_year === filterYear)
-  const uniqueYears = [...new Set(corrections.map(c => c.tax_year))].sort((a, b) => b - a)
+  const uniqueYears = Array.from(new Set(corrections.map(c => c.tax_year))).sort((a, b) => b - a)
 
   if (loading) {
     return (
@@ -436,7 +436,7 @@ export default function TaxCorrectionPage() {
                   </div>
                   <div className="hidden md:flex col-span-2 items-center gap-1.5">
                     <span className="text-xs font-mono text-muted-foreground">{correction.correction_number}</span>
-                    {correction.ai_detected && <Sparkles className="w-3 h-3 text-emerald-500" title="AI 발견" />}
+                    {correction.ai_detected && <span title="AI 발견"><Sparkles className="w-3 h-3 text-emerald-500" /></span>}
                   </div>
                   <div className="hidden md:block col-span-2 text-sm">
                     ₩{formatAmount(correction.original_filed_amount)}
@@ -503,7 +503,7 @@ export default function TaxCorrectionPage() {
                                 </span>
                                 <div className="flex-1 text-sm">{ded.description}</div>
                                 <div className="text-sm font-semibold">₩{formatAmount(ded.amount)}</div>
-                                {ded.ai_suggested && <Sparkles className="w-3 h-3 text-emerald-500" title="AI 제안" />}
+                                {ded.ai_suggested && <span title="AI 제안"><Sparkles className="w-3 h-3 text-emerald-500" /></span>}
                               </div>
                             ))}
                           </div>

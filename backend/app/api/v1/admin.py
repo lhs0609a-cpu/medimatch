@@ -15,6 +15,7 @@ from app.models.user import User, UserRole
 from app.models.payment import Payment, Subscription, UsageCredit, PaymentStatus
 from app.models.listing_subscription import ListingSubscription, ListingSubStatus
 from app.models.service_subscription import ServiceSubscription, ServiceSubStatus, ServiceType
+from app.models.contact_inquiry import ContactInquiry
 
 router = APIRouter()
 
@@ -67,6 +68,8 @@ class StatsResponse(BaseModel):
     prospects: dict
     partners: dict
     engagement: dict
+    consultations: int = 0
+    inquiries: int = 0
 
 
 # ===== 관리자 권한 체크 =====
@@ -220,6 +223,28 @@ async def get_stats(
     # 계산된 성장률 (이전 기간 대비)
     growth_rate = 15.0  # 기본값
 
+    # 문의/상담 카운트 (NEW 상태)
+    consultation_types = ("consultation", "homepage_consultation", "program_consultation")
+    try:
+        consult_count_result = await db.execute(
+            select(func.count(ContactInquiry.id)).where(
+                ContactInquiry.contact_type.in_(consultation_types),
+                ContactInquiry.status == "NEW",
+            )
+        )
+        consultations_count = consult_count_result.scalar() or 0
+
+        inquiry_count_result = await db.execute(
+            select(func.count(ContactInquiry.id)).where(
+                ContactInquiry.contact_type.notin_(consultation_types),
+                ContactInquiry.status == "NEW",
+            )
+        )
+        inquiries_count = inquiry_count_result.scalar() or 0
+    except Exception:
+        consultations_count = 0
+        inquiries_count = 0
+
     return StatsResponse(
         users={
             "total": total_users_count,
@@ -260,7 +285,9 @@ async def get_stats(
             "avg_session_duration": 12.5,
             "chat_messages": 0,
             "simulations": 0
-        }
+        },
+        consultations=consultations_count,
+        inquiries=inquiries_count,
     )
 
 

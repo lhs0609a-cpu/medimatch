@@ -7,6 +7,18 @@ export interface SubTask {
   tips?: string
 }
 
+export interface ConnectedFeature {
+  name: string
+  href: string
+  icon: string
+}
+
+export interface PhaseDocument {
+  name: string
+  description: string
+  templateUrl?: string
+}
+
 export interface Phase {
   id: number
   title: string
@@ -16,6 +28,8 @@ export interface Phase {
   color: string
   description: string
   subtasks: SubTask[]
+  connectedFeatures?: ConnectedFeature[]
+  documents?: PhaseDocument[]
 }
 
 export const phases: Phase[] = [
@@ -27,6 +41,14 @@ export const phases: Phase[] = [
     duration: 2,
     color: '#3B82F6',
     description: '개원 목표 설정, 진료과 선정, 사업타당성 분석',
+    connectedFeatures: [
+      { name: '수익성 시뮬레이션', href: '/opening-package#simulation', icon: 'Calculator' },
+      { name: '대출 계산기', href: '/emr/opening/budget?tab=loan', icon: 'Landmark' },
+    ],
+    documents: [
+      { name: '사업계획서 양식', description: '의원 개원 사업계획서 템플릿' },
+      { name: '손익분기점 계산표', description: '예상 매출/비용 기반 BEP 분석 시트' },
+    ],
     subtasks: [
       { id: '1-1', title: '개원 목표 및 비전 설정', description: '진료 철학, 타깃 환자군, 차별화 전략 수립', estimatedDays: 7 },
       { id: '1-2', title: '진료과 및 세부 전공 결정', description: '시장 수요, 경쟁 현황, 개인 역량 고려', estimatedDays: 7 },
@@ -43,6 +65,14 @@ export const phases: Phase[] = [
     duration: 2,
     color: '#10B981',
     description: '상권 분석, 후보지 방문, 임대차 계약',
+    connectedFeatures: [
+      { name: '경쟁의원 분석', href: '/opening-package#location', icon: 'MapPin' },
+      { name: '매물 검색', href: '/opening-package#location', icon: 'Building2' },
+    ],
+    documents: [
+      { name: '상권 분석 체크리스트', description: '유동인구, 경쟁현황, 접근성 체크항목' },
+      { name: '임대차계약서 체크리스트', description: '계약 시 확인해야 할 필수 항목' },
+    ],
     subtasks: [
       { id: '2-1', title: '상권 분석', description: '유동인구, 주거인구, 경쟁의원 현황 조사', estimatedDays: 14, tips: '메디플라톤 경쟁 모니터링 활용' },
       { id: '2-2', title: '후보지 리스트업 (3~5곳)', description: '부동산 매물 탐색, 현장 방문', estimatedDays: 14 },
@@ -59,6 +89,15 @@ export const phases: Phase[] = [
     duration: 2,
     color: '#F59E0B',
     description: '의료기관 개설 신고, 사업자등록, 각종 인허가',
+    connectedFeatures: [
+      { name: '인허가 가이드', href: '/emr/opening/permits', icon: 'FileCheck' },
+      { name: '서류 관리', href: '/emr/opening/permits', icon: 'FolderOpen' },
+    ],
+    documents: [
+      { name: '의료기관 개설 신고서', description: '보건소 제출용 양식' },
+      { name: '사업자등록 신청서', description: '홈택스/세무서 제출용' },
+      { name: '요양기관 지정 신청서', description: '심평원 제출용' },
+    ],
     subtasks: [
       { id: '3-1', title: '의료기관 개설 신고', description: '관할 보건소에 개설 신고서 제출', estimatedDays: 14, estimatedCost: 0 },
       { id: '3-2', title: '사업자등록', description: '세무서 사업자등록 (면세사업자)', estimatedDays: 3, estimatedCost: 0 },
@@ -76,6 +115,14 @@ export const phases: Phase[] = [
     duration: 3,
     color: '#8B5CF6',
     description: '의원 설계, 인테리어 시공, 의료가스/전기 공사',
+    connectedFeatures: [
+      { name: '파트너 매칭', href: '/emr/opening/vendors?tab=interior', icon: 'Paintbrush' },
+      { name: '공동구매', href: '/emr/group-buying', icon: 'ShoppingCart' },
+    ],
+    documents: [
+      { name: '인테리어 비교 견적서', description: '업체별 비교 양식' },
+      { name: '설계 도면 체크리스트', description: '진료실 배치 확인 항목' },
+    ],
     subtasks: [
       { id: '4-1', title: '인테리어 업체 선정', description: '의료 전문 인테리어 3곳 이상 비교 견적', estimatedDays: 14, tips: '메디플라톤 인테리어 견적 활용' },
       { id: '4-2', title: '설계 도면 확정', description: '진료실, 대기실, 처치실, 상담실 배치', estimatedDays: 14, estimatedCost: 500 },
@@ -93,6 +140,14 @@ export const phases: Phase[] = [
     duration: 2,
     color: '#EC4899',
     description: '의료장비 구매, 진료 소모품, 가구/집기',
+    connectedFeatures: [
+      { name: '장비 공동구매', href: '/emr/group-buying', icon: 'ShoppingCart' },
+      { name: 'EMR 시작하기', href: '/emr/dashboard', icon: 'Monitor' },
+    ],
+    documents: [
+      { name: '진료과별 장비 목록', description: '필수/권장/선택 장비 리스트' },
+      { name: '장비 견적 비교표', description: '업체별 가격 비교 양식' },
+    ],
     subtasks: [
       { id: '5-1', title: '필수 의료장비 구매', description: '진료과별 필수 장비 리스트 작성 및 발주', estimatedDays: 21, estimatedCost: 15000, tips: '리스/렌탈 옵션도 비교' },
       { id: '5-2', title: '진료 소모품 구매', description: '주사기, 거즈, 소독제, 약품 등 초도 물량', estimatedDays: 7, estimatedCost: 500 },
@@ -109,6 +164,14 @@ export const phases: Phase[] = [
     duration: 2,
     color: '#06B6D4',
     description: '간호사, 간호조무사, 원무 행정 직원 채용',
+    connectedFeatures: [
+      { name: '인건비 시뮬레이터', href: '/emr/cost/staff', icon: 'Users' },
+    ],
+    documents: [
+      { name: '채용공고 템플릿', description: '의료기관 채용공고 양식' },
+      { name: '근로계약서 양식', description: '의료기관용 표준 근로계약서' },
+      { name: '4대보험 안내', description: '가입 절차 및 요율 안내' },
+    ],
     subtasks: [
       { id: '6-1', title: '직원 채용 계획', description: '필요 인원, 직급, 급여 기준 설정', estimatedDays: 7 },
       { id: '6-2', title: '채용 공고 게시', description: '의료 전문 구인사이트, 지역 커뮤니티 활용', estimatedDays: 7, estimatedCost: 30 },
@@ -125,6 +188,15 @@ export const phases: Phase[] = [
     duration: 2,
     color: '#F97316',
     description: '브랜딩, 온/오프라인 마케팅, 사전 예약 시스템',
+    connectedFeatures: [
+      { name: '마케팅 비용 분석', href: '/emr/cost/marketing', icon: 'TrendingUp' },
+      { name: '네이버 플레이스 가이드', href: '/emr/opening/phase/7?tab=documents', icon: 'MapPinned' },
+    ],
+    documents: [
+      { name: '네이버 플레이스 등록 가이드', description: '스마트플레이스 등록 및 최적화 방법' },
+      { name: 'SNS 마케팅 전략 가이드', description: '인스타그램, 카카오톡 활용법' },
+      { name: '개원 홍보물 체크리스트', description: '명함, 전단지, 현수막 등 준비물' },
+    ],
     subtasks: [
       { id: '7-1', title: 'CI/BI 디자인', description: '로고, 명함, 진료카드, 봉투 등 디자인', estimatedDays: 14, estimatedCost: 300 },
       { id: '7-2', title: '홈페이지 / 블로그 제작', description: '네이버 플레이스, 홈페이지, 블로그 세팅', estimatedDays: 14, estimatedCost: 300, tips: '네이버 스마트플레이스 필수 등록' },
@@ -142,6 +214,15 @@ export const phases: Phase[] = [
     duration: 2,
     color: '#EF4444',
     description: '시범 운영, 오픈 이벤트, 정식 개원',
+    connectedFeatures: [
+      { name: '보험청구 테스트', href: '/emr/claims', icon: 'Receipt' },
+      { name: '환자관리', href: '/emr/patients', icon: 'UserPlus' },
+      { name: 'EMR 대시보드', href: '/emr/dashboard', icon: 'LayoutDashboard' },
+    ],
+    documents: [
+      { name: '개원 전 최종 체크리스트', description: '개원 D-7 ~ D-Day 점검 항목' },
+      { name: '오픈 이벤트 기획서 양식', description: '개원 기념 이벤트 계획서' },
+    ],
     subtasks: [
       { id: '8-1', title: '리허설 운영 (1주)', description: '지인/가족 대상 모의 진료, 동선 확인', estimatedDays: 7 },
       { id: '8-2', title: '소방/안전 점검', description: '소방서 합동 점검, 소화기/비상구 확인', estimatedDays: 3, estimatedCost: 0 },

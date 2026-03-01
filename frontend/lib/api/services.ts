@@ -16,7 +16,7 @@ import {
   GroupBuyingTotalStats, SavingsCalculation, CohortListResponse,
   MyParticipationsResponse, CohortStatus,
   // Opening Project Types
-  OpeningProject,
+  OpeningProject, OpeningProjectAnalytics, WeeklyTaskItem,
 } from './client'
 
 // Auth Services
@@ -1998,6 +1998,21 @@ export const openingProjectService = {
   },
   delete: async (id: string) => {
     const response = await apiClient.delete(`/opening-projects/${id}`)
+    return response.data
+  },
+  getAnalytics: async (id: string): Promise<OpeningProjectAnalytics> => {
+    const response = await apiClient.get(`/opening-projects/${id}/analytics`)
+    return response.data
+  },
+  getWeeklyTasks: async (id: string): Promise<{ tasks: WeeklyTaskItem[] }> => {
+    const response = await apiClient.get(`/opening-projects/${id}/weekly-tasks`)
+    return response.data
+  },
+  applyTemplate: async (id: string, data: {
+    template_id: string; specialty?: string; budget_total?: number;
+    phase_deadlines?: Record<number, string>; region_code?: string;
+  }): Promise<OpeningProject> => {
+    const response = await apiClient.put(`/opening-projects/${id}/template`, data)
     return response.data
   },
 }
