@@ -98,6 +98,7 @@ export function useOpeningProject(forceApi = false) {
               completedTasks: proj.tasks.filter(t => t.is_completed).map(t => t.subtask_id),
               actualCosts: Object.fromEntries(proj.tasks.filter(t => t.actual_cost).map(t => [t.subtask_id, t.actual_cost!])),
               memos: Object.fromEntries(proj.tasks.filter(t => t.memo).map(t => [t.subtask_id, t.memo!])),
+              seenMilestones: [],
             })
           } else {
             // 서버에 프로젝트 없음 → localStorage에 데이터 있으면 동기화
