@@ -22,7 +22,8 @@ export default function SettingsPage() {
   const [dataSharing, setDataSharing] = useState(false)
 
   const handleLogout = () => {
-    localStorage.removeItem('token')
+    localStorage.removeItem('access_token')
+    localStorage.removeItem('refresh_token')
     router.push('/login')
   }
 

@@ -75,7 +75,7 @@ export default function VendorsPage() {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center gap-3">
-        <Link href="/emr/opening" className="text-muted-foreground hover:text-foreground">
+        <Link href="/opening" className="text-muted-foreground hover:text-foreground">
           <ArrowLeft className="w-5 h-5" />
         </Link>
         <div className="w-10 h-10 rounded-xl bg-purple-500/10 flex items-center justify-center">

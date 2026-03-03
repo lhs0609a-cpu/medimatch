@@ -88,11 +88,11 @@ interface ClaimStats {
   is_demo: boolean
 }
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || ''
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || '/api/v1'
 
 async function fetchApi(path: string, options?: RequestInit) {
   const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null
-  const res = await fetch(`${API_URL}/api/v1${path}`, {
+  const res = await fetch(`${API_BASE}${path}`, {
     ...options,
     headers: {
       'Content-Type': 'application/json',

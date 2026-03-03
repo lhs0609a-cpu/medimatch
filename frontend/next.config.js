@@ -22,12 +22,42 @@ const nextConfig = {
     ],
   },
   async rewrites() {
+    // NEXT_PUBLIC_API_URL contains /api/v1, strip it to get the backend base for rewrites
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1';
+    const backendBase = apiUrl.replace(/\/api\/v1$/, '');
     return [
       {
         source: '/api/:path*',
-        destination: process.env.NEXT_PUBLIC_API_URL
-          ? `${process.env.NEXT_PUBLIC_API_URL}/api/:path*`
-          : 'http://localhost:8000/api/:path*',
+        destination: `${backendBase}/api/:path*`,
+      },
+    ];
+  },
+  async redirects() {
+    return [
+      {
+        source: '/emr/opening',
+        destination: '/opening-project',
+        permanent: true,
+      },
+      {
+        source: '/emr/opening/:path*',
+        destination: '/opening-project/:path*',
+        permanent: true,
+      },
+      {
+        source: '/opening',
+        destination: '/opening-project',
+        permanent: false,
+      },
+      {
+        source: '/opening/phase/:id',
+        destination: '/opening-project/phase/:id',
+        permanent: false,
+      },
+      {
+        source: '/opening/wizard',
+        destination: '/opening-project/wizard',
+        permanent: false,
       },
     ];
   },

@@ -43,7 +43,7 @@ export const phases: Phase[] = [
     description: '개원 목표 설정, 진료과 선정, 사업타당성 분석',
     connectedFeatures: [
       { name: '수익성 시뮬레이션', href: '/opening-package#simulation', icon: 'Calculator' },
-      { name: '대출 계산기', href: '/emr/opening/budget?tab=loan', icon: 'Landmark' },
+      { name: '대출 계산기', href: '/opening/budget?tab=loan', icon: 'Landmark' },
     ],
     documents: [
       { name: '사업계획서 양식', description: '의원 개원 사업계획서 템플릿' },
@@ -90,8 +90,8 @@ export const phases: Phase[] = [
     color: '#F59E0B',
     description: '의료기관 개설 신고, 사업자등록, 각종 인허가',
     connectedFeatures: [
-      { name: '인허가 가이드', href: '/emr/opening/permits', icon: 'FileCheck' },
-      { name: '서류 관리', href: '/emr/opening/permits', icon: 'FolderOpen' },
+      { name: '인허가 가이드', href: '/opening/permits', icon: 'FileCheck' },
+      { name: '서류 관리', href: '/opening/permits', icon: 'FolderOpen' },
     ],
     documents: [
       { name: '의료기관 개설 신고서', description: '보건소 제출용 양식' },
@@ -116,7 +116,7 @@ export const phases: Phase[] = [
     color: '#8B5CF6',
     description: '의원 설계, 인테리어 시공, 의료가스/전기 공사',
     connectedFeatures: [
-      { name: '파트너 매칭', href: '/emr/opening/vendors?tab=interior', icon: 'Paintbrush' },
+      { name: '파트너 매칭', href: '/opening/vendors?tab=interior', icon: 'Paintbrush' },
       { name: '공동구매', href: '/emr/group-buying', icon: 'ShoppingCart' },
     ],
     documents: [
@@ -190,7 +190,7 @@ export const phases: Phase[] = [
     description: '브랜딩, 온/오프라인 마케팅, 사전 예약 시스템',
     connectedFeatures: [
       { name: '마케팅 비용 분석', href: '/emr/cost/marketing', icon: 'TrendingUp' },
-      { name: '네이버 플레이스 가이드', href: '/emr/opening/phase/7?tab=documents', icon: 'MapPinned' },
+      { name: '네이버 플레이스 가이드', href: '/opening/phase/7?tab=documents', icon: 'MapPinned' },
     ],
     documents: [
       { name: '네이버 플레이스 등록 가이드', description: '스마트플레이스 등록 및 최적화 방법' },

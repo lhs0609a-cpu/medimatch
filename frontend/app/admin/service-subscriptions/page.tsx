@@ -59,14 +59,14 @@ export default function AdminServiceSubscriptionsPage() {
     try {
       setLoading(true);
       const token = localStorage.getItem('access_token');
-      const API_URL = process.env.NEXT_PUBLIC_API_URL || '';
+      const API_BASE = process.env.NEXT_PUBLIC_API_URL || '/api/v1';
       const params = new URLSearchParams();
       params.set('page', String(page));
       params.set('page_size', String(pageSize));
       if (filterType) params.set('service_type', filterType);
       if (filterStatus) params.set('status', filterStatus);
 
-      const res = await fetch(`${API_URL}/api/v1/admin/service-subscriptions?${params}`, {
+      const res = await fetch(`${API_BASE}/admin/service-subscriptions?${params}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
@@ -85,8 +85,8 @@ export default function AdminServiceSubscriptionsPage() {
     try {
       setActionLoading(id);
       const token = localStorage.getItem('access_token');
-      const API_URL = process.env.NEXT_PUBLIC_API_URL || '';
-      await fetch(`${API_URL}/api/v1/admin/service-subscriptions/${id}/${action}`, {
+      const API_BASE = process.env.NEXT_PUBLIC_API_URL || '/api/v1';
+      await fetch(`${API_BASE}/admin/service-subscriptions/${id}/${action}`, {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}` },
       });

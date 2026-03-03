@@ -13,7 +13,7 @@ from uuid import UUID
 from datetime import datetime
 from pydantic import BaseModel, EmailStr
 
-from ..deps import get_db, get_current_active_user
+from ..deps import get_db, get_current_active_user, get_current_user_optional
 from ...core.security import get_current_user, TokenData
 from ...models.user import User, UserRole
 from ...models.landlord import (
@@ -648,7 +648,7 @@ async def search_buildings(
     page: int = Query(1, ge=1),
     page_size: int = Query(20, ge=1, le=100),
     db: AsyncSession = Depends(get_db),
-    current_user: Optional[TokenData] = Depends(get_current_user)
+    current_user: Optional[TokenData] = Depends(get_current_user_optional)
 ):
     """
     건물 매물 검색 (의사/약사용)
@@ -727,7 +727,7 @@ async def search_buildings(
 async def get_building_detail(
     listing_id: UUID,
     db: AsyncSession = Depends(get_db),
-    current_user: Optional[TokenData] = Depends(get_current_user)
+    current_user: Optional[TokenData] = Depends(get_current_user_optional)
 ):
     """
     건물 매물 상세 조회

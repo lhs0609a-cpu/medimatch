@@ -39,7 +39,7 @@ export default function MyPage() {
 
   const fetchUserData = async () => {
     try {
-      const token = localStorage.getItem('token')
+      const token = localStorage.getItem('access_token')
       if (!token) {
         router.push('/login')
         return
@@ -53,7 +53,8 @@ export default function MyPage() {
 
       if (!profileResponse.ok) {
         if (profileResponse.status === 401) {
-          localStorage.removeItem('token')
+          localStorage.removeItem('access_token')
+          localStorage.removeItem('refresh_token')
           router.push('/login')
           return
         }
@@ -86,7 +87,7 @@ export default function MyPage() {
   const handleSaveProfile = async () => {
     try {
       setSaving(true)
-      const token = localStorage.getItem('token')
+      const token = localStorage.getItem('access_token')
       if (!token) {
         router.push('/login')
         return
@@ -131,7 +132,8 @@ export default function MyPage() {
   }
 
   const handleLogout = () => {
-    localStorage.removeItem('token')
+    localStorage.removeItem('access_token')
+    localStorage.removeItem('refresh_token')
     router.push('/login')
   }
 

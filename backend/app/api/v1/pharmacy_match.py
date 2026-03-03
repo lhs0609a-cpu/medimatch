@@ -12,7 +12,7 @@ from sqlalchemy import select
 from typing import Optional, List
 from uuid import UUID
 
-from ..deps import get_db, get_current_active_user
+from ..deps import get_db, get_current_active_user, get_current_user_optional
 from ...core.security import get_current_user, TokenData
 from ...models.user import User
 from ...models.listing_access import AccessLevel, ListingAccessLevel, AccessPricing
@@ -647,7 +647,7 @@ async def get_listing_access_level(
 async def get_listing_with_access_level(
     listing_id: UUID,
     db: AsyncSession = Depends(get_db),
-    current_user: Optional[TokenData] = Depends(get_current_user)
+    current_user: Optional[TokenData] = Depends(get_current_user_optional)
 ):
     """
     접근 레벨에 따른 매물 상세 조회

@@ -45,7 +45,7 @@ import {
 
 const sidebarLinks = [
   { href: '/emr/dashboard', label: '대시보드', icon: LayoutDashboard },
-  { href: '/emr/opening', label: '개원 준비', icon: Rocket, badge: '진행중' },
+  { href: '/opening-project', label: '개원 준비', icon: Rocket, badge: '진행중' },
   { href: '/emr/appointments', label: '예약/접수', icon: CalendarCheck },
   { href: '/emr/patients', label: '환자 관리', icon: Users },
   { href: '/emr/chart/new', label: 'AI 진료차트', icon: Mic, accent: true },

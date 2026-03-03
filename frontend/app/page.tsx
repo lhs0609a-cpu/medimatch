@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { useState, useEffect, useRef } from 'react'
 import dynamic from 'next/dynamic'
 import OnboardingModal, { useOnboarding } from '@/components/onboarding/OnboardingModal'
+import HomepageOpeningCTA from '@/components/opening/HomepageOpeningCTA'
 import { platformStats, generateActivityFeed, recentSuccessStories, generateBuildingListings, generatePharmacyListings } from '@/lib/data/seedListings'
 import {
   ArrowRight,
@@ -47,6 +48,7 @@ import {
   Wrench,
   Settings,
   Map,
+  Rocket,
 } from 'lucide-react'
 import { TossIcon } from '@/components/ui/TossIcon'
 
@@ -365,6 +367,10 @@ export default function HomePage() {
                           <div className="border-t border-border mt-3 pt-3">
                             <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">개원 도구</p>
                             <div className="space-y-1">
+                              <Link href="/opening-project" className="flex items-center gap-3 p-2 rounded-lg hover:bg-accent transition-colors">
+                                <Rocket className="w-4 h-4 text-emerald-500 flex-shrink-0" />
+                                <span className="text-xs">개원 D-Day 체크리스트</span>
+                              </Link>
                               <Link href="/cost-calculator" className="flex items-center gap-3 p-2 rounded-lg hover:bg-accent transition-colors">
                                 <Calculator className="w-4 h-4 text-blue-500 flex-shrink-0" />
                                 <span className="text-xs">개원 비용 계산기</span>
@@ -390,6 +396,10 @@ export default function HomePage() {
                   <span className="px-1.5 py-0.5 text-[10px] font-bold bg-red-500 text-white rounded">HOT</span>
                 </Link>
                 <Link href="/buildings" className="nav-link">매물</Link>
+                <Link href="/opening-project" className="nav-link flex items-center gap-1">
+                  개원 D-Day
+                  <span className="px-1.5 py-0.5 text-[10px] font-bold bg-emerald-500 text-white rounded">NEW</span>
+                </Link>
                 <Link href="/group-buying" className="nav-link hidden xl:block">공동구매</Link>
                 <Link href="/map" className="nav-link">지도</Link>
               </nav>
@@ -441,6 +451,10 @@ export default function HomePage() {
                 <Link href="/services/emr" className="flex items-center gap-3 p-3 rounded-xl hover:bg-accent" onClick={() => setMobileMenuOpen(false)}>
                   <TossIcon icon={Stethoscope} color="from-teal-500 to-cyan-600" size="xs" shadow="shadow-teal-500/25" className="flex-shrink-0" />
                   <span className="flex items-center gap-2">클라우드 EMR <span className="px-1.5 py-0.5 text-[10px] font-bold bg-blue-600/10 text-blue-600 rounded">NEW</span></span>
+                </Link>
+                <Link href="/opening-project" className="flex items-center gap-3 p-3 rounded-xl hover:bg-accent" onClick={() => setMobileMenuOpen(false)}>
+                  <TossIcon icon={Rocket} color="from-emerald-500 to-green-600" size="xs" shadow="shadow-emerald-500/25" className="flex-shrink-0" />
+                  <span className="flex items-center gap-2">개원 D-Day 체크리스트 <span className="px-1.5 py-0.5 text-[10px] font-bold bg-emerald-500 text-white rounded">NEW</span></span>
                 </Link>
                 <Link href="/cost-calculator" className="flex items-center gap-3 p-3 rounded-xl hover:bg-accent" onClick={() => setMobileMenuOpen(false)}>
                   <TossIcon icon={Calculator} color="from-blue-500 to-blue-600" size="xs" shadow="shadow-blue-500/25" className="flex-shrink-0" />
@@ -1012,6 +1026,9 @@ export default function HomePage() {
             </div>
           </div>
         </section>
+
+        {/* ===== 개원 프로젝트 CTA ===== */}
+        <HomepageOpeningCTA />
 
         {/* ===== 함께한 병원 로고 마키 ===== */}
         <section className="py-20 md:py-28 overflow-hidden">

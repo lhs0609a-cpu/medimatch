@@ -14,7 +14,7 @@ from uuid import UUID
 from datetime import datetime, date, timedelta
 import random
 
-from ..deps import get_db, get_current_active_user
+from ..deps import get_db, get_current_active_user, get_current_user_optional
 from ...core.security import get_current_user, TokenData
 from ...models.user import User, UserRole
 from ...models.banner import (
@@ -36,7 +36,7 @@ async def get_banners(
     position: str = Query(..., description="배너 위치: HOME_TOP, SIDEBAR, SEARCH_RESULT, PARTNERS_LIST"),
     limit: int = Query(5, ge=1, le=10),
     db: AsyncSession = Depends(get_db),
-    current_user: Optional[TokenData] = Depends(get_current_user)
+    current_user: Optional[TokenData] = Depends(get_current_user_optional)
 ):
     """
     활성 배너 조회
@@ -107,7 +107,7 @@ async def record_impression(
     session_id: Optional[str] = None,
     page_url: Optional[str] = None,
     db: AsyncSession = Depends(get_db),
-    current_user: Optional[TokenData] = Depends(get_current_user)
+    current_user: Optional[TokenData] = Depends(get_current_user_optional)
 ):
     """
     배너 노출 기록
@@ -198,7 +198,7 @@ async def record_click(
     session_id: Optional[str] = None,
     page_url: Optional[str] = None,
     db: AsyncSession = Depends(get_db),
-    current_user: Optional[TokenData] = Depends(get_current_user)
+    current_user: Optional[TokenData] = Depends(get_current_user_optional)
 ):
     """배너 클릭 기록"""
     result = await db.execute(

@@ -17,6 +17,7 @@ export interface LocalProjectData {
   completedTasks: string[]
   actualCosts: Record<string, number>
   memos: Record<string, string>
+  seenMilestones: string[]
 }
 
 const DEFAULT_LOCAL: LocalProjectData = {
@@ -29,6 +30,7 @@ const DEFAULT_LOCAL: LocalProjectData = {
   completedTasks: [],
   actualCosts: {},
   memos: {},
+  seenMilestones: [],
 }
 
 function loadLocal(): LocalProjectData {
@@ -228,6 +230,13 @@ export function useOpeningProject(forceApi = false) {
     }
   }, [data, useApi, serverProjectId])
 
+  const markMilestoneSeen = useCallback((milestoneId: string) => {
+    if (data.seenMilestones.includes(milestoneId)) return
+    const newData = { ...data, seenMilestones: [...data.seenMilestones, milestoneId] }
+    setData(newData)
+    if (!useApi) saveLocal(newData)
+  }, [data, useApi])
+
   // 계산값
   const completedCount = data.completedTasks.length
   const progress = totalTasks > 0 ? Math.round((completedCount / totalTasks) * 100) : 0
@@ -257,6 +266,7 @@ export function useOpeningProject(forceApi = false) {
     updateMeta,
     updateTaskCost,
     updateTaskMemo,
+    markMilestoneSeen,
     completedCount,
     totalTasks,
     progress,

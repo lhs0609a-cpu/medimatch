@@ -39,7 +39,7 @@ export default function SimulationHistoryPage() {
 
   const fetchHistories = async () => {
     try {
-      const token = localStorage.getItem('token')
+      const token = localStorage.getItem('access_token')
       const response = await fetch('/api/v1/simulations/history', {
         headers: {
           Authorization: `Bearer ${token}`,

@@ -125,11 +125,11 @@ export default function OpeningWizardPage() {
         // Template apply is optional, project already created
       }
 
-      router.push('/emr/opening')
+      router.push('/opening')
     } catch (err: any) {
       if (err?.response?.status === 400) {
         // Project already exists
-        router.push('/emr/opening')
+        router.push('/opening')
       } else {
         alert('프로젝트 생성에 실패했습니다. 다시 시도해주세요.')
       }
@@ -420,7 +420,7 @@ export default function OpeningWizardPage() {
       {/* Navigation */}
       <div className="flex items-center justify-between">
         <button
-          onClick={() => step > 1 ? setStep(step - 1) : router.push('/emr/opening')}
+          onClick={() => step > 1 ? setStep(step - 1) : router.push('/opening')}
           className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />

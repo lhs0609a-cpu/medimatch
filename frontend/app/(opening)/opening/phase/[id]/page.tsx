@@ -125,7 +125,7 @@ export default function PhaseDeepPage() {
     return (
       <div className="text-center py-12">
         <p className="text-muted-foreground">존재하지 않는 단계입니다.</p>
-        <Link href="/emr/opening" className="text-primary hover:underline text-sm mt-2 inline-block">돌아가기</Link>
+        <Link href="/opening" className="text-primary hover:underline text-sm mt-2 inline-block">돌아가기</Link>
       </div>
     )
   }
@@ -135,7 +135,7 @@ export default function PhaseDeepPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <Link href="/emr/opening" className="text-muted-foreground hover:text-foreground">
+          <Link href="/opening" className="text-muted-foreground hover:text-foreground">
             <ArrowLeft className="w-5 h-5" />
           </Link>
           <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ backgroundColor: `${phase.color}20` }}>
@@ -152,12 +152,12 @@ export default function PhaseDeepPage() {
         {/* Phase navigation */}
         <div className="flex items-center gap-1">
           {phaseId > 1 && (
-            <Link href={`/emr/opening/phase/${phaseId - 1}`} className="btn-icon">
+            <Link href={`/opening/phase/${phaseId - 1}`} className="btn-icon">
               <ChevronLeft className="w-4 h-4" />
             </Link>
           )}
           {phaseId < 8 && (
-            <Link href={`/emr/opening/phase/${phaseId + 1}`} className="btn-icon">
+            <Link href={`/opening/phase/${phaseId + 1}`} className="btn-icon">
               <ChevronRight className="w-4 h-4" />
             </Link>
           )}
@@ -301,7 +301,7 @@ export default function PhaseDeepPage() {
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <h3 className="text-sm font-semibold">추천 파트너</h3>
-                  <Link href="/emr/opening/vendors" className="text-xs text-primary hover:underline">
+                  <Link href="/opening/vendors" className="text-xs text-primary hover:underline">
                     전체 보기 →
                   </Link>
                 </div>
@@ -457,7 +457,7 @@ export default function PhaseDeepPage() {
                 return (
                   <Link
                     key={p.id}
-                    href={`/emr/opening/phase/${p.id}`}
+                    href={`/opening/phase/${p.id}`}
                     className={`flex items-center gap-2 px-2 py-1.5 rounded-lg text-xs transition-colors ${p.id === phaseId ? 'bg-primary/10 text-primary font-medium' : 'hover:bg-secondary/50 text-muted-foreground'}`}
                   >
                     <span className="w-4 text-center">{p.id}</span>

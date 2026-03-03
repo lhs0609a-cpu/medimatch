@@ -46,10 +46,10 @@ export default function ServiceConsultationForm({
     setErrorMsg('');
 
     try {
-      const API_URL = process.env.NEXT_PUBLIC_API_URL || '';
+      const API_BASE = process.env.NEXT_PUBLIC_API_URL || '/api/v1';
 
       // 1) Backend API
-      const res = await fetch(`${API_URL}/api/v1/service-subscription/inquiry`, {
+      const res = await fetch(`${API_BASE}/service-subscription/inquiry`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

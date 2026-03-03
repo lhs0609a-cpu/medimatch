@@ -26,7 +26,7 @@ export default function PaymentHistoryPage() {
     try {
       const response = await fetch('/api/v1/payments/history', {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
+          Authorization: `Bearer ${localStorage.getItem('access_token')}`,
         },
       });
       const data = await response.json();

@@ -19,7 +19,7 @@ from ...services.ai_analysis import ai_analysis_service
 from ...services.pdf_generator import pdf_generator_service
 from ...models.user import User
 from ...models.simulation import Simulation, SimulationReport, FreeTrialUsage
-from ..deps import get_db, get_current_active_user
+from ..deps import get_db, get_current_active_user, get_current_user_optional
 from ...core.security import get_current_user, TokenData
 
 router = APIRouter()
@@ -56,7 +56,7 @@ async def create_simulation(
     simulation_request: SimulationRequest,
     request: Request,
     db: AsyncSession = Depends(get_db),
-    current_user: Optional[TokenData] = Depends(get_current_user)
+    current_user: Optional[TokenData] = Depends(get_current_user_optional)
 ):
     """
     시뮬레이션 실행
@@ -249,7 +249,7 @@ async def get_simulation(
     simulation_id: UUID,
     request: Request,
     db: AsyncSession = Depends(get_db),
-    current_user: Optional[TokenData] = Depends(get_current_user)
+    current_user: Optional[TokenData] = Depends(get_current_user_optional)
 ):
     """
     시뮬레이션 결과 조회
@@ -582,7 +582,7 @@ async def generate_report(
 async def preview_report(
     report_id: UUID,
     db: AsyncSession = Depends(get_db),
-    current_user: Optional[TokenData] = Depends(get_current_user)
+    current_user: Optional[TokenData] = Depends(get_current_user_optional)
 ):
     """
     리포트 미리보기

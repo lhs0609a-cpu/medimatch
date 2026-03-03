@@ -44,7 +44,7 @@ export default function EMROpeningPage() {
   // Redirect to wizard if no project
   useEffect(() => {
     if (!loading && !serverProjectId && !data.specialty && !data.title && data.completedTasks.length === 0) {
-      router.push('/emr/opening/wizard')
+      router.push('/opening/wizard')
     }
   }, [loading, serverProjectId, data, router])
 
@@ -114,7 +114,7 @@ export default function EMROpeningPage() {
               D{daysRemaining > 0 ? `-${daysRemaining}` : daysRemaining === 0 ? '-Day' : `+${Math.abs(daysRemaining)}`}
             </div>
           )}
-          <Link href="/emr/opening/budget" className="btn-secondary btn-sm flex items-center gap-1">
+          <Link href="/opening/budget" className="btn-secondary btn-sm flex items-center gap-1">
             <Wallet className="w-3.5 h-3.5" /> 예산
           </Link>
         </div>
@@ -167,7 +167,7 @@ export default function EMROpeningPage() {
               })()}
             </div>
             <Link
-              href={`/emr/opening/phase/${activePhase}`}
+              href={`/opening/phase/${activePhase}`}
               className="text-xs text-primary hover:underline flex items-center gap-0.5"
             >
               상세보기 <ChevronRight className="w-3 h-3" />
@@ -196,13 +196,13 @@ export default function EMROpeningPage() {
 
                 {/* Quick actions */}
                 <div className="flex flex-wrap gap-2">
-                  <Link href={`/emr/opening/phase/${activePhase}?tab=checklist`} className="text-xs px-2.5 py-1 rounded-lg bg-secondary hover:bg-secondary/80 transition-colors">
+                  <Link href={`/opening/phase/${activePhase}?tab=checklist`} className="text-xs px-2.5 py-1 rounded-lg bg-secondary hover:bg-secondary/80 transition-colors">
                     체크리스트
                   </Link>
-                  <Link href={`/emr/opening/phase/${activePhase}?tab=tools`} className="text-xs px-2.5 py-1 rounded-lg bg-secondary hover:bg-secondary/80 transition-colors">
+                  <Link href={`/opening/phase/${activePhase}?tab=tools`} className="text-xs px-2.5 py-1 rounded-lg bg-secondary hover:bg-secondary/80 transition-colors">
                     도구
                   </Link>
-                  <Link href="/emr/opening/budget" className="text-xs px-2.5 py-1 rounded-lg bg-secondary hover:bg-secondary/80 transition-colors">
+                  <Link href="/opening/budget" className="text-xs px-2.5 py-1 rounded-lg bg-secondary hover:bg-secondary/80 transition-colors">
                     비용분석
                   </Link>
                 </div>
@@ -257,7 +257,7 @@ export default function EMROpeningPage() {
               <Wallet className="w-4 h-4 text-primary" />
               <h3 className="text-sm font-semibold">예산 현황</h3>
             </div>
-            <Link href="/emr/opening/budget" className="text-xs text-primary hover:underline flex items-center gap-0.5">
+            <Link href="/opening/budget" className="text-xs text-primary hover:underline flex items-center gap-0.5">
               예산 상세 <ChevronRight className="w-3 h-3" />
             </Link>
           </div>
@@ -372,7 +372,7 @@ export default function EMROpeningPage() {
             return (
               <Link
                 key={phase.id}
-                href={`/emr/opening/phase/${phase.id}`}
+                href={`/opening/phase/${phase.id}`}
                 className={`
                   bg-card rounded-xl border p-3 transition-all hover:shadow-md hover:-translate-y-0.5
                   ${status === 'active' ? 'border-primary/30 ring-1 ring-primary/10' : 'border-border'}

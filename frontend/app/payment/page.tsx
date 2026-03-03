@@ -38,8 +38,9 @@ function PaymentContent() {
   const fetchProducts = async () => {
     try {
       const response = await fetch('/api/v1/payments/products');
+      if (!response.ok) return;
       const data = await response.json();
-      setProducts(data.products);
+      setProducts(data.products || {});
     } catch (err) {
       console.error('Failed to fetch products:', err);
     }
@@ -77,7 +78,7 @@ function PaymentContent() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
+          Authorization: `Bearer ${localStorage.getItem('access_token')}`,
         },
         body: JSON.stringify({
           product_id: productId,

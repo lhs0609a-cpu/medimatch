@@ -40,7 +40,6 @@ from .claims_appeal import router as claims_appeal_router
 from .claims_analytics import router as claims_analytics_router
 from .dur import router as dur_router
 from .hira_codes import router as hira_codes_router
-from .tax_correction import router as tax_correction_router
 from .tax import router as tax_v2_router
 from .staff_cost import router as staff_cost_router
 from .fixed_cost import router as fixed_cost_router
@@ -93,8 +92,8 @@ api_router.include_router(claims_appeal_router, prefix="/appeals", tags=["Claims
 api_router.include_router(claims_analytics_router, prefix="/claims-analytics", tags=["Claims Analytics - 청구 분석"])
 api_router.include_router(dur_router, prefix="/dur", tags=["DUR - 약물 안전성"])
 api_router.include_router(hira_codes_router, prefix="/hira-codes", tags=["HIRA Codes - 코드 검색"])
-api_router.include_router(tax_correction_router, prefix="/tax-correction", tags=["Tax Correction - 경정청구"])
-api_router.include_router(tax_v2_router, prefix="/tax-correction", tags=["Tax Correction v2 - 경정청구 확장"])
+# tax_correction_router (v1) removed — v2 (tax/) includes all v1 endpoints plus extras
+api_router.include_router(tax_v2_router, prefix="/tax-correction", tags=["Tax Correction - 경정청구"])
 api_router.include_router(staff_cost_router, prefix="/emr/staff-cost", tags=["EMR Staff Cost - 인건비 최적화"])
 api_router.include_router(fixed_cost_router, prefix="/emr/fixed-cost", tags=["EMR Fixed Cost - 고정비 절감"])
 api_router.include_router(supply_price_router, prefix="/emr/supply-price", tags=["EMR Supply Price - 소모품/약가 비교"])

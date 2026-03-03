@@ -109,19 +109,21 @@ export const staleTimes = {
  * 현재 사용자 정보 쿼리
  */
 export function useCurrentUser() {
+  const hasToken = typeof window !== 'undefined' && !!localStorage.getItem('access_token')
   return useQuery({
     queryKey: queryKeys.user.current(),
     queryFn: async () => {
+      const token = localStorage.getItem('access_token')
       const response = await fetch('/api/v1/users/me', {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
+          Authorization: `Bearer ${token}`,
         },
       })
       if (!response.ok) throw new Error('Failed to fetch user')
       return response.json()
     },
     staleTime: staleTimes.realtime,
-    enabled: !!localStorage.getItem('token'),
+    enabled: hasToken,
   })
 }
 

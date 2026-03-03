@@ -9,7 +9,7 @@ from datetime import datetime, timedelta
 from pydantic import BaseModel
 
 from app.core.database import get_db
-from app.core.security import get_current_user
+from app.api.deps import get_current_active_user
 from app.models.user import User
 from app.models.payment import Payment, PaymentStatus, PaymentMethod, Subscription, UsageCredit
 from app.services.payment import payment_service, get_product_info, generate_order_id, PRODUCTS
@@ -44,7 +44,7 @@ async def get_products():
 @router.post("/create")
 async def create_payment(
     request: PaymentCreateRequest,
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_current_active_user),
     db: AsyncSession = Depends(get_db)
 ):
     """결제 요청 생성"""
@@ -73,7 +73,7 @@ async def create_payment(
         order_id=order_id,
         amount=product["price"],
         order_name=product["name"],
-        customer_name=current_user.name,
+        customer_name=current_user.full_name,
         customer_email=current_user.email,
         success_url=request.success_url,
         fail_url=request.fail_url,
@@ -90,7 +90,7 @@ async def create_payment(
 @router.post("/confirm")
 async def confirm_payment(
     request: PaymentConfirmRequest,
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_current_active_user),
     db: AsyncSession = Depends(get_db)
 ):
     """결제 승인"""
@@ -228,7 +228,7 @@ async def process_payment_completion(db: AsyncSession, payment: Payment, user_id
 @router.post("/cancel")
 async def cancel_payment(
     request: PaymentCancelRequest,
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_current_active_user),
     db: AsyncSession = Depends(get_db)
 ):
     """결제 취소"""
@@ -282,7 +282,7 @@ async def cancel_payment(
 async def get_payment_history(
     skip: int = 0,
     limit: int = 20,
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_current_active_user),
     db: AsyncSession = Depends(get_db)
 ):
     """결제 내역 조회"""
@@ -314,7 +314,7 @@ async def get_payment_history(
 
 @router.get("/subscription")
 async def get_subscription(
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_current_active_user),
     db: AsyncSession = Depends(get_db)
 ):
     """구독 정보 조회"""
@@ -348,7 +348,7 @@ async def get_subscription(
 
 @router.get("/credits")
 async def get_credits(
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_current_active_user),
     db: AsyncSession = Depends(get_db)
 ):
     """크레딧 잔액 조회"""

@@ -13,7 +13,7 @@ from datetime import datetime
 from pydantic import BaseModel, Field
 
 from app.core.database import get_db
-from app.core.security import get_current_user
+from app.api.deps import get_current_active_user
 from app.models.user import User
 from app.models.notification import (
     UserDevice, UserNotification, NotificationPreference,
@@ -94,7 +94,7 @@ class PreferenceResponse(BaseModel):
 async def register_device(
     request: DeviceRegisterRequest,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_user)
+    current_user: User = Depends(get_current_active_user)
 ):
     """
     디바이스 등록 (FCM 푸시 알림용)
@@ -134,7 +134,7 @@ async def register_device(
 @router.get("/devices", response_model=List[DeviceResponse])
 async def get_devices(
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_user)
+    current_user: User = Depends(get_current_active_user)
 ):
     """등록된 디바이스 목록 조회"""
     result = await db.execute(
@@ -149,7 +149,7 @@ async def get_devices(
 async def unregister_device(
     device_id: UUID,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_user)
+    current_user: User = Depends(get_current_active_user)
 ):
     """디바이스 등록 해제"""
     result = await db.execute(
@@ -172,7 +172,7 @@ async def unregister_device(
 @router.delete("/devices")
 async def unregister_all_devices(
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_user)
+    current_user: User = Depends(get_current_active_user)
 ):
     """모든 디바이스 등록 해제"""
     await db.execute(
@@ -194,7 +194,7 @@ async def get_notifications(
     unread_only: bool = Query(False),
     notification_type: Optional[NotificationType] = Query(None),
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_user)
+    current_user: User = Depends(get_current_active_user)
 ):
     """알림 내역 조회"""
     query = select(UserNotification).where(UserNotification.user_id == current_user.id)
@@ -236,7 +236,7 @@ async def get_notifications(
 async def mark_as_read(
     notification_id: UUID,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_user)
+    current_user: User = Depends(get_current_active_user)
 ):
     """알림 읽음 처리"""
     result = await db.execute(
@@ -260,7 +260,7 @@ async def mark_as_read(
 @router.post("/read-all")
 async def mark_all_as_read(
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_user)
+    current_user: User = Depends(get_current_active_user)
 ):
     """모든 알림 읽음 처리"""
     await db.execute(
@@ -280,7 +280,7 @@ async def mark_all_as_read(
 async def delete_notification(
     notification_id: UUID,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_user)
+    current_user: User = Depends(get_current_active_user)
 ):
     """알림 삭제"""
     result = await db.execute(
@@ -305,7 +305,7 @@ async def delete_notification(
 @router.get("/preferences", response_model=PreferenceResponse)
 async def get_preferences(
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_user)
+    current_user: User = Depends(get_current_active_user)
 ):
     """알림 설정 조회"""
     result = await db.execute(
@@ -329,7 +329,7 @@ async def get_preferences(
 async def update_preferences(
     request: PreferenceRequest,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_user)
+    current_user: User = Depends(get_current_active_user)
 ):
     """알림 설정 업데이트"""
     result = await db.execute(
@@ -359,7 +359,7 @@ async def update_preferences(
 @router.post("/test")
 async def send_test_notification(
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_user)
+    current_user: User = Depends(get_current_active_user)
 ):
     """테스트 알림 발송 (개발용)"""
     # 알림 생성
