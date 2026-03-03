@@ -44,7 +44,7 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || ''
 
 async function fetchApi(path: string, options?: RequestInit) {
   const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null
-  const res = await fetch(`\`, {
+  const res = await fetch(`${API_URL}${path}`, {
     ...options,
     headers: {
       'Content-Type': 'application/json',
