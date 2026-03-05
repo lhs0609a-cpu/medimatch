@@ -6,7 +6,7 @@
 """
 from sqlalchemy import (
     Column, Integer, BigInteger, String, Boolean, DateTime, Date,
-    ForeignKey, Index,
+    ForeignKey, Index, text,
 )
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
@@ -19,7 +19,7 @@ class MedicalSupplyItem(Base):
     """소모품/약품 품목"""
     __tablename__ = "medical_supply_items"
 
-    id = Column(UUID(as_uuid=True), primary_key=True, server_default="gen_random_uuid()")
+    id = Column(UUID(as_uuid=True), primary_key=True, server_default=text("gen_random_uuid()"))
     user_id = Column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
 
     item_type = Column(String(20), nullable=False, default="SUPPLY")  # SUPPLY / DRUG
@@ -53,7 +53,7 @@ class VendorPriceQuote(Base):
     """공급업체 견적"""
     __tablename__ = "vendor_price_quotes"
 
-    id = Column(UUID(as_uuid=True), primary_key=True, server_default="gen_random_uuid()")
+    id = Column(UUID(as_uuid=True), primary_key=True, server_default=text("gen_random_uuid()"))
     supply_item_id = Column(UUID(as_uuid=True), ForeignKey("medical_supply_items.id", ondelete="CASCADE"), nullable=False)
 
     vendor_name = Column(String(100), nullable=False)

@@ -6,7 +6,7 @@
 """
 from sqlalchemy import (
     Column, Integer, BigInteger, String, Boolean, DateTime, Text,
-    ForeignKey, Index, UniqueConstraint,
+    ForeignKey, Index, UniqueConstraint, text,
 )
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
@@ -19,7 +19,7 @@ class MarketingSpend(Base):
     """채널별 마케팅 지출/성과"""
     __tablename__ = "marketing_spends"
 
-    id = Column(UUID(as_uuid=True), primary_key=True, server_default="gen_random_uuid()")
+    id = Column(UUID(as_uuid=True), primary_key=True, server_default=text("gen_random_uuid()"))
     user_id = Column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
 
     year_month = Column(String(7), nullable=False)

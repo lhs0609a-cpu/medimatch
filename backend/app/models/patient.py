@@ -7,7 +7,7 @@
 import enum
 from sqlalchemy import (
     Column, Integer, String, Boolean, DateTime, Date, Text, Enum,
-    ForeignKey, Index,
+    ForeignKey, Index, text,
 )
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
@@ -41,7 +41,7 @@ class Patient(Base):
     """환자 유입/상담/예약/동의 추적"""
     __tablename__ = "patients"
 
-    id = Column(UUID(as_uuid=True), primary_key=True, server_default="gen_random_uuid()")
+    id = Column(UUID(as_uuid=True), primary_key=True, server_default=text("gen_random_uuid()"))
     user_id = Column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
 
     seq_no = Column(Integer)

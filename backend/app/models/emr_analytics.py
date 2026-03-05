@@ -7,7 +7,7 @@ EMR 비즈니스 분석 일별 메트릭 모델
 """
 from sqlalchemy import (
     Column, Integer, BigInteger, String, Date, Boolean, DateTime,
-    ForeignKey, Index, UniqueConstraint,
+    ForeignKey, Index, UniqueConstraint, text,
 )
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
@@ -20,7 +20,7 @@ class EMRDailyMetrics(Base):
     """EMR 일별 메트릭 (매출/환자/벤치마크)"""
     __tablename__ = "emr_daily_metrics"
 
-    id = Column(UUID(as_uuid=True), primary_key=True, server_default="gen_random_uuid()")
+    id = Column(UUID(as_uuid=True), primary_key=True, server_default=text("gen_random_uuid()"))
     user_id = Column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
 
     metric_date = Column(Date, nullable=False)

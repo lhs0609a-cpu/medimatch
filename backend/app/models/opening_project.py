@@ -8,7 +8,7 @@
 import enum
 from sqlalchemy import (
     Column, Integer, String, Boolean, DateTime, Text, Enum,
-    ForeignKey, Index, BigInteger, JSON,
+    ForeignKey, Index, BigInteger, JSON, text,
 )
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
@@ -32,7 +32,7 @@ class OpeningProject(Base):
     """개원 프로젝트 (사용자별 1개)"""
     __tablename__ = "opening_projects"
 
-    id = Column(UUID(as_uuid=True), primary_key=True, server_default="gen_random_uuid()")
+    id = Column(UUID(as_uuid=True), primary_key=True, server_default=text("gen_random_uuid()"))
     user_id = Column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
 
     title = Column(String(200))
@@ -67,7 +67,7 @@ class OpeningProjectTask(Base):
     """개원 프로젝트 서브태스크 (phase-subtask 매핑)"""
     __tablename__ = "opening_project_tasks"
 
-    id = Column(UUID(as_uuid=True), primary_key=True, server_default="gen_random_uuid()")
+    id = Column(UUID(as_uuid=True), primary_key=True, server_default=text("gen_random_uuid()"))
     project_id = Column(UUID(as_uuid=True), ForeignKey("opening_projects.id", ondelete="CASCADE"), nullable=False)
     phase_id = Column(Integer, nullable=False)
     subtask_id = Column(String(10), nullable=False)

@@ -6,7 +6,7 @@
 """
 from sqlalchemy import (
     Column, BigInteger, String, Boolean, DateTime, Date, Text,
-    ForeignKey, Index,
+    ForeignKey, Index, text,
 )
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
@@ -19,7 +19,7 @@ class FixedCostEntry(Base):
     """항목별 고정비"""
     __tablename__ = "fixed_cost_entries"
 
-    id = Column(UUID(as_uuid=True), primary_key=True, server_default="gen_random_uuid()")
+    id = Column(UUID(as_uuid=True), primary_key=True, server_default=text("gen_random_uuid()"))
     user_id = Column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
 
     year_month = Column(String(7), nullable=False)
