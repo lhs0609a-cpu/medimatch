@@ -1,13 +1,22 @@
 'use client'
 
 import Link from 'next/link'
-import { X, Trophy, ArrowRight, Stethoscope, LayoutDashboard } from 'lucide-react'
+import { X, Trophy, ArrowRight, LayoutDashboard, Zap, Target } from 'lucide-react'
+import { type LevelInfo } from '@/app/checklist/data/gamification/xp-levels'
+import { type ReadinessGradeInfo } from '@/app/checklist/data/gamification/readiness'
 
 interface GraduationModalProps {
   onClose: () => void
+  readinessScore?: number
+  readinessGrade?: ReadinessGradeInfo
+  xp?: number
+  level?: LevelInfo
+  achievementCount?: number
 }
 
-export default function GraduationModal({ onClose }: GraduationModalProps) {
+export default function GraduationModal({
+  onClose, readinessScore, readinessGrade, xp, level, achievementCount,
+}: GraduationModalProps) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       {/* Backdrop */}
@@ -39,13 +48,13 @@ export default function GraduationModal({ onClose }: GraduationModalProps) {
           <p className="text-lg font-medium text-primary mb-2">
             개원 여정을 완주하셨습니다
           </p>
-          <p className="text-sm text-muted-foreground mb-8">
+          <p className="text-sm text-muted-foreground mb-6">
             44개 체크리스트를 모두 완료했습니다.<br />
             이제 EMR로 본격적인 진료를 시작하세요.
           </p>
 
           {/* Stats */}
-          <div className="flex items-center justify-center gap-6 mb-8">
+          <div className="flex items-center justify-center gap-4 mb-6">
             <div className="text-center">
               <div className="text-2xl font-bold text-green-500">44/44</div>
               <div className="text-xs text-muted-foreground">완료</div>
@@ -56,6 +65,35 @@ export default function GraduationModal({ onClose }: GraduationModalProps) {
               <div className="text-xs text-muted-foreground">전체 단계</div>
             </div>
           </div>
+
+          {/* Gamification Stats */}
+          {(readinessScore !== undefined || xp !== undefined) && (
+            <div className="grid grid-cols-3 gap-2 mb-6">
+              {readinessScore !== undefined && readinessGrade && (
+                <div className="bg-secondary/30 rounded-xl p-3 text-center">
+                  <Target className="w-4 h-4 mx-auto mb-1" style={{ color: readinessGrade.color }} />
+                  <div className="text-lg font-bold" style={{ color: readinessGrade.color }}>
+                    {readinessGrade.grade}
+                  </div>
+                  <div className="text-[10px] text-muted-foreground">준비도 {readinessScore}점</div>
+                </div>
+              )}
+              {xp !== undefined && level && (
+                <div className="bg-secondary/30 rounded-xl p-3 text-center">
+                  <Zap className="w-4 h-4 text-primary mx-auto mb-1" />
+                  <div className="text-lg font-bold text-primary">Lv.{level.level}</div>
+                  <div className="text-[10px] text-muted-foreground">{xp.toLocaleString()} XP</div>
+                </div>
+              )}
+              {achievementCount !== undefined && (
+                <div className="bg-secondary/30 rounded-xl p-3 text-center">
+                  <Trophy className="w-4 h-4 text-amber-500 mx-auto mb-1" />
+                  <div className="text-lg font-bold text-amber-500">{achievementCount}</div>
+                  <div className="text-[10px] text-muted-foreground">업적 달성</div>
+                </div>
+              )}
+            </div>
+          )}
 
           {/* CTAs */}
           <div className="space-y-3">

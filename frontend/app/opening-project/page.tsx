@@ -1,24 +1,35 @@
 'use client'
 
 import { useEffect, useRef, useState, useCallback } from 'react'
-import { phases } from '@/app/checklist/data/phases'
 import { useOpeningProject } from '@/components/opening/useOpeningProject'
+import { useGamification } from '@/components/opening/useGamification'
 import OpeningProjectHeader from '@/components/opening/OpeningProjectHeader'
 import JourneyPhaseCard from '@/components/opening/JourneyPhaseCard'
 import JourneyConnector from '@/components/opening/JourneyConnector'
 import JourneySidebar from '@/components/opening/JourneySidebar'
+import GamificationSidebar from '@/components/opening/gamification/GamificationSidebar'
 import MilestoneCelebration from '@/components/opening/MilestoneCelebration'
 import GraduationModal from '@/components/opening/GraduationModal'
+import QuizModal from '@/components/opening/gamification/QuizModal'
+import LevelUpModal from '@/components/opening/gamification/LevelUpModal'
+import AchievementToast from '@/components/opening/gamification/AchievementToast'
 import FadeIn from '@/components/animation/FadeIn'
 import StaggerChildren from '@/components/animation/StaggerChildren'
 import { Loader2, Rocket } from 'lucide-react'
 import Link from 'next/link'
+import { AnimatePresence } from 'framer-motion'
 
 export default function OpeningProjectPage() {
   const project = useOpeningProject()
+  const gamification = useGamification(
+    project.data.completedTasks,
+    project.data.actualCosts,
+    project.data.memos,
+  )
   const [showGraduation, setShowGraduation] = useState(false)
   const activeRef = useRef<HTMLDivElement>(null)
   const scrolledRef = useRef(false)
+  const lastCompletedRef = useRef<string | null>(null)
 
   // Auto-scroll to active phase on load
   useEffect(() => {
@@ -34,6 +45,24 @@ export default function OpeningProjectPage() {
     setShowGraduation(true)
   }, [])
 
+  // Wrap toggleTask to also award XP and trigger quiz
+  const handleToggle = useCallback((subtaskId: string) => {
+    const wasCompleted = project.data.completedTasks.includes(subtaskId)
+    project.toggleTask(subtaskId)
+
+    if (!wasCompleted) {
+      // Award task XP
+      gamification.awardTaskXP(subtaskId)
+      // Trigger quiz after 600ms
+      lastCompletedRef.current = subtaskId
+      setTimeout(() => {
+        if (lastCompletedRef.current === subtaskId) {
+          gamification.startQuiz(subtaskId)
+        }
+      }, 600)
+    }
+  }, [project, gamification])
+
   if (project.loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -44,6 +73,11 @@ export default function OpeningProjectPage() {
 
   // Not started yet - show intro
   const hasStarted = project.data.specialty || project.completedCount > 0
+
+  // Find task title for quiz modal
+  const quizTaskTitle = gamification.pendingQuizTaskId
+    ? project.filteredPhases.flatMap(p => p.subtasks).find(s => s.id === gamification.pendingQuizTaskId)?.title || ''
+    : ''
 
   return (
     <>
@@ -88,7 +122,7 @@ export default function OpeningProjectPage() {
           {/* Journey Map */}
           <div className="flex-1 min-w-0">
             <StaggerChildren staggerDelay={80}>
-              {phases.map((phase, index) => {
+              {project.filteredPhases.map((phase, index) => {
                 const status = project.getPhaseStatus(phase.id)
                 const progress = project.getPhaseProgress(phase.id)
                 const isActive = project.activePhase === phase.id
@@ -100,9 +134,12 @@ export default function OpeningProjectPage() {
                       status={status}
                       progress={progress}
                       completedTasks={project.data.completedTasks}
-                      onToggle={project.toggleTask}
+                      onToggle={handleToggle}
+                      getTaskQuizScore={gamification.getTaskQuizScore}
+                      onQuizClick={gamification.startQuiz}
+                      phaseQuizAverage={gamification.getPhaseQuizAverage(phase.id)}
                     />
-                    {index < phases.length - 1 && (
+                    {index < project.filteredPhases.length - 1 && (
                       <JourneyConnector
                         color={phase.color}
                         completed={status === 'completed'}
@@ -116,7 +153,7 @@ export default function OpeningProjectPage() {
 
           {/* Desktop Sidebar */}
           <div className="hidden lg:block w-72 flex-shrink-0">
-            <div className="sticky top-20">
+            <div className="sticky top-20 space-y-4">
               <JourneySidebar
                 completedCount={project.completedCount}
                 totalTasks={project.totalTasks}
@@ -126,6 +163,16 @@ export default function OpeningProjectPage() {
                 targetDate={project.data.targetDate}
                 onDateChange={(date) => project.updateMeta({ targetDate: date })}
                 getPhaseProgress={project.getPhaseProgress}
+              />
+              <GamificationSidebar
+                xp={gamification.data.xp}
+                level={gamification.level}
+                readinessScore={gamification.readinessScore}
+                readinessGrade={gamification.readinessGrade}
+                readinessBreakdown={gamification.readinessBreakdown}
+                unlockedAchievements={gamification.data.unlockedAchievements}
+                completedTasks={project.data.completedTasks}
+                getPhaseQuizAverage={gamification.getPhaseQuizAverage}
               />
             </div>
           </div>
@@ -142,8 +189,48 @@ export default function OpeningProjectPage() {
 
       {/* Graduation Modal */}
       {showGraduation && (
-        <GraduationModal onClose={() => setShowGraduation(false)} />
+        <GraduationModal
+          onClose={() => setShowGraduation(false)}
+          readinessScore={gamification.readinessScore}
+          readinessGrade={gamification.readinessGrade}
+          xp={gamification.data.xp}
+          level={gamification.level}
+          achievementCount={gamification.data.unlockedAchievements.length}
+        />
       )}
+
+      {/* Quiz Modal */}
+      <AnimatePresence>
+        {gamification.pendingQuizTaskId && (
+          <QuizModal
+            taskId={gamification.pendingQuizTaskId}
+            taskTitle={quizTaskTitle}
+            onSubmit={gamification.submitQuizAnswers}
+            onClose={gamification.dismissQuiz}
+            previousScore={gamification.getTaskQuizScore(gamification.pendingQuizTaskId)}
+          />
+        )}
+      </AnimatePresence>
+
+      {/* Level Up Modal */}
+      <AnimatePresence>
+        {gamification.pendingLevelUp && !gamification.pendingQuizTaskId && (
+          <LevelUpModal
+            level={gamification.pendingLevelUp}
+            onClose={gamification.dismissLevelUp}
+          />
+        )}
+      </AnimatePresence>
+
+      {/* Achievement Toast */}
+      <AnimatePresence>
+        {gamification.pendingAchievements.length > 0 && (
+          <AchievementToast
+            achievement={gamification.pendingAchievements[0]}
+            onDismiss={gamification.dismissAchievement}
+          />
+        )}
+      </AnimatePresence>
     </>
   )
 }

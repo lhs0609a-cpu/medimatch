@@ -1,18 +1,25 @@
 'use client'
 
 import { useParams, useRouter } from 'next/navigation'
+import { useCallback, useRef } from 'react'
 import Link from 'next/link'
 import { phases, getPhaseCost } from '@/app/checklist/data/phases'
 import { getPhaseFunnelConfig, getBannerStyleClasses } from '@/app/checklist/data/emr-funnel-config'
 import { useOpeningProject } from '@/components/opening/useOpeningProject'
+import { useGamification } from '@/components/opening/useGamification'
 import PhaseChecklist from '@/components/opening/PhaseChecklist'
 import ToolRecommendation from '@/components/opening/ToolRecommendation'
+import XPBar from '@/components/opening/gamification/XPBar'
+import QuizModal from '@/components/opening/gamification/QuizModal'
+import LevelUpModal from '@/components/opening/gamification/LevelUpModal'
+import AchievementToast from '@/components/opening/gamification/AchievementToast'
 import FadeIn from '@/components/animation/FadeIn'
 import {
   ClipboardList, MapPin, FileCheck, Ruler, Stethoscope,
   Users, Megaphone, PartyPopper, ArrowLeft, ArrowRight,
   Calendar, Wallet, FileText, Loader2,
 } from 'lucide-react'
+import { AnimatePresence } from 'framer-motion'
 
 const PHASE_ICONS: Record<number, React.ElementType> = {
   1: ClipboardList, 2: MapPin, 3: FileCheck, 4: Ruler,
@@ -25,6 +32,27 @@ export default function PhaseDetailPage() {
   const phaseId = parseInt(params.id as string)
   const phase = phases.find(p => p.id === phaseId)
   const project = useOpeningProject()
+  const gamification = useGamification(
+    project.data.completedTasks,
+    project.data.actualCosts,
+    project.data.memos,
+  )
+  const lastCompletedRef = useRef<string | null>(null)
+
+  // Wrap toggleTask with gamification
+  const handleToggle = useCallback((subtaskId: string) => {
+    const wasCompleted = project.data.completedTasks.includes(subtaskId)
+    project.toggleTask(subtaskId)
+    if (!wasCompleted) {
+      gamification.awardTaskXP(subtaskId)
+      lastCompletedRef.current = subtaskId
+      setTimeout(() => {
+        if (lastCompletedRef.current === subtaskId) {
+          gamification.startQuiz(subtaskId)
+        }
+      }, 600)
+    }
+  }, [project, gamification])
 
   if (!phase) {
     return (
@@ -52,6 +80,10 @@ export default function PhaseDetailPage() {
   const status = project.getPhaseStatus(phase.id)
   const prevPhase = phases.find(p => p.id === phaseId - 1)
   const nextPhase = phases.find(p => p.id === phaseId + 1)
+
+  const quizTaskTitle = gamification.pendingQuizTaskId
+    ? phase.subtasks.find(s => s.id === gamification.pendingQuizTaskId)?.title || ''
+    : ''
 
   return (
     <div className="min-h-screen bg-background">
@@ -113,6 +145,11 @@ export default function PhaseDetailPage() {
                 />
               </div>
             </div>
+
+            {/* XP Bar (compact) */}
+            <div className="mt-3 max-w-sm mx-auto">
+              <XPBar xp={gamification.data.xp} level={gamification.level} compact />
+            </div>
           </div>
         </FadeIn>
 
@@ -124,9 +161,11 @@ export default function PhaseDetailPage() {
               completedTasks={project.data.completedTasks}
               actualCosts={project.data.actualCosts}
               memos={project.data.memos}
-              onToggle={project.toggleTask}
+              onToggle={handleToggle}
               onCostChange={project.updateTaskCost}
               onMemoChange={project.updateTaskMemo}
+              getTaskQuizScore={gamification.getTaskQuizScore}
+              onQuizClick={gamification.startQuiz}
             />
           </div>
         </FadeIn>
@@ -221,6 +260,39 @@ export default function PhaseDetailPage() {
           )}
         </div>
       </div>
+
+      {/* Quiz Modal */}
+      <AnimatePresence>
+        {gamification.pendingQuizTaskId && (
+          <QuizModal
+            taskId={gamification.pendingQuizTaskId}
+            taskTitle={quizTaskTitle}
+            onSubmit={gamification.submitQuizAnswers}
+            onClose={gamification.dismissQuiz}
+            previousScore={gamification.getTaskQuizScore(gamification.pendingQuizTaskId)}
+          />
+        )}
+      </AnimatePresence>
+
+      {/* Level Up Modal */}
+      <AnimatePresence>
+        {gamification.pendingLevelUp && !gamification.pendingQuizTaskId && (
+          <LevelUpModal
+            level={gamification.pendingLevelUp}
+            onClose={gamification.dismissLevelUp}
+          />
+        )}
+      </AnimatePresence>
+
+      {/* Achievement Toast */}
+      <AnimatePresence>
+        {gamification.pendingAchievements.length > 0 && (
+          <AchievementToast
+            achievement={gamification.pendingAchievements[0]}
+            onDismiss={gamification.dismissAchievement}
+          />
+        )}
+      </AnimatePresence>
     </div>
   )
 }

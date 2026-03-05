@@ -5,14 +5,22 @@ import Link from 'next/link'
 import {
   ClipboardList, MapPin, FileCheck, Ruler, Stethoscope,
   Users, Megaphone, PartyPopper, Check, ChevronDown, ChevronUp,
-  ArrowRight,
+  ArrowRight, Lightbulb, Brain, ChevronRight, MessageSquareQuote,
+  Globe, Building2, FileText, Wrench, ExternalLink, TrendingUp,
 } from 'lucide-react'
+import type { TaskResource } from '@/app/checklist/data/task-guides'
+import TaskTimelineBar from './TaskTimelineBar'
+import TaskBenchmarks from './TaskBenchmarks'
 import { type Phase, getPhaseCost } from '@/app/checklist/data/phases'
 import { getPhaseFunnelConfig } from '@/app/checklist/data/emr-funnel-config'
+import { taskGuides } from '@/app/checklist/data/task-guides'
+import { getDisplayCost } from '@/app/checklist/data/specialty-filter'
+import TaskQuizIndicator from './gamification/TaskQuizIndicator'
 
 const PHASE_ICONS: Record<number, React.ElementType> = {
   1: ClipboardList, 2: MapPin, 3: FileCheck, 4: Ruler,
   5: Stethoscope, 6: Users, 7: Megaphone, 8: PartyPopper,
+  9: TrendingUp,
 }
 
 interface JourneyPhaseCardProps {
@@ -21,12 +29,17 @@ interface JourneyPhaseCardProps {
   progress: { completed: number; total: number; percent: number }
   completedTasks: string[]
   onToggle: (subtaskId: string) => void
+  getTaskQuizScore?: (taskId: string) => number | null
+  onQuizClick?: (taskId: string) => void
+  phaseQuizAverage?: number
 }
 
 export default function JourneyPhaseCard({
   phase, status, progress, completedTasks, onToggle,
+  getTaskQuizScore, onQuizClick, phaseQuizAverage,
 }: JourneyPhaseCardProps) {
   const [expanded, setExpanded] = useState(status === 'active')
+  const [expandedTaskId, setExpandedTaskId] = useState<string | null>(null)
   const Icon = PHASE_ICONS[phase.id] || ClipboardList
   const funnelConfig = getPhaseFunnelConfig(phase.id)
   const phaseCost = getPhaseCost(phase)
@@ -83,6 +96,12 @@ export default function JourneyPhaseCard({
                 진행중
               </span>
             )}
+            {phaseQuizAverage !== undefined && phaseQuizAverage > 0 && (
+              <span className="text-[10px] font-medium bg-purple-100 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400 px-1.5 py-0.5 rounded flex items-center gap-0.5">
+                <Brain className="w-2.5 h-2.5" />
+                {phaseQuizAverage}%
+              </span>
+            )}
           </div>
           <h3 className="text-base font-bold mt-0.5">{phase.title}</h3>
           <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1">{phase.description}</p>
@@ -113,32 +132,95 @@ export default function JourneyPhaseCard({
           <div className="space-y-1.5">
             {phase.subtasks.map((task) => {
               const isCompleted = completedTasks.includes(task.id)
+              const guide = taskGuides[task.id]
+              const quizScore = getTaskQuizScore?.(task.id) ?? null
+              const isTaskExpanded = expandedTaskId === task.id
               return (
                 <div
                   key={task.id}
-                  className={`flex items-center gap-3 px-3 py-2 rounded-xl transition-colors ${
+                  className={`px-3 py-2 rounded-xl transition-colors ${
                     isCompleted ? 'bg-green-50 dark:bg-green-900/10' : 'hover:bg-secondary/50'
                   }`}
                 >
-                  <button
-                    onClick={() => onToggle(task.id)}
-                    className={`
-                      w-5 h-5 rounded-md flex items-center justify-center flex-shrink-0 transition-all
-                      ${isCompleted
-                        ? 'bg-green-500 text-white'
-                        : 'border-2 border-muted-foreground/30 hover:border-primary'
-                      }
-                    `}
-                  >
-                    {isCompleted && <Check className="w-3 h-3" />}
-                  </button>
-                  <span className={`text-sm flex-1 ${isCompleted ? 'line-through text-muted-foreground' : ''}`}>
-                    {task.title}
-                  </span>
-                  {task.estimatedCost !== undefined && task.estimatedCost > 0 && (
-                    <span className="text-[10px] text-muted-foreground bg-secondary px-1.5 py-0.5 rounded flex-shrink-0">
-                      ~{task.estimatedCost.toLocaleString()}만
-                    </span>
+                  <div className="flex items-center gap-3">
+                    <button
+                      onClick={() => onToggle(task.id)}
+                      className={`
+                        w-5 h-5 rounded-md flex items-center justify-center flex-shrink-0 transition-all
+                        ${isCompleted
+                          ? 'bg-green-500 text-white'
+                          : 'border-2 border-muted-foreground/30 hover:border-primary'
+                        }
+                      `}
+                    >
+                      {isCompleted && <Check className="w-3 h-3" />}
+                    </button>
+                    <button
+                      onClick={() => !isCompleted && guide && setExpandedTaskId(isTaskExpanded ? null : task.id)}
+                      className={`text-sm flex-1 text-left ${isCompleted ? 'line-through text-muted-foreground' : 'cursor-pointer'}`}
+                      disabled={isCompleted || !guide}
+                    >
+                      {task.title}
+                    </button>
+                    <div className="flex items-center gap-1.5 flex-shrink-0">
+                      {isCompleted && (
+                        <TaskQuizIndicator
+                          taskId={task.id}
+                          quizScore={quizScore}
+                          onClick={() => onQuizClick?.(task.id)}
+                        />
+                      )}
+                      {(() => {
+                        const cost = getDisplayCost(task)
+                        return cost ? (
+                          <span className="text-[10px] text-muted-foreground bg-secondary px-1.5 py-0.5 rounded">
+                            {cost}
+                          </span>
+                        ) : null
+                      })()}
+                      {!isCompleted && guide && (
+                        <ChevronRight
+                          className={`w-3.5 h-3.5 text-muted-foreground transition-transform duration-200 ${isTaskExpanded ? 'rotate-90' : ''}`}
+                        />
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Tip preview — only when collapsed and not completed */}
+                  {guide && !isCompleted && !isTaskExpanded && (
+                    <div className="flex items-center gap-1.5 ml-8 mt-1">
+                      <Lightbulb className="w-3 h-3 text-amber-500 flex-shrink-0" />
+                      <span className="text-[11px] text-muted-foreground line-clamp-1">{guide.tips[0]}</span>
+                    </div>
+                  )}
+
+                  {/* Inline guide expansion */}
+                  {isTaskExpanded && guide && (
+                    <div className="ml-8 mt-2 mb-1 space-y-2">
+                      {guide.timeline && <TaskTimelineBar timeline={guide.timeline} />}
+
+                      {guide.expertAdvice && (
+                        <div className="flex items-start gap-2 bg-blue-50 dark:bg-blue-900/10 rounded-lg px-3 py-2">
+                          <MessageSquareQuote className="w-3.5 h-3.5 text-blue-500 mt-0.5 flex-shrink-0" />
+                          <span className="text-xs text-blue-700 dark:text-blue-300">{guide.expertAdvice}</span>
+                        </div>
+                      )}
+
+                      {guide.resources && guide.resources.length > 0 && (
+                        <InlineResources resources={guide.resources.slice(0, 3)} />
+                      )}
+
+                      {guide.benchmarks && guide.benchmarks.length > 0 && (
+                        <TaskBenchmarks benchmarks={guide.benchmarks.slice(0, 3)} />
+                      )}
+
+                      <Link
+                        href={`/opening-project/phase/${phase.id}`}
+                        className="inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline pt-1"
+                      >
+                        전체 가이드 보기 <ArrowRight className="w-3 h-3" />
+                      </Link>
+                    </div>
                   )}
                 </div>
               )
@@ -176,6 +258,45 @@ export default function JourneyPhaseCard({
           </div>
         </div>
       )}
+    </div>
+  )
+}
+
+const RESOURCE_TYPE_ICONS: Record<string, { icon: React.ElementType; color: string }> = {
+  website: { icon: Globe, color: 'text-blue-500' },
+  government: { icon: Building2, color: 'text-green-600' },
+  template: { icon: FileText, color: 'text-orange-500' },
+  tool: { icon: Wrench, color: 'text-purple-500' },
+  community: { icon: Users, color: 'text-pink-500' },
+}
+
+function InlineResources({ resources }: { resources: TaskResource[] }) {
+  return (
+    <div className="space-y-1">
+      <div className="flex items-center gap-1.5 text-xs font-medium text-foreground">
+        <Globe className="w-3.5 h-3.5 text-blue-500" />
+        <span>핵심 리소스</span>
+      </div>
+      <div className="space-y-1">
+        {resources.map((r, i) => {
+          const config = RESOURCE_TYPE_ICONS[r.type] || RESOURCE_TYPE_ICONS.website
+          const Icon = config.icon
+          return (
+            <div key={i} className="flex items-center gap-1.5 text-xs">
+              <Icon className={`w-3 h-3 flex-shrink-0 ${config.color}`} />
+              {r.url ? (
+                <a href={r.url} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline inline-flex items-center gap-0.5">
+                  {r.name}
+                  <ExternalLink className="w-2.5 h-2.5" />
+                </a>
+              ) : (
+                <span className="font-medium">{r.name}</span>
+              )}
+              <span className="text-muted-foreground truncate">— {r.description}</span>
+            </div>
+          )
+        })}
+      </div>
     </div>
   )
 }

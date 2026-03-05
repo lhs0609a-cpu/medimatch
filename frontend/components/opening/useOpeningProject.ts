@@ -1,7 +1,9 @@
 'use client'
 
-import { useState, useEffect, useCallback, useRef } from 'react'
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react'
 import { phases } from '@/app/checklist/data/phases'
+import { getFilteredPhases } from '@/app/checklist/data/specialty-filter'
+import { getTemplateByName } from '@/app/checklist/data/specialty-templates'
 import { openingProjectService } from '@/lib/api/services'
 
 const STORAGE_KEY = 'medimatch_opening_project'
@@ -65,9 +67,6 @@ function isLoggedIn(): boolean {
   return !!localStorage.getItem('access_token')
 }
 
-// 전체 subtask 수
-const totalTasks = phases.reduce((sum, p) => sum + p.subtasks.length, 0)
-
 export function useOpeningProject(forceApi = false) {
   const [data, setData] = useState<LocalProjectData>(DEFAULT_LOCAL)
   const [serverProjectId, setServerProjectId] = useState<string | null>(null)
@@ -75,6 +74,15 @@ export function useOpeningProject(forceApi = false) {
   const [activePhase, setActivePhase] = useState(1)
   const useApi = forceApi || isLoggedIn()
   const initialized = useRef(false)
+
+  // 진료과 기반 필터링
+  const specialtyId = useMemo(() => {
+    if (!data.specialty) return undefined
+    return getTemplateByName(data.specialty)?.id
+  }, [data.specialty])
+
+  const filteredPhases = useMemo(() => getFilteredPhases(specialtyId), [specialtyId])
+  const totalTasks = useMemo(() => filteredPhases.reduce((sum, p) => sum + p.subtasks.length, 0), [filteredPhases])
 
   // 초기 로드
   useEffect(() => {
@@ -130,8 +138,8 @@ export function useOpeningProject(forceApi = false) {
             }
           }
         } catch {
-          // API 실패 → 로컬로 폴백
-          setData(loadLocal())
+          // API 실패 → 로그인 유저는 빈 상태로 (localStorage 공유 방지)
+          setData(DEFAULT_LOCAL)
         }
       } else {
         setData(loadLocal())
@@ -145,17 +153,17 @@ export function useOpeningProject(forceApi = false) {
   // 현재 활성 Phase 자동 계산
   useEffect(() => {
     if (loading) return
-    for (let i = phases.length - 1; i >= 0; i--) {
-      const phase = phases[i]
+    for (let i = filteredPhases.length - 1; i >= 0; i--) {
+      const phase = filteredPhases[i]
       const hasCompleted = phase.subtasks.some(s => data.completedTasks.includes(s.id))
       if (hasCompleted) {
         const allDone = phase.subtasks.every(s => data.completedTasks.includes(s.id))
-        setActivePhase(allDone && i < phases.length - 1 ? phase.id + 1 : phase.id)
+        setActivePhase(allDone && i < filteredPhases.length - 1 ? filteredPhases[i + 1].id : phase.id)
         return
       }
     }
-    setActivePhase(1)
-  }, [data.completedTasks, loading])
+    setActivePhase(filteredPhases[0]?.id ?? 1)
+  }, [data.completedTasks, loading, filteredPhases])
 
   const toggleTask = useCallback(async (subtaskId: string) => {
     const isCompleted = !data.completedTasks.includes(subtaskId)
@@ -244,11 +252,11 @@ export function useOpeningProject(forceApi = false) {
   const budgetSpent = Object.values(data.actualCosts).reduce((s, v) => s + v, 0)
 
   const getPhaseProgress = useCallback((phaseId: number) => {
-    const phase = phases.find(p => p.id === phaseId)
-    if (!phase) return { completed: 0, total: 0, percent: 0 }
+    const phase = filteredPhases.find(p => p.id === phaseId)
+    if (!phase || phase.subtasks.length === 0) return { completed: 0, total: 0, percent: 0 }
     const completed = phase.subtasks.filter(s => data.completedTasks.includes(s.id)).length
     return { completed, total: phase.subtasks.length, percent: Math.round((completed / phase.subtasks.length) * 100) }
-  }, [data.completedTasks])
+  }, [data.completedTasks, filteredPhases])
 
   const getPhaseStatus = useCallback((phaseId: number): 'completed' | 'active' | 'upcoming' => {
     const { percent } = getPhaseProgress(phaseId)
@@ -276,5 +284,7 @@ export function useOpeningProject(forceApi = false) {
     getPhaseStatus,
     isLoggedIn: useApi,
     serverProjectId,
+    filteredPhases,
+    specialtyId,
   }
 }

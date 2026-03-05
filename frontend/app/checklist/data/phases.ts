@@ -4,6 +4,9 @@ export interface SubTask {
   description: string
   estimatedDays: number
   estimatedCost?: number // 만원 단위
+  costRange?: [number, number] // [min, max] 만원 — 비용 범위
+  applicableSpecialties?: string[] // undefined = 전체 적용
+  dependencies?: string[] // 선행 태스크 ID
   tips?: string
 }
 
@@ -52,9 +55,9 @@ export const phases: Phase[] = [
     subtasks: [
       { id: '1-1', title: '개원 목표 및 비전 설정', description: '진료 철학, 타깃 환자군, 차별화 전략 수립', estimatedDays: 7 },
       { id: '1-2', title: '진료과 및 세부 전공 결정', description: '시장 수요, 경쟁 현황, 개인 역량 고려', estimatedDays: 7 },
-      { id: '1-3', title: '사업타당성 분석', description: '예상 환자수, 매출, 손익분기점 분석', estimatedDays: 14, estimatedCost: 300, tips: '메디플라톤 시뮬레이션 활용 추천' },
+      { id: '1-3', title: '사업타당성 분석', description: '예상 환자수, 매출, 손익분기점 분석', estimatedDays: 14, estimatedCost: 300, costRange: [100, 500], tips: '메디플라톤 시뮬레이션 활용 추천' },
       { id: '1-4', title: '자금 계획 수립', description: '총 투자비, 자기자본/대출 비율, 월 고정비 산출', estimatedDays: 7, estimatedCost: 0 },
-      { id: '1-5', title: '개원 컨설팅 상담', description: '전문 컨설턴트 미팅, 벤치마킹', estimatedDays: 14, estimatedCost: 500, tips: '2~3곳 비교 상담 권장' },
+      { id: '1-5', title: '개원 컨설팅 상담', description: '전문 컨설턴트 미팅, 벤치마킹', estimatedDays: 14, estimatedCost: 500, costRange: [300, 800], tips: '2~3곳 비교 상담 권장' },
     ],
   },
   {
@@ -74,11 +77,11 @@ export const phases: Phase[] = [
       { name: '임대차계약서 체크리스트', description: '계약 시 확인해야 할 필수 항목' },
     ],
     subtasks: [
-      { id: '2-1', title: '상권 분석', description: '유동인구, 주거인구, 경쟁의원 현황 조사', estimatedDays: 14, tips: '메디플라톤 경쟁 모니터링 활용' },
+      { id: '2-1', title: '상권 분석', description: '유동인구, 주거인구, 경쟁의원 현황 조사', estimatedDays: 14, dependencies: ['1-2'], tips: '메디플라톤 경쟁 모니터링 활용' },
       { id: '2-2', title: '후보지 리스트업 (3~5곳)', description: '부동산 매물 탐색, 현장 방문', estimatedDays: 14 },
       { id: '2-3', title: '건물 실사', description: '주차, 대중교통, 간판 가시성, 층수, 엘리베이터 확인', estimatedDays: 7 },
-      { id: '2-4', title: '임대차 계약', description: '보증금, 월세, 관리비, 특약사항 협의', estimatedDays: 14, estimatedCost: 5000, tips: '권리금 없는 곳 우선 고려' },
-      { id: '2-5', title: '법률 검토', description: '등기부등본 확인, 계약서 법률 검토', estimatedDays: 7, estimatedCost: 100 },
+      { id: '2-4', title: '임대차 계약', description: '보증금, 월세, 관리비, 특약사항 협의', estimatedDays: 14, estimatedCost: 5000, costRange: [3000, 8000], tips: '권리금 없는 곳 우선 고려' },
+      { id: '2-5', title: '법률 검토', description: '등기부등본 확인, 계약서 법률 검토', estimatedDays: 7, estimatedCost: 100, costRange: [50, 200] },
     ],
   },
   {
@@ -99,12 +102,13 @@ export const phases: Phase[] = [
       { name: '요양기관 지정 신청서', description: '심평원 제출용' },
     ],
     subtasks: [
-      { id: '3-1', title: '의료기관 개설 신고', description: '관할 보건소에 개설 신고서 제출', estimatedDays: 14, estimatedCost: 0 },
+      { id: '3-1', title: '의료기관 개설 신고', description: '관할 보건소에 개설 신고서 제출', estimatedDays: 14, estimatedCost: 0, dependencies: ['2-4'] },
       { id: '3-2', title: '사업자등록', description: '세무서 사업자등록 (면세사업자)', estimatedDays: 3, estimatedCost: 0 },
-      { id: '3-3', title: '요양기관 지정 신청', description: '건강보험심사평가원 요양기관 신청', estimatedDays: 21, estimatedCost: 0 },
-      { id: '3-4', title: '의료폐기물 위탁 계약', description: '의료폐기물 처리업체 계약', estimatedDays: 7, estimatedCost: 30 },
-      { id: '3-5', title: '진단용 방사선 발생장치 신고', description: 'X-ray 등 방사선 장비 사용 시 신고', estimatedDays: 14, estimatedCost: 50, tips: '해당 장비 없으면 생략' },
-      { id: '3-6', title: '세무사 / 노무사 계약', description: '기장 대행, 4대보험, 근로계약서 자문', estimatedDays: 7, estimatedCost: 50 },
+      { id: '3-3', title: '요양기관 지정 신청', description: '건강보험심사평가원 요양기관 신청', estimatedDays: 21, estimatedCost: 0, dependencies: ['3-1'] },
+      { id: '3-4', title: '의료폐기물 위탁 계약', description: '의료폐기물 처리업체 계약', estimatedDays: 7, estimatedCost: 30, costRange: [20, 50] },
+      { id: '3-5', title: '진단용 방사선 발생장치 신고', description: 'X-ray 등 방사선 장비 사용 시 신고', estimatedDays: 14, estimatedCost: 50, costRange: [30, 80], tips: '해당 장비 없으면 생략' },
+      { id: '3-5a', title: '방사선 안전관리자 선임 신고', description: 'CT, X-ray 등 방사선 장비 사용 의원 필수 — 원자력안전위원회 신고', estimatedDays: 14, estimatedCost: 30, costRange: [20, 50], applicableSpecialties: ['dental', 'orthopedics', 'urology'] },
+      { id: '3-6', title: '세무사 / 노무사 계약', description: '기장 대행, 4대보험, 근로계약서 자문', estimatedDays: 7, estimatedCost: 50, costRange: [30, 80] },
     ],
   },
   {
@@ -124,12 +128,12 @@ export const phases: Phase[] = [
       { name: '설계 도면 체크리스트', description: '진료실 배치 확인 항목' },
     ],
     subtasks: [
-      { id: '4-1', title: '인테리어 업체 선정', description: '의료 전문 인테리어 3곳 이상 비교 견적', estimatedDays: 14, tips: '메디플라톤 인테리어 견적 활용' },
-      { id: '4-2', title: '설계 도면 확정', description: '진료실, 대기실, 처치실, 상담실 배치', estimatedDays: 14, estimatedCost: 500 },
-      { id: '4-3', title: '인테리어 시공', description: '바닥, 벽체, 천장, 조명 공사', estimatedDays: 45, estimatedCost: 8000 },
-      { id: '4-4', title: '의료가스 공사', description: '산소, 흡인, 공기 배관 (해당 시)', estimatedDays: 14, estimatedCost: 1500 },
-      { id: '4-5', title: '전기/통신 공사', description: 'EMR 네트워크, CCTV, 인터폰, 전화', estimatedDays: 14, estimatedCost: 800 },
-      { id: '4-6', title: '간판 제작 / 설치', description: '외부 간판, 실내 안내판, 층별 안내', estimatedDays: 14, estimatedCost: 500 },
+      { id: '4-1', title: '인테리어 업체 선정', description: '의료 전문 인테리어 3곳 이상 비교 견적', estimatedDays: 14, dependencies: ['2-4'], tips: '메디플라톤 인테리어 견적 활용' },
+      { id: '4-2', title: '설계 도면 확정', description: '진료실, 대기실, 처치실, 상담실 배치', estimatedDays: 14, estimatedCost: 500, costRange: [300, 800] },
+      { id: '4-3', title: '인테리어 시공', description: '바닥, 벽체, 천장, 조명 공사', estimatedDays: 45, estimatedCost: 8000, costRange: [5000, 12000], dependencies: ['4-2'] },
+      { id: '4-4', title: '의료가스 공사', description: '산소, 흡인, 공기 배관 (해당 시)', estimatedDays: 14, estimatedCost: 1500, costRange: [800, 2500] },
+      { id: '4-5', title: '전기/통신 공사', description: 'EMR 네트워크, CCTV, 인터폰, 전화', estimatedDays: 14, estimatedCost: 800, costRange: [500, 1200] },
+      { id: '4-6', title: '간판 제작 / 설치', description: '외부 간판, 실내 안내판, 층별 안내', estimatedDays: 14, estimatedCost: 500, costRange: [300, 800] },
     ],
   },
   {
@@ -149,10 +153,14 @@ export const phases: Phase[] = [
       { name: '장비 견적 비교표', description: '업체별 가격 비교 양식' },
     ],
     subtasks: [
-      { id: '5-1', title: '필수 의료장비 구매', description: '진료과별 필수 장비 리스트 작성 및 발주', estimatedDays: 21, estimatedCost: 15000, tips: '리스/렌탈 옵션도 비교' },
-      { id: '5-2', title: '진료 소모품 구매', description: '주사기, 거즈, 소독제, 약품 등 초도 물량', estimatedDays: 7, estimatedCost: 500 },
-      { id: '5-3', title: 'EMR 시스템 도입', description: 'EMR 업체 선정, 설치, 초기 세팅', estimatedDays: 14, estimatedCost: 800, tips: '클라우드형 추천 (유지보수 용이)' },
-      { id: '5-4', title: '가구/집기 구매', description: '대기실 의자, 진료 데스크, 수납장 등', estimatedDays: 14, estimatedCost: 1000 },
+      { id: '5-1', title: '필수 의료장비 구매', description: '진료과별 필수 장비 리스트 작성 및 발주', estimatedDays: 21, estimatedCost: 15000, costRange: [8000, 25000], dependencies: ['4-2'], tips: '리스/렌탈 옵션도 비교' },
+      { id: '5-1a', title: '치과 유니트체어 구매 및 배관', description: '체어당 배관/전기 배선 포함, 2~4대 기본', estimatedDays: 21, costRange: [6000, 16000], applicableSpecialties: ['dental'], dependencies: ['4-2'] },
+      { id: '5-1b', title: '피부과 레이저 장비 도입', description: '주력 레이저 1~2대 + IPL 등 서브 장비', estimatedDays: 21, costRange: [10000, 25000], applicableSpecialties: ['dermatology'], dependencies: ['4-2'] },
+      { id: '5-1c', title: '안과 OCT/검사장비 도입', description: 'OCT, 세극등, 자동굴절검사기 등 필수 장비', estimatedDays: 21, costRange: [12000, 25000], applicableSpecialties: ['ophthalmology'], dependencies: ['4-2'] },
+      { id: '5-1d', title: '물리치료 장비세트 구매', description: '전기치료, 온열치료, 견인치료 장비세트', estimatedDays: 21, costRange: [6000, 12000], applicableSpecialties: ['orthopedics', 'rehabilitation'], dependencies: ['4-2'] },
+      { id: '5-2', title: '진료 소모품 구매', description: '주사기, 거즈, 소독제, 약품 등 초도 물량', estimatedDays: 7, estimatedCost: 500, costRange: [300, 800] },
+      { id: '5-3', title: 'EMR 시스템 도입', description: 'EMR 업체 선정, 설치, 초기 세팅', estimatedDays: 14, estimatedCost: 800, costRange: [500, 1200], dependencies: ['4-5'], tips: '클라우드형 추천 (유지보수 용이)' },
+      { id: '5-4', title: '가구/집기 구매', description: '대기실 의자, 진료 데스크, 수납장 등', estimatedDays: 14, estimatedCost: 1000, costRange: [600, 1500] },
       { id: '5-5', title: '장비 설치 및 검수', description: '설치 완료 후 작동 테스트, AS 조건 확인', estimatedDays: 7 },
     ],
   },
@@ -174,10 +182,13 @@ export const phases: Phase[] = [
     ],
     subtasks: [
       { id: '6-1', title: '직원 채용 계획', description: '필요 인원, 직급, 급여 기준 설정', estimatedDays: 7 },
-      { id: '6-2', title: '채용 공고 게시', description: '의료 전문 구인사이트, 지역 커뮤니티 활용', estimatedDays: 7, estimatedCost: 30 },
+      { id: '6-1a', title: '물리치료사 채용', description: '면허 확인, 실무 경력 우대, 2~3명 기본', estimatedDays: 21, estimatedCost: 50, costRange: [30, 80], applicableSpecialties: ['orthopedics', 'rehabilitation'] },
+      { id: '6-1b', title: '치과위생사 채용', description: '면허 확인, 스케일링/교정 경력 우대', estimatedDays: 21, estimatedCost: 50, costRange: [30, 80], applicableSpecialties: ['dental'] },
+      { id: '6-1c', title: '피부관리사/상담실장 채용', description: '시술 경력, 상담 역량 중시', estimatedDays: 21, estimatedCost: 50, costRange: [30, 80], applicableSpecialties: ['dermatology', 'plastic-surgery'] },
+      { id: '6-2', title: '채용 공고 게시', description: '의료 전문 구인사이트, 지역 커뮤니티 활용', estimatedDays: 7, estimatedCost: 30, costRange: [10, 50] },
       { id: '6-3', title: '면접 및 최종 채용', description: '서류 심사, 면접, 레퍼런스 체크', estimatedDays: 21 },
       { id: '6-4', title: '근로계약서 작성', description: '급여, 근무시간, 복리후생, 수습 기간 명시', estimatedDays: 7, estimatedCost: 0, tips: '노무사 검토 필수' },
-      { id: '6-5', title: '직원 교육', description: 'EMR 사용법, 진료 프로세스, 응급 대응 교육', estimatedDays: 14 },
+      { id: '6-5', title: '직원 교육', description: 'EMR 사용법, 진료 프로세스, 응급 대응 교육', estimatedDays: 14, dependencies: ['5-3', '6-3'] },
     ],
   },
   {
@@ -198,12 +209,15 @@ export const phases: Phase[] = [
       { name: '개원 홍보물 체크리스트', description: '명함, 전단지, 현수막 등 준비물' },
     ],
     subtasks: [
-      { id: '7-1', title: 'CI/BI 디자인', description: '로고, 명함, 진료카드, 봉투 등 디자인', estimatedDays: 14, estimatedCost: 300 },
-      { id: '7-2', title: '홈페이지 / 블로그 제작', description: '네이버 플레이스, 홈페이지, 블로그 세팅', estimatedDays: 14, estimatedCost: 300, tips: '네이버 스마트플레이스 필수 등록' },
+      { id: '7-1', title: 'CI/BI 디자인', description: '로고, 명함, 진료카드, 봉투 등 디자인', estimatedDays: 14, estimatedCost: 300, costRange: [150, 500] },
+      { id: '7-2', title: '홈페이지 / 블로그 제작', description: '네이버 플레이스, 홈페이지, 블로그 세팅', estimatedDays: 14, estimatedCost: 300, costRange: [150, 500], dependencies: ['7-1'], tips: '네이버 스마트플레이스 필수 등록' },
       { id: '7-3', title: 'SNS 채널 개설', description: '인스타그램, 카카오톡 채널, 유튜브', estimatedDays: 7, estimatedCost: 0 },
-      { id: '7-4', title: '지역 마케팅', description: '전단지, 현수막, 지역 커뮤니티 홍보', estimatedDays: 14, estimatedCost: 200 },
-      { id: '7-5', title: '온라인 광고 셋업', description: '네이버 검색광고, 카카오 모먼트, SNS 광고', estimatedDays: 7, estimatedCost: 500, tips: '월 광고비 별도' },
-      { id: '7-6', title: '사전 예약 시스템 구축', description: '네이버 예약, 자체 예약 시스템 연동', estimatedDays: 7, estimatedCost: 100 },
+      { id: '7-3a', title: '인스타그램 시술후기 콘텐츠 전략', description: '비포/애프터, 시술 과정 영상, 해시태그 전략', estimatedDays: 14, estimatedCost: 200, costRange: [100, 500], applicableSpecialties: ['dermatology', 'plastic-surgery'] },
+      { id: '7-3b', title: '네이버 건강검진/만성질환 콘텐츠', description: '건강정보 블로그, 검진 패키지 소개', estimatedDays: 14, estimatedCost: 100, costRange: [50, 200], applicableSpecialties: ['internal', 'family-medicine'] },
+      { id: '7-3c', title: '지역맘카페/육아커뮤니티 마케팅', description: '소아과 전문 지역 맘카페 홍보 전략', estimatedDays: 14, estimatedCost: 50, costRange: [30, 100], applicableSpecialties: ['pediatrics'] },
+      { id: '7-4', title: '지역 마케팅', description: '전단지, 현수막, 지역 커뮤니티 홍보', estimatedDays: 14, estimatedCost: 200, costRange: [100, 400] },
+      { id: '7-5', title: '온라인 광고 셋업', description: '네이버 검색광고, 카카오 모먼트, SNS 광고', estimatedDays: 7, estimatedCost: 500, costRange: [300, 800], tips: '월 광고비 별도' },
+      { id: '7-6', title: '사전 예약 시스템 구축', description: '네이버 예약, 자체 예약 시스템 연동', estimatedDays: 7, estimatedCost: 100, costRange: [50, 200] },
     ],
   },
   {
@@ -226,20 +240,52 @@ export const phases: Phase[] = [
     subtasks: [
       { id: '8-1', title: '리허설 운영 (1주)', description: '지인/가족 대상 모의 진료, 동선 확인', estimatedDays: 7 },
       { id: '8-2', title: '소방/안전 점검', description: '소방서 합동 점검, 소화기/비상구 확인', estimatedDays: 3, estimatedCost: 0 },
-      { id: '8-3', title: '건강보험 청구 테스트', description: 'EMR → 심평원 청구 프로세스 테스트', estimatedDays: 7 },
-      { id: '8-4', title: '오픈 이벤트 기획', description: '개원 기념 이벤트, 할인, 기념품 준비', estimatedDays: 7, estimatedCost: 300 },
+      { id: '8-3', title: '건강보험 청구 테스트', description: 'EMR → 심평원 청구 프로세스 테스트', estimatedDays: 7, dependencies: ['3-3', '5-3'] },
+      { id: '8-4', title: '오픈 이벤트 기획', description: '개원 기념 이벤트, 할인, 기념품 준비', estimatedDays: 7, estimatedCost: 300, costRange: [150, 500] },
       { id: '8-5', title: '정식 개원', description: '개원일 진료 시작, 첫 환자 맞이', estimatedDays: 1 },
       { id: '8-6', title: '개원 후 1개월 점검', description: '환자수 추이, 직원 적응도, 시스템 안정성 점검', estimatedDays: 30, tips: '메디플라톤 개원 후 대시보드 활용' },
+    ],
+  },
+  {
+    id: 9,
+    title: '개원 후 안정화',
+    icon: 'TrendingUp',
+    month: 13,
+    duration: 12,
+    color: '#6366F1',
+    description: '개원 후 경영 안정화, 환자 리텐션, BEP 달성 추적',
+    connectedFeatures: [
+      { name: 'EMR 대시보드', href: '/emr/dashboard', icon: 'LayoutDashboard' },
+      { name: '경영분석', href: '/emr/analytics', icon: 'BarChart3' },
+    ],
+    documents: [
+      { name: '월별 경영 점검표', description: '매출/비용/환자수 월별 추적 양식' },
+      { name: 'BEP 분석 시트', description: '손익분기점 도달 추적 시트' },
+    ],
+    subtasks: [
+      { id: '9-1', title: '1개월 경영 점검', description: '첫 달 매출, 환자수, 운영 이슈 종합 점검', estimatedDays: 7, estimatedCost: 0, dependencies: ['8-5'] },
+      { id: '9-2', title: '3개월 손익 분석', description: '3개월 누적 매출/비용 분석, 예산 대비 실적 비교', estimatedDays: 14, estimatedCost: 0, dependencies: ['9-1'] },
+      { id: '9-3', title: '직원 이탈 대응 및 팀빌딩', description: '초기 이탈 방지, 팀 문화 형성, 정기 미팅 체계', estimatedDays: 30, estimatedCost: 100, costRange: [50, 200] },
+      { id: '9-4', title: '환자 리텐션 전략 수립', description: '재방문율 분석, 리콜 시스템, 만족도 조사', estimatedDays: 14, estimatedCost: 50, costRange: [30, 100] },
+      { id: '9-5', title: '6개월 BEP 도달 점검', description: '손익분기점 도달 여부 확인, 미달 시 개선 계획', estimatedDays: 7, estimatedCost: 0, dependencies: ['9-2'] },
+      { id: '9-6', title: '마케팅 ROI 분석 및 조정', description: '채널별 효과 분석, 비용 재배분, 신규 채널 테스트', estimatedDays: 14, estimatedCost: 100, costRange: [50, 200] },
+      { id: '9-7', title: '1년 종합 경영 리뷰', description: '연간 실적 종합 분석, 2년차 전략 수립', estimatedDays: 14, estimatedCost: 0, dependencies: ['9-5'] },
     ],
   },
 ]
 
 export const getTotalCost = (phases: Phase[]): number => {
   return phases.reduce((total, phase) => {
-    return total + phase.subtasks.reduce((sub, task) => sub + (task.estimatedCost || 0), 0)
+    return total + phase.subtasks.reduce((sub, task) => {
+      if (task.costRange) return sub + Math.round((task.costRange[0] + task.costRange[1]) / 2)
+      return sub + (task.estimatedCost || 0)
+    }, 0)
   }, 0)
 }
 
 export const getPhaseCost = (phase: Phase): number => {
-  return phase.subtasks.reduce((sum, task) => sum + (task.estimatedCost || 0), 0)
+  return phase.subtasks.reduce((sum, task) => {
+    if (task.costRange) return sum + Math.round((task.costRange[0] + task.costRange[1]) / 2)
+    return sum + (task.estimatedCost || 0)
+  }, 0)
 }
