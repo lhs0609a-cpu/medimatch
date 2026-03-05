@@ -47,16 +47,16 @@ export default function PhaseChecklist({
   return (
     <div>
       {/* Phase 헤더 */}
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex items-center justify-between mb-6">
         <div>
-          <h3 className="text-lg font-bold">{phase.title}</h3>
-          <p className="text-sm text-muted-foreground">{phase.description}</p>
+          <h3 className="text-2xl font-bold">{phase.title}</h3>
+          <p className="text-base text-muted-foreground mt-1">{phase.description}</p>
         </div>
-        <div className="flex items-center gap-2">
-          <span className="text-sm text-muted-foreground">
+        <div className="flex items-center gap-3">
+          <span className="text-lg font-semibold text-muted-foreground">
             {completedCount}/{phase.subtasks.length}
           </span>
-          <div className="w-20 h-2 bg-secondary rounded-full overflow-hidden">
+          <div className="w-28 h-2.5 bg-secondary rounded-full overflow-hidden">
             <div
               className="h-full bg-primary rounded-full transition-all duration-500"
               style={{ width: `${phase.subtasks.length > 0 ? (completedCount / phase.subtasks.length) * 100 : 0}%` }}
@@ -126,20 +126,20 @@ function ChecklistItem({
     `}>
       {/* 의존성 경고 */}
       {unmetDeps.length > 0 && !isCompleted && (
-        <div className="flex items-start gap-2 px-4 py-2 bg-amber-50 dark:bg-amber-900/10 border-b border-amber-200 dark:border-amber-800/30 rounded-t-xl">
-          <Link2 className="w-3.5 h-3.5 text-amber-500 mt-0.5 flex-shrink-0" />
-          <span className="text-xs text-amber-700 dark:text-amber-400">
+        <div className="flex items-start gap-3 px-5 py-3 bg-amber-50 dark:bg-amber-900/10 border-b border-amber-200 dark:border-amber-800/30 rounded-t-xl">
+          <Link2 className="w-4 h-4 text-amber-500 mt-0.5 flex-shrink-0" />
+          <span className="text-sm text-amber-700 dark:text-amber-400">
             선행 태스크 필요: {unmetDeps.map(d => d.title).join(', ')}
           </span>
         </div>
       )}
 
       {/* 메인 행 */}
-      <div className="flex items-center gap-3 px-4 py-3">
+      <div className="flex items-center gap-4 px-5 py-4">
         <button
           onClick={onToggle}
           className={`
-            w-6 h-6 rounded-lg flex items-center justify-center flex-shrink-0
+            w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0
             transition-all duration-200
             ${isCompleted
               ? 'bg-primary text-white'
@@ -147,14 +147,14 @@ function ChecklistItem({
             }
           `}
         >
-          {isCompleted && <Check className="w-3.5 h-3.5" />}
+          {isCompleted && <Check className="w-4 h-4" />}
         </button>
 
         <div className="flex-1 min-w-0">
-          <div className={`text-sm font-medium ${isCompleted ? 'line-through text-muted-foreground' : ''}`}>
+          <div className={`text-lg font-medium ${isCompleted ? 'line-through text-muted-foreground' : ''}`}>
             {task.title}
           </div>
-          <div className="text-xs text-muted-foreground mt-0.5">
+          <div className="text-sm text-muted-foreground mt-0.5">
             {task.description}
           </div>
         </div>
@@ -168,15 +168,15 @@ function ChecklistItem({
             />
           )}
           {displayCost && (
-            <span className="text-xs text-muted-foreground bg-secondary px-2 py-0.5 rounded-md">
+            <span className="text-sm text-muted-foreground bg-secondary px-3 py-1 rounded-lg">
               {displayCost}
             </span>
           )}
           <button
             onClick={() => setExpanded(!expanded)}
-            className="w-6 h-6 flex items-center justify-center text-muted-foreground hover:text-foreground rounded-md hover:bg-secondary"
+            className="w-8 h-8 flex items-center justify-center text-muted-foreground hover:text-foreground rounded-lg hover:bg-secondary"
           >
-            {expanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+            {expanded ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
           </button>
         </div>
       </div>
@@ -185,7 +185,7 @@ function ChecklistItem({
       {expanded && (() => {
         const guide = getGuideForSpecialty(task.id, specialtyId) ?? taskGuides[task.id]
         return (
-          <div className="px-4 pb-3 pt-1 space-y-3 border-t border-border/50">
+          <div className="px-5 pb-4 pt-2 space-y-4 border-t border-border/50">
             {/* "알고 계셨나요?" 교육 팝업 */}
             {!isCompleted && (
               <DidYouKnow
@@ -201,8 +201,8 @@ function ChecklistItem({
             )}
 
             {task.tips && (
-              <div className="flex items-start gap-2 text-xs bg-amber-50 dark:bg-amber-900/10 text-amber-700 dark:text-amber-400 px-3 py-2 rounded-lg">
-                <Lightbulb className="w-3.5 h-3.5 mt-0.5 flex-shrink-0" />
+              <div className="flex items-start gap-3 text-sm bg-amber-50 dark:bg-amber-900/10 text-amber-700 dark:text-amber-400 px-4 py-3 rounded-xl">
+                <Lightbulb className="w-4 h-4 mt-0.5 flex-shrink-0" />
                 <span>{task.tips}</span>
               </div>
             )}
@@ -210,13 +210,13 @@ function ChecklistItem({
             {/* 진행 방법 */}
             {guide?.steps && guide.steps.length > 0 && (
               <div className="space-y-1.5">
-                <div className="flex items-center gap-1.5 text-xs font-medium text-foreground">
-                  <ListOrdered className="w-3.5 h-3.5 text-blue-500" />
+                <div className="flex items-center gap-1.5 text-sm font-semibold text-foreground">
+                  <ListOrdered className="w-4 h-4 text-blue-500" />
                   <span>진행 방법</span>
                 </div>
                 <ol className="space-y-1 ml-5">
                   {guide.steps.map((step, i) => (
-                    <li key={i} className="text-xs text-muted-foreground list-decimal pl-1">
+                    <li key={i} className="text-sm text-muted-foreground list-decimal pl-1">
                       {step}
                     </li>
                   ))}
@@ -227,13 +227,13 @@ function ChecklistItem({
             {/* 꿀팁 */}
             {guide?.tips && guide.tips.length > 0 && (
               <div className="space-y-1.5">
-                <div className="flex items-center gap-1.5 text-xs font-medium text-foreground">
-                  <Lightbulb className="w-3.5 h-3.5 text-amber-500" />
+                <div className="flex items-center gap-1.5 text-sm font-semibold text-foreground">
+                  <Lightbulb className="w-4 h-4 text-amber-500" />
                   <span>꿀팁</span>
                 </div>
                 <ul className="space-y-1 ml-5">
                   {guide.tips.map((tip, i) => (
-                    <li key={i} className="text-xs text-muted-foreground list-disc pl-1">
+                    <li key={i} className="text-sm text-muted-foreground list-disc pl-1">
                       {tip}
                     </li>
                   ))}
@@ -252,13 +252,13 @@ function ChecklistItem({
               <div className="space-y-2">
                 {guide.subChecklists.map((checklist, ci) => (
                   <div key={ci} className="space-y-1.5">
-                    <div className="flex items-center gap-1.5 text-xs font-medium text-foreground">
-                      <ClipboardList className="w-3.5 h-3.5 text-violet-500" />
+                    <div className="flex items-center gap-1.5 text-sm font-semibold text-foreground">
+                      <ClipboardList className="w-4 h-4 text-violet-500" />
                       <span>{checklist.label}</span>
                     </div>
                     <ul className="space-y-1 ml-5">
                       {checklist.items.map((item, ii) => (
-                        <li key={ii} className="text-xs text-muted-foreground flex items-center gap-1.5">
+                        <li key={ii} className="text-sm text-muted-foreground flex items-center gap-2">
                           <div className="w-1.5 h-1.5 rounded-full bg-violet-400 flex-shrink-0" />
                           {item}
                         </li>
@@ -294,13 +294,13 @@ function ChecklistItem({
             {/* 법적 리스크 */}
             {guide?.legalRisks && guide.legalRisks.length > 0 && (
               <div className="space-y-1.5">
-                <div className="flex items-center gap-1.5 text-xs font-medium text-foreground">
-                  <AlertTriangle className="w-3.5 h-3.5 text-red-500" />
+                <div className="flex items-center gap-1.5 text-sm font-semibold text-foreground">
+                  <AlertTriangle className="w-4 h-4 text-red-500" />
                   <span>법적 리스크</span>
                 </div>
                 <ul className="space-y-1 ml-5">
                   {guide.legalRisks.map((risk, i) => (
-                    <li key={i} className="text-xs text-red-600 dark:text-red-400 list-disc pl-1">
+                    <li key={i} className="text-sm text-red-600 dark:text-red-400 list-disc pl-1">
                       {risk}
                     </li>
                   ))}
@@ -311,13 +311,13 @@ function ChecklistItem({
             {/* 관련 법규 */}
             {guide?.regulations && guide.regulations.length > 0 && (
               <div className="space-y-1.5">
-                <div className="flex items-center gap-1.5 text-xs font-medium text-foreground">
-                  <Scale className="w-3.5 h-3.5 text-red-500" />
+                <div className="flex items-center gap-1.5 text-sm font-semibold text-foreground">
+                  <Scale className="w-4 h-4 text-red-500" />
                   <span>관련 법규</span>
                 </div>
                 <ul className="space-y-1 ml-5">
                   {guide.regulations.map((reg, i) => (
-                    <li key={i} className="text-xs text-muted-foreground list-disc pl-1">
+                    <li key={i} className="text-sm text-muted-foreground list-disc pl-1">
                       {reg}
                     </li>
                   ))}
@@ -327,8 +327,8 @@ function ChecklistItem({
 
             {/* 전문가 조언 */}
             {guide?.expertAdvice && (
-              <div className="flex items-start gap-2 text-xs bg-blue-50 dark:bg-blue-900/10 text-blue-700 dark:text-blue-400 px-3 py-2 rounded-lg">
-                <MessageSquareQuote className="w-3.5 h-3.5 mt-0.5 flex-shrink-0" />
+              <div className="flex items-start gap-3 text-sm bg-blue-50 dark:bg-blue-900/10 text-blue-700 dark:text-blue-400 px-4 py-3 rounded-xl">
+                <MessageSquareQuote className="w-4 h-4 mt-0.5 flex-shrink-0" />
                 <span>{guide.expertAdvice}</span>
               </div>
             )}
@@ -336,13 +336,13 @@ function ChecklistItem({
             {/* 필요 서류 */}
             {guide?.documents && guide.documents.length > 0 && (
               <div className="space-y-1.5">
-                <div className="flex items-center gap-1.5 text-xs font-medium text-foreground">
-                  <FileText className="w-3.5 h-3.5 text-green-600" />
+                <div className="flex items-center gap-1.5 text-sm font-semibold text-foreground">
+                  <FileText className="w-4 h-4 text-green-600" />
                   <span>필요 서류</span>
                 </div>
                 <ul className="space-y-1 ml-5">
                   {guide.documents.map((doc, i) => (
-                    <li key={i} className="text-xs text-muted-foreground flex items-center gap-1.5">
+                    <li key={i} className="text-sm text-muted-foreground flex items-center gap-2">
                       <Check className="w-3 h-3 text-green-500 flex-shrink-0" />
                       {doc}
                     </li>
@@ -353,35 +353,35 @@ function ChecklistItem({
 
             {/* 실제 비용 입력 */}
             {onCostChange && (
-              <div className="flex items-center gap-2">
-                <Banknote className="w-3.5 h-3.5 text-muted-foreground" />
-                <span className="text-xs text-muted-foreground">실제 비용:</span>
+              <div className="flex items-center gap-3">
+                <Banknote className="w-4 h-4 text-muted-foreground" />
+                <span className="text-sm text-muted-foreground">실제 비용:</span>
                 <input
                   type="number"
                   value={actualCost || ''}
                   onChange={(e) => onCostChange(parseInt(e.target.value) || 0)}
                   placeholder="만원"
-                  className="w-24 text-xs bg-secondary/50 border border-border rounded-md px-2 py-1 outline-none focus:ring-2 focus:ring-primary/30"
+                  className="w-28 text-sm bg-secondary/50 border border-border rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-primary/30"
                 />
-                <span className="text-xs text-muted-foreground">만원</span>
+                <span className="text-sm text-muted-foreground">만원</span>
               </div>
             )}
 
             {/* 메모 */}
             {onMemoChange && (
-              <div className="flex items-start gap-2">
-                <StickyNote className="w-3.5 h-3.5 text-muted-foreground mt-1.5" />
+              <div className="flex items-start gap-3">
+                <StickyNote className="w-4 h-4 text-muted-foreground mt-2" />
                 <textarea
                   value={memo}
                   onChange={(e) => onMemoChange(e.target.value)}
                   placeholder="메모를 입력하세요..."
                   rows={2}
-                  className="flex-1 text-xs bg-secondary/50 border border-border rounded-md px-2 py-1.5 outline-none focus:ring-2 focus:ring-primary/30 resize-none"
+                  className="flex-1 text-sm bg-secondary/50 border border-border rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-primary/30 resize-none"
                 />
               </div>
             )}
 
-            <div className="text-xs text-muted-foreground">
+            <div className="text-sm text-muted-foreground">
               예상 소요: {task.estimatedDays}일
             </div>
           </div>
