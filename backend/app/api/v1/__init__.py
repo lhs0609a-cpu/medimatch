@@ -48,6 +48,8 @@ from .marketing_roi import router as marketing_roi_router
 from .patients import router as patients_router
 from .opening_project import router as opening_project_router
 from .admin_contacts import router as admin_contacts_router
+from .community import router as community_router
+from .maintenance import router as maintenance_router
 
 api_router = APIRouter()
 
@@ -101,3 +103,5 @@ api_router.include_router(marketing_roi_router, prefix="/emr/marketing-roi", tag
 api_router.include_router(patients_router, prefix="/emr/patients", tags=["EMR Patients - 환자 관리"])
 api_router.include_router(opening_project_router, prefix="/opening-projects", tags=["Opening Project - 개원 프로젝트"])
 api_router.include_router(admin_contacts_router, prefix="/admin", tags=["Admin Contacts - 상담/문의 관리"])
+api_router.include_router(community_router, prefix="/community", tags=["Community - 커뮤니티"])
+api_router.include_router(maintenance_router, prefix="/maintenance", tags=["Maintenance - 관리유지비"])

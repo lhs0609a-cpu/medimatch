@@ -25,6 +25,7 @@ celery_app = Celery(
         "app.tasks.service_subscription_tasks",
         "app.tasks.broker_tasks",
         "app.tasks.claims_tasks",
+        "app.tasks.maintenance_tasks",
     ]
 )
 
@@ -213,5 +214,22 @@ celery_app.conf.beat_schedule = {
     "tax-process-fee-settlement": {
         "task": "app.tasks.claims_tasks.process_fee_settlement",
         "schedule": crontab(hour=10, minute=0),
+    },
+
+    # ===== 관리유지비 =====
+    # 매일 07:00: 관리유지비 자동갱신 + PAST_DUE 재시도
+    "maintenance-renewals": {
+        "task": "app.tasks.maintenance_tasks.process_maintenance_renewals",
+        "schedule": crontab(hour=7, minute=0),
+    },
+    # 매일 01:00: CANCELED → EXPIRED
+    "maintenance-expire": {
+        "task": "app.tasks.maintenance_tasks.expire_canceled_maintenance",
+        "schedule": crontab(hour=1, minute=0),
+    },
+    # 매일 09:00: PENDING_SETUP 리마인더
+    "maintenance-setup-reminders": {
+        "task": "app.tasks.maintenance_tasks.send_maintenance_setup_reminders",
+        "schedule": crontab(hour=9, minute=0),
     },
 }

@@ -25,6 +25,7 @@ import {
   ShieldCheck,
   ShoppingCart,
   Globe,
+  Wrench,
   LayoutDashboard,
   UserCog,
   GitBranch,
@@ -87,6 +88,7 @@ const sidebarGroups: SidebarGroup[] = [
       { href: '/admin/simulations', label: '시뮬레이션', icon: BarChart3 },
       { href: '/admin/payments', label: '결제/구독', icon: CreditCard },
       { href: '/admin/service-subscriptions', label: '서비스 구독', icon: Globe },
+      { href: '/admin/maintenance', label: '관리유지비', icon: Wrench },
       { href: '/admin/campaigns', label: '캠페인', icon: Send },
       { href: '/admin/prospects', label: '약국 타겟팅', icon: Pill },
       { href: '/admin/stats', label: '통계', icon: TrendingUp },
@@ -193,7 +195,7 @@ export default function AdminLayout({
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
-          <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center mx-auto mb-4 animate-pulse">
+          <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center mx-auto mb-4 animate-pulse">
             <Sparkles className="w-8 h-8 text-white" />
           </div>
           <p className="text-gray-500">권한 확인 중...</p>
@@ -208,7 +210,7 @@ export default function AdminLayout({
         <div className="w-full max-w-sm mx-auto">
           <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-8">
             <div className="text-center mb-6">
-              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center mx-auto mb-4">
+              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center mx-auto mb-4">
                 <Sparkles className="w-7 h-7 text-white" />
               </div>
               <h1 className="text-xl font-bold text-gray-900">관리자 로그인</h1>
@@ -223,7 +225,7 @@ export default function AdminLayout({
                   required
                   value={loginEmail}
                   onChange={(e) => setLoginEmail(e.target.value)}
-                  className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent"
+                  className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   placeholder="admin@example.com"
                 />
               </div>
@@ -234,7 +236,7 @@ export default function AdminLayout({
                   required
                   value={loginPassword}
                   onChange={(e) => setLoginPassword(e.target.value)}
-                  className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent"
+                  className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   placeholder="••••••••"
                 />
               </div>
@@ -246,7 +248,7 @@ export default function AdminLayout({
               <button
                 type="submit"
                 disabled={loginLoading}
-                className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-gradient-to-r from-violet-600 to-indigo-600 text-white text-sm font-medium rounded-xl hover:from-violet-700 hover:to-indigo-700 transition-all disabled:opacity-50"
+                className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-gradient-to-r from-blue-600 to-blue-700 text-white text-sm font-medium rounded-xl hover:from-blue-700 hover:to-blue-800 transition-all disabled:opacity-50"
               >
                 {loginLoading ? (
                   <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -277,11 +279,11 @@ export default function AdminLayout({
         <div className="flex h-full flex-col">
           {/* Logo */}
           <div className="flex h-16 items-center gap-3 px-6 border-b border-gray-100">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-violet-600 to-indigo-600 flex items-center justify-center">
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-600 to-blue-700 flex items-center justify-center">
               <Sparkles className="w-5 h-5 text-white" />
             </div>
             <span className="text-lg font-bold text-gray-900">메디플라톤</span>
-            <span className="px-2 py-0.5 bg-violet-100 text-violet-700 text-xs font-medium rounded-full">
+            <span className="px-2 py-0.5 bg-blue-100 text-blue-700 text-xs font-medium rounded-full">
               Admin
             </span>
           </div>
@@ -304,11 +306,11 @@ export default function AdminLayout({
                         href={item.href}
                         className={`flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all text-sm ${
                           isActive
-                            ? 'bg-violet-50 text-violet-700 font-medium'
+                            ? 'bg-blue-50 text-blue-700 font-medium'
                             : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
                         }`}
                       >
-                        <item.icon className={`w-4 h-4 ${isActive ? 'text-violet-600' : ''}`} />
+                        <item.icon className={`w-4 h-4 ${isActive ? 'text-blue-600' : ''}`} />
                         {item.label}
                       </Link>
                     );

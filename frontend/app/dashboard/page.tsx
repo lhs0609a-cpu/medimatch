@@ -23,6 +23,7 @@ import {
   LogOut,
   Menu,
   X,
+  Wrench,
 } from 'lucide-react';
 import { TossIcon } from '@/components/ui/TossIcon';
 
@@ -138,20 +139,20 @@ export default function DashboardPage() {
       case 'LANDLORD':
         return [
           { label: '매물 등록', href: '/landlord/register', icon: Plus, color: 'emerald', desc: '새 매물' },
-          { label: '내 매물', href: '/landlord', icon: Building2, color: 'violet', desc: '관리하기' },
+          { label: '내 매물', href: '/landlord', icon: Building2, color: 'blue', desc: '관리하기' },
           { label: '구독 관리', href: '/subscription/listing', icon: CreditCard, color: 'amber', desc: '정기결제' },
           { label: '매물 검색', href: '/buildings', icon: Search, color: 'sky', desc: '입점 현황' },
         ];
       case 'PHARMACIST':
         return [
           { label: '매물 찾기', href: '/buildings', icon: Search, color: 'emerald', desc: '건물 검색' },
-          { label: '약국 등록', href: '/pharmacist/register', icon: Plus, color: 'violet', desc: '양도 등록' },
+          { label: '약국 등록', href: '/pharmacist/register', icon: Plus, color: 'blue', desc: '양도 등록' },
           { label: '내 약국 매물', href: '/pharmacist', icon: Building2, color: 'fuchsia', desc: '관리하기' },
           { label: '약국 매칭', href: '/pharmacy', icon: MapPin, color: 'sky', desc: '매칭 찾기' },
         ];
       default:
         return [
-          { label: '시뮬레이션', href: '/simulate', icon: BarChart3, color: 'violet', desc: '개원 분석' },
+          { label: '시뮬레이션', href: '/simulate', icon: BarChart3, color: 'blue', desc: '개원 분석' },
           { label: '개원지 탐색', href: '/prospects', icon: Search, color: 'emerald', desc: '프로스펙트' },
           { label: '약국 매칭', href: '/pharmacy', icon: Building2, color: 'fuchsia', desc: '입찰하기' },
           { label: '지도', href: '/map', icon: MapPin, color: 'sky', desc: '전체보기' },
@@ -187,7 +188,7 @@ export default function DashboardPage() {
       <div className="min-h-screen gradient-bg-soft flex items-center justify-center">
         <div className="text-center">
           <div className="mx-auto mb-4 animate-pulse w-fit">
-            <TossIcon icon={Sparkles} color="from-violet-500 to-indigo-600" size="xl" />
+            <TossIcon icon={Sparkles} color="from-blue-500 to-blue-600" size="xl" />
           </div>
           <p className="text-gray-500">로딩 중...</p>
         </div>
@@ -211,7 +212,7 @@ export default function DashboardPage() {
                   key={item}
                   href={['/', '/map', '/alerts', '/mypage'][i]}
                   className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
-                    i === 0 ? 'text-violet-600 bg-violet-50' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+                    i === 0 ? 'text-blue-600 bg-blue-50' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
                   }`}
                 >
                   {item}
@@ -226,7 +227,7 @@ export default function DashboardPage() {
                   <span className="absolute top-1 right-1 w-2 h-2 bg-rose-500 rounded-full" />
                 )}
               </button>
-              <div className="w-9 h-9 rounded-full bg-violet-500 flex items-center justify-center text-white font-medium text-sm">
+              <div className="w-9 h-9 rounded-full bg-blue-500 flex items-center justify-center text-white font-medium text-sm">
                 {userName.charAt(0)}
               </div>
               <button
@@ -250,7 +251,7 @@ export default function DashboardPage() {
                   href={['/', '/map', '/alerts', '/mypage'][i]}
                   onClick={() => setMobileMenuOpen(false)}
                   className={`block px-4 py-3 text-sm font-medium rounded-lg transition-colors ${
-                    i === 0 ? 'text-violet-600 bg-violet-50' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+                    i === 0 ? 'text-blue-600 bg-blue-50' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
                   }`}
                 >
                   {item}
@@ -294,6 +295,21 @@ export default function DashboardPage() {
           ))}
         </div>
 
+        {/* Maintenance Link */}
+        <Link
+          href="/my/maintenance"
+          className="flex items-center gap-3 mb-8 p-4 bg-white rounded-2xl border border-gray-100 hover:border-blue-200 hover:shadow-sm transition-all group"
+        >
+          <div className="w-10 h-10 rounded-xl bg-violet-50 flex items-center justify-center">
+            <Wrench className="w-5 h-5 text-violet-600" />
+          </div>
+          <div className="flex-1">
+            <h4 className="text-sm font-semibold text-gray-900">관리유지비</h4>
+            <p className="text-xs text-gray-500">홈페이지/프로그램 관리비 결제 및 요청</p>
+          </div>
+          <ChevronRight className="w-4 h-4 text-gray-400 group-hover:text-gray-600 group-hover:translate-x-0.5 transition-all" />
+        </Link>
+
         {/* Stats Cards */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
           <div className="bg-white rounded-2xl p-5 border border-gray-100">
@@ -310,7 +326,7 @@ export default function DashboardPage() {
           <div className="bg-white rounded-2xl p-5 border border-gray-100">
             <div className="flex items-center justify-between mb-4">
               <span className="text-2xl">📈</span>
-              <span className="text-xs font-medium text-violet-600 bg-violet-50 px-2 py-1 rounded-full">
+              <span className="text-xs font-medium text-blue-600 bg-blue-50 px-2 py-1 rounded-full">
                 {stats?.totalBids ? Math.round((stats.successfulBids / stats.totalBids) * 100) : 0}%
               </span>
             </div>
@@ -345,7 +361,7 @@ export default function DashboardPage() {
           <div className="lg:col-span-2 bg-white rounded-2xl border border-gray-100 p-6">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-lg font-semibold text-gray-900">최근 활동</h2>
-              <Link href="/dashboard" className="text-sm text-violet-600 hover:text-violet-700 font-medium flex items-center gap-1">
+              <Link href="/dashboard" className="text-sm text-blue-600 hover:text-blue-700 font-medium flex items-center gap-1">
                 전체 보기
                 <ChevronRight className="w-4 h-4" />
               </Link>
@@ -368,7 +384,7 @@ export default function DashboardPage() {
                     className="flex items-center gap-4 p-4 rounded-xl hover:bg-gray-50 transition-colors cursor-pointer"
                   >
                     <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
-                      activity.type === 'simulation' ? 'bg-violet-100 text-violet-600' :
+                      activity.type === 'simulation' ? 'bg-blue-100 text-blue-600' :
                       activity.type === 'alert' ? 'bg-rose-100 text-rose-600' :
                       activity.type === 'bid' ? 'bg-emerald-100 text-emerald-600' :
                       'bg-gray-100 text-gray-600'
@@ -406,7 +422,7 @@ export default function DashboardPage() {
             <div className="bg-white rounded-2xl border border-gray-100 p-6">
               <h2 className="text-lg font-semibold text-gray-900 mb-4">구독 상태</h2>
               {stats?.subscriptionStatus === 'ACTIVE' ? (
-                <div className="bg-gradient-to-br from-emerald-50 to-teal-50 rounded-xl p-4 border border-emerald-100">
+                <div className="bg-gradient-to-br from-emerald-50 to-blue-50 rounded-xl p-4 border border-emerald-100">
                   <div className="flex items-center gap-2 mb-2">
                     <CheckCircle2 className="w-5 h-5 text-emerald-600" />
                     <span className="font-semibold text-emerald-800">프로 구독 활성화</span>
@@ -435,25 +451,25 @@ export default function DashboardPage() {
             <div className="bg-white rounded-2xl border border-gray-100 p-6">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-lg font-semibold text-gray-900">추천 프로스펙트</h2>
-                <Link href="/prospects" className="text-sm text-violet-600 hover:text-violet-700">
+                <Link href="/prospects" className="text-sm text-blue-600 hover:text-blue-700">
                   더보기
                 </Link>
               </div>
 
               <div className="space-y-3">
-                <div className="p-4 rounded-xl border border-gray-100 hover:border-violet-200 hover:bg-violet-50/30 transition-all cursor-pointer">
+                <div className="p-4 rounded-xl border border-gray-100 hover:border-blue-200 hover:bg-blue-50/30 transition-all cursor-pointer">
                   <div className="flex items-center gap-2 mb-2">
                     <span className="badge badge-success">신규</span>
-                    <span className="text-sm font-semibold text-violet-600">92점</span>
+                    <span className="text-sm font-semibold text-blue-600">92점</span>
                   </div>
                   <h4 className="font-medium text-gray-900 mb-1">강남구 역삼동 신축</h4>
                   <p className="text-xs text-gray-500">피부과, 정형외과 추천</p>
                 </div>
 
-                <div className="p-4 rounded-xl border border-gray-100 hover:border-violet-200 hover:bg-violet-50/30 transition-all cursor-pointer">
+                <div className="p-4 rounded-xl border border-gray-100 hover:border-blue-200 hover:bg-blue-50/30 transition-all cursor-pointer">
                   <div className="flex items-center gap-2 mb-2">
                     <span className="badge badge-danger">공실</span>
-                    <span className="text-sm font-semibold text-violet-600">88점</span>
+                    <span className="text-sm font-semibold text-blue-600">88점</span>
                   </div>
                   <h4 className="font-medium text-gray-900 mb-1">서초구 의료빌딩</h4>
                   <p className="text-xs text-gray-500">이전: 내과의원</p>

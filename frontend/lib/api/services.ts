@@ -2016,3 +2016,123 @@ export const openingProjectService = {
     return response.data
   },
 }
+
+// ============================================================
+// Maintenance Service (관리유지비 정기결제)
+// ============================================================
+
+export const maintenanceService = {
+  // ===== Admin =====
+  adminGetContracts: async (params?: { status?: string; service_type?: string; search?: string; page?: number; size?: number }) => {
+    const response = await apiClient.get('/maintenance/admin/contracts', { params })
+    return response.data
+  },
+  adminGetDashboard: async () => {
+    const response = await apiClient.get('/maintenance/admin/dashboard')
+    return response.data
+  },
+  adminCreateContract: async (data: {
+    project_name: string; service_type: string; monthly_amount: number; billing_day?: number;
+    company_name?: string; contact_person?: string; contact_email?: string; contact_phone?: string;
+    description?: string; admin_memo?: string; user_id?: string;
+  }) => {
+    const response = await apiClient.post('/maintenance/admin/contracts', data)
+    return response.data
+  },
+  adminUpdateContract: async (id: number, data: Record<string, any>) => {
+    const response = await apiClient.put(`/maintenance/admin/contracts/${id}`, data)
+    return response.data
+  },
+  adminSuspend: async (id: number) => {
+    const response = await apiClient.post(`/maintenance/admin/contracts/${id}/suspend`)
+    return response.data
+  },
+  adminActivate: async (id: number) => {
+    const response = await apiClient.post(`/maintenance/admin/contracts/${id}/activate`)
+    return response.data
+  },
+  adminUpdateMemo: async (id: number, memo: string) => {
+    const response = await apiClient.put(`/maintenance/admin/contracts/${id}/memo`, { memo })
+    return response.data
+  },
+  adminSendInvite: async (id: number) => {
+    const response = await apiClient.post(`/maintenance/admin/contracts/${id}/send-invite`)
+    return response.data
+  },
+  adminSendReminder: async (id: number) => {
+    const response = await apiClient.post(`/maintenance/admin/contracts/${id}/send-reminder`)
+    return response.data
+  },
+  adminGetPresets: async () => {
+    const response = await apiClient.get('/maintenance/admin/presets')
+    return response.data
+  },
+  adminCreatePreset: async (data: { name: string; amount: number; description?: string; sort_order?: number }) => {
+    const response = await apiClient.post('/maintenance/admin/presets', data)
+    return response.data
+  },
+  adminUpdatePreset: async (id: number, data: { name: string; amount: number; description?: string; sort_order?: number }) => {
+    const response = await apiClient.put(`/maintenance/admin/presets/${id}`, data)
+    return response.data
+  },
+  adminDeletePreset: async (id: number) => {
+    const response = await apiClient.delete(`/maintenance/admin/presets/${id}`)
+    return response.data
+  },
+  adminGetRequests: async (params?: { status?: string; page?: number; size?: number }) => {
+    const response = await apiClient.get('/maintenance/admin/requests', { params })
+    return response.data
+  },
+
+  // ===== Customer =====
+  getMyContracts: async () => {
+    const response = await apiClient.get('/maintenance/my-contracts')
+    return response.data
+  },
+  getBillingConfig: async (contractId: number) => {
+    const response = await apiClient.get(`/maintenance/config/${contractId}`)
+    return response.data
+  },
+  setupBilling: async (data: { contract_id: number; auth_key: string; customer_key: string }) => {
+    const response = await apiClient.post('/maintenance/setup-billing', data)
+    return response.data
+  },
+  changeCard: async (contractId: number, data: { auth_key: string; customer_key: string }) => {
+    const response = await apiClient.post(`/maintenance/${contractId}/change-card`, data)
+    return response.data
+  },
+  retryPayment: async (contractId: number) => {
+    const response = await apiClient.post(`/maintenance/${contractId}/retry-payment`)
+    return response.data
+  },
+  cancelContract: async (contractId: number, reason?: string) => {
+    const response = await apiClient.post(`/maintenance/${contractId}/cancel`, { reason })
+    return response.data
+  },
+  getBillingHistory: async (contractId: number) => {
+    const response = await apiClient.get(`/maintenance/${contractId}/billing-history`)
+    return response.data
+  },
+
+  // ===== Request Board =====
+  getRequests: async (contractId: number, params?: { page?: number; size?: number }) => {
+    const response = await apiClient.get(`/maintenance/${contractId}/requests`, { params })
+    return response.data
+  },
+  createRequest: async (contractId: number, data: { category: string; priority?: string; title: string; content: string }) => {
+    const response = await apiClient.post(`/maintenance/${contractId}/requests`, data)
+    return response.data
+  },
+  getRequestDetail: async (requestId: number) => {
+    const response = await apiClient.get(`/maintenance/requests/${requestId}`)
+    return response.data
+  },
+  createComment: async (requestId: number, data: { content: string; is_internal?: boolean }) => {
+    const response = await apiClient.post(`/maintenance/requests/${requestId}/comments`, data)
+    return response.data
+  },
+  updateRequestStatus: async (requestId: number, status: string) => {
+    const response = await apiClient.patch(`/maintenance/requests/${requestId}/status`, { status })
+    return response.data
+  },
+}

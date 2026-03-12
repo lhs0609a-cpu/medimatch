@@ -119,6 +119,15 @@ from .patient import Patient, InboundStatus, ConsentStatus, DBQuality
 from .opening_project import OpeningProject, OpeningProjectTask, ProjectStatus
 # 문의/상담
 from .contact_inquiry import ContactInquiry, ContactStatus
+# 커뮤니티
+from .community import CommunityPost, CommunityComment, CommunityLike, CommunityCategory, PostStatus
+# 캠페인
+from .campaign import Campaign, CampaignStatus, CampaignType
+# 관리유지비
+from .maintenance import (
+    MaintenanceContract, MaintenanceRequest, MaintenanceComment, MaintenancePlanPreset,
+    MaintenanceStatus, MaintenanceServiceType, RequestCategory, RequestStatus, RequestPriority,
+)
 
 __all__ = [
     "User",
@@ -318,4 +327,24 @@ __all__ = [
     # 문의/상담
     "ContactInquiry",
     "ContactStatus",
+    # 커뮤니티
+    "CommunityPost",
+    "CommunityComment",
+    "CommunityLike",
+    "CommunityCategory",
+    "PostStatus",
+    # 캠페인
+    "Campaign",
+    "CampaignStatus",
+    "CampaignType",
+    # 관리유지비
+    "MaintenanceContract",
+    "MaintenanceRequest",
+    "MaintenanceComment",
+    "MaintenancePlanPreset",
+    "MaintenanceStatus",
+    "MaintenanceServiceType",
+    "RequestCategory",
+    "RequestStatus",
+    "RequestPriority",
 ]
