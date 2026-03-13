@@ -75,7 +75,7 @@ export default function OverallRadar({ result }: OverallRadarProps) {
     {
       label: '인구 밀도',
       score: popScore,
-      color: 'bg-violet-500',
+      color: 'bg-blue-500',
       desc: `1km ${(result.demographics.population_1km / 10000).toFixed(1)}만명`,
     },
     {
@@ -89,7 +89,7 @@ export default function OverallRadar({ result }: OverallRadarProps) {
   return (
     <div className="card p-6">
       <div className="flex items-center gap-2 mb-5">
-        <BarChart3 className="w-5 h-5 text-indigo-500" />
+        <BarChart3 className="w-5 h-5 text-blue-600" />
         <h3 className="font-semibold text-foreground">종합 입지 점수</h3>
         <span className={`ml-auto text-sm font-semibold px-2.5 py-1 rounded-full ${overallLabel.color} bg-secondary`}>
           {overallLabel.text}
@@ -133,9 +133,9 @@ export default function OverallRadar({ result }: OverallRadarProps) {
         {/* Score Breakdown */}
         <div className="space-y-3">
           {/* Overall Score */}
-          <div className="text-center p-4 bg-indigo-50 dark:bg-indigo-950/30 rounded-xl border border-indigo-200/50 dark:border-indigo-800/50 mb-4">
+          <div className="text-center p-4 bg-blue-50 dark:bg-blue-950/30 rounded-xl border border-blue-200/50 dark:border-blue-800/50 mb-4">
             <div className="text-[11px] text-muted-foreground mb-1">무료 분석 종합</div>
-            <div className="text-4xl font-bold text-indigo-600 dark:text-indigo-400">
+            <div className="text-4xl font-bold text-blue-700 dark:text-blue-400">
               {avgScore}<span className="text-lg font-normal text-muted-foreground">/100</span>
             </div>
           </div>

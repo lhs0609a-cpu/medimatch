@@ -119,7 +119,7 @@ export default function ListingDetailPage() {
           onClick={() => setShowUpgradeModal(true)}
           className="absolute inset-0 flex items-center justify-center bg-white/80 hover:bg-white/90 transition-colors"
         >
-          <span className="flex items-center gap-1 text-sm text-purple-600 font-medium">
+          <span className="flex items-center gap-1 text-sm text-blue-600 font-medium">
             <Lock className="w-4 h-4" />
             {levelConfig[requiredLevel].label} 필요
           </span>
@@ -132,7 +132,7 @@ export default function ListingDetailPage() {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin h-8 w-8 border-4 border-purple-600 border-t-transparent rounded-full mx-auto mb-4" />
+          <div className="animate-spin h-8 w-8 border-4 border-blue-600 border-t-transparent rounded-full mx-auto mb-4" />
           <p className="text-gray-600">매물 정보를 불러오는 중...</p>
         </div>
       </div>
@@ -145,7 +145,7 @@ export default function ListingDetailPage() {
         <div className="text-center">
           <Pill className="w-12 h-12 text-gray-300 mx-auto mb-4" />
           <h2 className="text-xl font-bold text-gray-900 mb-2">매물을 찾을 수 없습니다</h2>
-          <Link href="/pharmacy-match" className="text-purple-600 hover:underline">
+          <Link href="/pharmacy-match" className="text-blue-600 hover:underline">
             목록으로 돌아가기
           </Link>
         </div>
@@ -163,7 +163,7 @@ export default function ListingDetailPage() {
               <ArrowLeft className="w-5 h-5" />
             </button>
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg flex items-center justify-center">
+              <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-500 rounded-lg flex items-center justify-center">
                 <Pill className="w-4 h-4 text-white" />
               </div>
               <span className="text-xl font-bold text-gray-900">매물 상세</span>
@@ -184,7 +184,7 @@ export default function ListingDetailPage() {
               <AccessLevelProgress currentLevel={accessLevel} />
               <div>
                 <p className="text-sm font-medium text-gray-900">
-                  현재 <span className="text-purple-600">{levelConfig[accessLevel].label}</span> 열람 중
+                  현재 <span className="text-blue-600">{levelConfig[accessLevel].label}</span> 열람 중
                 </p>
                 <p className="text-xs text-gray-500">{levelConfig[accessLevel].description}</p>
               </div>
@@ -192,7 +192,7 @@ export default function ListingDetailPage() {
             {accessLevel !== 'FULL' && (
               <button
                 onClick={() => setShowUpgradeModal(true)}
-                className="px-4 py-2 bg-purple-600 text-white rounded-lg text-sm font-medium hover:bg-purple-700 flex items-center gap-2"
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 flex items-center gap-2"
               >
                 <Unlock className="w-4 h-4" />
                 업그레이드
@@ -204,12 +204,12 @@ export default function ListingDetailPage() {
         {/* Main Card */}
         <div className="bg-white rounded-2xl border overflow-hidden">
           {/* Header Section */}
-          <div className="bg-gradient-to-r from-purple-600 to-pink-600 p-6 text-white">
+          <div className="bg-gradient-to-r from-blue-600 to-blue-600 p-6 text-white">
             <div className="flex items-center justify-between mb-4">
               <span className="bg-white/20 backdrop-blur px-3 py-1 rounded-full text-sm">
                 {listing.status === 'ACTIVE' ? '매칭중' : listing.status}
               </span>
-              <div className="flex items-center gap-4 text-sm text-purple-100">
+              <div className="flex items-center gap-4 text-sm text-blue-100">
                 <span className="flex items-center gap-1">
                   <Eye className="w-4 h-4" />
                   {listing.view_count}
@@ -225,7 +225,7 @@ export default function ListingDetailPage() {
                 ? listing.pharmacy_name
                 : listing.region_name}
             </h1>
-            <p className="text-purple-100">
+            <p className="text-blue-100">
               {pharmacyTypeLabels[listing.pharmacy_type]}
               {listing.floor_info && ` · ${listing.floor_info}`}
               {listing.operation_years && ` · 운영 ${listing.operation_years}년`}
@@ -270,8 +270,8 @@ export default function ListingDetailPage() {
 
             {/* Price Section - PARTIAL+ */}
             <div className="grid md:grid-cols-3 gap-4 mb-8">
-              <div className="bg-purple-50 rounded-xl p-4">
-                <p className="text-sm text-purple-600 mb-1">권리금</p>
+              <div className="bg-blue-50 rounded-xl p-4">
+                <p className="text-sm text-blue-600 mb-1">권리금</p>
                 <LockedContent requiredLevel="PARTIAL" placeholder="??? ~ ???만원">
                   <p className="text-2xl font-bold text-gray-900">
                     {listing.premium_min && listing.premium_max
@@ -301,7 +301,7 @@ export default function ListingDetailPage() {
             {/* Revenue Section - PARTIAL+ */}
             <div className="mb-8">
               <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-                <TrendingUp className="w-5 h-5 text-purple-600" />
+                <TrendingUp className="w-5 h-5 text-blue-600" />
                 매출 정보
               </h2>
               <div className="grid md:grid-cols-2 gap-4">
@@ -329,7 +329,7 @@ export default function ListingDetailPage() {
             {/* Details Section - PARTIAL+ */}
             <div className="mb-8">
               <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-                <Building2 className="w-5 h-5 text-purple-600" />
+                <Building2 className="w-5 h-5 text-blue-600" />
                 약국 정보
               </h2>
               <div className="grid md:grid-cols-2 gap-4">
@@ -378,7 +378,7 @@ export default function ListingDetailPage() {
                   {listing.nearby_hospital_types.map((type) => (
                     <span
                       key={type}
-                      className="px-3 py-1.5 bg-purple-100 text-purple-700 rounded-full text-sm"
+                      className="px-3 py-1.5 bg-blue-100 text-blue-700 rounded-full text-sm"
                     >
                       {type}
                     </span>
@@ -425,7 +425,7 @@ export default function ListingDetailPage() {
                     <strong>부분 정보 열람 중입니다.</strong> 정확한 주소와 연락처는{' '}
                     <button
                       onClick={() => setShowUpgradeModal(true)}
-                      className="text-purple-600 underline font-medium"
+                      className="text-blue-600 underline font-medium"
                     >
                       전체 정보 열람
                     </button>
@@ -439,7 +439,7 @@ export default function ListingDetailPage() {
                     <strong>기본 정보만 열람 중입니다.</strong>{' '}
                     <button
                       onClick={() => setShowUpgradeModal(true)}
-                      className="text-purple-600 underline font-medium"
+                      className="text-blue-600 underline font-medium"
                     >
                       정보 업그레이드
                     </button>
@@ -456,7 +456,7 @@ export default function ListingDetailPage() {
           {accessLevel !== 'FULL' && (
             <button
               onClick={() => setShowUpgradeModal(true)}
-              className="flex-1 bg-white border-2 border-purple-600 text-purple-600 py-4 rounded-xl font-medium hover:bg-purple-50 flex items-center justify-center gap-2"
+              className="flex-1 bg-white border-2 border-blue-600 text-blue-600 py-4 rounded-xl font-medium hover:bg-blue-50 flex items-center justify-center gap-2"
             >
               <Unlock className="w-5 h-5" />
               정보 업그레이드
@@ -465,7 +465,7 @@ export default function ListingDetailPage() {
           <button
             onClick={() => setShowInterestModal(true)}
             disabled={listing.status !== 'ACTIVE'}
-            className="flex-1 bg-purple-600 text-white py-4 rounded-xl font-medium hover:bg-purple-700 disabled:bg-gray-300 flex items-center justify-center gap-2"
+            className="flex-1 bg-blue-600 text-white py-4 rounded-xl font-medium hover:bg-blue-700 disabled:bg-gray-300 flex items-center justify-center gap-2"
           >
             <Heart className="w-5 h-5" />
             관심 표시하기
@@ -491,7 +491,7 @@ export default function ListingDetailPage() {
                 onChange={(e) => setInterestMessage(e.target.value)}
                 rows={3}
                 placeholder="간단한 인사나 문의사항을 남겨주세요"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
               />
             </div>
 
@@ -505,7 +505,7 @@ export default function ListingDetailPage() {
               <button
                 onClick={() => interestMutation.mutate()}
                 disabled={interestMutation.isPending}
-                className="flex-1 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:bg-gray-400 flex items-center justify-center gap-2"
+                className="flex-1 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 flex items-center justify-center gap-2"
               >
                 {interestMutation.isPending ? (
                   <Loader2 className="w-4 h-4 animate-spin" />

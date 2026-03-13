@@ -93,16 +93,16 @@ interface ScanResult {
 
 const statusConfig: Record<CorrectionStatus, { label: string; color: string; bg: string }> = {
   DRAFT: { label: '초안', color: 'text-slate-600 dark:text-slate-400', bg: 'bg-slate-50 dark:bg-slate-900/20' },
-  SCANNING: { label: 'AI스캔중', color: 'text-purple-600 dark:text-purple-400', bg: 'bg-purple-50 dark:bg-purple-900/20' },
-  SCAN_COMPLETE: { label: '스캔완료', color: 'text-violet-600 dark:text-violet-400', bg: 'bg-violet-50 dark:bg-violet-900/20' },
+  SCANNING: { label: 'AI스캔중', color: 'text-blue-600 dark:text-blue-400', bg: 'bg-blue-50 dark:bg-blue-900/20' },
+  SCAN_COMPLETE: { label: '스캔완료', color: 'text-blue-600 dark:text-blue-400', bg: 'bg-blue-50 dark:bg-blue-900/20' },
   PENDING_REVIEW: { label: '검토중', color: 'text-amber-600 dark:text-amber-400', bg: 'bg-amber-50 dark:bg-amber-900/20' },
   PENDING_DOCS: { label: '서류필요', color: 'text-orange-600 dark:text-orange-400', bg: 'bg-orange-50 dark:bg-orange-900/20' },
-  READY_TO_SUBMIT: { label: '제출준비', color: 'text-cyan-600 dark:text-cyan-400', bg: 'bg-cyan-50 dark:bg-cyan-900/20' },
+  READY_TO_SUBMIT: { label: '제출준비', color: 'text-blue-600 dark:text-blue-400', bg: 'bg-blue-50 dark:bg-blue-900/20' },
   SUBMITTED: { label: '제출완료', color: 'text-blue-600 dark:text-blue-400', bg: 'bg-blue-50 dark:bg-blue-900/20' },
-  NTS_RECEIVED: { label: '국세청접수', color: 'text-indigo-600 dark:text-indigo-400', bg: 'bg-indigo-50 dark:bg-indigo-900/20' },
+  NTS_RECEIVED: { label: '국세청접수', color: 'text-blue-700 dark:text-blue-500', bg: 'bg-blue-50 dark:bg-blue-900/20' },
   UNDER_REVIEW: { label: '심사중', color: 'text-sky-600 dark:text-sky-400', bg: 'bg-sky-50 dark:bg-sky-900/20' },
   APPROVED: { label: '승인', color: 'text-emerald-600 dark:text-emerald-400', bg: 'bg-emerald-50 dark:bg-emerald-900/20' },
-  PARTIALLY_APPROVED: { label: '일부승인', color: 'text-teal-600 dark:text-teal-400', bg: 'bg-teal-50 dark:bg-teal-900/20' },
+  PARTIALLY_APPROVED: { label: '일부승인', color: 'text-blue-600 dark:text-blue-400', bg: 'bg-blue-50 dark:bg-blue-900/20' },
   REJECTED: { label: '반려', color: 'text-red-600 dark:text-red-400', bg: 'bg-red-50 dark:bg-red-900/20' },
   REFUND_PENDING: { label: '환급대기', color: 'text-lime-600 dark:text-lime-400', bg: 'bg-lime-50 dark:bg-lime-900/20' },
   COMPLETED: { label: '환급완료', color: 'text-green-600 dark:text-green-400', bg: 'bg-green-50 dark:bg-green-900/20' },
@@ -249,7 +249,7 @@ export default function TaxCorrectionPage() {
       {/* ───── 헤더 ───── */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex items-center gap-3">
-          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center">
+          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-emerald-500 to-blue-600 flex items-center justify-center">
             <Calculator className="w-6 h-6 text-white" />
           </div>
           <div>

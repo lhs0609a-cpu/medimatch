@@ -64,7 +64,7 @@ interface Facility {
 const platformKpis = [
   { label: '총 가입 기관', value: '3,247', change: '+124', positive: true, icon: Building2, color: 'bg-blue-100 text-blue-600 dark:bg-blue-900/30' },
   { label: '활성 사용자', value: '8,952', change: '+342', positive: true, icon: Users, color: 'bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30' },
-  { label: '월 구독 매출', value: '4.82억', change: '+18.7%', positive: true, icon: DollarSign, color: 'bg-purple-100 text-purple-600 dark:bg-purple-900/30' },
+  { label: '월 구독 매출', value: '4.82억', change: '+18.7%', positive: true, icon: DollarSign, color: 'bg-blue-100 text-blue-600 dark:bg-blue-900/30' },
   { label: '이탈률', value: '2.1%', change: '-0.3%p', positive: true, icon: Activity, color: 'bg-amber-100 text-amber-600 dark:bg-amber-900/30' },
 ]
 
@@ -110,7 +110,7 @@ const monthlyRevenueData = [
 const planConfig: Record<PlanType, { label: string; color: string }> = {
   starter: { label: 'Starter', color: 'bg-gray-100 text-gray-600 dark:bg-gray-800' },
   clinic: { label: 'Clinic', color: 'bg-blue-100 text-blue-600 dark:bg-blue-900/30' },
-  clinic_pro: { label: 'Clinic Pro', color: 'bg-purple-100 text-purple-600 dark:bg-purple-900/30' },
+  clinic_pro: { label: 'Clinic Pro', color: 'bg-blue-100 text-blue-600 dark:bg-blue-900/30' },
   pharmacy: { label: 'Pharmacy', color: 'bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30' },
 }
 
@@ -139,7 +139,7 @@ export default function AdminPage() {
       {/* 헤더 */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div className="flex items-center gap-3">
-          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center">
+          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-600 to-blue-700 flex items-center justify-center">
             <LayoutDashboard className="w-6 h-6 text-white" />
           </div>
           <div>
@@ -224,7 +224,7 @@ export default function AdminPage() {
             {/* 기관 구성 */}
             <div className="card p-5">
               <h2 className="font-bold text-sm mb-4 flex items-center gap-2">
-                <Building2 className="w-4 h-4 text-purple-600" /> 가입 기관 현황
+                <Building2 className="w-4 h-4 text-blue-600" /> 가입 기관 현황
               </h2>
               <div className="space-y-4">
                 <div>
@@ -250,20 +250,20 @@ export default function AdminPage() {
                 <div>
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center gap-2">
-                      <Pill className="w-4 h-4 text-purple-600" />
+                      <Pill className="w-4 h-4 text-blue-600" />
                       <span className="text-sm font-semibold">약국</span>
                     </div>
                     <span className="text-sm font-bold">{facilityBreakdown.pharmacies.total.toLocaleString()}곳</span>
                   </div>
                   <div className="flex h-4 rounded-full overflow-hidden bg-gray-100 dark:bg-gray-800">
-                    <div className="bg-purple-500" style={{ width: `${(facilityBreakdown.pharmacies.paid / facilityBreakdown.pharmacies.total) * 100}%` }} />
-                    <div className="bg-purple-300" style={{ width: `${(facilityBreakdown.pharmacies.starter / facilityBreakdown.pharmacies.total) * 100}%` }} />
-                    <div className="bg-purple-100" style={{ width: `${(facilityBreakdown.pharmacies.trial / facilityBreakdown.pharmacies.total) * 100}%` }} />
+                    <div className="bg-blue-600" style={{ width: `${(facilityBreakdown.pharmacies.paid / facilityBreakdown.pharmacies.total) * 100}%` }} />
+                    <div className="bg-blue-300" style={{ width: `${(facilityBreakdown.pharmacies.starter / facilityBreakdown.pharmacies.total) * 100}%` }} />
+                    <div className="bg-blue-100" style={{ width: `${(facilityBreakdown.pharmacies.trial / facilityBreakdown.pharmacies.total) * 100}%` }} />
                   </div>
                   <div className="flex items-center gap-3 mt-1 text-2xs text-muted-foreground">
-                    <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-purple-500" /> 유료 {facilityBreakdown.pharmacies.paid}</span>
-                    <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-purple-300" /> 무료 {facilityBreakdown.pharmacies.starter}</span>
-                    <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-purple-100" /> 체험 {facilityBreakdown.pharmacies.trial}</span>
+                    <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-blue-600" /> 유료 {facilityBreakdown.pharmacies.paid}</span>
+                    <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-blue-300" /> 무료 {facilityBreakdown.pharmacies.starter}</span>
+                    <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-blue-100" /> 체험 {facilityBreakdown.pharmacies.trial}</span>
                   </div>
                 </div>
               </div>
@@ -383,9 +383,9 @@ export default function AdminPage() {
                         <td className="py-3 px-4">
                           <div className="flex items-center gap-2">
                             <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${
-                              f.type === 'clinic' ? 'bg-blue-100 dark:bg-blue-900/30' : 'bg-purple-100 dark:bg-purple-900/30'
+                              f.type === 'clinic' ? 'bg-blue-100 dark:bg-blue-900/30' : 'bg-blue-100 dark:bg-blue-900/30'
                             }`}>
-                              {f.type === 'clinic' ? <Stethoscope className="w-4 h-4 text-blue-600" /> : <Pill className="w-4 h-4 text-purple-600" />}
+                              {f.type === 'clinic' ? <Stethoscope className="w-4 h-4 text-blue-600" /> : <Pill className="w-4 h-4 text-blue-600" />}
                             </div>
                             <div>
                               <span className="font-medium text-xs">{f.name}</span>
@@ -458,7 +458,7 @@ export default function AdminPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
             {[
               { label: 'CPU 사용률', value: '34%', icon: Cpu, color: 'text-blue-600', barWidth: 34 },
-              { label: '메모리 사용률', value: '62%', icon: Database, color: 'text-purple-600', barWidth: 62 },
+              { label: '메모리 사용률', value: '62%', icon: Database, color: 'text-blue-600', barWidth: 62 },
               { label: '디스크 사용률', value: '48%', icon: HardDrive, color: 'text-amber-600', barWidth: 48 },
               { label: '네트워크 I/O', value: '1.2 Gbps', icon: Wifi, color: 'text-emerald-600', barWidth: 45 },
             ].map((m, i) => (

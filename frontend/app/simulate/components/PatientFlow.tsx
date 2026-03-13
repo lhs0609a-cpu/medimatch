@@ -12,7 +12,7 @@ interface PatientFlowProps {
   result: SimulationResponse
 }
 
-const SOURCE_COLORS = ['#3b82f6', '#8b5cf6', '#f59e0b', '#22c55e', '#ef4444']
+const SOURCE_COLORS = ['#3b82f6', '#2563eb', '#f59e0b', '#22c55e', '#ef4444']
 
 function formatMoney(v: number): string {
   if (v >= 100000000) return `${(v / 100000000).toFixed(1)}억`
@@ -54,7 +54,7 @@ export default function PatientFlow({ result }: PatientFlowProps) {
     <div className="card p-6">
       {/* Header */}
       <div className="flex items-center gap-2 mb-5">
-        <Users className="w-5 h-5 text-indigo-500" />
+        <Users className="w-5 h-5 text-blue-600" />
         <h3 className="font-semibold text-foreground">환자 유입 경로 분석</h3>
         <span className="ml-auto text-[11px] text-muted-foreground">월 {monthlyPatients}명 기준</span>
       </div>
@@ -128,14 +128,14 @@ export default function PatientFlow({ result }: PatientFlowProps) {
             </div>
 
             {/* Retention gauge */}
-            <div className="p-3 bg-indigo-50 dark:bg-indigo-950/30 rounded-xl">
+            <div className="p-3 bg-blue-50 dark:bg-blue-950/30 rounded-xl">
               <div className="flex justify-between items-center mb-2">
                 <span className="text-xs text-muted-foreground">환자 재방문율</span>
-                <span className="text-lg font-bold text-indigo-600 dark:text-indigo-400">{retentionRate.toFixed(0)}%</span>
+                <span className="text-lg font-bold text-blue-700 dark:text-blue-500">{retentionRate.toFixed(0)}%</span>
               </div>
-              <div className="h-2.5 bg-indigo-200/50 dark:bg-indigo-800/30 rounded-full overflow-hidden">
+              <div className="h-2.5 bg-blue-300/50 dark:bg-blue-900/30 rounded-full overflow-hidden">
                 <div
-                  className="h-full bg-gradient-to-r from-indigo-400 to-indigo-600 rounded-full"
+                  className="h-full bg-gradient-to-r from-blue-500 to-blue-700 rounded-full"
                   style={{ width: `${retentionRate}%` }}
                 />
               </div>
@@ -156,7 +156,7 @@ export default function PatientFlow({ result }: PatientFlowProps) {
                 <XAxis dataKey="month" tick={{ fontSize: 10 }} />
                 <YAxis tick={{ fontSize: 10 }} />
                 <Tooltip formatter={(v: number) => [`${v}명`]} />
-                <Bar dataKey="newPatients" name="신규 환자" fill="#6366f1" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="newPatients" name="신규 환자" fill="#2563eb" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>

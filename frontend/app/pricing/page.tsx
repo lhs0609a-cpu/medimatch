@@ -414,7 +414,7 @@ export default function PricingPage() {
         </div>
 
         {/* CTA Banner */}
-        <div className="mt-16 bg-gradient-to-r from-primary/10 to-purple-500/10 rounded-2xl p-8 text-center">
+        <div className="mt-16 bg-gradient-to-r from-primary/10 to-blue-500/10 rounded-2xl p-8 text-center">
           <h3 className="text-2xl font-bold mb-2">아직 고민되시나요?</h3>
           <p className="text-muted-foreground mb-6">
             무료로 시작하고, 효과를 확인한 후 업그레이드하세요.

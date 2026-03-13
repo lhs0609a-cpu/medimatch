@@ -67,11 +67,11 @@ const phases = [
 const channels = [
   { name: '네이버 플레이스', cost: '무료', costRange: '필수 등록', effect: 5, roi: '최고', desc: '지역 검색 1위 채널. 리뷰·사진·예약 연동 필수', color: 'border-green-500' },
   { name: '네이버 블로그', cost: '무료~30만/월', costRange: '외주 시 30~50만', effect: 4, roi: '높음', desc: '의료정보 포스팅으로 전문성 어필. SEO 효과 탁월', color: 'border-blue-500' },
-  { name: '네이버 파워링크', cost: '50~200만/월', costRange: '클릭당 500~3,000원', effect: 4, roi: '중상', desc: '즉각적인 환자 유입. 키워드별 입찰가 관리 필요', color: 'border-indigo-500' },
-  { name: '인스타그램 광고', cost: '30~100만/월', costRange: '지역 타겟 광고', effect: 3, roi: '보통', desc: '20~40대 여성 타겟 효과적. 비주얼 콘텐츠 필수', color: 'border-pink-500' },
+  { name: '네이버 파워링크', cost: '50~200만/월', costRange: '클릭당 500~3,000원', effect: 4, roi: '중상', desc: '즉각적인 환자 유입. 키워드별 입찰가 관리 필요', color: 'border-blue-600' },
+  { name: '인스타그램 광고', cost: '30~100만/월', costRange: '지역 타겟 광고', effect: 3, roi: '보통', desc: '20~40대 여성 타겟 효과적. 비주얼 콘텐츠 필수', color: 'border-blue-500' },
   { name: '전단지/현수막', cost: '20~50만', costRange: '1회성 비용', effect: 2, roi: '낮음', desc: '개원 초기 인지도. 반경 1km 내 효과적', color: 'border-yellow-500' },
   { name: '카카오맵 등록', cost: '무료', costRange: '필수 등록', effect: 3, roi: '높음', desc: '카카오 검색 유입. 카카오톡 채널 연동 권장', color: 'border-amber-500' },
-  { name: '지역 커뮤니티', cost: '무료', costRange: '시간 투자', effect: 3, roi: '높음', desc: '맘카페, 지역카페 활동. 신뢰도 높은 입소문 채널', color: 'border-teal-500' },
+  { name: '지역 커뮤니티', cost: '무료', costRange: '시간 투자', effect: 3, roi: '높음', desc: '맘카페, 지역카페 활동. 신뢰도 높은 입소문 채널', color: 'border-blue-500' },
 ]
 
 const defaultAlloc = [
@@ -121,7 +121,7 @@ export default function MarketingPage() {
             { label: '총 체크리스트', value: `${phases.reduce((s, p) => s + p.items.length, 0)}개`, icon: Target, color: 'text-blue-500' },
             { label: '완료 항목', value: `${completed.length}개`, icon: CheckCircle2, color: 'text-green-500' },
             { label: '예상 월 예산', value: `${budget}만원`, icon: Calculator, color: 'text-orange-500' },
-            { label: '추천 채널', value: '7개', icon: BarChart3, color: 'text-purple-500' },
+            { label: '추천 채널', value: '7개', icon: BarChart3, color: 'text-blue-500' },
           ].map((kpi) => (
             <div key={kpi.label} className="card p-5">
               <div className="flex items-center gap-2 mb-1">

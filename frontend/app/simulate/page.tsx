@@ -418,7 +418,7 @@ export default function SimulatePage() {
                   <RentAnalysis result={DEMO_RESULT} />
 
                   {/* 2차 잠금 리마인더 */}
-                  <div className="flex items-center gap-3 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/30 dark:to-indigo-950/30 border border-blue-200 dark:border-blue-800 rounded-xl">
+                  <div className="flex items-center gap-3 p-4 bg-gradient-to-r from-blue-50 to-blue-50 dark:from-blue-950/30 dark:to-blue-950/30 border border-blue-200 dark:border-blue-800 rounded-xl">
                     <Lock className="w-5 h-5 text-blue-600 flex-shrink-0" />
                     <div className="flex-1">
                       <span className="text-sm font-medium text-foreground">AI 전략 리포트 · SWOT · 리스크 분석</span>
@@ -442,8 +442,8 @@ export default function SimulatePage() {
                   <AnalysisPack1 result={DEMO_RESULT} />
 
                   {/* 3차 잠금 리마인더 */}
-                  <div className="flex items-center gap-3 p-4 bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-950/30 dark:to-pink-950/30 border border-purple-200 dark:border-purple-800 rounded-xl">
-                    <Lock className="w-5 h-5 text-purple-600 flex-shrink-0" />
+                  <div className="flex items-center gap-3 p-4 bg-gradient-to-r from-blue-50 to-blue-50 dark:from-blue-950/30 dark:to-blue-950/30 border border-blue-200 dark:border-blue-800 rounded-xl">
+                    <Lock className="w-5 h-5 text-blue-600 flex-shrink-0" />
                     <div className="flex-1">
                       <span className="text-sm font-medium text-foreground">심층 의료 수요 · 인구 분석 120개+ 섹션</span>
                       <span className="text-xs text-muted-foreground ml-2">끝없는 인사이트가 기다립니다</span>
@@ -483,7 +483,7 @@ export default function SimulatePage() {
                   <OpeningTimeline result={DEMO_RESULT} />
 
                   {/* 5차 잠금 리마인더 */}
-                  <div className="flex items-center gap-3 p-4 bg-gradient-to-r from-rose-50 to-pink-50 dark:from-rose-950/30 dark:to-pink-950/30 border border-rose-200 dark:border-rose-800 rounded-xl">
+                  <div className="flex items-center gap-3 p-4 bg-gradient-to-r from-rose-50 to-blue-50 dark:from-rose-950/30 dark:to-blue-950/30 border border-rose-200 dark:border-rose-800 rounded-xl">
                     <Lock className="w-5 h-5 text-rose-600 flex-shrink-0" />
                     <div className="flex-1">
                       <span className="text-sm font-medium text-foreground">디지털 헬스 · 환자 경험 · 경쟁 심층 30개+ 섹션</span>
@@ -505,8 +505,8 @@ export default function SimulatePage() {
                   <CompetitionPack result={DEMO_RESULT} />
 
                   {/* 6차 잠금 리마인더 */}
-                  <div className="flex items-center gap-3 p-4 bg-gradient-to-r from-cyan-50 to-blue-50 dark:from-cyan-950/30 dark:to-blue-950/30 border border-cyan-200 dark:border-cyan-800 rounded-xl">
-                    <Lock className="w-5 h-5 text-cyan-600 flex-shrink-0" />
+                  <div className="flex items-center gap-3 p-4 bg-gradient-to-r from-blue-50 to-blue-50 dark:from-blue-950/30 dark:to-blue-950/30 border border-blue-200 dark:border-blue-800 rounded-xl">
+                    <Lock className="w-5 h-5 text-blue-600 flex-shrink-0" />
                     <div className="flex-1">
                       <span className="text-sm font-medium text-foreground">입지 심층 · 환자 분석 · 재무 심층 30개+ 섹션</span>
                       <span className="text-xs text-muted-foreground ml-2">보행자 동선 · 절세 · 환자 세분화</span>
@@ -546,8 +546,8 @@ export default function SimulatePage() {
                   <AnalysisPack6 result={DEMO_RESULT} />
 
                   {/* 8차 잠금 리마인더 */}
-                  <div className="flex items-center gap-3 p-4 bg-gradient-to-r from-indigo-50 to-violet-50 dark:from-indigo-950/30 dark:to-violet-950/30 border border-indigo-200 dark:border-indigo-800 rounded-xl">
-                    <Lock className="w-5 h-5 text-indigo-600 flex-shrink-0" />
+                  <div className="flex items-center gap-3 p-4 bg-gradient-to-r from-blue-50 to-blue-50 dark:from-blue-950/30 dark:to-blue-950/30 border border-blue-200 dark:border-blue-800 rounded-xl">
+                    <Lock className="w-5 h-5 text-blue-700 flex-shrink-0" />
                     <div className="flex-1">
                       <span className="text-sm font-medium text-foreground">프리미엄 AI 전략 리포트 9개 섹션</span>
                       <span className="text-xs text-muted-foreground ml-2">SWOT · 3년 성장전략 · 마케팅 · 리스크 대응</span>
@@ -619,7 +619,7 @@ export default function SimulatePage() {
                 </Link>
               </div>
             ) : (
-              <div className="card p-6 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/30 dark:to-indigo-950/30 border-blue-200 dark:border-blue-800">
+              <div className="card p-6 bg-gradient-to-r from-blue-50 to-blue-50 dark:from-blue-950/30 dark:to-blue-950/30 border-blue-200 dark:border-blue-800">
                 <div className="flex flex-col md:flex-row items-center justify-between gap-4">
                   <div>
                     <h3 className="font-semibold text-foreground">전체 분석 결과 확인하기</h3>

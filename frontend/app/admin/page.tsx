@@ -108,25 +108,25 @@ export default function AdminDashboardPage() {
 
   const statCards = [
     { title: '심사 대기', value: stats.pendingReview, icon: ClipboardCheck, color: 'from-amber-500 to-orange-500', shadow: 'shadow-amber-500/25', href: '/admin/listings', change: '건물주 매물', changeType: stats.pendingReview > 0 ? 'up' : 'neutral' },
-    { title: '상담 신청', value: stats.consultations, icon: Stethoscope, color: 'from-rose-500 to-pink-500', shadow: 'shadow-rose-500/25', href: '/admin/consultations', change: '개원 패키지', changeType: stats.consultations > 0 ? 'up' : 'neutral' },
-    { title: '문의', value: stats.inquiries, icon: MessageCircle, color: 'from-violet-500 to-purple-500', shadow: 'shadow-violet-500/25', href: '/admin/inquiries', change: '미답변', changeType: stats.inquiries > 0 ? 'up' : 'neutral' },
-    { title: '부동산 매물', value: stats.realEstateListings, icon: Building2, color: 'from-blue-500 to-indigo-500', shadow: 'shadow-blue-500/25', href: '/admin/realestate', change: '활성', changeType: 'neutral' as const },
-    { title: '약국 타겟', value: stats.pharmacyProspects, icon: Pill, color: 'from-rose-500 to-pink-500', shadow: 'shadow-rose-500/25', href: '/admin/prospects', change: `HOT ${stats.hotProspects}`, changeType: 'neutral' as const },
-    { title: '에스크로', value: stats.escrowActive, icon: ShieldCheck, color: 'from-teal-500 to-cyan-500', shadow: 'shadow-teal-500/25', href: '/admin/escrow', change: '진행중', changeType: 'neutral' as const },
+    { title: '상담 신청', value: stats.consultations, icon: Stethoscope, color: 'from-blue-500 to-blue-600', shadow: 'shadow-blue-500/25', href: '/admin/consultations', change: '개원 패키지', changeType: stats.consultations > 0 ? 'up' : 'neutral' },
+    { title: '문의', value: stats.inquiries, icon: MessageCircle, color: 'from-blue-500 to-blue-600', shadow: 'shadow-blue-500/25', href: '/admin/inquiries', change: '미답변', changeType: stats.inquiries > 0 ? 'up' : 'neutral' },
+    { title: '부동산 매물', value: stats.realEstateListings, icon: Building2, color: 'from-blue-500 to-blue-600', shadow: 'shadow-blue-500/25', href: '/admin/realestate', change: '활성', changeType: 'neutral' as const },
+    { title: '약국 타겟', value: stats.pharmacyProspects, icon: Pill, color: 'from-blue-500 to-blue-600', shadow: 'shadow-blue-500/25', href: '/admin/prospects', change: `HOT ${stats.hotProspects}`, changeType: 'neutral' as const },
+    { title: '에스크로', value: stats.escrowActive, icon: ShieldCheck, color: 'from-blue-500 to-blue-600', shadow: 'shadow-blue-500/25', href: '/admin/escrow', change: '진행중', changeType: 'neutral' as const },
     { title: '배너 대기', value: stats.bannersPending, icon: Megaphone, color: 'from-orange-500 to-red-500', shadow: 'shadow-orange-500/25', href: '/admin/banners', change: '승인 필요', changeType: stats.bannersPending > 0 ? 'up' : 'neutral' },
-    { title: '약국 매물 대기', value: stats.pharmacyPendingReview, icon: Pill, color: 'from-rose-500 to-pink-500', shadow: 'shadow-rose-500/25', href: '/admin/pharmacy-listings', change: '약국 양도', changeType: stats.pharmacyPendingReview > 0 ? 'up' : 'neutral' },
-    { title: '발송 완료', value: stats.campaignsSent, icon: Send, color: 'from-blue-400 to-cyan-500', shadow: 'shadow-blue-500/25', href: '/admin/campaigns', change: '이번 주', changeType: 'neutral' as const },
-    { title: 'SMS 잔액', value: stats.smsBalance.toLocaleString(), icon: TrendingUp, color: 'from-emerald-500 to-teal-500', shadow: 'shadow-emerald-500/25', href: '/admin/campaigns', change: '원', changeType: 'neutral' as const },
+    { title: '약국 매물 대기', value: stats.pharmacyPendingReview, icon: Pill, color: 'from-blue-500 to-blue-600', shadow: 'shadow-blue-500/25', href: '/admin/pharmacy-listings', change: '약국 양도', changeType: stats.pharmacyPendingReview > 0 ? 'up' : 'neutral' },
+    { title: '발송 완료', value: stats.campaignsSent, icon: Send, color: 'from-blue-500 to-blue-600', shadow: 'shadow-blue-500/25', href: '/admin/campaigns', change: '이번 주', changeType: 'neutral' as const },
+    { title: 'SMS 잔액', value: stats.smsBalance.toLocaleString(), icon: TrendingUp, color: 'from-emerald-500 to-emerald-600', shadow: 'shadow-emerald-500/25', href: '/admin/campaigns', change: '원', changeType: 'neutral' as const },
   ];
 
   const quickLinks = [
-    { href: '/admin/consultations', label: '상담 신청', desc: '개원 패키지 상담', icon: Stethoscope, color: 'from-rose-500 to-pink-500', shadow: 'shadow-rose-500/25' },
-    { href: '/admin/inquiries', label: '문의 관리', desc: '고객 문의 확인/답변', icon: MessageCircle, color: 'from-violet-500 to-purple-500', shadow: 'shadow-violet-500/25' },
+    { href: '/admin/consultations', label: '상담 신청', desc: '개원 패키지 상담', icon: Stethoscope, color: 'from-blue-500 to-blue-600', shadow: 'shadow-blue-500/25' },
+    { href: '/admin/inquiries', label: '문의 관리', desc: '고객 문의 확인/답변', icon: MessageCircle, color: 'from-blue-500 to-blue-600', shadow: 'shadow-blue-500/25' },
     { href: '/admin/banners', label: '배너 광고', desc: '광고 승인/수익 관리', icon: Megaphone, color: 'from-orange-500 to-red-500', shadow: 'shadow-orange-500/25' },
-    { href: '/admin/partners', label: '파트너 관리', desc: '파트너 인증/현황', icon: HeartHandshake, color: 'from-red-500 to-pink-500', shadow: 'shadow-red-500/25' },
-    { href: '/admin/escrow', label: '에스크로', desc: '안전거래/분쟁 관리', icon: ShieldCheck, color: 'from-teal-500 to-cyan-500', shadow: 'shadow-teal-500/25' },
-    { href: '/admin/group-buying', label: '공동구매', desc: '코호트/참여자 관리', icon: ShoppingCart, color: 'from-pink-500 to-rose-500', shadow: 'shadow-pink-500/25' },
-    { href: '/admin/simulations', label: '시뮬레이션', desc: '이력/통계 조회', icon: BarChart3, color: 'from-cyan-500 to-blue-500', shadow: 'shadow-cyan-500/25' },
+    { href: '/admin/partners', label: '파트너 관리', desc: '파트너 인증/현황', icon: HeartHandshake, color: 'from-blue-500 to-blue-600', shadow: 'shadow-blue-500/25' },
+    { href: '/admin/escrow', label: '에스크로', desc: '안전거래/분쟁 관리', icon: ShieldCheck, color: 'from-blue-500 to-blue-600', shadow: 'shadow-blue-500/25' },
+    { href: '/admin/group-buying', label: '공동구매', desc: '코호트/참여자 관리', icon: ShoppingCart, color: 'from-blue-500 to-blue-600', shadow: 'shadow-blue-500/25' },
+    { href: '/admin/simulations', label: '시뮬레이션', desc: '이력/통계 조회', icon: BarChart3, color: 'from-blue-500 to-blue-600', shadow: 'shadow-blue-500/25' },
   ];
 
   return (
@@ -226,17 +226,17 @@ export default function AdminDashboardPage() {
           {/* 상담 신청 */}
           <div className="bg-white rounded-2xl p-6 border border-gray-100">
             <div className="flex items-center gap-3 mb-4">
-              <TossIcon icon={Stethoscope} color="from-rose-500 to-pink-500" shadow="shadow-rose-500/25" size="sm" />
+              <TossIcon icon={Stethoscope} color="from-blue-500 to-blue-600" shadow="shadow-blue-500/25" size="sm" />
               <div>
                 <h3 className="font-semibold text-gray-900">상담 신청</h3>
                 <p className="text-sm text-gray-500">개원 패키지 상담</p>
               </div>
             </div>
             <div className="space-y-2">
-              <Link href="/admin/consultations" className="block px-4 py-3 bg-gray-50 rounded-xl text-gray-700 hover:bg-rose-50 hover:text-rose-700 transition-colors text-sm">
+              <Link href="/admin/consultations" className="block px-4 py-3 bg-gray-50 rounded-xl text-gray-700 hover:bg-blue-50 hover:text-blue-700 transition-colors text-sm">
                 전체 상담 보기
               </Link>
-              <Link href="/admin/consultations?status=NEW" className="block w-full px-4 py-3 bg-rose-600 text-white rounded-xl hover:bg-rose-700 transition-colors text-center text-sm">
+              <Link href="/admin/consultations?status=NEW" className="block w-full px-4 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors text-center text-sm">
                 신규 상담 확인
               </Link>
             </div>
@@ -245,7 +245,7 @@ export default function AdminDashboardPage() {
           {/* 문의 관리 */}
           <div className="bg-white rounded-2xl p-6 border border-gray-100">
             <div className="flex items-center gap-3 mb-4">
-              <TossIcon icon={MessageCircle} color="from-violet-500 to-purple-500" shadow="shadow-violet-500/25" size="sm" />
+              <TossIcon icon={MessageCircle} color="from-blue-500 to-blue-600" shadow="shadow-blue-500/25" size="sm" />
               <div>
                 <h3 className="font-semibold text-gray-900">문의 관리</h3>
                 <p className="text-sm text-gray-500">고객 문의 답변</p>
@@ -271,10 +271,10 @@ export default function AdminDashboardPage() {
               </div>
             </div>
             <div className="space-y-2">
-              <Link href="/admin/banners" className="block px-4 py-3 bg-gray-50 rounded-xl text-gray-700 hover:bg-pink-50 hover:text-pink-700 transition-colors text-sm">
+              <Link href="/admin/banners" className="block px-4 py-3 bg-gray-50 rounded-xl text-gray-700 hover:bg-blue-50 hover:text-blue-700 transition-colors text-sm">
                 광고 목록 보기
               </Link>
-              <Link href="/admin/banners?status=PENDING" className="block w-full px-4 py-3 bg-pink-600 text-white rounded-xl hover:bg-pink-700 transition-colors text-center text-sm">
+              <Link href="/admin/banners?status=PENDING" className="block w-full px-4 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors text-center text-sm">
                 승인 대기 ({stats.bannersPending}건)
               </Link>
             </div>
@@ -283,17 +283,17 @@ export default function AdminDashboardPage() {
           {/* 에스크로 */}
           <div className="bg-white rounded-2xl p-6 border border-gray-100">
             <div className="flex items-center gap-3 mb-4">
-              <TossIcon icon={ShieldCheck} color="from-teal-500 to-cyan-500" shadow="shadow-teal-500/25" size="sm" />
+              <TossIcon icon={ShieldCheck} color="from-blue-500 to-blue-600" shadow="shadow-blue-500/25" size="sm" />
               <div>
                 <h3 className="font-semibold text-gray-900">에스크로</h3>
                 <p className="text-sm text-gray-500">안전거래/분쟁</p>
               </div>
             </div>
             <div className="space-y-2">
-              <Link href="/admin/escrow" className="block px-4 py-3 bg-gray-50 rounded-xl text-gray-700 hover:bg-teal-50 hover:text-teal-700 transition-colors text-sm">
+              <Link href="/admin/escrow" className="block px-4 py-3 bg-gray-50 rounded-xl text-gray-700 hover:bg-blue-50 hover:text-blue-700 transition-colors text-sm">
                 거래 목록 보기
               </Link>
-              <Link href="/admin/escrow?tab=disputes" className="block w-full px-4 py-3 bg-teal-600 text-white rounded-xl hover:bg-teal-700 transition-colors text-center text-sm">
+              <Link href="/admin/escrow?tab=disputes" className="block w-full px-4 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors text-center text-sm">
                 분쟁 관리
               </Link>
             </div>
@@ -314,7 +314,7 @@ export default function AdminDashboardPage() {
               { time: '2시간 전', text: '에스크로 거래가 완료되었습니다', type: 'escrow', href: '/admin/escrow' },
             ].map((activity, i) => (
               <Link key={i} href={activity.href} className="flex items-center gap-4 p-3 rounded-xl hover:bg-gray-50 transition-colors group">
-                <div className="w-2 h-2 rounded-full bg-violet-400 flex-shrink-0" />
+                <div className="w-2 h-2 rounded-full bg-blue-400 flex-shrink-0" />
                 <div className="flex-1">
                   <p className="text-sm text-gray-700 group-hover:text-gray-900">{activity.text}</p>
                   <p className="text-xs text-gray-400 flex items-center gap-1 mt-0.5">

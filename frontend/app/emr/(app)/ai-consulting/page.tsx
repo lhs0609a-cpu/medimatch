@@ -54,7 +54,7 @@ interface AIInsight {
 const kpis = [
   { label: '월 매출', value: '8,420만원', change: '+12.4%', positive: true, icon: DollarSign, color: 'bg-blue-100 dark:bg-blue-900/30 text-blue-600' },
   { label: '월 환자 수', value: '624명', change: '+8.2%', positive: true, icon: Users, color: 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600' },
-  { label: '객단가', value: '134,900원', change: '-2.1%', positive: false, icon: Target, color: 'bg-purple-100 dark:bg-purple-900/30 text-purple-600' },
+  { label: '객단가', value: '134,900원', change: '-2.1%', positive: false, icon: Target, color: 'bg-blue-100 dark:bg-blue-900/30 text-blue-600' },
   { label: '청구 인정률', value: '97.6%', change: '+0.8%p', positive: true, icon: Shield, color: 'bg-amber-100 dark:bg-amber-900/30 text-amber-600' },
 ]
 
@@ -148,7 +148,7 @@ const insightConfig: Record<InsightType, { icon: typeof TrendingUp; color: strin
   growth: { icon: TrendingUp, color: 'text-emerald-600', bg: 'bg-emerald-50 dark:bg-emerald-900/10', border: 'border-emerald-200 dark:border-emerald-800' },
   warning: { icon: AlertTriangle, color: 'text-amber-600', bg: 'bg-amber-50 dark:bg-amber-900/10', border: 'border-amber-200 dark:border-amber-800' },
   saving: { icon: Wallet, color: 'text-blue-600', bg: 'bg-blue-50 dark:bg-blue-900/10', border: 'border-blue-200 dark:border-blue-800' },
-  optimization: { icon: Zap, color: 'text-purple-600', bg: 'bg-purple-50 dark:bg-purple-900/10', border: 'border-purple-200 dark:border-purple-800' },
+  optimization: { icon: Zap, color: 'text-blue-600', bg: 'bg-blue-50 dark:bg-blue-900/10', border: 'border-blue-200 dark:border-blue-800' },
 }
 
 const feeScheduleImpact = [
@@ -168,7 +168,7 @@ export default function AIConsultingPage() {
       {/* 헤더 */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div className="flex items-center gap-3">
-          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
+          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
             <Brain className="w-6 h-6 text-white" />
           </div>
           <div>
@@ -324,7 +324,7 @@ export default function AIConsultingPage() {
                         insight.type === 'growth' ? 'bg-emerald-600 hover:bg-emerald-700' :
                         insight.type === 'warning' ? 'bg-amber-600 hover:bg-amber-700' :
                         insight.type === 'saving' ? 'bg-blue-600 hover:bg-blue-700' :
-                        'bg-purple-600 hover:bg-purple-700'
+                        'bg-blue-600 hover:bg-blue-700'
                       }`}>
                         {insight.actionLabel} <ChevronRight className="w-3 h-3" />
                       </button>
@@ -401,7 +401,7 @@ export default function AIConsultingPage() {
         <div className="space-y-4">
           <div className="card p-5">
             <h2 className="font-bold flex items-center gap-2 mb-4">
-              <PieChart className="w-5 h-5 text-purple-600" /> 진료과목별 매출 구성
+              <PieChart className="w-5 h-5 text-blue-600" /> 진료과목별 매출 구성
             </h2>
 
             <div className="space-y-3">
@@ -416,7 +416,7 @@ export default function AIConsultingPage() {
                     <div className="h-4 bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden">
                       <div
                         className={`h-full rounded-full ${
-                          i === 0 ? 'bg-blue-500' : i === 1 ? 'bg-emerald-500' : i === 2 ? 'bg-purple-500' : i === 3 ? 'bg-amber-500' : 'bg-pink-500'
+                          i === 0 ? 'bg-blue-500' : i === 1 ? 'bg-emerald-500' : i === 2 ? 'bg-blue-500' : i === 3 ? 'bg-amber-500' : 'bg-blue-500'
                         }`}
                         style={{ width: `${item.ratio}%` }}
                       />
@@ -432,12 +432,12 @@ export default function AIConsultingPage() {
               ))}
             </div>
 
-            <div className="mt-4 bg-purple-50 dark:bg-purple-900/10 rounded-xl p-3">
+            <div className="mt-4 bg-blue-50 dark:bg-blue-900/10 rounded-xl p-3">
               <div className="flex items-start gap-2">
-                <Brain className="w-4 h-4 text-purple-600 flex-shrink-0 mt-0.5" />
+                <Brain className="w-4 h-4 text-blue-600 flex-shrink-0 mt-0.5" />
                 <div>
-                  <p className="text-xs font-semibold text-purple-600">AI 수익성 분석</p>
-                  <ul className="mt-1 space-y-1 text-2xs text-purple-700 dark:text-purple-300">
+                  <p className="text-xs font-semibold text-blue-600">AI 수익성 분석</p>
+                  <ul className="mt-1 space-y-1 text-2xs text-blue-700 dark:text-blue-300">
                     <li>• <strong>건강검진</strong>이 가장 빠른 성장세 (+18.4%). 인력/장비 투자 ROI 최고</li>
                     <li>• <strong>만성질환 관리</strong>는 안정적 수입원. 재방문율 높아 객단가 보완</li>
                     <li>• <strong>호흡기</strong> 하락세 지속. 전문 의원 개원 영향. 포트폴리오 재조정 권고</li>

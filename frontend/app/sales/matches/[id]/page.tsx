@@ -17,7 +17,7 @@ const statusConfig: Record<string, { label: string; color: string; bgColor: stri
   REJECTED: { label: '거절됨', color: 'text-red-700', bgColor: 'bg-red-100', icon: XCircle },
   EXPIRED: { label: '만료됨', color: 'text-gray-700', bgColor: 'bg-gray-100', icon: Clock },
   REFUNDED: { label: '환불됨', color: 'text-blue-700', bgColor: 'bg-blue-100', icon: RefreshCw },
-  CONTACT_MADE: { label: '컨택 완료', color: 'text-purple-700', bgColor: 'bg-purple-100', icon: CheckCircle2 },
+  CONTACT_MADE: { label: '컨택 완료', color: 'text-blue-700', bgColor: 'bg-blue-100', icon: CheckCircle2 },
   COMPLETED: { label: '완료', color: 'text-green-700', bgColor: 'bg-green-100', icon: CheckCircle2 },
 }
 
@@ -75,7 +75,7 @@ export default function SalesMatchDetailPage() {
               <ArrowLeft className="w-5 h-5" />
             </button>
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center">
+              <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-700 rounded-lg flex items-center justify-center">
                 <Briefcase className="w-4 h-4 text-white" />
               </div>
               <span className="text-xl font-bold text-gray-900">매칭 상세</span>

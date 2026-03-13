@@ -123,9 +123,9 @@ export default function RevenueCalc({
             </span>
             <span className="font-semibold text-foreground">{formatWon(revenue.insuranceRevenue)}원</span>
           </div>
-          <div className="flex items-center justify-between p-3 bg-purple-50 dark:bg-purple-950/20 rounded-lg">
+          <div className="flex items-center justify-between p-3 bg-blue-50 dark:bg-blue-950/20 rounded-lg">
             <span className="text-sm text-muted-foreground flex items-center gap-1.5">
-              <Sparkles className="w-4 h-4 text-purple-500" /> 비보험 수익
+              <Sparkles className="w-4 h-4 text-blue-500" /> 비보험 수익
             </span>
             <span className="font-semibold text-foreground">{formatWon(revenue.nonInsuranceRevenue)}원</span>
           </div>

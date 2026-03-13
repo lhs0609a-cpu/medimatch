@@ -166,7 +166,7 @@ export default function SalesProfilePage() {
               <ArrowLeft className="w-5 h-5" />
             </Link>
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center">
+              <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-700 rounded-lg flex items-center justify-center">
                 <Briefcase className="w-4 h-4 text-white" />
               </div>
               <span className="text-xl font-bold text-gray-900">
@@ -296,7 +296,7 @@ export default function SalesProfilePage() {
                   onClick={() => toggleSpecialty(specialty)}
                   className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
                     formData.target_specialties.includes(specialty)
-                      ? 'bg-purple-600 text-white'
+                      ? 'bg-blue-600 text-white'
                       : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                   }`}
                 >

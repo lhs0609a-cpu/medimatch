@@ -103,7 +103,7 @@ const riskConfig = {
 const statusConfig = {
   pending: { label: '검토 필요', color: 'text-amber-600', bg: 'bg-amber-50 dark:bg-amber-900/20' },
   defended: { label: '방어 완료', color: 'text-blue-600', bg: 'bg-blue-50 dark:bg-blue-900/20' },
-  revised: { label: '수정 완료', color: 'text-purple-600', bg: 'bg-purple-50 dark:bg-purple-900/20' },
+  revised: { label: '수정 완료', color: 'text-blue-600', bg: 'bg-blue-50 dark:bg-blue-900/20' },
   safe: { label: '적정', color: 'text-emerald-600', bg: 'bg-emerald-50 dark:bg-emerald-900/20' },
 }
 
@@ -224,7 +224,7 @@ export default function ClaimDefensePage() {
       {/* 헤더 */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div className="flex items-center gap-3">
-          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center">
+          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-500 flex items-center justify-center">
             <Shield className="w-6 h-6 text-white" />
           </div>
           <div>
@@ -463,7 +463,7 @@ export default function ClaimDefensePage() {
 
                       <div className="card p-4">
                         <h4 className="text-xs font-semibold text-muted-foreground mb-3 flex items-center gap-1.5">
-                          <Sparkles className="w-3.5 h-3.5 text-purple-600" /> AI 방어 제안
+                          <Sparkles className="w-3.5 h-3.5 text-blue-600" /> AI 방어 제안
                         </h4>
                         <div className="p-3 rounded-xl bg-blue-50 dark:bg-blue-900/10 mb-4">
                           <p className="text-sm text-blue-800 dark:text-blue-300 leading-relaxed">{claim.aiSuggestion}</p>
@@ -474,7 +474,7 @@ export default function ClaimDefensePage() {
                               <button className="btn-sm text-2xs bg-blue-600 text-white hover:bg-blue-700">
                                 <Edit3 className="w-3 h-3" /> 차트 수정
                               </button>
-                              <button className="btn-sm text-2xs bg-purple-500 text-white hover:bg-purple-600">
+                              <button className="btn-sm text-2xs bg-blue-500 text-white hover:bg-blue-600">
                                 <Sparkles className="w-3 h-3" /> AI 의견서 생성
                               </button>
                               <button className="btn-sm text-2xs bg-secondary text-foreground" onClick={() => setShowAppealModal(claim.id)}>

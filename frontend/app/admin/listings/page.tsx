@@ -21,6 +21,7 @@ import {
   AlertTriangle,
 } from 'lucide-react';
 import { TossIcon } from '@/components/ui/TossIcon';
+import { toast } from 'sonner';
 
 // ============================================================
 // Types
@@ -105,7 +106,7 @@ const STATUS_CONFIG: Record<string, { label: string; bg: string; text: string }>
   PENDING_REVIEW: { label: '심사대기', bg: 'bg-orange-100',  text: 'text-orange-700' },
   ACTIVE:         { label: '활성',     bg: 'bg-emerald-100', text: 'text-emerald-700' },
   RESERVED:       { label: '예약됨',   bg: 'bg-amber-100',   text: 'text-amber-700' },
-  CONTRACTED:     { label: '계약완료', bg: 'bg-violet-100',  text: 'text-violet-700' },
+  CONTRACTED:     { label: '계약완료', bg: 'bg-blue-100',  text: 'text-blue-700' },
   CLOSED:         { label: '마감',     bg: 'bg-gray-100',    text: 'text-gray-500' },
   REJECTED:       { label: '거부됨',   bg: 'bg-rose-100',    text: 'text-rose-700' },
 };
@@ -219,10 +220,10 @@ export default function AdminListingsPage() {
         fetchListings();
       } else {
         const err = await res.json();
-        alert(err.detail || '승인 실패');
+        toast.error(err.detail || '승인 실패');
       }
     } catch (e) {
-      alert('요청 실패');
+      toast.error('요청 실패');
     } finally {
       setActionLoading(false);
     }
@@ -247,10 +248,10 @@ export default function AdminListingsPage() {
         fetchListings();
       } else {
         const err = await res.json();
-        alert(err.detail || '거부 실패');
+        toast.error(err.detail || '거부 실패');
       }
     } catch (e) {
-      alert('요청 실패');
+      toast.error('요청 실패');
     } finally {
       setActionLoading(false);
     }
@@ -276,10 +277,10 @@ export default function AdminListingsPage() {
         fetchListings();
       } else {
         const err = await res.json();
-        alert(err.detail || '상태 변경 실패');
+        toast.error(err.detail || '상태 변경 실패');
       }
     } catch (e) {
-      alert('요청 실패');
+      toast.error('요청 실패');
     } finally {
       setActionLoading(false);
     }
@@ -338,7 +339,7 @@ export default function AdminListingsPage() {
                 }}
                 className={`p-3 rounded-xl border text-center transition-all ${
                   isSelected
-                    ? 'border-violet-300 bg-violet-50 ring-2 ring-violet-200'
+                    ? 'border-blue-300 bg-blue-50 ring-2 ring-blue-200'
                     : 'border-gray-100 bg-white hover:border-gray-200'
                 }`}
               >
@@ -362,13 +363,13 @@ export default function AdminListingsPage() {
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-            className="w-full pl-10 pr-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-violet-200 focus:border-violet-300"
+            className="w-full pl-10 pr-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-300"
           />
         </div>
         <select
           value={statusFilter}
           onChange={(e) => { setStatusFilter(e.target.value); setPage(1); }}
-          className="px-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-violet-200"
+          className="px-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-200"
         >
           <option value="">전체 상태</option>
           {ALL_STATUSES.map((s) => (
@@ -377,7 +378,7 @@ export default function AdminListingsPage() {
         </select>
         <button
           onClick={handleSearch}
-          className="px-4 py-2.5 bg-violet-600 text-white rounded-xl text-sm hover:bg-violet-700 transition-colors"
+          className="px-4 py-2.5 bg-blue-600 text-white rounded-xl text-sm hover:bg-blue-700 transition-colors"
         >
           검색
         </button>
@@ -444,7 +445,7 @@ export default function AdminListingsPage() {
                         <div className="flex items-center justify-center gap-1">
                           <button
                             onClick={() => openDetail(item.id)}
-                            className="p-1.5 rounded-lg text-gray-400 hover:text-violet-600 hover:bg-violet-50 transition-colors"
+                            className="p-1.5 rounded-lg text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-colors"
                             title="상세보기"
                           >
                             <Eye className="w-4 h-4" />
@@ -538,7 +539,7 @@ export default function AdminListingsPage() {
                     onClick={() => setPage(p)}
                     className={`w-8 h-8 rounded-lg text-sm font-medium transition-colors ${
                       p === page
-                        ? 'bg-violet-600 text-white'
+                        ? 'bg-blue-600 text-white'
                         : 'text-gray-600 hover:bg-gray-100'
                     }`}
                   >
@@ -566,7 +567,7 @@ export default function AdminListingsPage() {
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-2xl max-h-[85vh] overflow-y-auto m-4" onClick={(e) => e.stopPropagation()}>
             {detailLoading ? (
               <div className="p-12 text-center">
-                <RefreshCw className="w-8 h-8 animate-spin mx-auto text-violet-500 mb-3" />
+                <RefreshCw className="w-8 h-8 animate-spin mx-auto text-blue-500 mb-3" />
                 <p className="text-gray-500">로딩 중...</p>
               </div>
             ) : detailModal && (
@@ -638,7 +639,7 @@ export default function AdminListingsPage() {
                             href={doc.url}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="flex items-center gap-2 px-3 py-2 bg-gray-50 rounded-lg text-sm text-violet-600 hover:bg-violet-50 transition-colors"
+                            className="flex items-center gap-2 px-3 py-2 bg-gray-50 rounded-lg text-sm text-blue-600 hover:bg-blue-50 transition-colors"
                           >
                             <FileText className="w-4 h-4" />
                             {doc.type} - {new Date(doc.uploaded_at).toLocaleDateString('ko-KR')}
@@ -779,7 +780,7 @@ export default function AdminListingsPage() {
               onChange={(e) => setStatusReason(e.target.value)}
               placeholder="사유를 입력하세요 (선택)"
               rows={2}
-              className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-violet-200 focus:border-violet-300 resize-none mb-4"
+              className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-300 resize-none mb-4"
             />
             <div className="flex gap-3">
               <button
@@ -791,7 +792,7 @@ export default function AdminListingsPage() {
               <button
                 onClick={handleStatusChange}
                 disabled={actionLoading}
-                className="flex-1 px-4 py-2.5 bg-violet-600 text-white rounded-xl text-sm font-medium hover:bg-violet-700 disabled:opacity-50 transition-colors"
+                className="flex-1 px-4 py-2.5 bg-blue-600 text-white rounded-xl text-sm font-medium hover:bg-blue-700 disabled:opacity-50 transition-colors"
               >
                 {actionLoading ? '처리 중...' : '변경'}
               </button>

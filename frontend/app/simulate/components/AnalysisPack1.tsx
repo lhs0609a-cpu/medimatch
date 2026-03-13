@@ -78,7 +78,7 @@ export default function AnalysisPack1({ result }: Props) {
       <Card icon={Thermometer} title="계절별 환자 수요 분석" color="text-orange-500">
         <div className="grid grid-cols-4 gap-3 mb-4">
           {[
-            { season: '봄', factor: 1.1, icon: '🌸', color: 'bg-pink-100 dark:bg-pink-900/30' },
+            { season: '봄', factor: 1.1, icon: '🌸', color: 'bg-blue-100 dark:bg-blue-900/30' },
             { season: '여름', factor: 0.85, icon: '☀️', color: 'bg-yellow-100 dark:bg-yellow-900/30' },
             { season: '가을', factor: 1.15, icon: '🍂', color: 'bg-orange-100 dark:bg-orange-900/30' },
             { season: '겨울', factor: 0.9, icon: '❄️', color: 'bg-blue-100 dark:bg-blue-900/30' },
@@ -97,7 +97,7 @@ export default function AnalysisPack1({ result }: Props) {
       </Card>
 
       {/* 4. 진료 항목 분포 */}
-      <Card icon={Activity} title="예상 진료 항목 분포" color="text-purple-500">
+      <Card icon={Activity} title="예상 진료 항목 분포" color="text-blue-500">
         <div className="space-y-2">
           {[
             { name: '초진 상담', pct: 35, count: 13, color: '#8b5cf6' },
@@ -121,10 +121,10 @@ export default function AnalysisPack1({ result }: Props) {
       </Card>
 
       {/* 5. 환자 체류시간 */}
-      <Card icon={Clock} title="평균 환자 체류시간 분석" color="text-cyan-500">
+      <Card icon={Clock} title="평균 환자 체류시간 분석" color="text-blue-600">
         <div className="grid grid-cols-2 gap-4 mb-4">
-          <div className="p-4 bg-cyan-50 dark:bg-cyan-950/20 rounded-xl text-center">
-            <div className="text-3xl font-bold text-cyan-600">42분</div>
+          <div className="p-4 bg-blue-50 dark:bg-blue-950/20 rounded-xl text-center">
+            <div className="text-3xl font-bold text-blue-600">42분</div>
             <div className="text-xs text-muted-foreground">평균 체류시간</div>
           </div>
           <div className="p-4 bg-secondary/50 rounded-xl text-center">
@@ -141,7 +141,7 @@ export default function AnalysisPack1({ result }: Props) {
             <div key={s.step} className="flex items-center gap-2">
               <span className="text-xs text-muted-foreground w-20">{s.step}</span>
               <div className="flex-1 h-4 bg-muted rounded overflow-hidden">
-                <div className="h-full bg-cyan-400 dark:bg-cyan-600 rounded" style={{ width: `${(s.min / 25) * 100}%` }} />
+                <div className="h-full bg-blue-400 dark:bg-blue-600 rounded" style={{ width: `${(s.min / 25) * 100}%` }} />
               </div>
               <span className="text-xs font-medium w-10 text-right">{s.min}분</span>
             </div>
@@ -208,10 +208,10 @@ export default function AnalysisPack1({ result }: Props) {
       </Card>
 
       {/* 8. 건강보험 심사율 */}
-      <Card icon={ShieldCheck} title="건강보험 심사 · 삭감 분석" color="text-teal-500">
+      <Card icon={ShieldCheck} title="건강보험 심사 · 삭감 분석" color="text-blue-500">
         <div className="grid grid-cols-3 gap-3 mb-4">
-          <div className="text-center p-3 bg-teal-50 dark:bg-teal-950/20 rounded-lg">
-            <div className="text-2xl font-bold text-teal-600">95.8%</div>
+          <div className="text-center p-3 bg-blue-50 dark:bg-blue-950/20 rounded-lg">
+            <div className="text-2xl font-bold text-blue-600">95.8%</div>
             <div className="text-[10px] text-muted-foreground">청구 인정률</div>
           </div>
           <div className="text-center p-3 bg-secondary/50 rounded-lg">
@@ -232,7 +232,7 @@ export default function AnalysisPack1({ result }: Props) {
             <div key={r.item} className="flex items-center gap-2">
               <span className="text-xs text-muted-foreground w-20">{r.item}</span>
               <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden">
-                <div className="h-full bg-teal-500 rounded-full" style={{ width: `${r.rate}%` }} />
+                <div className="h-full bg-blue-500 rounded-full" style={{ width: `${r.rate}%` }} />
               </div>
               <span className="text-xs font-medium w-12 text-right">{r.rate}%</span>
             </div>
@@ -241,7 +241,7 @@ export default function AnalysisPack1({ result }: Props) {
       </Card>
 
       {/* 9. 의료장비 활용률 */}
-      <Card icon={Microscope} title="의료장비 투자 · 활용률 분석" color="text-indigo-500">
+      <Card icon={Microscope} title="의료장비 투자 · 활용률 분석" color="text-blue-600">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
@@ -273,7 +273,7 @@ export default function AnalysisPack1({ result }: Props) {
             </tbody>
           </table>
         </div>
-        <div className="mt-3 p-3 bg-indigo-50 dark:bg-indigo-950/20 rounded-lg text-xs text-muted-foreground">
+        <div className="mt-3 p-3 bg-blue-50 dark:bg-blue-950/20 rounded-lg text-xs text-muted-foreground">
           총 장비 투자: <span className="font-bold text-foreground">약 2억 300만원</span> · 월 장비 수익: <span className="font-bold text-foreground">약 1,970만원</span> · 투자 회수: <span className="font-bold text-foreground">약 10.3개월</span>
         </div>
       </Card>

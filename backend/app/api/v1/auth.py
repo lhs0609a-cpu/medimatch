@@ -1,9 +1,10 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
-from pydantic import BaseModel, EmailStr
-from datetime import datetime
+from pydantic import BaseModel, EmailStr, Field
+from datetime import datetime, timedelta
 import logging
+import uuid
 
 from ...schemas.user import (
     UserCreate, UserResponse, UserLogin, UserUpdate,
@@ -187,20 +188,68 @@ class PasswordResetRequest(BaseModel):
     email: EmailStr
 
 
+class PasswordReset(BaseModel):
+    token: str
+    new_password: str = Field(..., min_length=8)
+
+
 @router.post("/forgot-password")
 async def forgot_password(
     data: PasswordResetRequest,
     db: AsyncSession = Depends(get_db)
 ):
     """비밀번호 재설정 이메일 발송 요청"""
-    # Always return success to prevent email enumeration
     result = await db.execute(
         select(User).where(User.email == data.email)
     )
     user = result.scalar_one_or_none()
 
     if user and user.is_active:
-        # TODO: Send password reset email via SMTP when configured
-        logger.info(f"Password reset requested for: {data.email}")
+        token = str(uuid.uuid4())
+        user.reset_token = token
+        user.reset_token_expires = datetime.utcnow() + timedelta(hours=1)
+        await db.commit()
+
+        # Send reset link via SMS (Solapi) if phone available
+        reset_url = f"https://medi.brandplaton.com/reset-password?token={token}"
+
+        try:
+            if user.phone:
+                from ...services.outbound_campaign import solapi_service
+                await solapi_service.send_sms(
+                    user.phone,
+                    f"[메디플라톤] 비밀번호 재설정\n아래 링크를 클릭하세요:\n{reset_url}\n(1시간 내 유효)"
+                )
+            logger.info(f"Password reset sent for: {data.email}")
+        except Exception as e:
+            logger.error(f"Failed to send reset: {e}")
 
     return {"message": "등록된 이메일이라면 비밀번호 재설정 링크가 발송됩니다."}
+
+
+@router.post("/reset-password")
+async def reset_password(
+    data: PasswordReset,
+    db: AsyncSession = Depends(get_db)
+):
+    """비밀번호 재설정 (토큰 검증)"""
+    result = await db.execute(
+        select(User).where(User.reset_token == data.token)
+    )
+    user = result.scalar_one_or_none()
+
+    if not user:
+        raise HTTPException(status_code=400, detail="유효하지 않은 토큰입니다")
+
+    if user.reset_token_expires and user.reset_token_expires < datetime.utcnow():
+        user.reset_token = None
+        user.reset_token_expires = None
+        await db.commit()
+        raise HTTPException(status_code=400, detail="토큰이 만료되었습니다. 다시 요청해주세요.")
+
+    user.hashed_password = get_password_hash(data.new_password)
+    user.reset_token = None
+    user.reset_token_expires = None
+    await db.commit()
+
+    return {"message": "비밀번호가 성공적으로 변경되었습니다"}

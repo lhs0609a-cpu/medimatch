@@ -14,7 +14,7 @@ import { PharmacySlot } from '@/lib/api/client'
 const statusLabels: Record<string, { label: string; color: string }> = {
   OPEN: { label: '모집중', color: 'bg-green-100 text-green-700' },
   BIDDING: { label: '입찰진행', color: 'bg-blue-100 text-blue-700' },
-  MATCHED: { label: '매칭완료', color: 'bg-purple-100 text-purple-700' },
+  MATCHED: { label: '매칭완료', color: 'bg-blue-100 text-blue-700' },
   CLOSED: { label: '마감', color: 'bg-gray-100 text-gray-700' },
 }
 
@@ -56,13 +56,13 @@ export default function PharmacyPage() {
               <ArrowLeft className="w-5 h-5" />
             </Link>
             <div className="flex items-center gap-2">
-              <TossIcon icon={Pill} color="from-rose-500 to-pink-500" size="xs" shadow="shadow-rose-500/25" />
+              <TossIcon icon={Pill} color="from-blue-500 to-blue-600" size="xs" shadow="shadow-blue-500/25" />
               <span className="text-xl font-bold text-gray-900">PharmMatch</span>
             </div>
           </div>
           <Link
             href="/login"
-            className="bg-purple-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-purple-700"
+            className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700"
           >
             로그인하고 입찰하기
           </Link>
@@ -71,20 +71,20 @@ export default function PharmacyPage() {
 
       <main className="container mx-auto px-4 py-8">
         {/* Hero Section */}
-        <div className="bg-gradient-to-r from-purple-600 to-purple-700 rounded-2xl p-8 mb-8 text-white">
+        <div className="bg-gradient-to-r from-blue-600 to-blue-700 rounded-2xl p-8 mb-8 text-white">
           <h1 className="text-3xl font-bold mb-2">독점 약국 자리</h1>
-          <p className="text-purple-100 mb-6">
+          <p className="text-blue-100 mb-6">
             의사 유치가 확정된 독점 약국 자리에 입찰하세요.<br />
             처방전 예측 데이터로 최적의 개국 위치를 찾을 수 있습니다.
           </p>
           <div className="flex gap-4">
             <div className="bg-white/20 rounded-xl px-4 py-2">
               <div className="text-2xl font-bold">{slots.length}</div>
-              <div className="text-sm text-purple-100">현재 모집중</div>
+              <div className="text-sm text-blue-100">현재 모집중</div>
             </div>
             <div className="bg-white/20 rounded-xl px-4 py-2">
               <div className="text-2xl font-bold">85%</div>
-              <div className="text-sm text-purple-100">처방전 예측 정확도</div>
+              <div className="text-sm text-blue-100">처방전 예측 정확도</div>
             </div>
           </div>
         </div>
@@ -100,7 +100,7 @@ export default function PharmacyPage() {
                 placeholder="주소 또는 지역으로 검색"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               />
             </div>
 
@@ -112,7 +112,7 @@ export default function PharmacyPage() {
                   onClick={() => setSelectedClinic(type)}
                   className={`px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition ${
                     selectedClinic === type
-                      ? 'bg-purple-600 text-white'
+                      ? 'bg-blue-600 text-white'
                       : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                   }`}
                 >
@@ -126,7 +126,7 @@ export default function PharmacyPage() {
         {/* Slots Grid */}
         {isLoading ? (
           <div className="text-center py-12">
-            <div className="animate-spin h-8 w-8 border-4 border-purple-600 border-t-transparent rounded-full mx-auto mb-4" />
+            <div className="animate-spin h-8 w-8 border-4 border-blue-600 border-t-transparent rounded-full mx-auto mb-4" />
             <p className="text-gray-600">약국 자리를 불러오는 중...</p>
           </div>
         ) : slots.length === 0 ? (
@@ -186,7 +186,7 @@ export default function PharmacyPage() {
                     </div>
                     <div>
                       <p className="text-xs text-gray-500">예상 월 조제료</p>
-                      <p className="text-lg font-bold text-purple-600">
+                      <p className="text-lg font-bold text-blue-600">
                         {slot.est_monthly_revenue ? formatCurrency(slot.est_monthly_revenue) : '-'}
                       </p>
                     </div>
@@ -201,7 +201,7 @@ export default function PharmacyPage() {
                     {slot.bid_count !== undefined && slot.bid_count > 0 && (
                       <div className="text-right">
                         <p className="text-xs text-gray-500">현재 입찰</p>
-                        <p className="font-bold text-purple-600">{slot.bid_count}건</p>
+                        <p className="font-bold text-blue-600">{slot.bid_count}건</p>
                       </div>
                     )}
                   </div>
@@ -232,7 +232,7 @@ export default function PharmacyPage() {
             </div>
             <div className="text-center">
               <div className="flex justify-center mb-3">
-                <TossIcon icon={TrendingUp} color="from-cyan-500 to-blue-500" size="md" shadow="shadow-cyan-500/25" />
+                <TossIcon icon={TrendingUp} color="from-blue-500 to-blue-600" size="md" shadow="shadow-blue-500/25" />
               </div>
               <h3 className="font-medium text-gray-900 mb-2">입찰 참여</h3>
               <p className="text-sm text-gray-600">
@@ -241,7 +241,7 @@ export default function PharmacyPage() {
             </div>
             <div className="text-center">
               <div className="flex justify-center mb-3">
-                <TossIcon icon={Building2} color="from-blue-500 to-indigo-500" size="md" shadow="shadow-blue-500/25" />
+                <TossIcon icon={Building2} color="from-blue-500 to-blue-600" size="md" shadow="shadow-blue-500/25" />
               </div>
               <h3 className="font-medium text-gray-900 mb-2">계약 진행</h3>
               <p className="text-sm text-gray-600">

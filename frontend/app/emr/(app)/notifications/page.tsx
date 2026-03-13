@@ -60,8 +60,8 @@ const notifications: Notification[] = [
     read: false,
     priority: 'normal',
     icon: Pill,
-    iconColor: 'text-purple-600',
-    iconBg: 'bg-purple-100 dark:bg-purple-900/30',
+    iconColor: 'text-blue-600',
+    iconBg: 'bg-blue-100 dark:bg-blue-900/30',
     actionLabel: '처방 확인',
     actionHref: '/emr/patients',
   },
@@ -179,8 +179,8 @@ const notifications: Notification[] = [
     read: true,
     priority: 'normal',
     icon: Zap,
-    iconColor: 'text-purple-600',
-    iconBg: 'bg-purple-100 dark:bg-purple-900/30',
+    iconColor: 'text-blue-600',
+    iconBg: 'bg-blue-100 dark:bg-blue-900/30',
   },
 ]
 

@@ -374,7 +374,7 @@ export default function BridgePage() {
                         {rx.drugs.map((drug, i) => (
                           <div key={i} className="flex items-center justify-between bg-secondary/30 rounded-lg px-3 py-2">
                             <div className="flex items-center gap-2">
-                              <Pill className="w-3.5 h-3.5 text-purple-600" />
+                              <Pill className="w-3.5 h-3.5 text-blue-600" />
                               <span className="text-xs font-medium">{drug.name}</span>
                             </div>
                             <span className="text-2xs text-muted-foreground">{drug.dosage} · {drug.days}일분</span>

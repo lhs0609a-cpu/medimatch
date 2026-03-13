@@ -539,7 +539,7 @@ export default function LandlordSimulatorPage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
       {/* ── Hero ── */}
-      <div className="bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 text-white">
+      <div className="bg-gradient-to-br from-blue-600 via-blue-700 to-blue-900 text-white">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16">
           <Link href="/" className="inline-flex items-center gap-1.5 text-blue-200 hover:text-white text-sm mb-6 transition-colors">
             <ArrowLeft className="w-4 h-4" />
@@ -1063,7 +1063,7 @@ export default function LandlordSimulatorPage() {
               )}
 
               {/* CTA */}
-              <div className="bg-gradient-to-br from-blue-600 to-indigo-700 rounded-2xl p-6 text-white">
+              <div className="bg-gradient-to-br from-blue-600 to-blue-800 rounded-2xl p-6 text-white">
                 <h3 className="text-lg font-bold mb-2">무료 매물 등록하기</h3>
                 <p className="text-sm text-blue-100 mb-4">
                   매물을 등록하면 개원을 준비하는 의료인에게 직접 노출됩니다.

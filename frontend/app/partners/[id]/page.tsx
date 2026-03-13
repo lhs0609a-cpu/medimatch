@@ -269,7 +269,7 @@ export default function PartnerDetailPage() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-4 border-violet-600 border-t-transparent" />
+        <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-600 border-t-transparent" />
       </div>
     )
   }
@@ -279,7 +279,7 @@ export default function PartnerDetailPage() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <h2 className="text-xl font-bold text-gray-900 mb-2">파트너를 찾을 수 없습니다</h2>
-          <Link href="/partners" className="text-violet-600 hover:underline">
+          <Link href="/partners" className="text-blue-600 hover:underline">
             목록으로 돌아가기
           </Link>
         </div>
@@ -297,7 +297,7 @@ export default function PartnerDetailPage() {
               <ArrowLeft className="w-5 h-5" />
             </button>
             <Link href="/" className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-600 to-indigo-600 flex items-center justify-center shadow-lg shadow-violet-500/30">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 to-blue-700 flex items-center justify-center shadow-lg shadow-blue-500/30">
                 <Sparkles className="w-5 h-5 text-white" />
               </div>
               <span className="text-xl font-bold text-gray-900">메디플라톤</span>
@@ -307,7 +307,7 @@ export default function PartnerDetailPage() {
       </header>
 
       {/* Cover Image */}
-      <div className="h-48 md:h-64 bg-gradient-to-br from-violet-600 to-indigo-600 relative">
+      <div className="h-48 md:h-64 bg-gradient-to-br from-blue-600 to-blue-700 relative">
         {partner.cover_image_url && (
           <img src={partner.cover_image_url} alt="" className="w-full h-full object-cover" />
         )}
@@ -321,7 +321,7 @@ export default function PartnerDetailPage() {
             <div className={`w-24 h-24 md:w-32 md:h-32 rounded-2xl flex items-center justify-center flex-shrink-0 ${
               partner.is_premium
                 ? 'bg-gradient-to-br from-amber-400 to-orange-500'
-                : 'bg-gradient-to-br from-violet-500 to-indigo-600'
+                : 'bg-gradient-to-br from-blue-500 to-blue-700'
             }`}>
               {partner.logo_url ? (
                 <img src={partner.logo_url} alt={partner.name} className="w-16 h-16 object-contain" />
@@ -370,7 +370,7 @@ export default function PartnerDetailPage() {
                 <button
                   onClick={handleStartChat}
                   disabled={isChatLoading}
-                  className="hidden md:flex items-center gap-2 bg-violet-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-violet-700 transition-colors disabled:opacity-50"
+                  className="hidden md:flex items-center gap-2 bg-blue-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-blue-700 transition-colors disabled:opacity-50"
                 >
                   {isChatLoading ? (
                     <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
@@ -407,7 +407,7 @@ export default function PartnerDetailPage() {
           <button
             onClick={handleStartChat}
             disabled={isChatLoading}
-            className="md:hidden w-full flex items-center justify-center gap-2 bg-violet-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-violet-700 transition-colors mt-6 disabled:opacity-50"
+            className="md:hidden w-full flex items-center justify-center gap-2 bg-blue-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-blue-700 transition-colors mt-6 disabled:opacity-50"
           >
             {isChatLoading ? (
               <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
@@ -432,7 +432,7 @@ export default function PartnerDetailPage() {
               onClick={() => setActiveTab(tab.key as any)}
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                 activeTab === tab.key
-                  ? 'bg-violet-600 text-white'
+                  ? 'bg-blue-600 text-white'
                   : 'text-gray-600 hover:bg-gray-100'
               }`}
             >
@@ -462,7 +462,7 @@ export default function PartnerDetailPage() {
                     {partner.specialties.map((specialty, idx) => (
                       <span
                         key={idx}
-                        className="bg-violet-50 text-violet-700 px-3 py-1.5 rounded-lg text-sm font-medium"
+                        className="bg-blue-50 text-blue-700 px-3 py-1.5 rounded-lg text-sm font-medium"
                       >
                         {specialty}
                       </span>
@@ -480,7 +480,7 @@ export default function PartnerDetailPage() {
                       key={area.id}
                       className={`px-3 py-1.5 rounded-lg text-sm font-medium ${
                         area.is_primary
-                          ? 'bg-violet-600 text-white'
+                          ? 'bg-blue-600 text-white'
                           : 'bg-gray-100 text-gray-700'
                       }`}
                     >
@@ -498,7 +498,7 @@ export default function PartnerDetailPage() {
               {(partner.price_range_min || partner.price_range_max) && (
                 <div className="bg-white rounded-2xl p-6">
                   <h2 className="text-lg font-bold text-gray-900 mb-4">예상 비용</h2>
-                  <div className="text-2xl font-bold text-violet-600">
+                  <div className="text-2xl font-bold text-blue-600">
                     {partner.price_range_min ? formatPrice(partner.price_range_min) : '0'}
                     {' ~ '}
                     {partner.price_range_max ? formatPrice(partner.price_range_max) : '상담'}
@@ -563,7 +563,7 @@ export default function PartnerDetailPage() {
               <div
                 key={portfolio.id}
                 onClick={() => setSelectedPortfolio(portfolio)}
-                className="bg-white rounded-2xl overflow-hidden border border-gray-100 hover:border-violet-200 hover:shadow-lg transition-all cursor-pointer group"
+                className="bg-white rounded-2xl overflow-hidden border border-gray-100 hover:border-blue-200 hover:shadow-lg transition-all cursor-pointer group"
               >
                 <div className="aspect-video bg-gray-100 relative">
                   {portfolio.images.length > 0 ? (
@@ -581,7 +581,7 @@ export default function PartnerDetailPage() {
                   )}
                 </div>
                 <div className="p-4">
-                  <h3 className="font-bold text-gray-900 mb-2 group-hover:text-violet-600 transition-colors">
+                  <h3 className="font-bold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors">
                     {portfolio.title}
                   </h3>
                   <div className="flex flex-wrap gap-2 text-sm text-gray-500">

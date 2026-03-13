@@ -41,14 +41,14 @@ export default function BreakevenTimeline({ result }: BreakevenTimelineProps) {
   return (
     <div className="card p-6">
       <div className="flex items-center gap-2 mb-5">
-        <Clock className="w-5 h-5 text-teal-500" />
+        <Clock className="w-5 h-5 text-blue-500" />
         <h3 className="font-semibold text-foreground">투자금 회수 타임라인</h3>
       </div>
 
       {/* Key metrics */}
       <div className="grid grid-cols-3 gap-2 md:gap-4 mb-5">
-        <div className="text-center p-3 bg-teal-50 dark:bg-teal-950/30 rounded-xl">
-          <div className="text-2xl font-bold text-teal-600 dark:text-teal-400">{breakevenMonths}<span className="text-sm font-normal">개월</span></div>
+        <div className="text-center p-3 bg-blue-50 dark:bg-blue-950/30 rounded-xl">
+          <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">{breakevenMonths}<span className="text-sm font-normal">개월</span></div>
           <div className="text-[11px] text-muted-foreground">손익분기점</div>
         </div>
         <div className="text-center p-3 bg-blue-50 dark:bg-blue-950/30 rounded-xl">
@@ -99,7 +99,7 @@ export default function BreakevenTimeline({ result }: BreakevenTimelineProps) {
 
       <div className="flex items-center justify-center gap-4 mt-3 text-xs text-muted-foreground">
         <span className="flex items-center gap-1">
-          <span className="w-3 h-0.5 bg-teal-500 rounded" />
+          <span className="w-3 h-0.5 bg-blue-500 rounded" />
           누적 수익
         </span>
         <span className="flex items-center gap-1">

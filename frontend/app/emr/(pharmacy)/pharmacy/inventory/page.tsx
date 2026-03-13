@@ -204,7 +204,7 @@ export default function InventoryPage() {
           <button className="btn-sm text-xs bg-secondary text-foreground">
             <Download className="w-3.5 h-3.5" /> 재고 내보내기
           </button>
-          <button className="btn-sm text-xs" style={{ backgroundColor: 'rgb(168 85 247)', color: 'white' }}>
+          <button className="btn-sm text-xs" style={{ backgroundColor: 'rgb(37 99 235)', color: 'white' }}>
             <Plus className="w-3.5 h-3.5" /> 약품 추가
           </button>
         </div>
@@ -215,8 +215,8 @@ export default function InventoryPage() {
         <div className="card p-4">
           <div className="flex items-center justify-between mb-2">
             <span className="text-xs text-muted-foreground font-medium">총 약품 수</span>
-            <div className="w-8 h-8 rounded-xl bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
-              <Package className="w-4 h-4 text-purple-600" />
+            <div className="w-8 h-8 rounded-xl bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
+              <Package className="w-4 h-4 text-blue-600" />
             </div>
           </div>
           <div className="text-2xl font-bold">{stats.total}</div>
@@ -259,7 +259,7 @@ export default function InventoryPage() {
         <div className="card p-4 lg:col-span-2">
           <div className="flex items-center justify-between mb-3">
             <h3 className="font-semibold text-sm">연동 도매상</h3>
-            <button className="text-2xs text-purple-600 font-medium hover:underline">+ 도매상 추가</button>
+            <button className="text-2xs text-blue-600 font-medium hover:underline">+ 도매상 추가</button>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             {wholesalers.map((w, i) => (
@@ -284,13 +284,13 @@ export default function InventoryPage() {
           <div className="space-y-3">
             <div className="flex items-center justify-between">
               <span className="text-sm">자동 발주 활성화</span>
-              <div className="w-10 h-6 rounded-full bg-purple-500 relative cursor-pointer">
+              <div className="w-10 h-6 rounded-full bg-blue-500 relative cursor-pointer">
                 <div className="w-4 h-4 rounded-full bg-white absolute top-1 right-1 shadow-sm" />
               </div>
             </div>
             <div className="flex items-center justify-between">
               <span className="text-sm text-muted-foreground">안전재고 도달 시</span>
-              <span className="text-xs text-purple-600 font-medium">자동 발주</span>
+              <span className="text-xs text-blue-600 font-medium">자동 발주</span>
             </div>
             <div className="flex items-center justify-between">
               <span className="text-sm text-muted-foreground">발주 기본 도매상</span>
@@ -305,17 +305,17 @@ export default function InventoryPage() {
 
       {/* 재고 발주 바 */}
       {orderItems.size > 0 && (
-        <div className="card p-4 border-purple-200 dark:border-purple-800 bg-purple-50/50 dark:bg-purple-900/10">
+        <div className="card p-4 border-blue-200 dark:border-blue-800 bg-blue-50/50 dark:bg-blue-900/10">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <ShoppingCart className="w-5 h-5 text-purple-600" />
-              <span className="font-semibold text-sm text-purple-600">{orderItems.size}개 약품 발주 대기</span>
+              <ShoppingCart className="w-5 h-5 text-blue-600" />
+              <span className="font-semibold text-sm text-blue-600">{orderItems.size}개 약품 발주 대기</span>
             </div>
             <div className="flex items-center gap-2">
               <button className="btn-sm text-xs bg-secondary text-foreground" onClick={() => setOrderItems(new Set())}>
                 초기화
               </button>
-              <button className="btn-sm text-xs" style={{ backgroundColor: 'rgb(168 85 247)', color: 'white' }} onClick={() => setShowOrderModal(true)}>
+              <button className="btn-sm text-xs" style={{ backgroundColor: 'rgb(37 99 235)', color: 'white' }} onClick={() => setShowOrderModal(true)}>
                 <ShoppingCart className="w-3 h-3" /> 발주하기
               </button>
             </div>
@@ -332,7 +332,7 @@ export default function InventoryPage() {
                 key={cat}
                 onClick={() => setCategoryFilter(cat)}
                 className={`px-3 py-1.5 rounded-lg text-sm font-medium whitespace-nowrap transition-colors ${
-                  categoryFilter === cat ? 'bg-purple-500 text-white' : 'text-muted-foreground hover:bg-secondary'
+                  categoryFilter === cat ? 'bg-blue-500 text-white' : 'text-muted-foreground hover:bg-secondary'
                 }`}
               >
                 {categoryLabels[cat]}
@@ -408,8 +408,8 @@ export default function InventoryPage() {
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-3">
-                        <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${drug.narcotic ? 'bg-red-100 dark:bg-red-900/30' : drug.refrigerated ? 'bg-blue-100 dark:bg-blue-900/30' : 'bg-purple-100 dark:bg-purple-900/30'}`}>
-                          <Pill className={`w-4 h-4 ${drug.narcotic ? 'text-red-600' : drug.refrigerated ? 'text-blue-600' : 'text-purple-600'}`} />
+                        <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${drug.narcotic ? 'bg-red-100 dark:bg-red-900/30' : drug.refrigerated ? 'bg-blue-100 dark:bg-blue-900/30' : 'bg-blue-100 dark:bg-blue-900/30'}`}>
+                          <Pill className={`w-4 h-4 ${drug.narcotic ? 'text-red-600' : drug.refrigerated ? 'text-blue-600' : 'text-blue-600'}`} />
                         </div>
                         <div className="min-w-0">
                           <div className="font-medium text-sm truncate max-w-[200px]">{drug.name}</div>
@@ -452,7 +452,7 @@ export default function InventoryPage() {
                     <td className="px-4 py-3 text-center">
                       <div className="flex items-center justify-center gap-1">
                         {(level === 'low' || level === 'critical' || level === 'out_of_stock') && (
-                          <button className="btn-sm text-2xs px-2 py-1" style={{ backgroundColor: 'rgb(168 85 247)', color: 'white' }} onClick={() => toggleOrderItem(drug.id)}>
+                          <button className="btn-sm text-2xs px-2 py-1" style={{ backgroundColor: 'rgb(37 99 235)', color: 'white' }} onClick={() => toggleOrderItem(drug.id)}>
                             <ShoppingCart className="w-3 h-3" /> 발주
                           </button>
                         )}
@@ -483,7 +483,7 @@ export default function InventoryPage() {
           <span>총 {filtered.length}개 약품</span>
           <div className="flex items-center gap-1">
             <button className="px-3 py-1 rounded-lg hover:bg-secondary">이전</button>
-            <button className="px-3 py-1 rounded-lg bg-purple-500 text-white">1</button>
+            <button className="px-3 py-1 rounded-lg bg-blue-500 text-white">1</button>
             <button className="px-3 py-1 rounded-lg hover:bg-secondary">다음</button>
           </div>
         </div>
@@ -495,7 +495,7 @@ export default function InventoryPage() {
           <div className="bg-card rounded-2xl shadow-xl max-w-md w-full max-h-[70vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
             <div className="flex items-center justify-between p-4 border-b border-border">
               <h3 className="font-bold text-lg flex items-center gap-2">
-                <ShoppingCart className="w-5 h-5 text-purple-600" /> 발주 확인
+                <ShoppingCart className="w-5 h-5 text-blue-600" /> 발주 확인
               </h3>
               <button onClick={() => setShowOrderModal(false)} className="btn-icon"><X className="w-4 h-4" /></button>
             </div>
@@ -518,11 +518,11 @@ export default function InventoryPage() {
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-sm font-semibold">총 발주 금액</span>
-                <span className="text-lg font-bold text-purple-600">
+                <span className="text-lg font-bold text-blue-600">
                   ₩{inventoryData.filter(d => orderItems.has(d.id)).reduce((acc, d) => acc + (d.maxStock - d.currentStock) * d.unitPrice, 0).toLocaleString()}
                 </span>
               </div>
-              <button className="w-full btn-sm text-sm py-2.5 mt-2" style={{ backgroundColor: 'rgb(168 85 247)', color: 'white' }}>
+              <button className="w-full btn-sm text-sm py-2.5 mt-2" style={{ backgroundColor: 'rgb(37 99 235)', color: 'white' }}>
                 <Truck className="w-4 h-4" /> 발주 전송
               </button>
             </div>

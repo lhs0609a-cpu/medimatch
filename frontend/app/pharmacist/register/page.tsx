@@ -122,7 +122,7 @@ export default function PharmacistRegisterPage() {
             <Link href="/pharmacist" className="text-gray-400 hover:text-gray-600 transition-colors">
               <ArrowLeft className="w-5 h-5" />
             </Link>
-            <TossIcon icon={Pill} color="from-teal-500 to-cyan-600" size="sm" shadow="shadow-teal-500/25" />
+            <TossIcon icon={Pill} color="from-blue-500 to-blue-600" size="sm" shadow="shadow-blue-500/25" />
             <div>
               <h1 className="text-xl font-bold text-gray-900">약국 양도 매물 등록</h1>
               <p className="text-sm text-gray-500">무료로 등록하고 매수자를 찾아보세요</p>
@@ -139,17 +139,17 @@ export default function PharmacistRegisterPage() {
               <div
                 className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold transition-colors ${
                   step >= s.num
-                    ? 'bg-teal-600 text-white'
+                    ? 'bg-blue-600 text-white'
                     : 'bg-gray-200 text-gray-500'
                 }`}
               >
                 {step > s.num ? <CheckCircle2 className="w-5 h-5" /> : s.num}
               </div>
-              <span className={`ml-2 text-sm font-medium hidden sm:inline ${step >= s.num ? 'text-teal-700' : 'text-gray-400'}`}>
+              <span className={`ml-2 text-sm font-medium hidden sm:inline ${step >= s.num ? 'text-blue-700' : 'text-gray-400'}`}>
                 {s.label}
               </span>
               {i < steps.length - 1 && (
-                <div className={`w-12 sm:w-24 h-0.5 mx-3 ${step > s.num ? 'bg-teal-600' : 'bg-gray-200'}`} />
+                <div className={`w-12 sm:w-24 h-0.5 mx-3 ${step > s.num ? 'bg-blue-600' : 'bg-gray-200'}`} />
               )}
             </div>
           ))}
@@ -174,7 +174,7 @@ export default function PharmacistRegisterPage() {
                   value={formData.pharmacy_name}
                   onChange={(e) => updateField('pharmacy_name', e.target.value)}
                   placeholder="예: OO약국"
-                  className={`w-full px-4 py-3 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-teal-200 focus:border-teal-300 ${errors.pharmacy_name ? 'border-red-300' : 'border-gray-200'}`}
+                  className={`w-full px-4 py-3 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-300 ${errors.pharmacy_name ? 'border-red-300' : 'border-gray-200'}`}
                 />
                 {errors.pharmacy_name && <p className="mt-1 text-xs text-red-500">{errors.pharmacy_name}</p>}
               </div>
@@ -188,7 +188,7 @@ export default function PharmacistRegisterPage() {
                   value={formData.address}
                   onChange={(e) => updateField('address', e.target.value)}
                   placeholder="예: 서울시 강남구 역삼동 123-45"
-                  className={`w-full px-4 py-3 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-teal-200 focus:border-teal-300 ${errors.address ? 'border-red-300' : 'border-gray-200'}`}
+                  className={`w-full px-4 py-3 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-300 ${errors.address ? 'border-red-300' : 'border-gray-200'}`}
                 />
                 {errors.address && <p className="mt-1 text-xs text-red-500">{errors.address}</p>}
               </div>
@@ -201,7 +201,7 @@ export default function PharmacistRegisterPage() {
                     value={formData.region_name}
                     onChange={(e) => updateField('region_name', e.target.value)}
                     placeholder="예: 서울 강남구"
-                    className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-teal-200 focus:border-teal-300"
+                    className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-300"
                   />
                 </div>
                 <div>
@@ -211,7 +211,7 @@ export default function PharmacistRegisterPage() {
                     value={formData.area_pyeong}
                     onChange={(e) => updateField('area_pyeong', e.target.value)}
                     placeholder="예: 30"
-                    className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-teal-200 focus:border-teal-300"
+                    className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-300"
                   />
                 </div>
               </div>
@@ -234,7 +234,7 @@ export default function PharmacistRegisterPage() {
                     value={formData.monthly_revenue}
                     onChange={(e) => updateField('monthly_revenue', e.target.value)}
                     placeholder="예: 50000000"
-                    className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-teal-200 focus:border-teal-300"
+                    className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-300"
                   />
                 </div>
                 <div>
@@ -244,7 +244,7 @@ export default function PharmacistRegisterPage() {
                     value={formData.monthly_rx_count}
                     onChange={(e) => updateField('monthly_rx_count', e.target.value)}
                     placeholder="예: 2000"
-                    className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-teal-200 focus:border-teal-300"
+                    className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-300"
                   />
                 </div>
               </div>
@@ -256,7 +256,7 @@ export default function PharmacistRegisterPage() {
                   value={formData.premium}
                   onChange={(e) => updateField('premium', e.target.value)}
                   placeholder="예: 200000000"
-                  className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-teal-200 focus:border-teal-300"
+                  className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-300"
                 />
               </div>
 
@@ -268,7 +268,7 @@ export default function PharmacistRegisterPage() {
                     value={formData.rent_monthly}
                     onChange={(e) => updateField('rent_monthly', e.target.value)}
                     placeholder="예: 3000000"
-                    className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-teal-200 focus:border-teal-300"
+                    className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-300"
                   />
                 </div>
                 <div>
@@ -278,7 +278,7 @@ export default function PharmacistRegisterPage() {
                     value={formData.rent_deposit}
                     onChange={(e) => updateField('rent_deposit', e.target.value)}
                     placeholder="예: 50000000"
-                    className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-teal-200 focus:border-teal-300"
+                    className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-300"
                   />
                 </div>
               </div>
@@ -298,7 +298,7 @@ export default function PharmacistRegisterPage() {
                 <select
                   value={formData.transfer_reason}
                   onChange={(e) => updateField('transfer_reason', e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-teal-200 focus:border-teal-300"
+                  className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-300"
                 >
                   <option value="">선택해주세요</option>
                   {transferReasonOptions.map((r) => (
@@ -314,7 +314,7 @@ export default function PharmacistRegisterPage() {
                   onChange={(e) => updateField('description', e.target.value)}
                   placeholder="약국의 특징, 입지 조건, 인근 병원 정보 등을 자유롭게 작성해주세요."
                   rows={4}
-                  className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-teal-200 focus:border-teal-300 resize-none"
+                  className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-300 resize-none"
                 />
               </div>
 
@@ -328,7 +328,7 @@ export default function PharmacistRegisterPage() {
                     value={formData.contact_name}
                     onChange={(e) => updateField('contact_name', e.target.value)}
                     placeholder="홍길동"
-                    className={`w-full px-4 py-3 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-teal-200 focus:border-teal-300 ${errors.contact_name ? 'border-red-300' : 'border-gray-200'}`}
+                    className={`w-full px-4 py-3 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-300 ${errors.contact_name ? 'border-red-300' : 'border-gray-200'}`}
                   />
                   {errors.contact_name && <p className="mt-1 text-xs text-red-500">{errors.contact_name}</p>}
                 </div>
@@ -341,14 +341,14 @@ export default function PharmacistRegisterPage() {
                     value={formData.contact_phone}
                     onChange={(e) => updateField('contact_phone', e.target.value)}
                     placeholder="010-0000-0000"
-                    className={`w-full px-4 py-3 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-teal-200 focus:border-teal-300 ${errors.contact_phone ? 'border-red-300' : 'border-gray-200'}`}
+                    className={`w-full px-4 py-3 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-300 ${errors.contact_phone ? 'border-red-300' : 'border-gray-200'}`}
                   />
                   {errors.contact_phone && <p className="mt-1 text-xs text-red-500">{errors.contact_phone}</p>}
                 </div>
               </div>
 
-              <div className="p-4 bg-teal-50 border border-teal-200 rounded-xl">
-                <p className="text-sm text-teal-700">
+              <div className="p-4 bg-blue-50 border border-blue-200 rounded-xl">
+                <p className="text-sm text-blue-700">
                   <strong>안내:</strong> 연락처는 관리자만 확인할 수 있으며, 공개 페이지에는 노출되지 않습니다.
                   매수 희망자는 카카오톡 문의를 통해 연락할 수 있습니다.
                 </p>
@@ -373,7 +373,7 @@ export default function PharmacistRegisterPage() {
             {step < 3 ? (
               <button
                 onClick={nextStep}
-                className="flex items-center gap-2 px-6 py-3 bg-teal-600 text-white rounded-xl font-medium hover:bg-teal-700 transition-colors"
+                className="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-xl font-medium hover:bg-blue-700 transition-colors"
               >
                 다음
                 <ChevronRight className="w-4 h-4" />
@@ -382,7 +382,7 @@ export default function PharmacistRegisterPage() {
               <button
                 onClick={handleSubmit}
                 disabled={submitting}
-                className="flex items-center gap-2 px-8 py-3 bg-teal-600 text-white rounded-xl font-medium hover:bg-teal-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="flex items-center gap-2 px-8 py-3 bg-blue-600 text-white rounded-xl font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
                 {submitting ? (
                   <>

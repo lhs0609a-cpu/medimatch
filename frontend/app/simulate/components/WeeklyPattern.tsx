@@ -51,7 +51,7 @@ export default function WeeklyPattern({ result }: WeeklyPatternProps) {
   return (
     <div className="card p-6">
       <div className="flex items-center gap-2 mb-5">
-        <Clock3 className="w-5 h-5 text-purple-500" />
+        <Clock3 className="w-5 h-5 text-blue-500" />
         <h3 className="font-semibold text-foreground">요일별 · 시간대별 환자 예측</h3>
       </div>
 
@@ -73,7 +73,7 @@ export default function WeeklyPattern({ result }: WeeklyPatternProps) {
                 />
                 <Bar dataKey="patients" radius={[6, 6, 0, 0]}>
                   {weekData.map((d, idx) => (
-                    <Cell key={idx} fill={d.peak ? '#8b5cf6' : '#c4b5fd'} />
+                    <Cell key={idx} fill={d.peak ? '#3b82f6' : '#93c5fd'} />
                   ))}
                 </Bar>
               </BarChart>
@@ -101,7 +101,7 @@ export default function WeeklyPattern({ result }: WeeklyPatternProps) {
                   <div className="flex-1 h-5 bg-muted rounded overflow-hidden">
                     <div
                       className={`h-full rounded transition-all duration-700 ${
-                        isHigh ? 'bg-purple-500' : isLow ? 'bg-purple-200 dark:bg-purple-900' : 'bg-purple-300 dark:bg-purple-700'
+                        isHigh ? 'bg-blue-500' : isLow ? 'bg-blue-200 dark:bg-blue-900' : 'bg-blue-300 dark:bg-blue-700'
                       }`}
                       style={{ width: `${barWidth}%` }}
                     />
@@ -115,9 +115,9 @@ export default function WeeklyPattern({ result }: WeeklyPatternProps) {
           </div>
 
           <div className="flex items-center gap-3 mt-3 text-[10px] text-muted-foreground">
-            <span className="flex items-center gap-1"><span className="w-2 h-2 rounded bg-purple-500" />피크</span>
-            <span className="flex items-center gap-1"><span className="w-2 h-2 rounded bg-purple-300 dark:bg-purple-700" />보통</span>
-            <span className="flex items-center gap-1"><span className="w-2 h-2 rounded bg-purple-200 dark:bg-purple-900" />비수시간</span>
+            <span className="flex items-center gap-1"><span className="w-2 h-2 rounded bg-blue-500" />피크</span>
+            <span className="flex items-center gap-1"><span className="w-2 h-2 rounded bg-blue-300 dark:bg-blue-700" />보통</span>
+            <span className="flex items-center gap-1"><span className="w-2 h-2 rounded bg-blue-200 dark:bg-blue-900" />비수시간</span>
           </div>
         </div>
       </div>

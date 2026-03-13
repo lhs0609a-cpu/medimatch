@@ -42,7 +42,7 @@ export const phases: Phase[] = [
     icon: 'ClipboardList',
     month: 1,
     duration: 2,
-    color: '#3B82F6',
+    color: '#BFDBFE',
     description: '개원 목표 설정, 진료과 선정, 사업타당성 분석',
     connectedFeatures: [
       { name: '수익성 시뮬레이션', href: '/opening-package#simulation', icon: 'Calculator' },
@@ -66,7 +66,7 @@ export const phases: Phase[] = [
     icon: 'MapPin',
     month: 2,
     duration: 2,
-    color: '#10B981',
+    color: '#93C5FD',
     description: '상권 분석, 후보지 방문, 임대차 계약',
     connectedFeatures: [
       { name: '경쟁의원 분석', href: '/opening-package#location', icon: 'MapPin' },
@@ -90,7 +90,7 @@ export const phases: Phase[] = [
     icon: 'FileCheck',
     month: 3,
     duration: 2,
-    color: '#F59E0B',
+    color: '#60A5FA',
     description: '의료기관 개설 신고, 사업자등록, 각종 인허가',
     connectedFeatures: [
       { name: '인허가 가이드', href: '/opening/permits', icon: 'FileCheck' },
@@ -117,7 +117,7 @@ export const phases: Phase[] = [
     icon: 'Ruler',
     month: 4,
     duration: 3,
-    color: '#8B5CF6',
+    color: '#3B82F6',
     description: '의원 설계, 인테리어 시공, 의료가스/전기 공사',
     connectedFeatures: [
       { name: '파트너 매칭', href: '/opening/vendors?tab=interior', icon: 'Paintbrush' },
@@ -142,7 +142,7 @@ export const phases: Phase[] = [
     icon: 'Stethoscope',
     month: 5,
     duration: 2,
-    color: '#EC4899',
+    color: '#2563EB',
     description: '의료장비 구매, 진료 소모품, 가구/집기',
     connectedFeatures: [
       { name: '장비 공동구매', href: '/emr/group-buying', icon: 'ShoppingCart' },
@@ -170,7 +170,7 @@ export const phases: Phase[] = [
     icon: 'Users',
     month: 7,
     duration: 2,
-    color: '#06B6D4',
+    color: '#1D4ED8',
     description: '간호사, 간호조무사, 원무 행정 직원 채용',
     connectedFeatures: [
       { name: '인건비 시뮬레이터', href: '/emr/cost/staff', icon: 'Users' },
@@ -197,7 +197,7 @@ export const phases: Phase[] = [
     icon: 'Megaphone',
     month: 9,
     duration: 2,
-    color: '#F97316',
+    color: '#1E40AF',
     description: '브랜딩, 온/오프라인 마케팅, 사전 예약 시스템',
     connectedFeatures: [
       { name: '마케팅 비용 분석', href: '/emr/cost/marketing', icon: 'TrendingUp' },
@@ -226,7 +226,7 @@ export const phases: Phase[] = [
     icon: 'PartyPopper',
     month: 11,
     duration: 2,
-    color: '#EF4444',
+    color: '#1E3A8A',
     description: '시범 운영, 오픈 이벤트, 정식 개원',
     connectedFeatures: [
       { name: '보험청구 테스트', href: '/emr/claims', icon: 'Receipt' },
@@ -252,7 +252,7 @@ export const phases: Phase[] = [
     icon: 'TrendingUp',
     month: 13,
     duration: 12,
-    color: '#6366F1',
+    color: '#172554',
     description: '개원 후 경영 안정화, 환자 리텐션, BEP 달성 추적',
     connectedFeatures: [
       { name: 'EMR 대시보드', href: '/emr/dashboard', icon: 'LayoutDashboard' },

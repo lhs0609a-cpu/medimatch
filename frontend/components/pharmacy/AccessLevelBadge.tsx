@@ -83,16 +83,16 @@ export function AccessLevelProgress({ currentLevel }: { currentLevel: AccessLeve
             <div
               className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors ${
                 isActive
-                  ? 'bg-purple-600 text-white'
+                  ? 'bg-blue-600 text-white'
                   : 'bg-gray-200 text-gray-400'
-              } ${isCurrentLevel ? 'ring-2 ring-purple-300 ring-offset-2' : ''}`}
+              } ${isCurrentLevel ? 'ring-2 ring-blue-300 ring-offset-2' : ''}`}
             >
               {index + 1}
             </div>
             {index < levels.length - 1 && (
               <div
                 className={`w-8 h-1 ${
-                  index < currentIndex ? 'bg-purple-600' : 'bg-gray-200'
+                  index < currentIndex ? 'bg-blue-600' : 'bg-gray-200'
                 }`}
               />
             )}
@@ -119,20 +119,20 @@ export function AccessLevelCard({
     <div
       className={`relative rounded-xl border-2 p-4 transition-all ${
         isCurrentLevel
-          ? 'border-purple-600 bg-purple-50'
+          ? 'border-blue-600 bg-blue-50'
           : 'border-gray-200 hover:border-gray-300'
       } ${onClick ? 'cursor-pointer' : ''}`}
       onClick={onClick}
     >
       {isCurrentLevel && (
-        <span className="absolute -top-3 right-4 bg-purple-600 text-white text-xs px-2 py-1 rounded-full">
+        <span className="absolute -top-3 right-4 bg-blue-600 text-white text-xs px-2 py-1 rounded-full">
           현재
         </span>
       )}
       <div className="flex items-center gap-3 mb-2">
         <div
           className={`w-10 h-10 rounded-lg flex items-center justify-center ${
-            isCurrentLevel ? 'bg-purple-600 text-white' : 'bg-gray-100 text-gray-600'
+            isCurrentLevel ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-600'
           }`}
         >
           <Icon className="w-5 h-5" />
@@ -144,7 +144,7 @@ export function AccessLevelCard({
       </div>
       {config.upgradeText && !isCurrentLevel && (
         <div className="mt-3 pt-3 border-t border-gray-200">
-          <p className="text-sm text-purple-600 font-medium">
+          <p className="text-sm text-blue-600 font-medium">
             {config.upgradeCost.toLocaleString()}원으로 업그레이드
           </p>
         </div>

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { toast } from 'sonner';
 import {
   Pill,
   Search,
@@ -117,7 +118,7 @@ export default function ProspectManagePage() {
       });
 
       if (response.ok) {
-        alert('스캔이 시작되었습니다. 완료까지 시간이 걸릴 수 있습니다.');
+        toast.info('스캔이 시작되었습니다. 완료까지 시간이 걸릴 수 있습니다.');
       }
     } catch (error) {
       console.error('Failed to trigger scan:', error);
@@ -161,7 +162,7 @@ export default function ProspectManagePage() {
   const getContactBadge = (status: string) => {
     const styles: Record<string, string> = {
       not_contacted: 'bg-gray-100 text-gray-600',
-      contacted: 'bg-violet-100 text-violet-700',
+      contacted: 'bg-blue-100 text-blue-700',
       interested: 'bg-emerald-100 text-emerald-700',
       not_interested: 'bg-rose-100 text-rose-700',
     };
@@ -381,7 +382,7 @@ export default function ProspectManagePage() {
                       )}
                       <button
                         onClick={() => updateContactStatus(prospect.ykiho, 'contacted')}
-                        className="p-2 text-gray-400 hover:text-violet-600 hover:bg-violet-50 rounded-lg"
+                        className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg"
                         title="연락 완료"
                       >
                         <MessageSquare className="w-4 h-4" />

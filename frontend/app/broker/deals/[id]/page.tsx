@@ -5,6 +5,7 @@ import { useParams } from 'next/navigation';
 import { ArrowLeft, Send, Building2, User, DollarSign, AlertTriangle } from 'lucide-react';
 import Link from 'next/link';
 import DealTimeline from '@/components/broker/DealTimeline';
+import { toast } from 'sonner';
 
 interface DealDetail {
   id: string; deal_number: string; title: string; description: string;
@@ -76,7 +77,7 @@ export default function DealDetailPage() {
         body: JSON.stringify(body),
       });
       if (res.ok) { setStatusNote(''); setShowClose(false); fetchDeal(); }
-      else { const err = await res.json(); alert(err.detail || '오류'); }
+      else { const err = await res.json(); toast.error(err.detail || '오류'); }
     } catch (e) { console.error(e); }
   };
 
@@ -204,7 +205,7 @@ export default function DealDetailPage() {
           {deal.listing && (
             <div className="bg-white rounded-xl border border-gray-100 p-4">
               <div className="flex items-center gap-2 mb-3">
-                <Building2 className="w-4 h-4 text-violet-600" />
+                <Building2 className="w-4 h-4 text-blue-600" />
                 <h3 className="text-sm font-semibold text-gray-700">매물 정보</h3>
               </div>
               <div className="space-y-1 text-sm">

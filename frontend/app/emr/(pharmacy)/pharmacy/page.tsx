@@ -94,7 +94,7 @@ export default function PharmacyDashboardPage() {
       {/* 인사 */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl md:text-3xl font-bold">{greeting}, <span className="text-purple-500">박약사님</span></h1>
+          <h1 className="text-2xl md:text-3xl font-bold">{greeting}, <span className="text-blue-500">박약사님</span></h1>
           <p className="text-muted-foreground mt-1">{now.toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' })}</p>
         </div>
         <div className="flex items-center gap-2">
@@ -115,7 +115,7 @@ export default function PharmacyDashboardPage() {
         <div className="card p-5">
           <div className="flex items-center justify-between mb-3">
             <span className="text-sm text-muted-foreground">오늘 처방</span>
-            <TossIcon icon={FileText} color="from-purple-500 to-violet-600" size="sm" />
+            <TossIcon icon={FileText} color="from-blue-500 to-blue-600" size="sm" />
           </div>
           <div className="text-3xl font-bold">{todayStats.prescriptions}<span className="text-lg text-muted-foreground">건</span></div>
           <div className="flex items-center gap-2 mt-2">
@@ -128,7 +128,7 @@ export default function PharmacyDashboardPage() {
         <div className="card p-5">
           <div className="flex items-center justify-between mb-3">
             <span className="text-sm text-muted-foreground">오늘 매출</span>
-            <TossIcon icon={DollarSign} color="from-emerald-500 to-teal-600" size="sm" />
+            <TossIcon icon={DollarSign} color="from-emerald-500 to-green-600" size="sm" />
           </div>
           <div className="text-3xl font-bold">{(todayStats.revenue / 10000).toFixed(0)}<span className="text-lg text-muted-foreground">만원</span></div>
           <div className="flex items-center gap-1 mt-2 text-sm">
@@ -141,7 +141,7 @@ export default function PharmacyDashboardPage() {
         <div className="card p-5">
           <div className="flex items-center justify-between mb-3">
             <span className="text-sm text-muted-foreground">평균 조제시간</span>
-            <TossIcon icon={Timer} color="from-blue-500 to-indigo-600" size="sm" />
+            <TossIcon icon={Timer} color="from-blue-500 to-blue-600" size="sm" />
           </div>
           <div className="text-3xl font-bold">{todayStats.avgDispenseTime}<span className="text-lg text-muted-foreground">분</span></div>
           <div className="flex items-center gap-1 mt-2 text-sm">
@@ -173,7 +173,7 @@ export default function PharmacyDashboardPage() {
               <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
               <span className="text-xs text-muted-foreground">실시간</span>
             </div>
-            <Link href="/emr/pharmacy/prescriptions" className="text-sm text-purple-500 font-semibold hover:underline flex items-center gap-1">
+            <Link href="/emr/pharmacy/prescriptions" className="text-sm text-blue-500 font-semibold hover:underline flex items-center gap-1">
               전체 보기 <ChevronRight className="w-4 h-4" />
             </Link>
           </div>
@@ -220,7 +220,7 @@ export default function PharmacyDashboardPage() {
           {/* 연동 의원 현황 */}
           <div className="card">
             <div className="flex items-center gap-2 p-5 border-b border-border">
-              <Zap className="w-5 h-5 text-purple-500" />
+              <Zap className="w-5 h-5 text-blue-500" />
               <h3 className="font-bold">연동 의원</h3>
             </div>
             <div className="p-3 space-y-2">
@@ -232,7 +232,7 @@ export default function PharmacyDashboardPage() {
                     <div className="text-2xs text-muted-foreground">{clinic.doctor}</div>
                   </div>
                   <div className="text-right flex-shrink-0">
-                    <div className="text-sm font-bold text-purple-500">{clinic.todayRx}</div>
+                    <div className="text-sm font-bold text-blue-500">{clinic.todayRx}</div>
                     <div className="text-2xs text-muted-foreground">오늘 처방</div>
                   </div>
                 </div>
@@ -243,7 +243,7 @@ export default function PharmacyDashboardPage() {
           {/* AI 인사이트 */}
           <div className="card">
             <div className="flex items-center gap-2 p-5 border-b border-border">
-              <Brain className="w-5 h-5 text-purple-500" />
+              <Brain className="w-5 h-5 text-blue-500" />
               <h3 className="font-bold">AI 인사이트</h3>
               <Sparkles className="w-4 h-4 text-amber-400" />
             </div>
@@ -253,7 +253,7 @@ export default function PharmacyDashboardPage() {
                   <insight.icon className={`w-4 h-4 ${insight.color} flex-shrink-0 mt-0.5`} />
                   <div className="flex-1 min-w-0">
                     <div className="text-xs leading-relaxed">{insight.text}</div>
-                    <button className="text-2xs text-purple-500 font-semibold mt-1 hover:underline">{insight.action} →</button>
+                    <button className="text-2xs text-blue-500 font-semibold mt-1 hover:underline">{insight.action} →</button>
                   </div>
                 </div>
               ))}
@@ -285,7 +285,7 @@ export default function PharmacyDashboardPage() {
                         : `현재 ${alert.current}개 / 최소 ${alert.minimum}개`}
                     </div>
                   </div>
-                  <button className="text-2xs font-semibold text-purple-500 hover:underline flex-shrink-0">
+                  <button className="text-2xs font-semibold text-blue-500 hover:underline flex-shrink-0">
                     {alert.type === 'expiry' ? '확인' : '주문'}
                   </button>
                 </div>
@@ -302,7 +302,7 @@ export default function PharmacyDashboardPage() {
       <div className="card p-5">
         <div className="flex items-center justify-between mb-6">
           <h3 className="text-lg font-bold">이번 주 현황</h3>
-          <Link href="/emr/pharmacy/analytics" className="text-sm text-purple-500 font-semibold hover:underline flex items-center gap-1">
+          <Link href="/emr/pharmacy/analytics" className="text-sm text-blue-500 font-semibold hover:underline flex items-center gap-1">
             상세 분석 <ChevronRight className="w-4 h-4" />
           </Link>
         </div>
@@ -315,10 +315,10 @@ export default function PharmacyDashboardPage() {
                 <div className="text-2xs text-muted-foreground">{d.count}건</div>
                 <div className="text-2xs text-muted-foreground font-semibold">{(d.amount / 10000).toFixed(0)}</div>
                 <div
-                  className={`w-full rounded-t-lg transition-all duration-500 ${isToday ? 'bg-purple-500' : 'bg-purple-100 dark:bg-purple-900/30 hover:bg-purple-200 dark:hover:bg-purple-900/50'}`}
+                  className={`w-full rounded-t-lg transition-all duration-500 ${isToday ? 'bg-blue-500' : 'bg-blue-100 dark:bg-blue-900/30 hover:bg-blue-200 dark:hover:bg-blue-900/50'}`}
                   style={{ height: `${height}%` }}
                 />
-                <div className={`text-xs ${isToday ? 'font-bold text-purple-500' : 'text-muted-foreground'}`}>{d.day}</div>
+                <div className={`text-xs ${isToday ? 'font-bold text-blue-500' : 'text-muted-foreground'}`}>{d.day}</div>
               </div>
             )
           })}

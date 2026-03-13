@@ -63,15 +63,15 @@ export default function AnalysisPack3({ result }: Props) {
       </Card>
 
       {/* 2. 상권 분석 */}
-      <Card icon={ShoppingBag} title="상권 유형 · 활성화 분석" color="text-pink-500">
-        <div className="p-4 bg-pink-50 dark:bg-pink-950/20 rounded-xl mb-4">
+      <Card icon={ShoppingBag} title="상권 유형 · 활성화 분석" color="text-blue-500">
+        <div className="p-4 bg-blue-50 dark:bg-blue-950/20 rounded-xl mb-4">
           <div className="flex items-center justify-between mb-2">
             <span className="text-sm font-medium text-foreground">상권 유형</span>
-            <span className="text-sm font-bold text-pink-600">오피스 밀집 상권</span>
+            <span className="text-sm font-bold text-blue-600">오피스 밀집 상권</span>
           </div>
           <div className="flex items-center justify-between">
             <span className="text-sm font-medium text-foreground">상권 등급</span>
-            <span className="text-sm font-bold text-pink-600">A등급</span>
+            <span className="text-sm font-bold text-blue-600">A등급</span>
           </div>
         </div>
         <div className="space-y-2">
@@ -93,12 +93,12 @@ export default function AnalysisPack3({ result }: Props) {
       </Card>
 
       {/* 3. 배후 인구 분석 */}
-      <Card icon={Home} title="배후 인구 상세 분석" color="text-teal-500">
+      <Card icon={Home} title="배후 인구 상세 분석" color="text-blue-500">
         <div className="grid grid-cols-3 gap-3 mb-4">
           {[
-            { range: '500m', pop: Math.round(pop * 0.4), color: 'bg-teal-600' },
-            { range: '1km', pop: pop, color: 'bg-teal-500' },
-            { range: '3km', pop: Math.round(pop * 2.8), color: 'bg-teal-400' },
+            { range: '500m', pop: Math.round(pop * 0.4), color: 'bg-blue-600' },
+            { range: '1km', pop: pop, color: 'bg-blue-500' },
+            { range: '3km', pop: Math.round(pop * 2.8), color: 'bg-blue-400' },
           ].map((d) => (
             <div key={d.range} className="text-center p-3 bg-secondary/50 rounded-lg">
               <div className={`inline-block w-8 h-8 rounded-full ${d.color} text-white text-xs font-bold flex items-center justify-center mb-1`}>
@@ -118,7 +118,7 @@ export default function AnalysisPack3({ result }: Props) {
             <div key={t.type} className="flex items-center gap-2">
               <span className="text-xs text-muted-foreground w-16">{t.type}</span>
               <div className="flex-1 h-3 bg-muted rounded-full overflow-hidden">
-                <div className="h-full bg-teal-500 rounded-full" style={{ width: `${t.pct}%` }} />
+                <div className="h-full bg-blue-500 rounded-full" style={{ width: `${t.pct}%` }} />
               </div>
               <span className="text-xs text-foreground w-12 text-right">{(t.count / 1000).toFixed(1)}천</span>
               <span className="text-xs font-bold text-foreground w-10 text-right">{t.pct}%</span>
@@ -128,7 +128,7 @@ export default function AnalysisPack3({ result }: Props) {
       </Card>
 
       {/* 4. 유동인구 시간대 */}
-      <Card icon={MapPin} title="유동인구 시간대별 분석" color="text-violet-500">
+      <Card icon={MapPin} title="유동인구 시간대별 분석" color="text-blue-500">
         <div className="space-y-1">
           {[
             { time: '06-08', count: 12500, label: '출근' },
@@ -147,19 +147,19 @@ export default function AnalysisPack3({ result }: Props) {
               <div key={t.time} className="flex items-center gap-2">
                 <span className="text-[11px] text-muted-foreground w-10 font-mono">{t.time}</span>
                 <div className="flex-1 h-5 bg-muted rounded overflow-hidden">
-                  <div className={`h-full rounded ${isPeak ? 'bg-violet-500' : 'bg-violet-300 dark:bg-violet-700'}`}
+                  <div className={`h-full rounded ${isPeak ? 'bg-blue-500' : 'bg-blue-300 dark:bg-blue-700'}`}
                     style={{ width: `${pct}%` }} />
                 </div>
                 <span className="text-[11px] font-medium text-foreground w-14 text-right">{(t.count / 10000).toFixed(1)}만</span>
-                {t.label && <span className="text-[10px] text-violet-600 w-14">{t.label}</span>}
+                {t.label && <span className="text-[10px] text-blue-600 w-14">{t.label}</span>}
                 {!t.label && <span className="w-14" />}
               </div>
             )
           })}
         </div>
         <div className="mt-3 grid grid-cols-2 gap-3">
-          <div className="p-2 bg-violet-50 dark:bg-violet-950/20 rounded-lg text-center">
-            <div className="text-lg font-bold text-violet-600">평일 9.2만</div>
+          <div className="p-2 bg-blue-50 dark:bg-blue-950/20 rounded-lg text-center">
+            <div className="text-lg font-bold text-blue-600">평일 9.2만</div>
             <div className="text-[10px] text-muted-foreground">일 평균</div>
           </div>
           <div className="p-2 bg-secondary/50 rounded-lg text-center">
@@ -203,7 +203,7 @@ export default function AnalysisPack3({ result }: Props) {
       </Card>
 
       {/* 6. 교육시설 분포 */}
-      <Card icon={School} title="교육시설 분포 분석" color="text-indigo-500">
+      <Card icon={School} title="교육시설 분포 분석" color="text-blue-600">
         <div className="grid grid-cols-2 gap-3 mb-4">
           {[
             { type: '초등학교', count: 4, students: 3200 },
@@ -214,13 +214,13 @@ export default function AnalysisPack3({ result }: Props) {
             <div key={s.type} className="p-3 bg-secondary/50 rounded-lg">
               <div className="text-sm font-medium text-foreground">{s.type}</div>
               <div className="flex items-center justify-between mt-1">
-                <span className="text-lg font-bold text-indigo-600">{s.count}개</span>
+                <span className="text-lg font-bold text-blue-700">{s.count}개</span>
                 <span className="text-xs text-muted-foreground">{(s.students / 1000).toFixed(1)}천명</span>
               </div>
             </div>
           ))}
         </div>
-        <p className="text-xs text-muted-foreground p-2 bg-indigo-50 dark:bg-indigo-950/20 rounded-lg">
+        <p className="text-xs text-muted-foreground p-2 bg-blue-50 dark:bg-blue-950/20 rounded-lg">
           학생 인구 약 {((3200 + 2800 + 2500 + 12000) / 1000).toFixed(1)}천명 — 소아/청소년 진료, 학교 건강검진 제휴 기회
         </p>
       </Card>

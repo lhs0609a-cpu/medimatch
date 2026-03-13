@@ -187,11 +187,11 @@ export default function ReportsPage() {
         <div className="card p-4">
           <div className="flex items-center justify-between mb-2">
             <span className="text-xs text-muted-foreground font-medium">청구 수납율</span>
-            <div className="w-8 h-8 rounded-xl bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
-              <Shield className="w-4 h-4 text-purple-600" />
+            <div className="w-8 h-8 rounded-xl bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
+              <Shield className="w-4 h-4 text-blue-600" />
             </div>
           </div>
-          <div className="text-2xl font-bold text-purple-600">{((monthlyReport.claims.accepted / monthlyReport.claims.submitted) * 100).toFixed(1)}%</div>
+          <div className="text-2xl font-bold text-blue-600">{((monthlyReport.claims.accepted / monthlyReport.claims.submitted) * 100).toFixed(1)}%</div>
           <div className="flex items-center gap-1 mt-1">
             <span className="text-2xs text-muted-foreground">삭감율 {monthlyReport.claims.rejectionRate}%</span>
           </div>
@@ -389,13 +389,13 @@ export default function ReportsPage() {
         {/* 연동 약국 실적 */}
         <div className="card p-5">
           <h3 className="font-semibold text-sm mb-4 flex items-center gap-2">
-            <Pill className="w-4 h-4 text-purple-600" /> 연동 약국 실적
+            <Pill className="w-4 h-4 text-blue-600" /> 연동 약국 실적
           </h3>
           <div className="space-y-3">
             {pharmacyStats.map((ph, i) => (
               <div key={i} className="flex items-center gap-3 p-3 rounded-xl bg-secondary/40">
-                <div className="w-10 h-10 rounded-xl bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center flex-shrink-0">
-                  <Building2 className="w-5 h-5 text-purple-600" />
+                <div className="w-10 h-10 rounded-xl bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center flex-shrink-0">
+                  <Building2 className="w-5 h-5 text-blue-600" />
                 </div>
                 <div className="flex-1">
                   <div className="text-sm font-medium">{ph.name}</div>
@@ -424,7 +424,7 @@ export default function ReportsPage() {
             <div className="text-xl font-bold mt-1">{monthlyReport.operations.avgWaitTime}<span className="text-xs font-normal text-muted-foreground">분</span></div>
           </div>
           <div className="p-4 rounded-xl bg-secondary/50 text-center">
-            <Stethoscope className="w-5 h-5 text-purple-600 mx-auto mb-2" />
+            <Stethoscope className="w-5 h-5 text-blue-600 mx-auto mb-2" />
             <div className="text-2xs text-muted-foreground">평균 진료시간</div>
             <div className="text-xl font-bold mt-1">{monthlyReport.operations.avgConsultTime}<span className="text-xs font-normal text-muted-foreground">분</span></div>
           </div>

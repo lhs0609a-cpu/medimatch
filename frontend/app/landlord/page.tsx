@@ -15,7 +15,7 @@ const statusConfig: Record<string, { label: string; color: string; icon: any }> 
   PENDING_REVIEW: { label: '심사중', color: 'bg-amber-100 text-amber-700', icon: AlertCircle },
   ACTIVE: { label: '공개중', color: 'bg-green-100 text-green-700', icon: CheckCircle2 },
   RESERVED: { label: '예약중', color: 'bg-blue-100 text-blue-700', icon: Clock },
-  CONTRACTED: { label: '계약완료', color: 'bg-purple-100 text-purple-700', icon: CheckCircle2 },
+  CONTRACTED: { label: '계약완료', color: 'bg-blue-100 text-blue-700', icon: CheckCircle2 },
   CLOSED: { label: '마감', color: 'bg-gray-100 text-gray-700', icon: XCircle },
   REJECTED: { label: '반려', color: 'bg-red-100 text-red-700', icon: XCircle },
 }
@@ -102,7 +102,7 @@ export default function LandlordDashboardPage() {
         <div className="grid md:grid-cols-4 gap-4 mb-8">
           <div className="bg-white rounded-xl p-6 shadow-sm">
             <div className="flex items-center justify-between mb-4">
-              <TossIcon icon={Home} color="from-blue-500 to-cyan-500" size="sm" />
+              <TossIcon icon={Home} color="from-blue-500 to-blue-600" size="sm" />
               <span className="text-2xl font-bold text-gray-900">{stats?.total_listings || 0}</span>
             </div>
             <p className="text-gray-500">총 등록 매물</p>
@@ -123,7 +123,7 @@ export default function LandlordDashboardPage() {
           </div>
           <div className="bg-white rounded-xl p-6 shadow-sm">
             <div className="flex items-center justify-between mb-4">
-              <TossIcon icon={MessageSquare} color="from-purple-500 to-pink-500" size="sm" />
+              <TossIcon icon={MessageSquare} color="from-blue-500 to-blue-600" size="sm" />
               <span className="text-2xl font-bold text-gray-900">{stats?.total_inquiries || 0}</span>
             </div>
             <p className="text-gray-500">총 문의수</p>

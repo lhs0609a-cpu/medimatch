@@ -77,8 +77,8 @@ export default function SmartBookingPage() {
       {/* 헤더 */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div className="flex items-center gap-3">
-          <div className="w-12 h-12 rounded-2xl bg-violet-100 dark:bg-violet-900/30 flex items-center justify-center">
-            <QrCode className="w-6 h-6 text-violet-600" />
+          <div className="w-12 h-12 rounded-2xl bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
+            <QrCode className="w-6 h-6 text-blue-600" />
           </div>
           <div>
             <h1 className="text-2xl font-bold">스마트 예약 (QR)</h1>
@@ -86,7 +86,7 @@ export default function SmartBookingPage() {
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <button onClick={() => setShowPreview(true)} className="btn-sm text-xs bg-violet-600 text-white hover:bg-violet-700">
+          <button onClick={() => setShowPreview(true)} className="btn-sm text-xs bg-blue-600 text-white hover:bg-blue-700">
             <Eye className="w-3.5 h-3.5" /> 환자 화면 미리보기
           </button>
         </div>
@@ -96,7 +96,7 @@ export default function SmartBookingPage() {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="card p-4">
           <div className="flex items-center justify-between mb-2">
-            <Calendar className="w-5 h-5 text-violet-600" />
+            <Calendar className="w-5 h-5 text-blue-600" />
             <span className="text-xs font-bold text-emerald-600 flex items-center gap-0.5"><ArrowUpRight className="w-3 h-3" />+24%</span>
           </div>
           <div className="text-2xl font-bold">{bookingStats.thisMonth}건</div>
@@ -136,7 +136,7 @@ export default function SmartBookingPage() {
             key={tab.key}
             onClick={() => setActiveTab(tab.key as typeof activeTab)}
             className={`flex items-center gap-1.5 px-4 py-2.5 text-sm font-medium border-b-2 transition-colors ${
-              activeTab === tab.key ? 'border-violet-500 text-violet-600' : 'border-transparent text-muted-foreground hover:text-foreground'
+              activeTab === tab.key ? 'border-blue-500 text-blue-600' : 'border-transparent text-muted-foreground hover:text-foreground'
             }`}
           >
             <tab.icon className="w-4 h-4" />
@@ -156,7 +156,7 @@ export default function SmartBookingPage() {
                 <QrCode className="w-24 h-24 text-white" />
                 <div className="absolute inset-0 flex items-center justify-center">
                   <div className="w-10 h-10 rounded-lg bg-white flex items-center justify-center">
-                    <span className="text-xs font-black text-violet-600">M</span>
+                    <span className="text-xs font-black text-blue-600">M</span>
                   </div>
                 </div>
               </div>
@@ -165,7 +165,7 @@ export default function SmartBookingPage() {
               이 QR을 스캔하면 환자가 모바일에서 바로 예약할 수 있습니다
             </p>
             <div className="flex items-center justify-center gap-2">
-              <button className="btn-sm text-xs bg-violet-600 text-white hover:bg-violet-700">
+              <button className="btn-sm text-xs bg-blue-600 text-white hover:bg-blue-700">
                 <Download className="w-3 h-3" /> 다운로드
               </button>
               <button className="btn-sm text-xs bg-secondary text-foreground">
@@ -198,7 +198,7 @@ export default function SmartBookingPage() {
               <div className="space-y-3">
                 {qrPlacements.map((p, i) => (
                   <div key={i} className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-lg bg-violet-100 dark:bg-violet-900/30 flex items-center justify-center text-xs font-bold text-violet-600">
+                    <div className="w-8 h-8 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-xs font-bold text-blue-600">
                       {i + 1}
                     </div>
                     <div className="flex-1 min-w-0">
@@ -208,7 +208,7 @@ export default function SmartBookingPage() {
                       </div>
                       <div className="text-2xs text-muted-foreground">{p.type}</div>
                       <div className="mt-1 h-1.5 bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden">
-                        <div className="h-full bg-violet-500 rounded-full" style={{ width: `${(p.scans / 156) * 100}%` }} />
+                        <div className="h-full bg-blue-500 rounded-full" style={{ width: `${(p.scans / 156) * 100}%` }} />
                       </div>
                     </div>
                   </div>
@@ -218,15 +218,15 @@ export default function SmartBookingPage() {
 
             <div className="card p-5">
               <h2 className="font-bold text-sm mb-3 flex items-center gap-2">
-                <Palette className="w-4 h-4 text-violet-600" /> QR 디자인 옵션
+                <Palette className="w-4 h-4 text-blue-600" /> QR 디자인 옵션
               </h2>
               <div className="grid grid-cols-3 gap-3">
                 {['기본 QR', '로고 QR', '컬러 QR'].map((style, i) => (
                   <div key={i} className={`p-3 rounded-xl border-2 cursor-pointer text-center transition-colors ${
-                    i === 1 ? 'border-violet-500 bg-violet-50 dark:bg-violet-900/10' : 'border-border hover:border-violet-300'
+                    i === 1 ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/10' : 'border-border hover:border-blue-300'
                   }`}>
                     <div className="w-16 h-16 mx-auto bg-gray-200 dark:bg-gray-700 rounded-lg mb-2 flex items-center justify-center">
-                      <QrCode className={`w-8 h-8 ${i === 1 ? 'text-violet-600' : 'text-gray-400'}`} />
+                      <QrCode className={`w-8 h-8 ${i === 1 ? 'text-blue-600' : 'text-gray-400'}`} />
                     </div>
                     <span className="text-2xs font-medium">{style}</span>
                   </div>
@@ -250,15 +250,15 @@ export default function SmartBookingPage() {
                 {recentBookings.map(booking => (
                   <div key={booking.id} className="flex items-center gap-3 p-4 hover:bg-secondary/30 transition-colors">
                     <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
-                      booking.method === 'QR' ? 'bg-violet-100 dark:bg-violet-900/30' : 'bg-blue-100 dark:bg-blue-900/30'
+                      booking.method === 'QR' ? 'bg-blue-100 dark:bg-blue-900/30' : 'bg-blue-100 dark:bg-blue-900/30'
                     }`}>
-                      {booking.method === 'QR' ? <QrCode className="w-5 h-5 text-violet-600" /> : <Globe className="w-5 h-5 text-blue-600" />}
+                      {booking.method === 'QR' ? <QrCode className="w-5 h-5 text-blue-600" /> : <Globe className="w-5 h-5 text-blue-600" />}
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
                         <span className="font-medium text-sm">{booking.name}</span>
                         <span className={`px-1.5 py-0.5 rounded text-2xs font-bold ${
-                          booking.type === '초진' ? 'bg-purple-100 text-purple-600 dark:bg-purple-900/30' : 'bg-blue-100 text-blue-600 dark:bg-blue-900/30'
+                          booking.type === '초진' ? 'bg-blue-100 text-blue-600 dark:bg-blue-900/30' : 'bg-blue-100 text-blue-600 dark:bg-blue-900/30'
                         }`}>{booking.type}</span>
                         <span className={`px-1.5 py-0.5 rounded text-2xs font-bold ${
                           booking.status === 'confirmed' ? 'bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30' : 'bg-amber-100 text-amber-600 dark:bg-amber-900/30'
@@ -282,17 +282,17 @@ export default function SmartBookingPage() {
                     <div key={i} className="flex-1 flex flex-col items-center gap-1">
                       <span className="text-2xs font-bold">{h.count}</span>
                       <div
-                        className={`w-full rounded-t-lg ${isPeak ? 'bg-violet-500' : 'bg-violet-200 dark:bg-violet-800/40'}`}
+                        className={`w-full rounded-t-lg ${isPeak ? 'bg-blue-500' : 'bg-blue-200 dark:bg-blue-800/40'}`}
                         style={{ height: `${height}%` }}
                       />
-                      <span className={`text-2xs ${isPeak ? 'font-bold text-violet-600' : 'text-muted-foreground'}`}>{h.hour}</span>
+                      <span className={`text-2xs ${isPeak ? 'font-bold text-blue-600' : 'text-muted-foreground'}`}>{h.hour}</span>
                     </div>
                   )
                 })}
               </div>
-              <div className="mt-3 bg-violet-50 dark:bg-violet-900/10 rounded-xl p-3 flex items-start gap-2">
-                <TrendingUp className="w-4 h-4 text-violet-600 flex-shrink-0 mt-0.5" />
-                <p className="text-2xs text-violet-700 dark:text-violet-300">
+              <div className="mt-3 bg-blue-50 dark:bg-blue-900/10 rounded-xl p-3 flex items-start gap-2">
+                <TrendingUp className="w-4 h-4 text-blue-600 flex-shrink-0 mt-0.5" />
+                <p className="text-2xs text-blue-700 dark:text-blue-300">
                   15시가 가장 인기 시간대입니다. 12시(점심)은 예약 희소 → 점심 진료 홍보 시 수요 창출 가능.
                 </p>
               </div>
@@ -304,7 +304,7 @@ export default function SmartBookingPage() {
             <h2 className="font-bold text-sm mb-4">예약 채널별 비교</h2>
             <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
               {[
-                { channel: 'QR 스캔', icon: QrCode, count: 82, ratio: 44.1, color: 'text-violet-600 bg-violet-100 dark:bg-violet-900/30' },
+                { channel: 'QR 스캔', icon: QrCode, count: 82, ratio: 44.1, color: 'text-blue-600 bg-blue-100 dark:bg-blue-900/30' },
                 { channel: '링크 공유', icon: Link, count: 45, ratio: 24.2, color: 'text-blue-600 bg-blue-100 dark:bg-blue-900/30' },
                 { channel: '전화 예약', icon: MessageSquare, count: 38, ratio: 20.4, color: 'text-emerald-600 bg-emerald-100 dark:bg-emerald-900/30' },
                 { channel: '현장 접수', icon: MapPin, count: 21, ratio: 11.3, color: 'text-amber-600 bg-amber-100 dark:bg-amber-900/30' },
@@ -315,7 +315,7 @@ export default function SmartBookingPage() {
                   </div>
                   <div className="font-bold text-lg">{ch.count}건</div>
                   <div className="text-xs text-muted-foreground">{ch.channel}</div>
-                  <div className="text-2xs font-bold text-violet-600 mt-1">{ch.ratio}%</div>
+                  <div className="text-2xs font-bold text-blue-600 mt-1">{ch.ratio}%</div>
                 </div>
               ))}
             </div>
@@ -340,7 +340,7 @@ export default function SmartBookingPage() {
                     <div className="text-sm font-medium">{setting.label}</div>
                     <div className="text-2xs text-muted-foreground">{setting.desc}</div>
                   </div>
-                  <span className="text-sm font-bold text-violet-600">{setting.value}</span>
+                  <span className="text-sm font-bold text-blue-600">{setting.value}</span>
                 </div>
               ))}
             </div>
@@ -361,7 +361,7 @@ export default function SmartBookingPage() {
                     <div className="text-sm font-medium">{setting.label}</div>
                     <div className="text-2xs text-muted-foreground">{setting.desc}</div>
                   </div>
-                  <div className={`w-10 h-6 rounded-full flex items-center px-0.5 cursor-pointer transition-colors ${setting.enabled ? 'bg-violet-500 justify-end' : 'bg-gray-300 dark:bg-gray-600 justify-start'}`}>
+                  <div className={`w-10 h-6 rounded-full flex items-center px-0.5 cursor-pointer transition-colors ${setting.enabled ? 'bg-blue-500 justify-end' : 'bg-gray-300 dark:bg-gray-600 justify-start'}`}>
                     <div className="w-5 h-5 rounded-full bg-white shadow" />
                   </div>
                 </div>

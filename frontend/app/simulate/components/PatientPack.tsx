@@ -101,10 +101,10 @@ export default function PatientPack({ result }: Props) {
       </Card>
 
       {/* 4. 정신건강 수요 */}
-      <Card icon={Brain} title="정신건강 · 스트레스 수요" color="text-purple-500">
+      <Card icon={Brain} title="정신건강 · 스트레스 수요" color="text-blue-500">
         <div className="grid grid-cols-3 gap-3 mb-4">
-          <div className="text-center p-3 bg-purple-50 dark:bg-purple-950/20 rounded-lg">
-            <div className="text-2xl font-bold text-purple-600">28%</div>
+          <div className="text-center p-3 bg-blue-50 dark:bg-blue-950/20 rounded-lg">
+            <div className="text-2xl font-bold text-blue-600">28%</div>
             <div className="text-[10px] text-muted-foreground">스트레스 인지율</div>
           </div>
           <div className="text-center p-3 bg-secondary/50 rounded-lg">
@@ -127,7 +127,7 @@ export default function PatientPack({ result }: Props) {
             <div key={s.symptom} className="flex items-center gap-2">
               <span className="text-xs text-muted-foreground w-24 flex-shrink-0">{s.symptom}</span>
               <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden">
-                <div className="h-full bg-purple-400 rounded-full" style={{ width: `${s.pct * 2.5}%` }} />
+                <div className="h-full bg-blue-400 rounded-full" style={{ width: `${s.pct * 2.5}%` }} />
               </div>
               <span className="text-xs text-foreground w-8 text-right">{s.pct}%</span>
               <span className={`text-[10px] px-1.5 py-0.5 rounded ${
@@ -207,7 +207,7 @@ export default function PatientPack({ result }: Props) {
       </Card>
 
       {/* 7. 약물 복용 패턴 */}
-      <Card icon={Pill} title="지역 주민 약물 복용 패턴" color="text-teal-500">
+      <Card icon={Pill} title="지역 주민 약물 복용 패턴" color="text-blue-500">
         <div className="space-y-2">
           {[
             { drug: '진통소염제', pct: 42, self: 65, prescription: 35, risk: '위장장애' },
@@ -219,7 +219,7 @@ export default function PatientPack({ result }: Props) {
           ].map((d) => (
             <div key={d.drug} className="flex items-center gap-2 p-2 rounded-lg hover:bg-muted/50">
               <span className="text-xs text-foreground flex-1">{d.drug}</span>
-              <span className="text-xs font-bold text-teal-600 w-10 text-right">{d.pct}%</span>
+              <span className="text-xs font-bold text-blue-600 w-10 text-right">{d.pct}%</span>
               <div className="w-20 h-3 bg-muted rounded-full overflow-hidden flex">
                 <div className="h-full bg-blue-500" style={{ width: `${d.prescription}%` }} />
                 <div className="h-full bg-amber-400" style={{ width: `${d.self}%` }} />
@@ -235,10 +235,10 @@ export default function PatientPack({ result }: Props) {
       </Card>
 
       {/* 8. 스포츠/운동 환자 */}
-      <Card icon={Dumbbell} title="스포츠 · 운동 관련 환자 분석" color="text-indigo-500">
+      <Card icon={Dumbbell} title="스포츠 · 운동 관련 환자 분석" color="text-blue-600">
         <div className="grid grid-cols-2 gap-3 mb-4">
-          <div className="p-3 bg-indigo-50 dark:bg-indigo-950/20 rounded-lg text-center">
-            <div className="text-2xl font-bold text-indigo-600">38%</div>
+          <div className="p-3 bg-blue-50 dark:bg-blue-950/20 rounded-lg text-center">
+            <div className="text-2xl font-bold text-blue-700">38%</div>
             <div className="text-[10px] text-muted-foreground">주민 운동 참여율</div>
           </div>
           <div className="p-3 bg-secondary/50 rounded-lg text-center">
@@ -291,7 +291,7 @@ export default function PatientPack({ result }: Props) {
       </Card>
 
       {/* 10. 예방접종/검진 수요 */}
-      <Card icon={BabyIcon} title="예방접종 · 건강검진 수요" color="text-cyan-500">
+      <Card icon={BabyIcon} title="예방접종 · 건강검진 수요" color="text-blue-600">
         <div className="space-y-2">
           {[
             { item: '독감 예방접종', season: '10-12월', demand: 85, patients: Math.round(pop * 0.15 / 100) * 100, price: '3-5만' },
@@ -305,14 +305,14 @@ export default function PatientPack({ result }: Props) {
               <span className="text-xs text-foreground flex-1">{v.item}</span>
               <span className="text-[10px] text-muted-foreground">{v.season}</span>
               <div className="w-12 h-2 bg-muted rounded-full overflow-hidden">
-                <div className="h-full bg-cyan-500 rounded-full" style={{ width: `${v.demand}%` }} />
+                <div className="h-full bg-blue-600 rounded-full" style={{ width: `${v.demand}%` }} />
               </div>
               <span className="text-[10px] text-muted-foreground w-12 text-right">{v.patients}명</span>
               <span className="text-[10px] font-medium text-foreground w-14 text-right">{v.price}</span>
             </div>
           ))}
         </div>
-        <p className="text-xs text-muted-foreground mt-3 p-2 bg-cyan-50 dark:bg-cyan-950/20 rounded">
+        <p className="text-xs text-muted-foreground mt-3 p-2 bg-blue-50 dark:bg-blue-950/20 rounded">
           예방접종+검진 연 추가 매출: <span className="font-bold text-foreground">약 {Math.round((pop * 0.15 * 40000 + pop * 0.12 * 175000 + pop * 0.05 * 450000) / 100000000 * 10) / 10}억원</span>
         </p>
       </Card>

@@ -10,6 +10,7 @@ import {
   CreditCard, MessageCircle, AlertCircle, Flag
 } from 'lucide-react'
 import { escrowService } from '@/lib/api/services'
+import { toast } from 'sonner'
 import { EscrowStatus, MilestoneStatus, EscrowMilestone } from '@/lib/api/client'
 
 const statusConfig: Record<EscrowStatus, { label: string; color: string }> = {
@@ -27,7 +28,7 @@ const milestoneStatusConfig: Record<MilestoneStatus, { label: string; color: str
   PENDING: { label: '대기', color: 'bg-gray-100 text-gray-600' },
   FUNDED: { label: '예치됨', color: 'bg-blue-100 text-blue-700' },
   IN_PROGRESS: { label: '진행중', color: 'bg-yellow-100 text-yellow-700' },
-  SUBMITTED: { label: '검토 대기', color: 'bg-purple-100 text-purple-700' },
+  SUBMITTED: { label: '검토 대기', color: 'bg-blue-100 text-blue-700' },
   APPROVED: { label: '승인됨', color: 'bg-green-100 text-green-700' },
   RELEASED: { label: '지급 완료', color: 'bg-emerald-100 text-emerald-700' },
   REJECTED: { label: '거절됨', color: 'bg-red-100 text-red-700' },
@@ -69,7 +70,7 @@ export default function EscrowDetailPage() {
       refetchMessages()
     },
     onError: (error: any) => {
-      alert(error.response?.data?.detail || '메시지 전송 실패')
+      toast.error(error.response?.data?.detail || '메시지 전송 실패')
     },
   })
 
@@ -472,10 +473,10 @@ export default function EscrowDetailPage() {
                   description: reason,
                 })
                   .then(() => {
-                    alert('분쟁이 접수되었습니다. 관리자가 검토 후 연락드립니다.')
+                    toast.info('분쟁이 접수되었습니다. 관리자가 검토 후 연락드립니다.')
                     queryClient.invalidateQueries({ queryKey: ['escrow-transaction', escrowId] })
                   })
-                  .catch(() => alert('분쟁 접수 실패'))
+                  .catch(() => toast.error('분쟁 접수 실패'))
               }
             }}
             className="w-full py-2 text-red-600 border border-red-200 rounded-lg text-sm hover:bg-red-50"

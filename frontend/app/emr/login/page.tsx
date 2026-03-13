@@ -46,10 +46,10 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen flex">
       {/* 왼쪽: 브랜딩 */}
-      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-blue-600 via-blue-700 to-purple-700 relative overflow-hidden">
+      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-blue-600 via-blue-700 to-blue-700 relative overflow-hidden">
         <div className="absolute inset-0 opacity-10">
           <div className="absolute top-20 left-20 w-72 h-72 bg-white rounded-full blur-3xl" />
-          <div className="absolute bottom-40 right-10 w-96 h-96 bg-purple-300 rounded-full blur-3xl" />
+          <div className="absolute bottom-40 right-10 w-96 h-96 bg-blue-300 rounded-full blur-3xl" />
         </div>
         <div className="relative z-10 flex flex-col justify-center px-16 text-white">
           <div className="flex items-center gap-3 mb-8">
@@ -144,20 +144,20 @@ export default function LoginPage() {
               onClick={() => setUserType('pharmacy')}
               className={`flex items-center gap-3 p-4 rounded-2xl border-2 transition-all ${
                 userType === 'pharmacy'
-                  ? 'border-purple-500 bg-purple-50 dark:bg-purple-900/20'
-                  : 'border-border hover:border-purple-200'
+                  ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
+                  : 'border-border hover:border-blue-200'
               }`}
             >
               <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
-                userType === 'pharmacy' ? 'bg-purple-500' : 'bg-secondary'
+                userType === 'pharmacy' ? 'bg-blue-500' : 'bg-secondary'
               }`}>
                 <Pill className={`w-5 h-5 ${userType === 'pharmacy' ? 'text-white' : 'text-muted-foreground'}`} />
               </div>
               <div className="text-left">
-                <div className={`text-sm font-semibold ${userType === 'pharmacy' ? 'text-purple-600' : ''}`}>약국</div>
+                <div className={`text-sm font-semibold ${userType === 'pharmacy' ? 'text-blue-600' : ''}`}>약국</div>
                 <div className="text-2xs text-muted-foreground">Pharmacy</div>
               </div>
-              {userType === 'pharmacy' && <Check className="w-4 h-4 text-purple-500 ml-auto" />}
+              {userType === 'pharmacy' && <Check className="w-4 h-4 text-blue-500 ml-auto" />}
             </button>
           </div>
 
@@ -242,7 +242,7 @@ export default function LoginPage() {
               type="submit"
               disabled={isLoading}
               className="w-full py-3 rounded-xl font-semibold text-sm text-white transition-all flex items-center justify-center gap-2 disabled:opacity-50"
-              style={{ backgroundColor: userType === 'clinic' ? 'rgb(37 99 235)' : 'rgb(168 85 247)' }}
+              style={{ backgroundColor: 'rgb(37 99 235)' }}
             >
               {isLoading ? (
                 <>

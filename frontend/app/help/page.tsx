@@ -163,7 +163,7 @@ export default function HelpPage() {
             <p className="text-sm text-muted-foreground">전문 상담사에게 문의하세요</p>
           </Link>
           <a href="https://open.kakao.com/o/sMLX4Zei" target="_blank" rel="noopener noreferrer" className="card card-interactive p-6">
-            <MessageCircle className="w-8 h-8 text-purple-500 mb-3" />
+            <MessageCircle className="w-8 h-8 text-blue-500 mb-3" />
             <h3 className="font-semibold text-foreground mb-1">카톡 상담</h3>
             <p className="text-sm text-muted-foreground">카카오톡 오픈채팅</p>
           </a>

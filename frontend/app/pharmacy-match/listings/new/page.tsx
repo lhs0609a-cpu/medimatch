@@ -121,7 +121,7 @@ export default function NewListingPage() {
             <ArrowLeft className="w-5 h-5" />
           </Link>
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg flex items-center justify-center">
+            <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-500 rounded-lg flex items-center justify-center">
               <Pill className="w-4 h-4 text-white" />
             </div>
             <span className="text-xl font-bold text-gray-900">매물 등록</span>
@@ -137,26 +137,26 @@ export default function NewListingPage() {
               <div
                 key={s}
                 className={`flex-1 h-2 rounded-full mx-1 ${
-                  s <= step ? 'bg-purple-600' : 'bg-gray-200'
+                  s <= step ? 'bg-blue-600' : 'bg-gray-200'
                 }`}
               />
             ))}
           </div>
           <div className="flex justify-between text-sm text-gray-500">
-            <span className={step >= 1 ? 'text-purple-600 font-medium' : ''}>위치</span>
-            <span className={step >= 2 ? 'text-purple-600 font-medium' : ''}>약국정보</span>
-            <span className={step >= 3 ? 'text-purple-600 font-medium' : ''}>가격</span>
-            <span className={step >= 4 ? 'text-purple-600 font-medium' : ''}>상세</span>
+            <span className={step >= 1 ? 'text-blue-600 font-medium' : ''}>위치</span>
+            <span className={step >= 2 ? 'text-blue-600 font-medium' : ''}>약국정보</span>
+            <span className={step >= 3 ? 'text-blue-600 font-medium' : ''}>가격</span>
+            <span className={step >= 4 ? 'text-blue-600 font-medium' : ''}>상세</span>
           </div>
         </div>
 
         {/* Privacy Notice */}
-        <div className="bg-purple-50 border border-purple-200 rounded-xl p-4 mb-6">
+        <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-6">
           <div className="flex items-start gap-3">
-            <Info className="w-5 h-5 text-purple-600 mt-0.5" />
+            <Info className="w-5 h-5 text-blue-600 mt-0.5" />
             <div>
-              <p className="font-medium text-purple-900">익명성 보장</p>
-              <p className="text-sm text-purple-700">
+              <p className="font-medium text-blue-900">익명성 보장</p>
+              <p className="text-sm text-blue-700">
                 정확한 주소와 연락처는 상호 매칭 전까지 절대 공개되지 않습니다.
                 구 단위 위치와 조건만 다른 사용자에게 표시됩니다.
               </p>
@@ -168,7 +168,7 @@ export default function NewListingPage() {
         {step === 1 && (
           <div className="bg-white rounded-2xl border p-6">
             <h2 className="text-lg font-bold text-gray-900 mb-6 flex items-center gap-2">
-              <MapPin className="w-5 h-5 text-purple-600" />
+              <MapPin className="w-5 h-5 text-blue-600" />
               위치 정보
             </h2>
 
@@ -184,7 +184,7 @@ export default function NewListingPage() {
                     region_name: e.target.value,
                     region_code: e.target.value.split(' ')[0]
                   })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                 >
                   <option value="">선택하세요</option>
                   <optgroup label="서울">
@@ -219,7 +219,7 @@ export default function NewListingPage() {
                   value={formData.exact_address}
                   onChange={(e) => updateForm({ exact_address: e.target.value })}
                   placeholder="예: 서울시 강남구 테헤란로 123, 1층"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                 />
                 <p className="text-xs text-gray-500 mt-1">매칭 후에만 상대방에게 공개됩니다</p>
               </div>
@@ -234,7 +234,7 @@ export default function NewListingPage() {
                   value={formData.pharmacy_name}
                   onChange={(e) => updateForm({ pharmacy_name: e.target.value })}
                   placeholder="예: 강남조제약국"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                 />
               </div>
 
@@ -248,7 +248,7 @@ export default function NewListingPage() {
                   value={formData.floor_info}
                   onChange={(e) => updateForm({ floor_info: e.target.value })}
                   placeholder="예: 1층, 지하1층"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                 />
               </div>
             </div>
@@ -259,7 +259,7 @@ export default function NewListingPage() {
         {step === 2 && (
           <div className="bg-white rounded-2xl border p-6">
             <h2 className="text-lg font-bold text-gray-900 mb-6 flex items-center gap-2">
-              <Building2 className="w-5 h-5 text-purple-600" />
+              <Building2 className="w-5 h-5 text-blue-600" />
               약국 정보
             </h2>
 
@@ -275,8 +275,8 @@ export default function NewListingPage() {
                       onClick={() => updateForm({ pharmacy_type: type.value })}
                       className={`px-4 py-3 rounded-lg border text-sm font-medium transition ${
                         formData.pharmacy_type === type.value
-                          ? 'bg-purple-600 text-white border-purple-600'
-                          : 'bg-white text-gray-700 border-gray-300 hover:border-purple-300'
+                          ? 'bg-blue-600 text-white border-blue-600'
+                          : 'bg-white text-gray-700 border-gray-300 hover:border-blue-300'
                       }`}
                     >
                       {type.label}
@@ -296,7 +296,7 @@ export default function NewListingPage() {
                       onClick={() => toggleHospitalType(type)}
                       className={`px-3 py-1.5 rounded-full text-sm transition ${
                         formData.nearby_hospital_types.includes(type)
-                          ? 'bg-purple-100 text-purple-700 border border-purple-300'
+                          ? 'bg-blue-100 text-blue-700 border border-blue-300'
                           : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                       }`}
                     >
@@ -316,7 +316,7 @@ export default function NewListingPage() {
                     min="0"
                     value={formData.operation_years || ''}
                     onChange={(e) => updateForm({ operation_years: parseInt(e.target.value) || 0 })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
                 <div>
@@ -328,7 +328,7 @@ export default function NewListingPage() {
                     min="0"
                     value={formData.employee_count || ''}
                     onChange={(e) => updateForm({ employee_count: parseInt(e.target.value) || 0 })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
               </div>
@@ -339,7 +339,7 @@ export default function NewListingPage() {
                     type="checkbox"
                     checked={formData.has_auto_dispenser}
                     onChange={(e) => updateForm({ has_auto_dispenser: e.target.checked })}
-                    className="w-5 h-5 text-purple-600 rounded focus:ring-purple-500"
+                    className="w-5 h-5 text-blue-600 rounded focus:ring-blue-500"
                   />
                   <span className="text-sm text-gray-700">자동조제기 보유</span>
                 </label>
@@ -348,7 +348,7 @@ export default function NewListingPage() {
                     type="checkbox"
                     checked={formData.has_parking}
                     onChange={(e) => updateForm({ has_parking: e.target.checked })}
-                    className="w-5 h-5 text-purple-600 rounded focus:ring-purple-500"
+                    className="w-5 h-5 text-blue-600 rounded focus:ring-blue-500"
                   />
                   <span className="text-sm text-gray-700">주차 가능</span>
                 </label>
@@ -361,7 +361,7 @@ export default function NewListingPage() {
         {step === 3 && (
           <div className="bg-white rounded-2xl border p-6">
             <h2 className="text-lg font-bold text-gray-900 mb-6 flex items-center gap-2">
-              <DollarSign className="w-5 h-5 text-purple-600" />
+              <DollarSign className="w-5 h-5 text-blue-600" />
               가격 정보
             </h2>
 
@@ -377,7 +377,7 @@ export default function NewListingPage() {
                     value={formData.monthly_revenue_min || ''}
                     onChange={(e) => updateForm({ monthly_revenue_min: parseInt(e.target.value) || 0 })}
                     placeholder="최소"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                   />
                   <input
                     type="number"
@@ -385,7 +385,7 @@ export default function NewListingPage() {
                     value={formData.monthly_revenue_max || ''}
                     onChange={(e) => updateForm({ monthly_revenue_max: parseInt(e.target.value) || 0 })}
                     placeholder="최대"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
               </div>
@@ -400,7 +400,7 @@ export default function NewListingPage() {
                   value={formData.monthly_rx_count || ''}
                   onChange={(e) => updateForm({ monthly_rx_count: parseInt(e.target.value) || 0 })}
                   placeholder="예: 3000"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                 />
               </div>
 
@@ -415,7 +415,7 @@ export default function NewListingPage() {
                     value={formData.premium_min || ''}
                     onChange={(e) => updateForm({ premium_min: parseInt(e.target.value) || 0 })}
                     placeholder="최소"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                   />
                   <input
                     type="number"
@@ -423,7 +423,7 @@ export default function NewListingPage() {
                     value={formData.premium_max || ''}
                     onChange={(e) => updateForm({ premium_max: parseInt(e.target.value) || 0 })}
                     placeholder="최대"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
               </div>
@@ -438,7 +438,7 @@ export default function NewListingPage() {
                     min="0"
                     value={formData.deposit || ''}
                     onChange={(e) => updateForm({ deposit: parseInt(e.target.value) || 0 })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
                 <div>
@@ -450,7 +450,7 @@ export default function NewListingPage() {
                     min="0"
                     value={formData.monthly_rent || ''}
                     onChange={(e) => updateForm({ monthly_rent: parseInt(e.target.value) || 0 })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
               </div>
@@ -467,7 +467,7 @@ export default function NewListingPage() {
                     value={formData.area_pyeong_min || ''}
                     onChange={(e) => updateForm({ area_pyeong_min: parseFloat(e.target.value) || 0 })}
                     placeholder="최소"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                   />
                   <input
                     type="number"
@@ -476,7 +476,7 @@ export default function NewListingPage() {
                     value={formData.area_pyeong_max || ''}
                     onChange={(e) => updateForm({ area_pyeong_max: parseFloat(e.target.value) || 0 })}
                     placeholder="최대"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
               </div>
@@ -488,7 +488,7 @@ export default function NewListingPage() {
         {step === 4 && (
           <div className="bg-white rounded-2xl border p-6">
             <h2 className="text-lg font-bold text-gray-900 mb-6 flex items-center gap-2">
-              <Info className="w-5 h-5 text-purple-600" />
+              <Info className="w-5 h-5 text-blue-600" />
               상세 정보
             </h2>
 
@@ -504,8 +504,8 @@ export default function NewListingPage() {
                       onClick={() => updateForm({ transfer_reason: reason.value })}
                       className={`px-3 py-2 rounded-lg border text-sm transition ${
                         formData.transfer_reason === reason.value
-                          ? 'bg-purple-600 text-white border-purple-600'
-                          : 'bg-white text-gray-700 border-gray-300 hover:border-purple-300'
+                          ? 'bg-blue-600 text-white border-blue-600'
+                          : 'bg-white text-gray-700 border-gray-300 hover:border-blue-300'
                       }`}
                     >
                       {reason.label}
@@ -524,7 +524,7 @@ export default function NewListingPage() {
                   onChange={(e) => updateForm({ description: e.target.value })}
                   rows={5}
                   placeholder="약국에 대한 추가 설명을 입력하세요.&#10;전화번호, 주소 등 개인정보는 자동으로 마스킹됩니다."
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                 />
               </div>
 
@@ -538,7 +538,7 @@ export default function NewListingPage() {
                   value={formData.owner_phone}
                   onChange={(e) => updateForm({ owner_phone: e.target.value })}
                   placeholder="010-1234-5678"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                 />
                 <p className="text-xs text-gray-500 mt-1">매칭 성사 후에만 상대방에게 공개됩니다</p>
               </div>
@@ -576,7 +576,7 @@ export default function NewListingPage() {
             <button
               onClick={() => setStep(step + 1)}
               disabled={!isStepValid(step)}
-              className="px-6 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:bg-gray-300 disabled:cursor-not-allowed"
+              className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed"
             >
               다음
             </button>
@@ -584,7 +584,7 @@ export default function NewListingPage() {
             <button
               onClick={handleSubmit}
               disabled={mutation.isPending}
-              className="px-6 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:bg-gray-400 flex items-center gap-2"
+              className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 flex items-center gap-2"
             >
               {mutation.isPending ? (
                 <>

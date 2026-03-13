@@ -167,21 +167,21 @@ export default function AdminBannersPage() {
           </div>
           <div className="bg-white rounded-2xl p-5 border border-gray-100">
             <div className="flex items-center gap-3 mb-2">
-              <TossIcon icon={Eye} color="from-blue-500 to-indigo-500" shadow="shadow-blue-500/25" size="sm" />
+              <TossIcon icon={Eye} color="from-blue-500 to-blue-600" shadow="shadow-blue-500/25" size="sm" />
               <span className="text-sm text-gray-500">총 노출</span>
             </div>
             <p className="text-2xl font-bold text-gray-900">{revenue.total_impressions.toLocaleString()}</p>
           </div>
           <div className="bg-white rounded-2xl p-5 border border-gray-100">
             <div className="flex items-center gap-3 mb-2">
-              <TossIcon icon={MousePointer} color="from-violet-500 to-purple-500" shadow="shadow-violet-500/25" size="sm" />
+              <TossIcon icon={MousePointer} color="from-blue-500 to-blue-600" shadow="shadow-blue-500/25" size="sm" />
               <span className="text-sm text-gray-500">총 클릭</span>
             </div>
             <p className="text-2xl font-bold text-gray-900">{revenue.total_clicks.toLocaleString()}</p>
           </div>
           <div className="bg-white rounded-2xl p-5 border border-gray-100">
             <div className="flex items-center gap-3 mb-2">
-              <TossIcon icon={TrendingUp} color="from-emerald-500 to-teal-500" shadow="shadow-emerald-500/25" size="sm" />
+              <TossIcon icon={TrendingUp} color="from-blue-500 to-blue-600" shadow="shadow-blue-500/25" size="sm" />
               <span className="text-sm text-gray-500">평균 CTR</span>
             </div>
             <p className="text-2xl font-bold text-gray-900">{revenue.avg_ctr.toFixed(2)}%</p>
@@ -191,7 +191,7 @@ export default function AdminBannersPage() {
 
       {/* Status Filter */}
       <div className="flex items-center gap-2 mb-6 overflow-x-auto pb-2">
-        <button onClick={() => { setStatusFilter(''); setPage(1); }} className={`px-3 py-1.5 rounded-lg text-sm font-medium whitespace-nowrap transition-all ${!statusFilter ? 'bg-violet-600 text-white' : 'bg-white border border-gray-200 text-gray-600 hover:border-gray-300'}`}>
+        <button onClick={() => { setStatusFilter(''); setPage(1); }} className={`px-3 py-1.5 rounded-lg text-sm font-medium whitespace-nowrap transition-all ${!statusFilter ? 'bg-blue-600 text-white' : 'bg-white border border-gray-200 text-gray-600 hover:border-gray-300'}`}>
           전체
         </button>
         {ALL_STATUSES.map((s) => {
@@ -199,7 +199,7 @@ export default function AdminBannersPage() {
           const count = statusCounts[s] || 0;
           return (
             <button key={s} onClick={() => { setStatusFilter(statusFilter === s ? '' : s); setPage(1); }}
-              className={`px-3 py-1.5 rounded-lg text-sm font-medium whitespace-nowrap transition-all ${statusFilter === s ? 'bg-violet-600 text-white' : 'bg-white border border-gray-200 text-gray-600 hover:border-gray-300'}`}>
+              className={`px-3 py-1.5 rounded-lg text-sm font-medium whitespace-nowrap transition-all ${statusFilter === s ? 'bg-blue-600 text-white' : 'bg-white border border-gray-200 text-gray-600 hover:border-gray-300'}`}>
               {cfg.label} ({count})
             </button>
           );
@@ -264,7 +264,7 @@ export default function AdminBannersPage() {
                 else if (page <= 3) p = i + 1;
                 else if (page >= totalPages - 2) p = totalPages - 4 + i;
                 else p = page - 2 + i;
-                return <button key={p} onClick={() => setPage(p)} className={`w-8 h-8 rounded-lg text-sm font-medium transition-colors ${p === page ? 'bg-violet-600 text-white' : 'text-gray-600 hover:bg-gray-100'}`}>{p}</button>;
+                return <button key={p} onClick={() => setPage(p)} className={`w-8 h-8 rounded-lg text-sm font-medium transition-colors ${p === page ? 'bg-blue-600 text-white' : 'text-gray-600 hover:bg-gray-100'}`}>{p}</button>;
               })}
               <button onClick={() => setPage(Math.min(totalPages, page + 1))} disabled={page === totalPages} className="p-2 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 disabled:opacity-30"><ChevronRight className="w-4 h-4" /></button>
             </div>
@@ -312,9 +312,9 @@ export default function AdminBannersPage() {
                   <p className="text-xl font-bold text-blue-700">{detailModal.impressions.toLocaleString()}</p>
                   <p className="text-xs text-blue-600">노출</p>
                 </div>
-                <div className="text-center p-3 bg-violet-50 rounded-xl">
-                  <p className="text-xl font-bold text-violet-700">{detailModal.clicks.toLocaleString()}</p>
-                  <p className="text-xs text-violet-600">클릭</p>
+                <div className="text-center p-3 bg-blue-50 rounded-xl">
+                  <p className="text-xl font-bold text-blue-700">{detailModal.clicks.toLocaleString()}</p>
+                  <p className="text-xs text-blue-600">클릭</p>
                 </div>
                 <div className="text-center p-3 bg-amber-50 rounded-xl">
                   <p className="text-xl font-bold text-amber-700">{detailModal.ctr.toFixed(2)}%</p>
@@ -332,7 +332,7 @@ export default function AdminBannersPage() {
                   <span className="text-sm font-medium">{detailModal.budget > 0 ? ((detailModal.spent / detailModal.budget) * 100).toFixed(1) : 0}%</span>
                 </div>
                 <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
-                  <div className="h-full bg-violet-500 rounded-full" style={{ width: `${detailModal.budget > 0 ? Math.min((detailModal.spent / detailModal.budget) * 100, 100) : 0}%` }} />
+                  <div className="h-full bg-blue-500 rounded-full" style={{ width: `${detailModal.budget > 0 ? Math.min((detailModal.spent / detailModal.budget) * 100, 100) : 0}%` }} />
                 </div>
                 <div className="flex justify-between mt-1">
                   <span className="text-xs text-gray-400">{formatMoney(detailModal.spent)}</span>

@@ -16,6 +16,7 @@ import {
   Wallet,
 } from 'lucide-react';
 import { TossIcon } from '@/components/ui/TossIcon';
+import { toast } from 'sonner';
 
 interface CampaignStats {
   sms_balance: number;
@@ -158,16 +159,16 @@ export default function CampaignManagePage() {
 
       if (response.ok) {
         const result = await response.json();
-        alert(`캠페인이 시작되었습니다!\nID: ${result.id}`);
+        toast.success('캠페인이 시작되었습니다!', { description: `ID: ${result.id}` });
         setShowNewCampaign(false);
         fetchStats();
         fetchHistory();
       } else {
-        alert('캠페인 시작에 실패했습니다.');
+        toast.error('캠페인 시작에 실패했습니다.');
       }
     } catch (error) {
       console.error('Failed to start campaign:', error);
-      alert('오류가 발생했습니다.');
+      toast.error('오류가 발생했습니다.');
     } finally {
       setSending(false);
     }
@@ -178,7 +179,7 @@ export default function CampaignManagePage() {
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div className="flex items-center gap-3">
-          <TossIcon icon={Send} color="from-blue-400 to-cyan-500" shadow="shadow-blue-500/25" size="md" />
+          <TossIcon icon={Send} color="from-blue-500 to-blue-600" shadow="shadow-blue-500/25" size="md" />
           <div>
             <h1 className="text-2xl font-bold text-gray-900">아웃바운드 캠페인</h1>
             <p className="text-gray-500 mt-1">SMS/이메일 캠페인을 관리합니다.</p>
@@ -207,7 +208,7 @@ export default function CampaignManagePage() {
 
         <div className="bg-white rounded-xl p-6 border border-gray-100">
           <div className="flex items-center justify-between mb-4">
-            <TossIcon icon={CheckCircle} color="from-emerald-500 to-teal-500" shadow="shadow-emerald-500/25" size="sm" />
+            <TossIcon icon={CheckCircle} color="from-emerald-500 to-green-500" shadow="shadow-emerald-500/25" size="sm" />
           </div>
           <p className="text-3xl font-bold text-gray-900 mb-1">
             {loading ? '-' : stats?.total_sent || 0}
@@ -217,7 +218,7 @@ export default function CampaignManagePage() {
 
         <div className="bg-white rounded-xl p-6 border border-gray-100">
           <div className="flex items-center justify-between mb-4">
-            <TossIcon icon={TrendingUp} color="from-rose-500 to-pink-500" shadow="shadow-rose-500/25" size="sm" />
+            <TossIcon icon={TrendingUp} color="from-rose-500 to-red-500" shadow="shadow-rose-500/25" size="sm" />
           </div>
           <p className="text-3xl font-bold text-gray-900 mb-1">
             {loading ? '-' : stats?.by_grade?.HOT || 0}
@@ -411,7 +412,7 @@ export default function CampaignManagePage() {
                 <tr key={c.id} className="border-b border-gray-50 hover:bg-gray-50/50">
                   <td className="px-4 py-3 text-gray-900">{c.name}</td>
                   <td className="px-4 py-3">
-                    <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${c.campaign_type === 'SMS' ? 'bg-sky-100 text-sky-700' : 'bg-violet-100 text-violet-700'}`}>
+                    <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${c.campaign_type === 'SMS' ? 'bg-sky-100 text-sky-700' : 'bg-blue-100 text-blue-700'}`}>
                       {c.campaign_type}
                     </span>
                   </td>
@@ -440,7 +441,7 @@ export default function CampaignManagePage() {
       </div>
 
       {/* Tips */}
-      <div className="mt-6 bg-gradient-to-br from-sky-50 to-indigo-50 rounded-xl p-6 border border-sky-100">
+      <div className="mt-6 bg-gradient-to-br from-sky-50 to-blue-50 rounded-xl p-6 border border-sky-100">
         <h3 className="font-semibold text-gray-900 mb-3">캠페인 발송 팁</h3>
         <ul className="space-y-2 text-sm text-gray-600">
           <li className="flex items-start gap-2">

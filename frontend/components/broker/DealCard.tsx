@@ -20,8 +20,8 @@ interface Deal {
 const STATUS_COLORS: Record<string, string> = {
   LEAD: 'bg-gray-100 text-gray-700',
   CONTACTED: 'bg-sky-100 text-sky-700',
-  VIEWING_SCHEDULED: 'bg-indigo-100 text-indigo-700',
-  VIEWED: 'bg-violet-100 text-violet-700',
+  VIEWING_SCHEDULED: 'bg-blue-100 text-blue-700',
+  VIEWED: 'bg-blue-100 text-blue-700',
   NEGOTIATING: 'bg-amber-100 text-amber-700',
   CONTRACT_PENDING: 'bg-orange-100 text-orange-700',
   CONTRACTED: 'bg-blue-100 text-blue-700',

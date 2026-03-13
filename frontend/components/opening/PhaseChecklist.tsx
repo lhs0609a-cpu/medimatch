@@ -253,13 +253,13 @@ function ChecklistItem({
                 {guide.subChecklists.map((checklist, ci) => (
                   <div key={ci} className="space-y-1.5">
                     <div className="flex items-center gap-1.5 text-sm font-semibold text-foreground">
-                      <ClipboardList className="w-4 h-4 text-violet-500" />
+                      <ClipboardList className="w-4 h-4 text-blue-500" />
                       <span>{checklist.label}</span>
                     </div>
                     <ul className="space-y-1 ml-5">
                       {checklist.items.map((item, ii) => (
                         <li key={ii} className="text-sm text-muted-foreground flex items-center gap-2">
-                          <div className="w-1.5 h-1.5 rounded-full bg-violet-400 flex-shrink-0" />
+                          <div className="w-1.5 h-1.5 rounded-full bg-blue-400 flex-shrink-0" />
                           {item}
                         </li>
                       ))}

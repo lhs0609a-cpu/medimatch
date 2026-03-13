@@ -230,7 +230,7 @@ export default function ReviewsPage() {
             </div>
             <div className="card p-4">
               <div className="flex items-center justify-between mb-2">
-                <Send className="w-5 h-5 text-purple-600" />
+                <Send className="w-5 h-5 text-blue-600" />
               </div>
               <div className="text-2xl font-bold">{overviewStats.responseRate}%</div>
               <div className="text-xs text-muted-foreground">설문 응답률</div>

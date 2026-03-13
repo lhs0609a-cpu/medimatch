@@ -94,7 +94,7 @@ export default function LoginPage() {
         <div className="max-w-md w-full mx-auto">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-3 mb-8">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-600 to-indigo-600 flex items-center justify-center shadow-lg shadow-violet-500/30">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 to-blue-700 flex items-center justify-center shadow-lg shadow-blue-500/30">
               <Sparkles className="w-5 h-5 text-white" />
             </div>
             <span className="text-xl font-bold text-gray-900">메디플라톤</span>
@@ -168,13 +168,13 @@ export default function LoginPage() {
               <label className="flex items-center gap-2 cursor-pointer">
                 <input
                   type="checkbox"
-                  className="w-4 h-4 rounded border-gray-300 text-violet-600 focus:ring-violet-500"
+                  className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                 />
                 <span className="text-sm text-gray-600">로그인 상태 유지</span>
               </label>
               <Link
                 href="/forgot-password"
-                className="text-sm text-violet-600 hover:text-violet-700 font-medium"
+                className="text-sm text-blue-600 hover:text-blue-700 font-medium"
               >
                 비밀번호 찾기
               </Link>
@@ -277,7 +277,7 @@ export default function LoginPage() {
           {/* Register Link */}
           <p className="text-center text-gray-500 mt-8">
             아직 계정이 없으신가요?{' '}
-            <Link href="/register" className="text-violet-600 font-semibold hover:text-violet-700">
+            <Link href="/register" className="text-blue-600 font-semibold hover:text-blue-700">
               회원가입
             </Link>
           </p>

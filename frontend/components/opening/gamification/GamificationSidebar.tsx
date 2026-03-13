@@ -89,7 +89,7 @@ export default function GamificationSidebar({
         <div className="grid grid-cols-2 gap-3">
           <StatItem icon={<Zap className="w-3.5 h-3.5 text-primary" />} label="총 XP" value={xp.toLocaleString()} />
           <StatItem icon={<Target className="w-3.5 h-3.5 text-green-500" />} label="준비도" value={`${readinessScore}점`} />
-          <StatItem icon={<Brain className="w-3.5 h-3.5 text-purple-500" />} label="퀴즈 풀이" value={`${Math.round(readinessBreakdown.quizRate)}%`} />
+          <StatItem icon={<Brain className="w-3.5 h-3.5 text-blue-500" />} label="퀴즈 풀이" value={`${Math.round(readinessBreakdown.quizRate)}%`} />
           <StatItem icon={<Trophy className="w-3.5 h-3.5 text-amber-500" />} label="업적" value={`${unlockedAchievements.length}개`} />
         </div>
       </div>

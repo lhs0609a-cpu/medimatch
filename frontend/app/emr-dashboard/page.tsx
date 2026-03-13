@@ -187,7 +187,7 @@ export default function EMRDashboardPage() {
           {/* 이번달 매출 */}
           <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
             <div className="flex items-center justify-between mb-3">
-              <TossIcon icon={DollarSign} color="from-blue-500 to-cyan-500" size="sm" />
+              <TossIcon icon={DollarSign} color="from-blue-500 to-blue-600" size="sm" />
               {summary && summary.revenue_change_pct !== 0 && (
                 <span
                   className={`flex items-center gap-0.5 text-xs font-medium ${
@@ -262,7 +262,7 @@ export default function EMRDashboardPage() {
           {/* 지역 순위 */}
           <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
             <div className="flex items-center justify-between mb-3">
-              <TossIcon icon={MapPin} color="from-purple-500 to-violet-500" size="sm" />
+              <TossIcon icon={MapPin} color="from-blue-500 to-blue-600" size="sm" />
             </div>
             <p className="text-2xl font-bold text-gray-900">
               {summaryLoading ? (
@@ -518,7 +518,7 @@ export default function EMRDashboardPage() {
         </div>
 
         {/* CTA Banner */}
-        <div className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl p-6 text-white">
+        <div className="bg-gradient-to-r from-blue-600 to-blue-700 rounded-2xl p-6 text-white">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
               <h3 className="text-lg font-bold">오직 PlatonEMR만의 차별점</h3>

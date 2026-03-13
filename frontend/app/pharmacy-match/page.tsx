@@ -207,7 +207,7 @@ export default function PharmacyMatchPage() {
                 <ArrowLeft className="w-5 h-5" />
               </Link>
               <div className="flex items-center gap-2">
-                <TossIcon icon={Pill} color="from-rose-500 to-pink-500" size="xs" shadow="shadow-rose-500/25" />
+                <TossIcon icon={Pill} color="from-blue-500 to-blue-600" size="xs" shadow="shadow-blue-500/25" />
                 <span className="text-lg font-bold text-foreground">익명 약국 매칭</span>
                 <span className="badge-info">
                   {platformStats.activePharmacyListings}+ 매물
@@ -229,7 +229,7 @@ export default function PharmacyMatchPage() {
 
       <main className="max-w-6xl mx-auto px-4 sm:px-6 py-8">
         {/* Hero Section */}
-        <div className="bg-gradient-to-br from-blue-600 to-cyan-600 dark:from-blue-700 dark:to-cyan-700 text-white rounded-2xl p-8 mb-8 relative overflow-hidden">
+        <div className="bg-gradient-to-br from-blue-600 to-blue-700 dark:from-blue-700 dark:to-blue-800 text-white rounded-2xl p-8 mb-8 relative overflow-hidden">
           <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2" />
           <div className="relative z-10">
             <h1 className="text-2xl md:text-3xl font-bold mb-2">익명 약국 매칭</h1>
@@ -261,7 +261,7 @@ export default function PharmacyMatchPage() {
         {/* Live Activity + Testimonial */}
         <div className="grid md:grid-cols-2 gap-4 mb-8">
           {/* Live Activity */}
-          <div className="bg-gradient-to-r from-blue-600/10 to-cyan-600/10 border border-blue-200 dark:border-blue-800 rounded-lg px-4 py-3">
+          <div className="bg-gradient-to-r from-blue-600/10 to-blue-700/10 border border-blue-200 dark:border-blue-800 rounded-lg px-4 py-3">
             <div className="flex items-center gap-2 text-sm">
               <span className="relative flex h-2 w-2">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
@@ -685,8 +685,8 @@ export default function PharmacyMatchPage() {
             {[
               { icon: Lock, color: 'from-slate-500 to-gray-600', shadow: 'shadow-slate-500/25', title: '익명 등록', desc: '구 단위 위치와 조건만 공개\n정확한 주소는 비공개' },
               { icon: Sparkles, color: 'from-amber-500 to-orange-500', shadow: 'shadow-amber-500/25', title: 'AI 매칭', desc: '조건에 맞는 약사를\n자동으로 추천' },
-              { icon: Heart, color: 'from-rose-500 to-pink-500', shadow: 'shadow-rose-500/25', title: '상호 관심', desc: '양방향 관심 표시 시\n연락처 자동 공개' },
-              { icon: Building2, color: 'from-blue-500 to-indigo-500', shadow: 'shadow-blue-500/25', title: '계약 진행', desc: '직접 만나서 협의\n성사 시 수수료 3~5%' },
+              { icon: Heart, color: 'from-blue-500 to-blue-600', shadow: 'shadow-blue-500/25', title: '상호 관심', desc: '양방향 관심 표시 시\n연락처 자동 공개' },
+              { icon: Building2, color: 'from-blue-500 to-blue-600', shadow: 'shadow-blue-500/25', title: '계약 진행', desc: '직접 만나서 협의\n성사 시 수수료 3~5%' },
             ].map((item) => (
               <div key={item.title} className="text-center">
                 <div className="flex justify-center mb-3">

@@ -260,7 +260,7 @@ export default function TaxScanPage() {
       {/* ───── 헤더 ───── */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex items-center gap-3">
-          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center">
+          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
             <Brain className="w-6 h-6 text-white" />
           </div>
           <div>
@@ -303,12 +303,12 @@ export default function TaxScanPage() {
           {scanning && (
             <div className="space-y-4">
               <div className="flex items-center gap-3">
-                <Loader2 className="w-5 h-5 animate-spin text-violet-600" />
+                <Loader2 className="w-5 h-5 animate-spin text-blue-600" />
                 <span className="text-sm font-semibold">{scanStages[currentStage]}...</span>
               </div>
               <div className="w-full h-3 rounded-full bg-secondary overflow-hidden">
                 <div
-                  className="h-full rounded-full bg-gradient-to-r from-violet-500 to-purple-500 transition-all duration-300"
+                  className="h-full rounded-full bg-gradient-to-r from-blue-500 to-blue-500 transition-all duration-300"
                   style={{ width: `${progress}%` }}
                 />
               </div>
@@ -318,7 +318,7 @@ export default function TaxScanPage() {
                     {i < currentStage ? (
                       <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
                     ) : i === currentStage ? (
-                      <Loader2 className="w-3.5 h-3.5 animate-spin text-violet-500" />
+                      <Loader2 className="w-3.5 h-3.5 animate-spin text-blue-500" />
                     ) : (
                       <Clock className="w-3.5 h-3.5 text-muted-foreground" />
                     )}
@@ -336,7 +336,7 @@ export default function TaxScanPage() {
             <button
               onClick={startScan}
               disabled={selectedYears.length === 0}
-              className="w-full py-4 rounded-2xl font-bold text-lg text-white bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 disabled:opacity-50 flex items-center justify-center gap-3 transition-all shadow-lg shadow-violet-500/20"
+              className="w-full py-4 rounded-2xl font-bold text-lg text-white bg-gradient-to-r from-blue-600 to-blue-600 hover:from-blue-700 hover:to-blue-700 disabled:opacity-50 flex items-center justify-center gap-3 transition-all shadow-lg shadow-blue-500/20"
             >
               <Brain className="w-6 h-6" />
               AI 세금 스캐너 실행
@@ -368,11 +368,11 @@ export default function TaxScanPage() {
             <div className="card p-5">
               <div className="flex items-center justify-between mb-3">
                 <span className="text-xs text-muted-foreground font-medium">발견 항목</span>
-                <div className="w-8 h-8 rounded-xl bg-violet-100 dark:bg-violet-900/30 flex items-center justify-center">
-                  <Search className="w-4 h-4 text-violet-600" />
+                <div className="w-8 h-8 rounded-xl bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
+                  <Search className="w-4 h-4 text-blue-600" />
                 </div>
               </div>
-              <div className="text-3xl font-bold text-violet-600">
+              <div className="text-3xl font-bold text-blue-600">
                 {summary.finding_count}<span className="text-sm text-muted-foreground">건</span>
               </div>
               <div className="text-xs text-muted-foreground mt-1">
@@ -403,7 +403,7 @@ export default function TaxScanPage() {
           <div className="card overflow-hidden">
             <div className="flex items-center justify-between p-4 border-b border-border">
               <h2 className="font-bold text-sm flex items-center gap-2">
-                <Sparkles className="w-4 h-4 text-violet-600" />
+                <Sparkles className="w-4 h-4 text-blue-600" />
                 AI 발견 항목
               </h2>
               <button
@@ -564,7 +564,7 @@ export default function TaxScanPage() {
           </div>
 
           {/* ───── 경정청구 생성 CTA ───── */}
-          <div className="card p-6 bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-900/10 dark:to-teal-900/10 border border-emerald-200 dark:border-emerald-800">
+          <div className="card p-6 bg-gradient-to-r from-emerald-50 to-blue-50 dark:from-emerald-900/10 dark:to-blue-900/10 border border-emerald-200 dark:border-emerald-800">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
                 <h3 className="font-bold text-lg">스캔 결과 기반 경정청구 생성</h3>

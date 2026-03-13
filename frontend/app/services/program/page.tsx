@@ -203,7 +203,7 @@ function EstimateCalculator() {
     green: 'bg-green-100 text-green-700',
     blue: 'bg-blue-100 text-blue-700',
     orange: 'bg-orange-100 text-orange-700',
-    purple: 'bg-purple-100 text-purple-700',
+    purple: 'bg-blue-100 text-blue-700',
   };
 
   return (
@@ -742,7 +742,7 @@ export default function ProgramServicePage() {
       <section id="demo" className="py-20 md:py-28 bg-white">
         <div className="max-w-5xl mx-auto px-4">
           <div className="text-center mb-12">
-            <span className="inline-block bg-purple-100 text-purple-700 text-sm font-semibold px-4 py-1.5 rounded-full mb-4">
+            <span className="inline-block bg-blue-100 text-blue-700 text-sm font-semibold px-4 py-1.5 rounded-full mb-4">
               실제 화면 공개
             </span>
             <h2 className="text-2xl md:text-4xl font-bold text-gray-900 mb-3">

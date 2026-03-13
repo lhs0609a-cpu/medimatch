@@ -7,8 +7,8 @@ const TYPE_CONFIG: Record<TaskResource['type'], { icon: React.ElementType; color
   website: { icon: Globe, color: 'text-blue-500' },
   government: { icon: Building2, color: 'text-green-600' },
   template: { icon: FileText, color: 'text-orange-500' },
-  tool: { icon: Wrench, color: 'text-purple-500' },
-  community: { icon: Users, color: 'text-pink-500' },
+  tool: { icon: Wrench, color: 'text-blue-500' },
+  community: { icon: Users, color: 'text-blue-500' },
 }
 
 interface TaskResourceListProps {

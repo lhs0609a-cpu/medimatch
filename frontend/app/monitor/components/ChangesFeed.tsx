@@ -12,7 +12,7 @@ const typeConfig = {
   open: { label: '개원', color: '#10B981', bgColor: 'bg-green-50 dark:bg-green-950/20', icon: Plus },
   close: { label: '폐원', color: '#EF4444', bgColor: 'bg-red-50 dark:bg-red-950/20', icon: X },
   move: { label: '이전', color: '#3B82F6', bgColor: 'bg-blue-50 dark:bg-blue-950/20', icon: ArrowRight },
-  expand: { label: '확장', color: '#8B5CF6', bgColor: 'bg-purple-50 dark:bg-purple-950/20', icon: Maximize2 },
+  expand: { label: '확장', color: '#3B82F6', bgColor: 'bg-blue-50 dark:bg-blue-950/20', icon: Maximize2 },
 }
 
 export default function ChangesFeed({ changes, filter }: ChangesFeedProps) {

@@ -93,7 +93,7 @@ export default function AnalysisPack4({ result }: Props) {
       </Card>
 
       {/* 3. AI 진단 보조 도구 */}
-      <Card icon={Cpu} title="AI 진단 보조 도구 도입 분석" color="text-purple-500">
+      <Card icon={Cpu} title="AI 진단 보조 도구 도입 분석" color="text-blue-500">
         <div className="space-y-3">
           {[
             { tool: 'AI X-ray 판독 보조', cost: '월 50만', accuracy: '95.2%', roi: 280, status: '도입 권장' },
@@ -113,24 +113,24 @@ export default function AnalysisPack4({ result }: Props) {
               <div className="grid grid-cols-3 gap-2 text-xs">
                 <div>비용: <span className="font-bold text-foreground">{t.cost}</span></div>
                 <div>정확도: <span className="font-bold text-foreground">{t.accuracy}</span></div>
-                <div>ROI: <span className="font-bold text-purple-600">{t.roi}%</span></div>
+                <div>ROI: <span className="font-bold text-blue-600">{t.roi}%</span></div>
               </div>
             </div>
           ))}
         </div>
-        <div className="mt-3 p-3 bg-purple-50 dark:bg-purple-950/20 rounded-lg text-center">
+        <div className="mt-3 p-3 bg-blue-50 dark:bg-blue-950/20 rounded-lg text-center">
           <span className="text-xs text-muted-foreground">AI 도구 전체 도입 시 진료 효율 </span>
-          <span className="text-sm font-bold text-purple-600">+25% 향상</span>
+          <span className="text-sm font-bold text-blue-600">+25% 향상</span>
           <span className="text-xs text-muted-foreground"> · 오진율 </span>
           <span className="text-sm font-bold text-green-600">-40% 감소</span>
         </div>
       </Card>
 
       {/* 4. 웨어러블 연동 */}
-      <Card icon={Watch} title="웨어러블 · IoT 연동 분석" color="text-cyan-500">
+      <Card icon={Watch} title="웨어러블 · IoT 연동 분석" color="text-blue-600">
         <div className="grid grid-cols-2 gap-3 mb-4">
-          <div className="p-3 bg-cyan-50 dark:bg-cyan-950/20 rounded-lg text-center">
-            <div className="text-2xl font-bold text-cyan-600">45%</div>
+          <div className="p-3 bg-blue-50 dark:bg-blue-950/20 rounded-lg text-center">
+            <div className="text-2xl font-bold text-blue-600">45%</div>
             <div className="text-[10px] text-muted-foreground">환자 웨어러블 보유율</div>
           </div>
           <div className="p-3 bg-secondary/50 rounded-lg text-center">
@@ -149,7 +149,7 @@ export default function AnalysisPack4({ result }: Props) {
             <div key={d.device} className="flex items-center gap-3 p-2 rounded-lg hover:bg-muted/50">
               <span className="text-sm text-foreground flex-1">{d.device}</span>
               <span className="text-xs text-muted-foreground w-24">{d.data}</span>
-              <span className="text-xs font-bold text-cyan-600 w-10 text-right">{d.users}%</span>
+              <span className="text-xs font-bold text-blue-600 w-10 text-right">{d.users}%</span>
             </div>
           ))}
         </div>
@@ -163,7 +163,7 @@ export default function AnalysisPack4({ result }: Props) {
             { platform: '네이버', avg: 4.5, reviews: 127, color: 'text-green-600' },
             { platform: '카카오', avg: 4.3, reviews: 84, color: 'text-amber-600' },
             { platform: '구글', avg: 4.4, reviews: 56, color: 'text-blue-600' },
-            { platform: '모두닥', avg: 4.2, reviews: 38, color: 'text-purple-600' },
+            { platform: '모두닥', avg: 4.2, reviews: 38, color: 'text-blue-600' },
           ].map((p) => (
             <div key={p.platform} className="text-center p-2 bg-secondary/50 rounded-lg">
               <div className={`text-lg font-bold ${p.color}`}>{p.avg}</div>
@@ -184,10 +184,10 @@ export default function AnalysisPack4({ result }: Props) {
       </Card>
 
       {/* 6. 키오스크/무인 접수 */}
-      <Card icon={QrCode} title="키오스크 · 무인접수 효과 분석" color="text-indigo-500">
+      <Card icon={QrCode} title="키오스크 · 무인접수 효과 분석" color="text-blue-600">
         <div className="grid grid-cols-2 gap-4 mb-4">
-          <div className="p-4 bg-indigo-50 dark:bg-indigo-950/20 rounded-xl">
-            <div className="text-2xl font-bold text-indigo-600">-65%</div>
+          <div className="p-4 bg-blue-50 dark:bg-blue-950/20 rounded-xl">
+            <div className="text-2xl font-bold text-blue-700">-65%</div>
             <div className="text-xs text-muted-foreground">접수 대기시간 단축</div>
           </div>
           <div className="p-4 bg-secondary/50 rounded-xl">
@@ -295,7 +295,7 @@ export default function AnalysisPack4({ result }: Props) {
       </Card>
 
       {/* 9. 스마트 클리닉 */}
-      <Card icon={Monitor} title="스마트 클리닉 구축 비용 분석" color="text-violet-500">
+      <Card icon={Monitor} title="스마트 클리닉 구축 비용 분석" color="text-blue-500">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
@@ -319,17 +319,17 @@ export default function AnalysisPack4({ result }: Props) {
                   <td className="py-1.5 text-foreground text-xs">{r.sys}</td>
                   <td className="py-1.5 text-right text-muted-foreground text-xs">{r.init}</td>
                   <td className="py-1.5 text-right text-foreground text-xs">{r.monthly}</td>
-                  <td className="py-1.5 text-right text-violet-600 text-xs font-medium">{r.effect}</td>
+                  <td className="py-1.5 text-right text-blue-600 text-xs font-medium">{r.effect}</td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
-        <div className="mt-3 p-2 bg-violet-50 dark:bg-violet-950/20 rounded-lg text-center">
+        <div className="mt-3 p-2 bg-blue-50 dark:bg-blue-950/20 rounded-lg text-center">
           <span className="text-xs text-muted-foreground">총 스마트화 비용: </span>
-          <span className="text-sm font-bold text-violet-600">약 2,350만원</span>
+          <span className="text-sm font-bold text-blue-600">약 2,350만원</span>
           <span className="text-xs text-muted-foreground"> · 투자 회수: </span>
-          <span className="text-sm font-bold text-violet-600">약 14개월</span>
+          <span className="text-sm font-bold text-blue-600">약 14개월</span>
         </div>
       </Card>
 

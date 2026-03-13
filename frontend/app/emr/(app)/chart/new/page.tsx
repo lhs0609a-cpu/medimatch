@@ -285,7 +285,7 @@ export default function NewChartPage() {
                   </p>
                   <div className="flex items-center justify-center gap-4 text-sm text-muted-foreground">
                     <span className="flex items-center gap-1.5">
-                      <Brain className="w-4 h-4 text-purple-500" />
+                      <Brain className="w-4 h-4 text-blue-500" />
                       의료용 AI 모델
                     </span>
                     <span className="flex items-center gap-1.5">
@@ -514,7 +514,7 @@ export default function NewChartPage() {
               {/* 처방 */}
               <div className="card p-5">
                 <h4 className="font-bold text-sm mb-3 flex items-center gap-2">
-                  <Pill className="w-4 h-4 text-purple-500" />
+                  <Pill className="w-4 h-4 text-blue-500" />
                   처방 (Rx)
                 </h4>
 
@@ -523,7 +523,7 @@ export default function NewChartPage() {
                   <div className="space-y-2 mb-4">
                     {prescriptions.map((rx) => (
                       <div key={rx.id} className="flex items-center gap-3 p-3 bg-secondary/30 rounded-xl">
-                        <Pill className="w-4 h-4 text-purple-400 flex-shrink-0" />
+                        <Pill className="w-4 h-4 text-blue-400 flex-shrink-0" />
                         <div className="flex-1">
                           <div className="text-sm font-medium">{rx.name}</div>
                           <div className="text-xs text-muted-foreground">{rx.frequency} · {rx.days}일분 · {rx.route}</div>

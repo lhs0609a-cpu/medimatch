@@ -17,9 +17,9 @@ const AGE_GROUPS = [
   { key: 'age_10_19', label: '10대', color: 'bg-sky-400 dark:bg-sky-600' },
   { key: 'age_20_29', label: '20대', color: 'bg-blue-400 dark:bg-blue-600' },
   { key: 'age_30_39', label: '30대', color: 'bg-blue-500 dark:bg-blue-500' },
-  { key: 'age_40_49', label: '40대', color: 'bg-indigo-500 dark:bg-indigo-500' },
-  { key: 'age_50_59', label: '50대', color: 'bg-violet-500 dark:bg-violet-500' },
-  { key: 'age_60_plus', label: '60+', color: 'bg-purple-600 dark:bg-purple-500' },
+  { key: 'age_40_49', label: '40대', color: 'bg-blue-600 dark:bg-blue-600' },
+  { key: 'age_50_59', label: '50대', color: 'bg-blue-500 dark:bg-blue-500' },
+  { key: 'age_60_plus', label: '60+', color: 'bg-blue-600 dark:bg-blue-500' },
 ] as const
 
 export default function DemographicsPreview({ result, isUnlocked }: DemographicsPreviewProps) {
@@ -207,7 +207,7 @@ export default function DemographicsPreview({ result, isUnlocked }: Demographics
                   남 {Math.round(dd.male_ratio * 100)}%
                 </div>
                 <div
-                  className="bg-pink-400 flex items-center justify-center text-white"
+                  className="bg-blue-400 flex items-center justify-center text-white"
                   style={{ width: `${Math.round(dd.female_ratio * 100)}%` }}
                 >
                   여 {Math.round(dd.female_ratio * 100)}%

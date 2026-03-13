@@ -36,10 +36,10 @@ const kpi = {
 }
 
 const channels = [
-  { name: '소개/추천', spend: 0, patients: 15, inquiries: 15, appointments: 15, revenue: 6_000_000, roi: 0, cpa: 0, color: 'bg-cyan-400' },
+  { name: '소개/추천', spend: 0, patients: 15, inquiries: 15, appointments: 15, revenue: 6_000_000, roi: 0, cpa: 0, color: 'bg-blue-400' },
   { name: '네이버 블로그', spend: 800_000, patients: 12, inquiries: 45, appointments: 18, revenue: 4_800_000, roi: 500, cpa: 66_667, color: 'bg-emerald-400' },
   { name: '네이버 광고', spend: 1_500_000, patients: 20, inquiries: 80, appointments: 30, revenue: 7_200_000, roi: 380, cpa: 75_000, color: 'bg-blue-400' },
-  { name: '인스타그램/SNS', spend: 400_000, patients: 8, inquiries: 35, appointments: 12, revenue: 3_200_000, roi: 700, cpa: 50_000, color: 'bg-purple-400' },
+  { name: '인스타그램/SNS', spend: 400_000, patients: 8, inquiries: 35, appointments: 12, revenue: 3_200_000, roi: 700, cpa: 50_000, color: 'bg-blue-400' },
   { name: '구글 광고', spend: 600_000, patients: 5, inquiries: 25, appointments: 8, revenue: 2_000_000, roi: 233, cpa: 120_000, color: 'bg-red-400' },
   { name: '카카오톡', spend: 300_000, patients: 4, inquiries: 15, appointments: 6, revenue: 1_200_000, roi: 300, cpa: 75_000, color: 'bg-amber-400' },
   { name: '오프라인 전단', spend: 200_000, patients: 3, inquiries: 10, appointments: 4, revenue: 900_000, roi: 350, cpa: 66_667, color: 'bg-orange-400' },
@@ -218,7 +218,7 @@ export default function MarketingROIPage() {
                 <div className="flex-1 flex h-7 rounded-lg overflow-hidden bg-secondary/30">
                   <div className="bg-blue-400 h-full" style={{ width: `${(m.naver / maxTrend) * 100}%` }} />
                   <div className="bg-red-400 h-full" style={{ width: `${(m.google / maxTrend) * 100}%` }} />
-                  <div className="bg-purple-400 h-full" style={{ width: `${(m.sns / maxTrend) * 100}%` }} />
+                  <div className="bg-blue-400 h-full" style={{ width: `${(m.sns / maxTrend) * 100}%` }} />
                   <div className="bg-gray-400 h-full" style={{ width: `${(m.other / maxTrend) * 100}%` }} />
                 </div>
                 <span className="text-xs font-semibold w-12 text-right">{fmtMan(m.total)}</span>
@@ -229,7 +229,7 @@ export default function MarketingROIPage() {
           <div className="flex items-center gap-6 pt-2 text-xs text-muted-foreground">
             <div className="flex items-center gap-1.5"><div className="w-3 h-3 rounded bg-blue-400" /> 네이버</div>
             <div className="flex items-center gap-1.5"><div className="w-3 h-3 rounded bg-red-400" /> 구글</div>
-            <div className="flex items-center gap-1.5"><div className="w-3 h-3 rounded bg-purple-400" /> SNS</div>
+            <div className="flex items-center gap-1.5"><div className="w-3 h-3 rounded bg-blue-400" /> SNS</div>
             <div className="flex items-center gap-1.5"><div className="w-3 h-3 rounded bg-gray-400" /> 기타</div>
           </div>
         </div>

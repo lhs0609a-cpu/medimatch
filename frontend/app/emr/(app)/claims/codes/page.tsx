@@ -294,7 +294,7 @@ export default function HIRACodeSearchPage() {
       {/* ───── 헤더 ───── */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex items-center gap-3">
-          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-teal-500 to-blue-500 flex items-center justify-center">
+          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-500 flex items-center justify-center">
             <BookOpen className="w-6 h-6 text-white" />
           </div>
           <div>

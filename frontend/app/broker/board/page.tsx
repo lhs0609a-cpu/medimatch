@@ -121,7 +121,7 @@ export default function BrokerBoardPage() {
     <div className="p-6 max-w-3xl mx-auto">
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-teal-500 to-teal-600 flex items-center justify-center">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
             <MessageSquare className="w-5 h-5 text-white" />
           </div>
           <h1 className="text-xl font-bold text-gray-900">게시판</h1>

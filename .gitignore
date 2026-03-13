@@ -50,4 +50,6 @@ venv/
 .vercel
 nul
 
-.vercel
+# Credentials / tokens
+*token*.json
+admin_token.json

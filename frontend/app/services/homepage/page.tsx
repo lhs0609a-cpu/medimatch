@@ -42,7 +42,7 @@ export default function HomepageServicePage() {
           <h1 className="text-5xl sm:text-7xl md:text-8xl lg:text-9xl font-black tracking-tight leading-[0.95]">
             <span className="text-white">병원 홈페이지</span>
             <br />
-            <span className="bg-gradient-to-r from-blue-400 to-cyan-300 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-blue-400 to-blue-400 bg-clip-text text-transparent">
               무료 제작
             </span>
           </h1>
@@ -85,7 +85,7 @@ export default function HomepageServicePage() {
           <h2 className="text-3xl sm:text-5xl md:text-6xl font-black leading-tight">
             조건은 딱 하나
           </h2>
-          <div className="mt-10 bg-gradient-to-r from-blue-600 to-cyan-500 rounded-3xl p-8 sm:p-12">
+          <div className="mt-10 bg-gradient-to-r from-blue-600 to-blue-600 rounded-3xl p-8 sm:p-12">
             <CreditCard className="w-16 h-16 mx-auto text-white/80 mb-6" />
             <p className="text-2xl sm:text-4xl md:text-5xl font-black text-white leading-tight">
               PG 단말기 설치

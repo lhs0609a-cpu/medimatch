@@ -58,7 +58,7 @@ export default function ForgotPasswordPage() {
       <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
         <div className="max-w-md w-full bg-white rounded-2xl shadow-lg p-8 text-center">
           <div className="flex justify-center mb-6">
-            <TossIcon icon={Mail} color="from-violet-500 to-purple-500" size="lg" shadow="shadow-violet-500/25" />
+            <TossIcon icon={Mail} color="from-blue-500 to-blue-600" size="lg" shadow="shadow-blue-500/25" />
           </div>
           <h2 className="text-2xl font-bold text-gray-900 mb-2">이메일을 확인해주세요</h2>
           <p className="text-gray-500 mb-6">
@@ -68,7 +68,7 @@ export default function ForgotPasswordPage() {
           </p>
           <Link
             href="/login"
-            className="inline-flex items-center gap-2 px-6 py-3 bg-violet-600 text-white rounded-xl hover:bg-violet-700 transition-colors font-medium"
+            className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors font-medium"
           >
             <ArrowLeft className="w-4 h-4" />
             로그인으로 돌아가기
@@ -132,7 +132,7 @@ export default function ForgotPasswordPage() {
           </form>
 
           <p className="text-center text-gray-500 mt-6">
-            <Link href="/login" className="text-violet-600 font-medium hover:text-violet-700">
+            <Link href="/login" className="text-blue-600 font-medium hover:text-blue-700">
               로그인으로 돌아가기
             </Link>
           </p>

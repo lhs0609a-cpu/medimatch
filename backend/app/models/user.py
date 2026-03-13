@@ -36,6 +36,10 @@ class User(Base):
     oauth_provider = Column(String(20), nullable=True)  # google, naver, kakao
     oauth_provider_id = Column(String(255), nullable=True)  # OAuth provider's user ID
 
+    # 비밀번호 재설정
+    reset_token = Column(String(100), nullable=True, index=True)
+    reset_token_expires = Column(DateTime, nullable=True)
+
     # 개원 준비 관련 필드 (DOCTOR용)
     is_opening_preparation = Column(Boolean, default=False)  # 개원 준비중 여부
     opening_region = Column(String(100), nullable=True)  # 희망 개원 지역 (시/구)

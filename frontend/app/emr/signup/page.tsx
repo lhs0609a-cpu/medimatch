@@ -63,10 +63,10 @@ export default function SignupPage() {
   return (
     <div className="min-h-screen flex">
       {/* 왼쪽: 브랜딩 */}
-      <div className="hidden lg:flex lg:w-[420px] bg-gradient-to-br from-blue-600 via-blue-700 to-purple-700 relative overflow-hidden flex-shrink-0">
+      <div className="hidden lg:flex lg:w-[420px] bg-gradient-to-br from-blue-600 via-blue-700 to-blue-700 relative overflow-hidden flex-shrink-0">
         <div className="absolute inset-0 opacity-10">
           <div className="absolute top-20 left-20 w-72 h-72 bg-white rounded-full blur-3xl" />
-          <div className="absolute bottom-40 right-10 w-96 h-96 bg-purple-300 rounded-full blur-3xl" />
+          <div className="absolute bottom-40 right-10 w-96 h-96 bg-blue-300 rounded-full blur-3xl" />
         </div>
         <div className="relative z-10 flex flex-col justify-center px-12 text-white">
           <Link href="/emr" className="flex items-center gap-2 mb-12">
@@ -169,12 +169,12 @@ export default function SignupPage() {
                   onClick={() => setUserType('pharmacy')}
                   className={`w-full flex items-center gap-4 p-5 rounded-2xl border-2 transition-all text-left ${
                     userType === 'pharmacy'
-                      ? 'border-purple-500 bg-purple-50 dark:bg-purple-900/20'
-                      : 'border-border hover:border-purple-200'
+                      ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
+                      : 'border-border hover:border-blue-200'
                   }`}
                 >
                   <div className={`w-14 h-14 rounded-2xl flex items-center justify-center ${
-                    userType === 'pharmacy' ? 'bg-purple-500' : 'bg-secondary'
+                    userType === 'pharmacy' ? 'bg-blue-500' : 'bg-secondary'
                   }`}>
                     <Pill className={`w-7 h-7 ${userType === 'pharmacy' ? 'text-white' : 'text-muted-foreground'}`} />
                   </div>
@@ -184,11 +184,11 @@ export default function SignupPage() {
                       실시간 처방 수신, 재고 관리, DUR 자동점검
                     </p>
                     <div className="flex items-center gap-2 mt-2">
-                      <span className="px-2 py-0.5 rounded bg-purple-100 dark:bg-purple-900/30 text-2xs font-semibold text-purple-600">무료 시작</span>
+                      <span className="px-2 py-0.5 rounded bg-blue-100 dark:bg-blue-900/30 text-2xs font-semibold text-blue-600">무료 시작</span>
                       <span className="text-2xs text-muted-foreground">Pharmacy 9만원/월</span>
                     </div>
                   </div>
-                  {userType === 'pharmacy' && <CheckCircle2 className="w-6 h-6 text-purple-500 flex-shrink-0" />}
+                  {userType === 'pharmacy' && <CheckCircle2 className="w-6 h-6 text-blue-500 flex-shrink-0" />}
                 </button>
               </div>
 
@@ -196,7 +196,7 @@ export default function SignupPage() {
                 onClick={() => userType && setStep(2)}
                 disabled={!userType}
                 className="w-full mt-8 py-3 rounded-xl font-semibold text-sm text-white transition-all flex items-center justify-center gap-2 disabled:opacity-30"
-                style={{ backgroundColor: userType === 'pharmacy' ? 'rgb(168 85 247)' : 'rgb(37 99 235)' }}
+                style={{ backgroundColor: 'rgb(37 99 235)' }}
               >
                 다음 <ArrowRight className="w-4 h-4" />
               </button>
@@ -351,7 +351,7 @@ export default function SignupPage() {
                 <button
                   onClick={() => setStep(3)}
                   className="flex-1 py-3 rounded-xl font-semibold text-sm text-white transition-all flex items-center justify-center gap-2"
-                  style={{ backgroundColor: userType === 'pharmacy' ? 'rgb(168 85 247)' : 'rgb(37 99 235)' }}
+                  style={{ backgroundColor: 'rgb(37 99 235)' }}
                 >
                   다음 <ArrowRight className="w-4 h-4" />
                 </button>
@@ -426,7 +426,7 @@ export default function SignupPage() {
                   onClick={handleSignup}
                   disabled={!allRequiredAgreed || isLoading}
                   className="flex-1 py-3 rounded-xl font-semibold text-sm text-white transition-all flex items-center justify-center gap-2 disabled:opacity-30"
-                  style={{ backgroundColor: userType === 'pharmacy' ? 'rgb(168 85 247)' : 'rgb(37 99 235)' }}
+                  style={{ backgroundColor: 'rgb(37 99 235)' }}
                 >
                   {isLoading ? (
                     <>

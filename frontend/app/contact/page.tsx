@@ -140,7 +140,7 @@ export default function ContactPage() {
             <div className="space-y-4">
               <div className="card p-5">
                 <div className="flex items-start gap-4">
-                  <TossIcon icon={Mail} color="from-violet-500 to-purple-500" size="sm" shadow="shadow-violet-500/25" />
+                  <TossIcon icon={Mail} color="from-blue-500 to-blue-600" size="sm" shadow="shadow-blue-500/25" />
                   <div>
                     <h3 className="font-medium text-foreground">이메일</h3>
                     <a href="mailto:support@mediplaton.com" className="text-muted-foreground hover:text-foreground">
@@ -152,7 +152,7 @@ export default function ContactPage() {
 
               <div className="card p-5">
                 <div className="flex items-start gap-4">
-                  <TossIcon icon={MessageCircle} color="from-violet-500 to-purple-500" size="sm" shadow="shadow-violet-500/25" />
+                  <TossIcon icon={MessageCircle} color="from-blue-500 to-blue-600" size="sm" shadow="shadow-blue-500/25" />
                   <div>
                     <h3 className="font-medium text-foreground">카톡 상담</h3>
                     <a href="https://open.kakao.com/o/sMLX4Zei" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground">

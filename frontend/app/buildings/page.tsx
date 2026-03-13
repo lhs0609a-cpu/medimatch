@@ -269,7 +269,7 @@ export default function BuildingsPage() {
 
           {/* Data Source Banner */}
           {dataSource === 'api' ? (
-            <div className="mt-4 bg-gradient-to-r from-emerald-600/10 to-teal-600/10 border border-emerald-200 dark:border-emerald-800 rounded-lg px-4 py-2">
+            <div className="mt-4 bg-gradient-to-r from-emerald-600/10 to-blue-600/10 border border-emerald-200 dark:border-emerald-800 rounded-lg px-4 py-2">
               <div className="flex items-center gap-2 text-sm">
                 <CheckCircle className="w-4 h-4 text-emerald-600" />
                 <span className="text-emerald-700 font-medium">
@@ -292,7 +292,7 @@ export default function BuildingsPage() {
           )}
 
           {/* Live Activity Banner */}
-          <div className="mt-4 bg-gradient-to-r from-blue-600/10 to-cyan-600/10 border border-blue-200 dark:border-blue-800 rounded-lg px-4 py-2">
+          <div className="mt-4 bg-gradient-to-r from-blue-600/10 to-blue-600/10 border border-blue-200 dark:border-blue-800 rounded-lg px-4 py-2">
             <div className="flex items-center gap-2 text-sm">
               <span className="relative flex h-2 w-2">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
@@ -524,7 +524,7 @@ export default function BuildingsPage() {
               className="card card-interactive overflow-hidden"
             >
               {/* Image - 블러 처리된 실제 건물 사진 */}
-              <div className="h-40 bg-gradient-to-br from-blue-100 to-cyan-100 dark:from-blue-900/30 dark:to-cyan-900/30 relative overflow-hidden">
+              <div className="h-40 bg-gradient-to-br from-blue-100 to-blue-100 dark:from-blue-900/30 dark:to-blue-900/30 relative overflow-hidden">
                 {/* 실제 건물 이미지 (블러 처리) - thumbnailIndex 기반 배정 */}
                 <Image
                   src={buildingListingImages[listing.thumbnailIndex % buildingListingImages.length]}

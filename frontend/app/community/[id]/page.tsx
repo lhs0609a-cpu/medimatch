@@ -156,7 +156,7 @@ export default function CommunityPostPage() {
           <h1 className="text-2xl font-bold text-foreground mb-4">{post.title}</h1>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-full flex items-center justify-center text-white font-bold">
+              <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center text-white font-bold">
                 {post.authorName[0]}
               </div>
               <div>

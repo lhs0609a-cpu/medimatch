@@ -16,7 +16,7 @@ const ACTION_CONFIG: Record<string, { icon: typeof CheckCircle2; color: string; 
   DEAL_CREATED: { icon: CheckCircle2, color: 'text-green-600 bg-green-100', label: '딜 생성' },
   STATUS_CHANGE: { icon: ArrowRight, color: 'text-blue-600 bg-blue-100', label: '상태 변경' },
   NOTE: { icon: MessageSquare, color: 'text-gray-600 bg-gray-100', label: '메모' },
-  BROKER_ASSIGNED: { icon: User, color: 'text-purple-600 bg-purple-100', label: '중개사 배정' },
+  BROKER_ASSIGNED: { icon: User, color: 'text-blue-600 bg-blue-100', label: '중개사 배정' },
   CIRCUMVENTION_FLAGGED: { icon: AlertTriangle, color: 'text-red-600 bg-red-100', label: '우회 의심' },
 };
 

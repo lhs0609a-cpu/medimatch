@@ -208,7 +208,7 @@ export default function BenchmarkPage() {
             { label: `${specLabel} 평균 환자수`, value: `${adjAvgPatients}명/일`, icon: Users, color: 'text-blue-500' },
             { label: '평균 월매출', value: `${adjAvgRevenue.toLocaleString()}만`, icon: DollarSign, color: 'text-green-500' },
             { label: '평균 영업이익률', value: `${data.operatingMargin.avg}%`, icon: TrendingUp, color: 'text-orange-500' },
-            { label: '환자당 진료비', value: `${adjPerPatient.toLocaleString()}원`, icon: Activity, color: 'text-purple-500' },
+            { label: '환자당 진료비', value: `${adjPerPatient.toLocaleString()}원`, icon: Activity, color: 'text-blue-500' },
           ].map(kpi => (
             <div key={kpi.label} className="card p-5">
               <div className="flex items-center gap-2 mb-1">

@@ -81,8 +81,8 @@ export default function NotFound() {
               href="/map"
               className="flex items-center gap-3 p-3 rounded-xl hover:bg-secondary transition-colors text-left"
             >
-              <div className="w-10 h-10 bg-violet-100 dark:bg-violet-900/30 rounded-lg flex items-center justify-center">
-                <MapPin className="w-5 h-5 text-violet-600" />
+              <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center">
+                <MapPin className="w-5 h-5 text-blue-600" />
               </div>
               <div>
                 <p className="font-medium text-foreground text-sm">지도 보기</p>

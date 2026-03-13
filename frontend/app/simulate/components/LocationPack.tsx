@@ -11,7 +11,7 @@ function Card({ icon: Icon, title, color, gradient, shadow, children }: { icon: 
   return (
     <div className="card p-6">
       <div className="flex items-center gap-3 mb-4">
-        <TossIcon icon={Icon} color={gradient || 'from-blue-500 to-indigo-500'} size="sm" shadow={shadow} />
+        <TossIcon icon={Icon} color={gradient || 'from-blue-500 to-blue-600'} size="sm" shadow={shadow} />
         <h3 className="font-semibold text-foreground">{title}</h3>
       </div>
       {children}
@@ -25,7 +25,7 @@ export default function LocationPack({ result }: Props) {
   return (
     <>
       {/* 1. 보행자 동선 분석 */}
-      <Card icon={Footprints} title="보행자 동선 · 유동인구 핫스팟" color="text-blue-500" gradient="from-blue-500 to-indigo-500" shadow="shadow-blue-500/25">
+      <Card icon={Footprints} title="보행자 동선 · 유동인구 핫스팟" color="text-blue-500" gradient="from-blue-500 to-blue-600" shadow="shadow-blue-500/25">
         <div className="space-y-2 mb-4">
           {[
             { spot: '지하철 출구 앞', flow: 35000, type: '출퇴근 집중', peak: '08:00-09:00', score: 98 },
@@ -96,7 +96,7 @@ export default function LocationPack({ result }: Props) {
       </Card>
 
       {/* 3. 층별 임대료 비교 */}
-      <Card icon={Building2} title="층별 임대 조건 비교" color="text-violet-500" gradient="from-blue-500 to-indigo-500" shadow="shadow-blue-500/25">
+      <Card icon={Building2} title="층별 임대 조건 비교" color="text-blue-500" gradient="from-blue-500 to-blue-600" shadow="shadow-blue-500/25">
         <div className="space-y-2">
           {[
             { floor: '1층', rent: 350, deposit: 15000, visibility: 98, access: 100, recommend: true },
@@ -105,7 +105,7 @@ export default function LocationPack({ result }: Props) {
             { floor: '4-5층', rent: 170, deposit: 7000, visibility: 30, access: 70, recommend: false },
             { floor: '지하1층', rent: 150, deposit: 5000, visibility: 15, access: 60, recommend: false },
           ].map((f) => (
-            <div key={f.floor} className={`flex items-center gap-3 p-3 rounded-lg ${f.recommend ? 'bg-violet-50 dark:bg-violet-950/20 border border-violet-200 dark:border-violet-800' : 'bg-secondary/30'}`}>
+            <div key={f.floor} className={`flex items-center gap-3 p-3 rounded-lg ${f.recommend ? 'bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800' : 'bg-secondary/30'}`}>
               <span className="text-sm font-medium text-foreground w-14">{f.floor}</span>
               <div className="flex-1">
                 <div className="grid grid-cols-2 gap-1 text-xs">
@@ -116,7 +116,7 @@ export default function LocationPack({ result }: Props) {
                   <div className="flex items-center gap-1">
                     <span className="text-[10px] text-muted-foreground">가시성</span>
                     <div className="w-12 h-1.5 bg-muted rounded-full overflow-hidden">
-                      <div className="h-full bg-violet-500 rounded-full" style={{ width: `${f.visibility}%` }} />
+                      <div className="h-full bg-blue-500 rounded-full" style={{ width: `${f.visibility}%` }} />
                     </div>
                   </div>
                   <div className="flex items-center gap-1">
@@ -127,7 +127,7 @@ export default function LocationPack({ result }: Props) {
                   </div>
                 </div>
               </div>
-              {f.recommend && <span className="text-[10px] px-2 py-0.5 bg-violet-500 text-white rounded-full">추천</span>}
+              {f.recommend && <span className="text-[10px] px-2 py-0.5 bg-blue-500 text-white rounded-full">추천</span>}
             </div>
           ))}
         </div>
@@ -135,7 +135,7 @@ export default function LocationPack({ result }: Props) {
       </Card>
 
       {/* 4. 대중교통 접근성 */}
-      <Card icon={Navigation} title="대중교통 접근성 상세" color="text-green-500" gradient="from-blue-500 to-cyan-500" shadow="shadow-blue-500/25">
+      <Card icon={Navigation} title="대중교통 접근성 상세" color="text-green-500" gradient="from-blue-500 to-blue-600" shadow="shadow-blue-500/25">
         <div className="space-y-3">
           {[
             { type: '지하철 2호선 교대역', dist: '180m', time: '도보 3분', daily: '12.5만명', lines: '2, 3호선' },
@@ -245,7 +245,7 @@ export default function LocationPack({ result }: Props) {
       </Card>
 
       {/* 8. 건물 적합성 */}
-      <Card icon={Building2} title="건물 시설 적합성 평가" color="text-rose-500" gradient="from-rose-500 to-pink-500" shadow="shadow-rose-500/25">
+      <Card icon={Building2} title="건물 시설 적합성 평가" color="text-rose-500" gradient="from-rose-500 to-blue-500" shadow="shadow-rose-500/25">
         <div className="space-y-2">
           {[
             { item: '전기 용량', score: 88, requirement: '100kW 이상', current: '150kW', pass: true },
@@ -305,7 +305,7 @@ export default function LocationPack({ result }: Props) {
       </Card>
 
       {/* 10. 장애인/어르신 접근성 */}
-      <Card icon={Accessibility} title="장애인 · 어르신 접근성 평가" color="text-teal-500" gradient="from-teal-500 to-cyan-500" shadow="shadow-teal-500/25">
+      <Card icon={Accessibility} title="장애인 · 어르신 접근성 평가" color="text-blue-500" gradient="from-blue-500 to-blue-600" shadow="shadow-blue-500/25">
         <div className="space-y-2">
           {[
             { item: '건물 출입 경사로', status: '설치됨', score: 90, note: '기울기 1/12 적합' },
@@ -325,14 +325,14 @@ export default function LocationPack({ result }: Props) {
                 'bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400'
               }`}>{a.status}</span>
               <div className="w-16 h-2 bg-muted rounded-full overflow-hidden">
-                <div className={`h-full rounded-full ${a.score >= 80 ? 'bg-teal-500' : a.score >= 60 ? 'bg-amber-500' : 'bg-red-500'}`}
+                <div className={`h-full rounded-full ${a.score >= 80 ? 'bg-blue-500' : a.score >= 60 ? 'bg-amber-500' : 'bg-red-500'}`}
                   style={{ width: `${a.score}%` }} />
               </div>
               <span className="text-xs font-bold text-foreground w-8 text-right">{a.score}</span>
             </div>
           ))}
         </div>
-        <div className="mt-3 p-2 bg-teal-50 dark:bg-teal-950/20 rounded-lg">
+        <div className="mt-3 p-2 bg-blue-50 dark:bg-blue-950/20 rounded-lg">
           <p className="text-xs text-muted-foreground">종합 접근성: <span className="font-bold text-foreground">78점</span> → 낮은 접수대 + 점자블록 보강 시 <span className="font-bold text-green-600">88점</span></p>
         </div>
       </Card>

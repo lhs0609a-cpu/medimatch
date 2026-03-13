@@ -13,7 +13,7 @@ const statusConfig: Record<MatchStatus, { label: string; color: string; icon: an
   PENDING: { label: '관심 대기', color: 'bg-yellow-100 text-yellow-700', icon: Clock },
   MUTUAL: { label: '상호 관심', color: 'bg-green-100 text-green-700', icon: Heart },
   CHATTING: { label: '대화중', color: 'bg-blue-100 text-blue-700', icon: MessageCircle },
-  MEETING: { label: '미팅 진행', color: 'bg-purple-100 text-purple-700', icon: Calendar },
+  MEETING: { label: '미팅 진행', color: 'bg-blue-100 text-blue-700', icon: Calendar },
   CONTRACTED: { label: '계약 완료', color: 'bg-emerald-100 text-emerald-700', icon: CheckCircle },
   CANCELLED: { label: '취소됨', color: 'bg-gray-100 text-gray-500', icon: XCircle },
 }
@@ -45,7 +45,7 @@ export default function MatchesPage() {
             <ArrowLeft className="w-5 h-5" />
           </Link>
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg flex items-center justify-center">
+            <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-500 rounded-lg flex items-center justify-center">
               <Users className="w-4 h-4 text-white" />
             </div>
             <span className="text-xl font-bold text-gray-900">매칭 현황</span>
@@ -57,11 +57,11 @@ export default function MatchesPage() {
         {/* Stats */}
         <div className="grid grid-cols-3 gap-4 mb-8">
           <div className="bg-white rounded-xl border p-4 text-center">
-            <p className="text-2xl font-bold text-purple-600">{interests?.total_sent || 0}</p>
+            <p className="text-2xl font-bold text-blue-600">{interests?.total_sent || 0}</p>
             <p className="text-sm text-gray-600">보낸 관심</p>
           </div>
           <div className="bg-white rounded-xl border p-4 text-center">
-            <p className="text-2xl font-bold text-pink-600">{interests?.total_received || 0}</p>
+            <p className="text-2xl font-bold text-blue-600">{interests?.total_received || 0}</p>
             <p className="text-sm text-gray-600">받은 관심</p>
           </div>
           <div className="bg-white rounded-xl border p-4 text-center">
@@ -74,7 +74,7 @@ export default function MatchesPage() {
 
         {/* Tabs */}
         <div className="flex gap-2 mb-6">
-          <button className="px-4 py-2 bg-purple-600 text-white rounded-lg text-sm font-medium">
+          <button className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium">
             매칭 ({matches?.total || 0})
           </button>
           <button className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-200">
@@ -88,7 +88,7 @@ export default function MatchesPage() {
         {/* Matches List */}
         {isLoading ? (
           <div className="text-center py-12">
-            <div className="animate-spin h-8 w-8 border-4 border-purple-600 border-t-transparent rounded-full mx-auto mb-4" />
+            <div className="animate-spin h-8 w-8 border-4 border-blue-600 border-t-transparent rounded-full mx-auto mb-4" />
             <p className="text-gray-600">매칭 목록을 불러오는 중...</p>
           </div>
         ) : matches?.items.length === 0 ? (
@@ -101,7 +101,7 @@ export default function MatchesPage() {
             </p>
             <Link
               href="/pharmacy-match"
-              className="inline-block bg-purple-600 text-white px-6 py-2 rounded-lg hover:bg-purple-700"
+              className="inline-block bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700"
             >
               매물 둘러보기
             </Link>
@@ -165,11 +165,11 @@ export default function MatchesPage() {
                     )}
                   </div>
 
-                  <div className="px-4 py-3 bg-gray-50 rounded-b-xl flex items-center justify-between group-hover:bg-purple-50">
-                    <span className="text-sm text-gray-600 group-hover:text-purple-700">
+                  <div className="px-4 py-3 bg-gray-50 rounded-b-xl flex items-center justify-between group-hover:bg-blue-50">
+                    <span className="text-sm text-gray-600 group-hover:text-blue-700">
                       상세 보기
                     </span>
-                    <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-purple-600" />
+                    <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-blue-600" />
                   </div>
                 </Link>
               )
@@ -201,7 +201,7 @@ export default function MatchesPage() {
                       </div>
                       <Link
                         href={`/pharmacy-match/listings/${interest.listing_id}`}
-                        className="text-purple-600 hover:text-purple-700 text-sm"
+                        className="text-blue-600 hover:text-blue-700 text-sm"
                       >
                         보기
                       </Link>

@@ -19,7 +19,7 @@ export default function PartnersLoading() {
       </header>
 
       {/* Hero Skeleton */}
-      <section className="bg-gradient-to-r from-violet-600 to-indigo-600 py-16">
+      <section className="bg-gradient-to-r from-blue-600 to-blue-700 py-16">
         <div className="container mx-auto px-4">
           <div className="max-w-3xl mx-auto text-center">
             <Skeleton className="h-10 w-80 mx-auto mb-4 bg-white/20" />

@@ -126,7 +126,7 @@ export default function PharmacySettingsPage() {
                 onClick={() => setActiveTab(tab.key)}
                 className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors ${
                   activeTab === tab.key
-                    ? 'bg-purple-50 dark:bg-purple-900/20 text-purple-600'
+                    ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600'
                     : 'text-muted-foreground hover:bg-secondary hover:text-foreground'
                 }`}
               >
@@ -205,7 +205,7 @@ export default function PharmacySettingsPage() {
               </div>
 
               <div className="flex justify-end">
-                <button className="btn-sm" style={{ backgroundColor: 'rgb(168 85 247)', color: 'white' }}>
+                <button className="btn-sm" style={{ backgroundColor: 'rgb(37 99 235)', color: 'white' }}>
                   <Save className="w-3.5 h-3.5" /> 저장
                 </button>
               </div>
@@ -218,15 +218,15 @@ export default function PharmacySettingsPage() {
               <div className="card p-5">
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="font-semibold">연동 의원 관리</h3>
-                  <button className="btn-sm text-xs" style={{ backgroundColor: 'rgb(168 85 247)', color: 'white' }}>
+                  <button className="btn-sm text-xs" style={{ backgroundColor: 'rgb(37 99 235)', color: 'white' }}>
                     <Plus className="w-3 h-3" /> 의원 연동 요청
                   </button>
                 </div>
                 <div className="space-y-3">
                   {linkedClinics.map(clinic => (
-                    <div key={clinic.id} className="flex items-center gap-4 p-4 rounded-xl border border-border hover:border-purple-200 dark:hover:border-purple-800 transition-colors">
-                      <div className="w-12 h-12 rounded-xl bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center flex-shrink-0">
-                        <Stethoscope className="w-6 h-6 text-purple-600" />
+                    <div key={clinic.id} className="flex items-center gap-4 p-4 rounded-xl border border-border hover:border-blue-200 dark:hover:border-blue-800 transition-colors">
+                      <div className="w-12 h-12 rounded-xl bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center flex-shrink-0">
+                        <Stethoscope className="w-6 h-6 text-blue-600" />
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
@@ -242,7 +242,7 @@ export default function PharmacySettingsPage() {
                         </div>
                       </div>
                       <div className="text-right flex-shrink-0">
-                        <div className="text-lg font-bold text-purple-600">{clinic.todayRx}</div>
+                        <div className="text-lg font-bold text-blue-600">{clinic.todayRx}</div>
                         <div className="text-2xs text-muted-foreground">오늘 처방</div>
                       </div>
                       <button className="btn-icon flex-shrink-0">
@@ -261,7 +261,7 @@ export default function PharmacySettingsPage() {
                       <span className="text-sm font-medium">자동 처방전 접수</span>
                       <p className="text-2xs text-muted-foreground mt-0.5">연동 의원의 처방전을 자동으로 접수합니다</p>
                     </div>
-                    <div className="w-10 h-6 rounded-full bg-purple-500 relative cursor-pointer">
+                    <div className="w-10 h-6 rounded-full bg-blue-500 relative cursor-pointer">
                       <div className="w-4 h-4 rounded-full bg-white absolute top-1 right-1 shadow-sm" />
                     </div>
                   </div>
@@ -270,7 +270,7 @@ export default function PharmacySettingsPage() {
                       <span className="text-sm font-medium">조제 완료 자동 알림</span>
                       <p className="text-2xs text-muted-foreground mt-0.5">조제 완료 시 의원에 자동 알림 전송</p>
                     </div>
-                    <div className="w-10 h-6 rounded-full bg-purple-500 relative cursor-pointer">
+                    <div className="w-10 h-6 rounded-full bg-blue-500 relative cursor-pointer">
                       <div className="w-4 h-4 rounded-full bg-white absolute top-1 right-1 shadow-sm" />
                     </div>
                   </div>
@@ -294,7 +294,7 @@ export default function PharmacySettingsPage() {
               <div className="card p-5">
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="font-semibold">도매상 관리</h3>
-                  <button className="btn-sm text-xs" style={{ backgroundColor: 'rgb(168 85 247)', color: 'white' }}>
+                  <button className="btn-sm text-xs" style={{ backgroundColor: 'rgb(37 99 235)', color: 'white' }}>
                     <Plus className="w-3 h-3" /> 도매상 추가
                   </button>
                 </div>
@@ -308,7 +308,7 @@ export default function PharmacySettingsPage() {
                         <div className="flex items-center gap-2">
                           <span className="font-semibold text-sm">{ws.name}</span>
                           {ws.priority === 1 && (
-                            <span className="px-1.5 py-0.5 rounded bg-purple-100 text-2xs font-bold text-purple-600 dark:bg-purple-900/30">기본</span>
+                            <span className="px-1.5 py-0.5 rounded bg-blue-100 text-2xs font-bold text-blue-600 dark:bg-blue-900/30">기본</span>
                           )}
                           {ws.autoOrder && (
                             <span className="px-1.5 py-0.5 rounded bg-emerald-100 text-2xs font-bold text-emerald-600 dark:bg-emerald-900/30">자동발주</span>
@@ -366,7 +366,7 @@ export default function PharmacySettingsPage() {
                     </div>
                   </div>
                   <div className="flex justify-end">
-                    <button className="btn-sm text-xs" style={{ backgroundColor: 'rgb(168 85 247)', color: 'white' }}>
+                    <button className="btn-sm text-xs" style={{ backgroundColor: 'rgb(37 99 235)', color: 'white' }}>
                       <Save className="w-3 h-3" /> 저장
                     </button>
                   </div>
@@ -391,7 +391,7 @@ export default function PharmacySettingsPage() {
                         <span className="text-2xs text-muted-foreground">알림</span>
                         <button
                           onClick={() => toggleNotification(n.key, 'enabled')}
-                          className={`w-10 h-6 rounded-full relative transition-colors ${n.enabled ? 'bg-purple-500' : 'bg-secondary'}`}
+                          className={`w-10 h-6 rounded-full relative transition-colors ${n.enabled ? 'bg-blue-500' : 'bg-secondary'}`}
                         >
                           <div className={`w-4 h-4 rounded-full bg-white absolute top-1 shadow-sm transition-all ${n.enabled ? 'right-1' : 'left-1'}`} />
                         </button>
@@ -400,7 +400,7 @@ export default function PharmacySettingsPage() {
                         <span className="text-2xs text-muted-foreground">소리</span>
                         <button
                           onClick={() => toggleNotification(n.key, 'sound')}
-                          className={`w-10 h-6 rounded-full relative transition-colors ${n.sound ? 'bg-purple-500' : 'bg-secondary'}`}
+                          className={`w-10 h-6 rounded-full relative transition-colors ${n.sound ? 'bg-blue-500' : 'bg-secondary'}`}
                         >
                           <div className={`w-4 h-4 rounded-full bg-white absolute top-1 shadow-sm transition-all ${n.sound ? 'right-1' : 'left-1'}`} />
                         </button>
@@ -433,7 +433,7 @@ export default function PharmacySettingsPage() {
                       <input type="password" className="input mt-1" placeholder="비밀번호 확인" />
                     </div>
                   </div>
-                  <button className="btn-sm text-xs" style={{ backgroundColor: 'rgb(168 85 247)', color: 'white' }}>
+                  <button className="btn-sm text-xs" style={{ backgroundColor: 'rgb(37 99 235)', color: 'white' }}>
                     <Key className="w-3 h-3" /> 비밀번호 변경
                   </button>
                 </div>
@@ -477,7 +477,7 @@ export default function PharmacySettingsPage() {
               <div className="card p-5">
                 <h3 className="font-semibold mb-4">데이터 내보내기</h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <button className="flex items-center gap-3 p-4 rounded-xl border border-border hover:border-purple-200 dark:hover:border-purple-800 transition-colors text-left">
+                  <button className="flex items-center gap-3 p-4 rounded-xl border border-border hover:border-blue-200 dark:hover:border-blue-800 transition-colors text-left">
                     <div className="w-10 h-10 rounded-xl bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center">
                       <Download className="w-5 h-5 text-emerald-600" />
                     </div>
@@ -486,7 +486,7 @@ export default function PharmacySettingsPage() {
                       <div className="text-2xs text-muted-foreground">CSV 형식으로 내보내기</div>
                     </div>
                   </button>
-                  <button className="flex items-center gap-3 p-4 rounded-xl border border-border hover:border-purple-200 dark:hover:border-purple-800 transition-colors text-left">
+                  <button className="flex items-center gap-3 p-4 rounded-xl border border-border hover:border-blue-200 dark:hover:border-blue-800 transition-colors text-left">
                     <div className="w-10 h-10 rounded-xl bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
                       <Download className="w-5 h-5 text-blue-600" />
                     </div>
@@ -495,16 +495,16 @@ export default function PharmacySettingsPage() {
                       <div className="text-2xs text-muted-foreground">Excel 형식으로 내보내기</div>
                     </div>
                   </button>
-                  <button className="flex items-center gap-3 p-4 rounded-xl border border-border hover:border-purple-200 dark:hover:border-purple-800 transition-colors text-left">
-                    <div className="w-10 h-10 rounded-xl bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
-                      <Download className="w-5 h-5 text-purple-600" />
+                  <button className="flex items-center gap-3 p-4 rounded-xl border border-border hover:border-blue-200 dark:hover:border-blue-800 transition-colors text-left">
+                    <div className="w-10 h-10 rounded-xl bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
+                      <Download className="w-5 h-5 text-blue-600" />
                     </div>
                     <div>
                       <div className="text-sm font-semibold">환자 기록</div>
                       <div className="text-2xs text-muted-foreground">HL7 FHIR 형식</div>
                     </div>
                   </button>
-                  <button className="flex items-center gap-3 p-4 rounded-xl border border-border hover:border-purple-200 dark:hover:border-purple-800 transition-colors text-left">
+                  <button className="flex items-center gap-3 p-4 rounded-xl border border-border hover:border-blue-200 dark:hover:border-blue-800 transition-colors text-left">
                     <div className="w-10 h-10 rounded-xl bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center">
                       <Download className="w-5 h-5 text-amber-600" />
                     </div>
@@ -518,7 +518,7 @@ export default function PharmacySettingsPage() {
 
               <div className="card p-5">
                 <h3 className="font-semibold mb-4">데이터 가져오기</h3>
-                <div className="border-2 border-dashed border-border rounded-xl p-8 text-center hover:border-purple-300 transition-colors cursor-pointer">
+                <div className="border-2 border-dashed border-border rounded-xl p-8 text-center hover:border-blue-300 transition-colors cursor-pointer">
                   <Upload className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
                   <p className="text-sm font-medium">파일을 드래그하거나 클릭하세요</p>
                   <p className="text-2xs text-muted-foreground mt-1">CSV, Excel, HL7 FHIR 형식 지원</p>
@@ -549,44 +549,44 @@ export default function PharmacySettingsPage() {
             <>
               <div className="card p-5">
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="w-12 h-12 rounded-2xl bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
-                    <Crown className="w-6 h-6 text-purple-600" />
+                  <div className="w-12 h-12 rounded-2xl bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
+                    <Crown className="w-6 h-6 text-blue-600" />
                   </div>
                   <div>
                     <div className="flex items-center gap-2">
                       <h3 className="font-bold text-lg">Pharmacy 플랜</h3>
-                      <span className="px-2 py-0.5 rounded-lg bg-purple-50 dark:bg-purple-900/20 text-2xs font-bold text-purple-600">현재 플랜</span>
+                      <span className="px-2 py-0.5 rounded-lg bg-blue-50 dark:bg-blue-900/20 text-2xs font-bold text-blue-600">현재 플랜</span>
                     </div>
                     <p className="text-sm text-muted-foreground">무료 체험 중 · 67일 남음</p>
                   </div>
                 </div>
 
-                <div className="p-4 rounded-xl bg-purple-50 dark:bg-purple-900/10 mb-4">
+                <div className="p-4 rounded-xl bg-blue-50 dark:bg-blue-900/10 mb-4">
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-sm font-medium">무료 체험 기간</span>
-                    <span className="text-sm font-bold text-purple-600">67일 남음</span>
+                    <span className="text-sm font-bold text-blue-600">67일 남음</span>
                   </div>
-                  <div className="w-full h-2 rounded-full bg-purple-200 dark:bg-purple-800">
-                    <div className="h-full rounded-full bg-purple-500" style={{ width: '25%' }} />
+                  <div className="w-full h-2 rounded-full bg-blue-200 dark:bg-blue-800">
+                    <div className="h-full rounded-full bg-blue-500" style={{ width: '25%' }} />
                   </div>
                   <p className="text-2xs text-muted-foreground mt-2">2024.04.01까지 모든 기능을 무료로 이용하실 수 있습니다</p>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="p-4 rounded-xl border-2 border-purple-500 relative">
-                    <div className="absolute -top-2.5 left-4 px-2 py-0.5 bg-purple-500 text-white text-2xs font-bold rounded">현재 플랜</div>
+                  <div className="p-4 rounded-xl border-2 border-blue-500 relative">
+                    <div className="absolute -top-2.5 left-4 px-2 py-0.5 bg-blue-500 text-white text-2xs font-bold rounded">현재 플랜</div>
                     <h4 className="font-bold text-lg mt-1">Pharmacy</h4>
                     <div className="flex items-baseline gap-1 mt-1">
                       <span className="text-2xl font-bold">₩9</span>
                       <span className="text-sm text-muted-foreground">만원/월</span>
                     </div>
                     <ul className="mt-3 space-y-1.5 text-xs text-muted-foreground">
-                      <li className="flex items-center gap-1.5"><Check className="w-3 h-3 text-purple-500" /> 실시간 처방전 수신</li>
-                      <li className="flex items-center gap-1.5"><Check className="w-3 h-3 text-purple-500" /> DUR 자동 점검</li>
-                      <li className="flex items-center gap-1.5"><Check className="w-3 h-3 text-purple-500" /> 재고 자동 관리</li>
-                      <li className="flex items-center gap-1.5"><Check className="w-3 h-3 text-purple-500" /> AI 복약지도 생성</li>
-                      <li className="flex items-center gap-1.5"><Check className="w-3 h-3 text-purple-500" /> 경영분석 대시보드</li>
-                      <li className="flex items-center gap-1.5"><Check className="w-3 h-3 text-purple-500" /> 의원 3곳 연동</li>
+                      <li className="flex items-center gap-1.5"><Check className="w-3 h-3 text-blue-500" /> 실시간 처방전 수신</li>
+                      <li className="flex items-center gap-1.5"><Check className="w-3 h-3 text-blue-500" /> DUR 자동 점검</li>
+                      <li className="flex items-center gap-1.5"><Check className="w-3 h-3 text-blue-500" /> 재고 자동 관리</li>
+                      <li className="flex items-center gap-1.5"><Check className="w-3 h-3 text-blue-500" /> AI 복약지도 생성</li>
+                      <li className="flex items-center gap-1.5"><Check className="w-3 h-3 text-blue-500" /> 경영분석 대시보드</li>
+                      <li className="flex items-center gap-1.5"><Check className="w-3 h-3 text-blue-500" /> 의원 3곳 연동</li>
                     </ul>
                   </div>
                   <div className="p-4 rounded-xl border border-border">
@@ -599,14 +599,14 @@ export default function PharmacySettingsPage() {
                       <span className="text-sm text-muted-foreground">만원/월</span>
                     </div>
                     <ul className="mt-3 space-y-1.5 text-xs text-muted-foreground">
-                      <li className="flex items-center gap-1.5"><Check className="w-3 h-3 text-purple-500" /> Pharmacy 모든 기능</li>
-                      <li className="flex items-center gap-1.5"><Check className="w-3 h-3 text-purple-500" /> 도매상 연동 자동발주</li>
-                      <li className="flex items-center gap-1.5"><Check className="w-3 h-3 text-purple-500" /> 다점포 통합 관리</li>
-                      <li className="flex items-center gap-1.5"><Check className="w-3 h-3 text-purple-500" /> 의원 무제한 연동</li>
-                      <li className="flex items-center gap-1.5"><Check className="w-3 h-3 text-purple-500" /> 전담 고객지원</li>
-                      <li className="flex items-center gap-1.5"><Check className="w-3 h-3 text-purple-500" /> API 연동 제공</li>
+                      <li className="flex items-center gap-1.5"><Check className="w-3 h-3 text-blue-500" /> Pharmacy 모든 기능</li>
+                      <li className="flex items-center gap-1.5"><Check className="w-3 h-3 text-blue-500" /> 도매상 연동 자동발주</li>
+                      <li className="flex items-center gap-1.5"><Check className="w-3 h-3 text-blue-500" /> 다점포 통합 관리</li>
+                      <li className="flex items-center gap-1.5"><Check className="w-3 h-3 text-blue-500" /> 의원 무제한 연동</li>
+                      <li className="flex items-center gap-1.5"><Check className="w-3 h-3 text-blue-500" /> 전담 고객지원</li>
+                      <li className="flex items-center gap-1.5"><Check className="w-3 h-3 text-blue-500" /> API 연동 제공</li>
                     </ul>
-                    <button className="w-full btn-sm text-xs mt-3" style={{ backgroundColor: 'rgb(168 85 247)', color: 'white' }}>
+                    <button className="w-full btn-sm text-xs mt-3" style={{ backgroundColor: 'rgb(37 99 235)', color: 'white' }}>
                       업그레이드
                     </button>
                   </div>
@@ -623,7 +623,7 @@ export default function PharmacySettingsPage() {
                     <div className="text-sm font-medium">등록된 결제 수단 없음</div>
                     <div className="text-2xs text-muted-foreground">무료 체험 종료 전 결제 수단을 등록해주세요</div>
                   </div>
-                  <button className="btn-sm text-xs" style={{ backgroundColor: 'rgb(168 85 247)', color: 'white' }}>
+                  <button className="btn-sm text-xs" style={{ backgroundColor: 'rgb(37 99 235)', color: 'white' }}>
                     <Plus className="w-3 h-3" /> 등록
                   </button>
                 </div>

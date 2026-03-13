@@ -140,11 +140,11 @@ export default function CRMPage() {
         <div className="card p-4">
           <div className="flex items-center justify-between mb-2">
             <span className="text-xs text-muted-foreground font-medium">예약 전환율</span>
-            <div className="w-8 h-8 rounded-xl bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
-              <UserPlus className="w-4 h-4 text-purple-600" />
+            <div className="w-8 h-8 rounded-xl bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
+              <UserPlus className="w-4 h-4 text-blue-600" />
             </div>
           </div>
-          <div className="text-2xl font-bold text-purple-600">{recallStats.bookingRate}%</div>
+          <div className="text-2xl font-bold text-blue-600">{recallStats.bookingRate}%</div>
           <div className="text-2xs text-muted-foreground mt-1">{recallStats.booked}명 예약 완료</div>
         </div>
         <div className="card p-4">

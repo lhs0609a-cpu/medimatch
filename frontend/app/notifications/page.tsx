@@ -44,46 +44,8 @@ export default function NotificationsPage() {
       setNotifications(data.notifications)
       setUnreadCount(data.unread_count)
     } catch (error) {
-      // Mock data for demo
-      setNotifications([
-        {
-          id: '1',
-          notification_type: 'PROSPECT_NEW',
-          title: '새로운 개원 후보지 발견',
-          body: '강남구 역삼동에 적합도 92점의 새로운 입지가 발견되었습니다.',
-          data: { url: '/prospects/123' },
-          is_read: false,
-          created_at: new Date().toISOString(),
-        },
-        {
-          id: '2',
-          notification_type: 'CHAT_MESSAGE',
-          title: '메디인테리어에서 메시지가 도착했습니다',
-          body: '견적서 첨부해드렸습니다. 확인 부탁드립니다.',
-          data: { url: '/chat/1' },
-          is_read: false,
-          created_at: new Date(Date.now() - 3600000).toISOString(),
-        },
-        {
-          id: '3',
-          notification_type: 'PAYMENT_SUCCESS',
-          title: '결제가 완료되었습니다',
-          body: 'Pro 구독이 성공적으로 결제되었습니다.',
-          data: { url: '/mypage' },
-          is_read: true,
-          created_at: new Date(Date.now() - 86400000).toISOString(),
-        },
-        {
-          id: '4',
-          notification_type: 'MATCH_NEW',
-          title: '새로운 매칭이 성사되었습니다',
-          body: '관심 표현하신 매물과 매칭되었습니다. 대화를 시작해보세요!',
-          data: { url: '/pharmacy-match/matches/1' },
-          is_read: true,
-          created_at: new Date(Date.now() - 172800000).toISOString(),
-        },
-      ])
-      setUnreadCount(2)
+      setNotifications([])
+      setUnreadCount(0)
     } finally {
       setIsLoading(false)
     }
@@ -151,7 +113,7 @@ export default function NotificationsPage() {
       case 'CHAT_MESSAGE':
       case 'PARTNER_INQUIRY':
       case 'PARTNER_RESPONSE':
-        return <MessageCircle className="w-5 h-5 text-violet-600" />
+        return <MessageCircle className="w-5 h-5 text-blue-600" />
       case 'PAYMENT_SUCCESS':
       case 'PAYMENT_FAILED':
       case 'ESCROW_FUNDED':
@@ -238,7 +200,7 @@ export default function NotificationsPage() {
                 onClick={() => setFilter(item.key as any)}
                 className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${
                   filter === item.key
-                    ? 'bg-violet-600 text-white'
+                    ? 'bg-blue-600 text-white'
                     : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                 }`}
               >
@@ -253,7 +215,7 @@ export default function NotificationsPage() {
       <div className="container mx-auto px-4 py-4">
         {isLoading ? (
           <div className="flex items-center justify-center py-16">
-            <Loader2 className="w-8 h-8 text-violet-600 animate-spin" />
+            <Loader2 className="w-8 h-8 text-blue-600 animate-spin" />
           </div>
         ) : notifications.length > 0 ? (
           <div className="space-y-2">
@@ -261,7 +223,7 @@ export default function NotificationsPage() {
               <div
                 key={notification.id}
                 className={`bg-white rounded-xl p-4 cursor-pointer hover:shadow-md transition-all ${
-                  !notification.is_read ? 'border-l-4 border-violet-600' : ''
+                  !notification.is_read ? 'border-l-4 border-blue-600' : ''
                 }`}
                 onClick={() => handleNotificationClick(notification)}
               >
@@ -269,7 +231,7 @@ export default function NotificationsPage() {
                   {/* Icon */}
                   <div
                     className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${
-                      !notification.is_read ? 'bg-violet-100' : 'bg-gray-100'
+                      !notification.is_read ? 'bg-blue-100' : 'bg-gray-100'
                     }`}
                   >
                     {getNotificationIcon(notification.notification_type)}

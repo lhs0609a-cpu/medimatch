@@ -365,8 +365,8 @@ export default function SubscribePage() {
               </p>
             </div>
             <div className="card p-6 text-center">
-              <div className="w-14 h-14 bg-purple-100 dark:bg-purple-900/30 rounded-xl flex items-center justify-center mx-auto mb-4">
-                <Shield className="w-7 h-7 text-purple-600" />
+              <div className="w-14 h-14 bg-blue-100 dark:bg-blue-900/30 rounded-xl flex items-center justify-center mx-auto mb-4">
+                <Shield className="w-7 h-7 text-blue-600" />
               </div>
               <h4 className="font-semibold mb-2">안전한 매칭 시스템</h4>
               <p className="text-sm text-muted-foreground">
@@ -426,7 +426,7 @@ export default function SubscribePage() {
         </div>
 
         {/* Final CTA */}
-        <div className="bg-gradient-to-r from-primary/10 via-purple-500/10 to-amber-500/10 rounded-2xl p-8 text-center">
+        <div className="bg-gradient-to-r from-primary/10 via-blue-500/10 to-amber-500/10 rounded-2xl p-8 text-center">
           <h3 className="text-2xl font-bold mb-2">지금 바로 시작하세요</h3>
           <p className="text-muted-foreground mb-6">
             첫 시뮬레이션은 무료입니다. 결제 정보 없이 체험해보세요.

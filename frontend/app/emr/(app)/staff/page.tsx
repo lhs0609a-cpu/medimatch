@@ -121,7 +121,7 @@ const staffList: Staff[] = [
 const roleConfig: Record<Role, { label: string; color: string; bg: string; icon: React.ElementType }> = {
   doctor: { label: '원장', color: 'text-blue-600', bg: 'bg-blue-100 dark:bg-blue-900/30', icon: Stethoscope },
   nurse: { label: '간호사', color: 'text-emerald-600', bg: 'bg-emerald-100 dark:bg-emerald-900/30', icon: Heart },
-  receptionist: { label: '접수/수납', color: 'text-purple-600', bg: 'bg-purple-100 dark:bg-purple-900/30', icon: ClipboardList },
+  receptionist: { label: '접수/수납', color: 'text-blue-600', bg: 'bg-blue-100 dark:bg-blue-900/30', icon: ClipboardList },
   admin: { label: '관리자', color: 'text-amber-600', bg: 'bg-amber-100 dark:bg-amber-900/30', icon: Shield },
 }
 

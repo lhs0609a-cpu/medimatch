@@ -83,10 +83,10 @@ export default function AnalysisPack2({ result }: Props) {
       </Card>
 
       {/* 3. 노인인구 의료이용 */}
-      <Card icon={Accessibility} title="노인인구 의료이용 패턴" color="text-violet-500">
+      <Card icon={Accessibility} title="노인인구 의료이용 패턴" color="text-blue-500">
         <div className="grid grid-cols-3 gap-3 mb-4">
-          <div className="text-center p-3 bg-violet-50 dark:bg-violet-950/20 rounded-lg">
-            <div className="text-2xl font-bold text-violet-600">{Math.round(pop * 0.14 / 1000)}천명</div>
+          <div className="text-center p-3 bg-blue-50 dark:bg-blue-950/20 rounded-lg">
+            <div className="text-2xl font-bold text-blue-600">{Math.round(pop * 0.14 / 1000)}천명</div>
             <div className="text-[10px] text-muted-foreground">60세+ 인구</div>
           </div>
           <div className="text-center p-3 bg-secondary/50 rounded-lg">
@@ -103,7 +103,7 @@ export default function AnalysisPack2({ result }: Props) {
             <div key={time} className="flex items-center gap-2">
               <span className="text-xs text-muted-foreground flex-1">{time}</span>
               <div className="w-40 h-2 bg-muted rounded-full overflow-hidden">
-                <div className="h-full bg-violet-500 rounded-full" style={{ width: `${[100, 85, 70, 65][i]}%` }} />
+                <div className="h-full bg-blue-500 rounded-full" style={{ width: `${[100, 85, 70, 65][i]}%` }} />
               </div>
               <span className="text-xs font-medium text-foreground w-8 text-right">{[38, 32, 27, 25][i]}%</span>
             </div>
@@ -113,10 +113,10 @@ export default function AnalysisPack2({ result }: Props) {
       </Card>
 
       {/* 4. 소아환자 분석 */}
-      <Card icon={Baby} title="소아/청소년 환자 분석" color="text-pink-500">
+      <Card icon={Baby} title="소아/청소년 환자 분석" color="text-blue-500">
         <div className="grid grid-cols-2 gap-4 mb-4">
-          <div className="p-4 bg-pink-50 dark:bg-pink-950/20 rounded-xl">
-            <div className="text-2xl font-bold text-pink-600">{Math.round(pop * 0.17 / 1000)}천명</div>
+          <div className="p-4 bg-blue-50 dark:bg-blue-950/20 rounded-xl">
+            <div className="text-2xl font-bold text-blue-600">{Math.round(pop * 0.17 / 1000)}천명</div>
             <div className="text-xs text-muted-foreground">0-19세 인구</div>
           </div>
           <div className="p-4 bg-secondary/50 rounded-xl">
@@ -135,7 +135,7 @@ export default function AnalysisPack2({ result }: Props) {
               <span className="text-sm text-foreground w-16">{a.age}</span>
               <span className="text-xs text-muted-foreground w-16">{(a.count / 1000).toFixed(1)}천명</span>
               <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden">
-                <div className="h-full bg-pink-400 rounded-full" style={{ width: `${(a.visits / 30) * 100}%` }} />
+                <div className="h-full bg-blue-400 rounded-full" style={{ width: `${(a.visits / 30) * 100}%` }} />
               </div>
               <span className="text-xs font-medium text-foreground w-14 text-right">{a.visits}회/년</span>
             </div>

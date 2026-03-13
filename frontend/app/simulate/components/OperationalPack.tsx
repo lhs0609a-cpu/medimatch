@@ -26,9 +26,9 @@ export default function OperationalPack({ result }: Props) {
         <div className="space-y-3">
           {[
             { month: '1개월', phase: '입지 선정 · 계약', tasks: ['부동산 탐색', '임대차 계약', '인허가 준비'], color: 'bg-blue-500', pct: 100 },
-            { month: '2개월', phase: '인허가 · 설계', tasks: ['의료기관 개설신고', '인테리어 설계', '장비 선정'], color: 'bg-indigo-500', pct: 100 },
-            { month: '3-4개월', phase: '인테리어 · 장비', tasks: ['시공 착공', '의료장비 발주', '가구/집기 구매'], color: 'bg-violet-500', pct: 100 },
-            { month: '5개월', phase: '인력 채용 · 교육', tasks: ['간호사/직원 채용', '업무 매뉴얼 작성', '시스템 세팅'], color: 'bg-purple-500', pct: 100 },
+            { month: '2개월', phase: '인허가 · 설계', tasks: ['의료기관 개설신고', '인테리어 설계', '장비 선정'], color: 'bg-blue-600', pct: 100 },
+            { month: '3-4개월', phase: '인테리어 · 장비', tasks: ['시공 착공', '의료장비 발주', '가구/집기 구매'], color: 'bg-blue-500', pct: 100 },
+            { month: '5개월', phase: '인력 채용 · 교육', tasks: ['간호사/직원 채용', '업무 매뉴얼 작성', '시스템 세팅'], color: 'bg-blue-500', pct: 100 },
             { month: '6개월', phase: '마케팅 · 오픈', tasks: ['온라인 마케팅 시작', '시범 운영 2주', '정식 개원'], color: 'bg-fuchsia-500', pct: 100 },
           ].map((p, idx) => (
             <div key={p.month} className="flex gap-3">
@@ -104,10 +104,10 @@ export default function OperationalPack({ result }: Props) {
       </Card>
 
       {/* 3. 마케팅 실행 계획 */}
-      <Card icon={Megaphone} title="마케팅 실행 로드맵" color="text-pink-500">
+      <Card icon={Megaphone} title="마케팅 실행 로드맵" color="text-blue-500">
         <div className="space-y-3">
           {[
-            { phase: '개원 전 (D-30)', items: ['네이버 플레이스 등록', '인스타그램 계정 개설', '블로그 건강 콘텐츠 5편', '당근마켓 비즈프로필'], color: 'bg-pink-100 dark:bg-pink-900/30' },
+            { phase: '개원 전 (D-30)', items: ['네이버 플레이스 등록', '인스타그램 계정 개설', '블로그 건강 콘텐츠 5편', '당근마켓 비즈프로필'], color: 'bg-blue-100 dark:bg-blue-900/30' },
             { phase: '개원 1주차', items: ['개원 이벤트 (초진 할인)', '오프라인 배너/현수막', '주변 아파트 전단지', '카카오톡 채널 개설'], color: 'bg-rose-100 dark:bg-rose-900/30' },
             { phase: '1-3개월', items: ['네이버 키워드 광고', '리뷰 관리 시스템 구축', '기업 건강검진 영업', '지역 커뮤니티 활동'], color: 'bg-orange-100 dark:bg-orange-900/30' },
             { phase: '3-6개월', items: ['콘텐츠 마케팅 강화', '환자 추천 프로그램', '인스타 릴스/숏폼', 'CRM 재방문 유도'], color: 'bg-amber-100 dark:bg-amber-900/30' },
@@ -117,7 +117,7 @@ export default function OperationalPack({ result }: Props) {
               <div className="grid grid-cols-2 gap-1">
                 {p.items.map((item) => (
                   <div key={item} className="flex items-center gap-1.5">
-                    <span className="w-1 h-1 rounded-full bg-pink-500 flex-shrink-0" />
+                    <span className="w-1 h-1 rounded-full bg-blue-500 flex-shrink-0" />
                     <span className="text-xs text-muted-foreground">{item}</span>
                   </div>
                 ))}
@@ -128,7 +128,7 @@ export default function OperationalPack({ result }: Props) {
       </Card>
 
       {/* 4. 진료 프로세스 */}
-      <Card icon={ClipboardList} title="최적 진료 프로세스 설계" color="text-cyan-500">
+      <Card icon={ClipboardList} title="최적 진료 프로세스 설계" color="text-blue-600">
         <div className="space-y-2">
           {[
             { step: 1, name: '접수/예약', time: '3분', staff: '접수', tool: 'EMR', tip: '온라인 예약 시스템으로 대기시간 단축' },
@@ -139,7 +139,7 @@ export default function OperationalPack({ result }: Props) {
             { step: 6, name: '예약관리', time: '2분', staff: '접수', tool: 'CRM', tip: '재방문 알림 자동 발송' },
           ].map((s) => (
             <div key={s.step} className="flex items-start gap-3 p-2 rounded-lg hover:bg-muted/50">
-              <div className="w-6 h-6 bg-cyan-500 text-white rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0">
+              <div className="w-6 h-6 bg-blue-600 text-white rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0">
                 {s.step}
               </div>
               <div className="flex-1">
@@ -153,16 +153,16 @@ export default function OperationalPack({ result }: Props) {
             </div>
           ))}
         </div>
-        <div className="mt-3 p-2 bg-cyan-50 dark:bg-cyan-950/20 rounded-lg text-center">
+        <div className="mt-3 p-2 bg-blue-50 dark:bg-blue-950/20 rounded-lg text-center">
           <span className="text-xs text-muted-foreground">총 프로세스 시간: </span>
-          <span className="text-sm font-bold text-cyan-600">약 55분/환자</span>
+          <span className="text-sm font-bold text-blue-600">약 55분/환자</span>
           <span className="text-xs text-muted-foreground"> · 시간당 처리: </span>
-          <span className="text-sm font-bold text-cyan-600">4-5명</span>
+          <span className="text-sm font-bold text-blue-600">4-5명</span>
         </div>
       </Card>
 
       {/* 5. IT 인프라 */}
-      <Card icon={Wifi} title="IT · 디지털 인프라 계획" color="text-indigo-500">
+      <Card icon={Wifi} title="IT · 디지털 인프라 계획" color="text-blue-600">
         <div className="space-y-2">
           {[
             { system: 'EMR (전자의무기록)', cost: '월 30만', priority: '필수', vendor: '메디칼소프트/닥터팔레트' },
@@ -187,9 +187,9 @@ export default function OperationalPack({ result }: Props) {
             </div>
           ))}
         </div>
-        <div className="mt-3 p-2 bg-indigo-50 dark:bg-indigo-950/20 rounded-lg text-center">
+        <div className="mt-3 p-2 bg-blue-50 dark:bg-blue-950/20 rounded-lg text-center">
           <span className="text-xs text-muted-foreground">IT 인프라 월 비용: </span>
-          <span className="text-sm font-bold text-indigo-600">약 71만원</span>
+          <span className="text-sm font-bold text-blue-700">약 71만원</span>
         </div>
       </Card>
 
@@ -276,10 +276,10 @@ export default function OperationalPack({ result }: Props) {
       </Card>
 
       {/* 9. 전화 상담 분석 */}
-      <Card icon={Phone} title="전화 상담 · 예약 분석" color="text-teal-500">
+      <Card icon={Phone} title="전화 상담 · 예약 분석" color="text-blue-500">
         <div className="grid grid-cols-3 gap-3 mb-4">
-          <div className="text-center p-3 bg-teal-50 dark:bg-teal-950/20 rounded-lg">
-            <div className="text-xl font-bold text-teal-600">45건</div>
+          <div className="text-center p-3 bg-blue-50 dark:bg-blue-950/20 rounded-lg">
+            <div className="text-xl font-bold text-blue-600">45건</div>
             <div className="text-[10px] text-muted-foreground">일 평균 전화</div>
           </div>
           <div className="text-center p-3 bg-secondary/50 rounded-lg">
@@ -300,7 +300,7 @@ export default function OperationalPack({ result }: Props) {
             <div key={t.type} className="flex items-center gap-2">
               <span className="text-xs text-muted-foreground w-16">{t.type}</span>
               <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden">
-                <div className="h-full bg-teal-500 rounded-full" style={{ width: `${t.pct * 2}%` }} />
+                <div className="h-full bg-blue-500 rounded-full" style={{ width: `${t.pct * 2}%` }} />
               </div>
               <span className="text-xs font-medium w-8 text-right">{t.pct}%</span>
             </div>
@@ -309,7 +309,7 @@ export default function OperationalPack({ result }: Props) {
       </Card>
 
       {/* 10. 법규 체크리스트 */}
-      <Card icon={BookOpen} title="의료기관 법규 · 인허가 체크리스트" color="text-purple-600">
+      <Card icon={BookOpen} title="의료기관 법규 · 인허가 체크리스트" color="text-blue-600">
         <div className="space-y-2">
           {[
             { item: '의료기관 개설신고', status: '필수', dept: '관할 보건소', time: '2-4주' },

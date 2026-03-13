@@ -26,6 +26,7 @@ import {
   X,
   Clock,
 } from 'lucide-react'
+import { toast } from 'sonner'
 
 /* ─── API ─── */
 const API_URL = process.env.NEXT_PUBLIC_API_URL || ''
@@ -306,7 +307,7 @@ export default function NewClaimPage() {
       })
       router.push('/emr/claims')
     } catch {
-      alert('청구 제출에 실패했습니다. 다시 시도해 주세요.')
+      toast.error('청구 제출에 실패했습니다. 다시 시도해 주세요.')
     } finally {
       setSubmitting(false)
     }
@@ -561,7 +562,7 @@ export default function NewClaimPage() {
                       <span
                         className={`text-2xs px-2 py-0.5 rounded-lg font-bold ${
                           t.item_type === 'drug'
-                            ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-600'
+                            ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-600'
                             : 'bg-blue-100 dark:bg-blue-900/30 text-blue-600'
                         }`}
                       >
@@ -600,7 +601,7 @@ export default function NewClaimPage() {
                         <span
                           className={`text-2xs px-2 py-0.5 rounded-lg font-bold ${
                             item.item_type === 'drug'
-                              ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-600'
+                              ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-600'
                               : 'bg-blue-100 dark:bg-blue-900/30 text-blue-600'
                           }`}
                         >
@@ -634,7 +635,7 @@ export default function NewClaimPage() {
                           <span
                             className={`text-2xs px-2 py-0.5 rounded-lg font-bold ${
                               item.item_type === 'drug'
-                                ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-600'
+                                ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-600'
                                 : 'bg-blue-100 dark:bg-blue-900/30 text-blue-600'
                             }`}
                           >

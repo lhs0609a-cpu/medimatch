@@ -45,12 +45,12 @@ export default function PharmacyLayout({ children }: { children: React.ReactNode
       {/* 사이드바 */}
       <aside className={`fixed top-0 left-0 h-full z-50 bg-card border-r border-border flex flex-col transition-all duration-300 ease-in-out ${collapsed ? 'w-[72px]' : 'w-[240px]'} ${mobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}>
         <div className={`h-16 flex items-center border-b border-border px-4 ${collapsed ? 'justify-center' : 'gap-3'}`}>
-          <div className="w-8 h-8 rounded-xl bg-purple-500 flex items-center justify-center flex-shrink-0">
+          <div className="w-8 h-8 rounded-xl bg-blue-500 flex items-center justify-center flex-shrink-0">
             <Pill className="w-4 h-4 text-white" />
           </div>
           {!collapsed && (
             <span className="font-bold text-sm whitespace-nowrap">
-              MediMatch <span className="text-purple-500">Pharmacy</span>
+              MediMatch <span className="text-blue-500">Pharmacy</span>
             </span>
           )}
         </div>
@@ -76,15 +76,15 @@ export default function PharmacyLayout({ children }: { children: React.ReactNode
                 onClick={() => setMobileOpen(false)}
                 className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${
                   isActive
-                    ? link.accent ? 'bg-purple-50 text-purple-600 dark:bg-purple-900/20 dark:text-purple-400' : 'bg-purple-500/10 text-purple-600 dark:text-purple-400'
+                    ? link.accent ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400' : 'bg-blue-500/10 text-blue-600 dark:text-blue-400'
                     : 'text-muted-foreground hover:text-foreground hover:bg-secondary'
                 } ${collapsed ? 'justify-center px-0' : ''}`}
                 title={collapsed ? link.label : undefined}
               >
-                <link.icon className={`w-5 h-5 flex-shrink-0 ${link.accent && isActive ? 'text-purple-500' : ''}`} />
+                <link.icon className={`w-5 h-5 flex-shrink-0 ${link.accent && isActive ? 'text-blue-500' : ''}`} />
                 {!collapsed && <span>{link.label}</span>}
                 {link.accent && !collapsed && (
-                  <span className="ml-auto w-2 h-2 rounded-full bg-purple-500 animate-pulse" />
+                  <span className="ml-auto w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
                 )}
               </Link>
             )
@@ -115,17 +115,17 @@ export default function PharmacyLayout({ children }: { children: React.ReactNode
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <Link href="/emr/pharmacy/prescriptions" className="btn-sm hidden sm:flex" style={{ backgroundColor: 'rgb(168 85 247)', color: 'white' }}>
+            <Link href="/emr/pharmacy/prescriptions" className="btn-sm hidden sm:flex" style={{ backgroundColor: 'rgb(37 99 235)', color: 'white' }}>
               <FileText className="w-3.5 h-3.5" />
               처방전 수신함
               <span className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center text-2xs font-bold">3</span>
             </Link>
             <button className="btn-icon relative">
               <Bell className="w-5 h-5" />
-              <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-purple-500 rounded-full" />
+              <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-blue-500 rounded-full" />
             </button>
             <button className="flex items-center gap-2 px-2 py-1.5 rounded-xl hover:bg-secondary transition-colors">
-              <div className="avatar avatar-sm bg-purple-500/10 text-purple-500">
+              <div className="avatar avatar-sm bg-blue-500/10 text-blue-500">
                 <span className="text-xs font-bold">박</span>
               </div>
               <span className="hidden sm:inline text-sm font-medium">박약사</span>

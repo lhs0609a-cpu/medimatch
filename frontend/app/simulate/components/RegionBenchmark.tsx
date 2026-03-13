@@ -48,7 +48,7 @@ export default function RegionBenchmark({ result }: RegionBenchmarkProps) {
         </div>
 
         {/* vs National Average */}
-        <div className="text-center p-3 md:p-4 bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-950/30 dark:to-indigo-950/30 rounded-xl">
+        <div className="text-center p-3 md:p-4 bg-gradient-to-br from-blue-50 to-blue-50 dark:from-blue-950/30 dark:to-blue-950/30 rounded-xl">
           <div className={`text-xl md:text-3xl font-bold ${isAboveAvg ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
             {isAboveAvg ? '+' : ''}{vsNational}%
           </div>
@@ -62,23 +62,23 @@ export default function RegionBenchmark({ result }: RegionBenchmarkProps) {
         </div>
 
         {/* Region Rank */}
-        <div className="text-center p-3 md:p-4 bg-gradient-to-br from-violet-50 to-purple-50 dark:from-violet-950/30 dark:to-purple-950/30 rounded-xl">
+        <div className="text-center p-3 md:p-4 bg-gradient-to-br from-blue-50 to-blue-50 dark:from-blue-950/30 dark:to-blue-950/30 rounded-xl">
           {rank ? (
             <>
-              <div className="text-xl md:text-3xl font-bold text-violet-600 dark:text-violet-400">
+              <div className="text-xl md:text-3xl font-bold text-blue-600 dark:text-blue-400">
                 {rank}<span className="text-base font-normal">위</span>
               </div>
               <div className="text-[11px] text-muted-foreground mt-1">
                 {total}개 지역 중
               </div>
               <div className="mt-2 flex items-center justify-center gap-1">
-                <Medal className="w-3 h-3 text-violet-400" />
+                <Medal className="w-3 h-3 text-blue-400" />
                 <span className="text-[10px] text-muted-foreground">동일 진료과</span>
               </div>
             </>
           ) : (
             <>
-              <div className="text-xl md:text-3xl font-bold text-violet-600 dark:text-violet-400">
+              <div className="text-xl md:text-3xl font-bold text-blue-600 dark:text-blue-400">
                 ~{formatMoney(myAvgRevenue)}
               </div>
               <div className="text-[11px] text-muted-foreground mt-1">예상 월매출</div>

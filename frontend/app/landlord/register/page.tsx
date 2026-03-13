@@ -474,7 +474,7 @@ export default function LandlordRegisterPage() {
         <div className="max-w-lg mx-auto">
           <div className="bg-white rounded-2xl shadow-lg p-8 text-center">
             <div className="flex justify-center mb-4">
-              <TossIcon icon={CreditCard} color="from-indigo-500 to-purple-500" size="lg" shadow="shadow-indigo-500/25" />
+              <TossIcon icon={CreditCard} color="from-blue-500 to-blue-600" size="lg" shadow="shadow-blue-500/25" />
             </div>
             <h1 className="text-2xl font-bold text-gray-900 mb-2">구독이 필요합니다</h1>
             <p className="text-gray-600 mb-2">
@@ -522,7 +522,7 @@ export default function LandlordRegisterPage() {
               <ArrowLeft className="w-5 h-5" />
             </Link>
             <div className="flex items-center gap-2">
-              <TossIcon icon={Building2} color="from-emerald-500 to-teal-600" size="xs" shadow="shadow-emerald-500/25" />
+              <TossIcon icon={Building2} color="from-emerald-500 to-emerald-600" size="xs" shadow="shadow-emerald-500/25" />
               <span className="text-xl font-bold text-gray-900">매물 등록</span>
             </div>
           </div>

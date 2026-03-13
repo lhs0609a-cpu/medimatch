@@ -132,9 +132,9 @@ const roleSteps: Record<UserRole, OnboardingStep[]> = {
 }
 
 const roleInfo: Record<UserRole, { label: string; icon: React.ReactNode; color: string }> = {
-  doctor: { label: '의사', icon: <Stethoscope className="w-5 h-5" />, color: 'from-blue-500 to-cyan-500' },
+  doctor: { label: '의사', icon: <Stethoscope className="w-5 h-5" />, color: 'from-blue-500 to-blue-600' },
   pharmacist: { label: '약사', icon: <Pill className="w-5 h-5" />, color: 'from-green-500 to-emerald-500' },
-  sales: { label: '영업사원', icon: <Briefcase className="w-5 h-5" />, color: 'from-purple-500 to-pink-500' },
+  sales: { label: '영업사원', icon: <Briefcase className="w-5 h-5" />, color: 'from-blue-500 to-blue-500' },
   landlord: { label: '건물주', icon: <Building2 className="w-5 h-5" />, color: 'from-orange-500 to-amber-500' },
   partner: { label: '파트너', icon: <Users className="w-5 h-5" />, color: 'from-red-500 to-rose-500' },
 }
@@ -193,7 +193,7 @@ export default function OnboardingModal({ isOpen, onClose, initialRole }: Onboar
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
         <div className="bg-background rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden animate-in fade-in zoom-in-95 duration-300">
           {/* Hero Header */}
-          <div className="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 px-6 py-8 text-white relative overflow-hidden">
+          <div className="bg-gradient-to-r from-blue-600 via-blue-700 to-blue-600 px-6 py-8 text-white relative overflow-hidden">
             <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4xIj48Y2lyY2xlIGN4PSIzMCIgY3k9IjMwIiByPSI0Ii8+PC9nPjwvZz48L3N2Zz4=')] opacity-30" />
             <button
               onClick={handleSkip}

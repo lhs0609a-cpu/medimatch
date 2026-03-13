@@ -7,6 +7,7 @@ import {
   Calendar, ArrowRight, Shield, Loader2
 } from 'lucide-react';
 import { serviceSubscriptionService } from '@/lib/api/services';
+import { toast } from 'sonner';
 
 type SubStatus = 'ACTIVE' | 'CANCELED' | 'EXPIRED' | 'PAST_DUE' | 'SUSPENDED' | null;
 
@@ -110,7 +111,7 @@ export default function HomepageSubscriptionPage() {
       setShowCancelConfirm(false);
       setCancelReason('');
       await fetchStatus();
-      alert(result.message);
+      toast.success(result.message);
     } catch (err: any) {
       setError(err?.response?.data?.detail || '구독 취소에 실패했습니다.');
     } finally {
@@ -124,7 +125,7 @@ export default function HomepageSubscriptionPage() {
       setError(null);
       const result = await serviceSubscriptionService.reactivate(SERVICE_TYPE);
       await fetchStatus();
-      alert(result.message);
+      toast.success(result.message);
     } catch (err: any) {
       setError(err?.response?.data?.detail || '재활성화에 실패했습니다.');
     } finally {

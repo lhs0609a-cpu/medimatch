@@ -44,22 +44,22 @@ export default function NotificationSettingsPage() {
   }
 
   const Toggle = ({ enabled, onChange, disabled = false }: { enabled: boolean; onChange: () => void; disabled?: boolean }) => (
-    <button onClick={onChange} disabled={disabled} className={`relative w-12 h-6 rounded-full transition-colors ${enabled ? 'bg-violet-600' : 'bg-gray-300'} ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}>
+    <button onClick={onChange} disabled={disabled} className={`relative w-12 h-6 rounded-full transition-colors ${enabled ? 'bg-blue-600' : 'bg-gray-300'} ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}>
       <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-transform ${enabled ? 'translate-x-7' : 'translate-x-1'}`} />
     </button>
   )
 
-  if (isLoading) return <div className="min-h-screen bg-gray-50 flex items-center justify-center"><Loader2 className="w-8 h-8 text-violet-600 animate-spin" /></div>
+  if (isLoading) return <div className="min-h-screen bg-gray-50 flex items-center justify-center"><Loader2 className="w-8 h-8 text-blue-600 animate-spin" /></div>
 
   const items = [
     { icon: Bell, color: 'from-amber-500 to-orange-500', shadow: 'shadow-amber-500/25', t: '푸시 알림', d: '브라우저/앱 푸시 알림', k: 'push_enabled' as const, v: true, sec: 1 },
-    { icon: Mail, color: 'from-violet-500 to-purple-500', shadow: 'shadow-violet-500/25', t: '이메일', d: '중요 알림 이메일 수신', k: 'email_enabled' as const, v: true, sec: 1 },
-    { icon: Smartphone, color: 'from-blue-500 to-indigo-500', shadow: 'shadow-blue-500/25', t: 'SMS', d: '문자 메시지 수신', k: 'sms_enabled' as const, v: false, sec: 1 },
-    { icon: MessageCircle, color: 'from-violet-500 to-purple-500', shadow: 'shadow-violet-500/25', t: '카카오 알림톡', d: '카카오톡으로 알림 수신', k: 'kakao_enabled' as const, v: false, sec: 1 },
+    { icon: Mail, color: 'from-blue-500 to-blue-600', shadow: 'shadow-blue-500/25', t: '이메일', d: '중요 알림 이메일 수신', k: 'email_enabled' as const, v: true, sec: 1 },
+    { icon: Smartphone, color: 'from-blue-500 to-blue-600', shadow: 'shadow-blue-500/25', t: 'SMS', d: '문자 메시지 수신', k: 'sms_enabled' as const, v: false, sec: 1 },
+    { icon: MessageCircle, color: 'from-blue-500 to-blue-600', shadow: 'shadow-blue-500/25', t: '카카오 알림톡', d: '카카오톡으로 알림 수신', k: 'kakao_enabled' as const, v: false, sec: 1 },
     { icon: MapPin, color: 'from-orange-500 to-red-500', shadow: 'shadow-orange-500/25', t: '프로스펙트 알림', d: '새로운 입지 발견 알림', k: 'prospect_alerts' as const, v: true, sec: 2 },
-    { icon: MessagesSquare, color: 'from-blue-400 to-cyan-500', shadow: 'shadow-blue-500/25', t: '채팅 메시지', d: '파트너/매칭 채팅 알림', k: 'chat_messages' as const, v: true, sec: 2 },
-    { icon: CreditCard, color: 'from-indigo-500 to-purple-500', shadow: 'shadow-indigo-500/25', t: '결제 알림', d: '결제/에스크로 관련 알림', k: 'payment_updates' as const, v: true, sec: 2 },
-    { icon: Users, color: 'from-purple-500 to-pink-500', shadow: 'shadow-purple-500/25', t: '매칭 알림', d: '매칭/관심 표현 알림', k: 'match_updates' as const, v: true, sec: 2 },
+    { icon: MessagesSquare, color: 'from-blue-400 to-blue-600', shadow: 'shadow-blue-500/25', t: '채팅 메시지', d: '파트너/매칭 채팅 알림', k: 'chat_messages' as const, v: true, sec: 2 },
+    { icon: CreditCard, color: 'from-blue-600 to-blue-500', shadow: 'shadow-blue-500/25', t: '결제 알림', d: '결제/에스크로 관련 알림', k: 'payment_updates' as const, v: true, sec: 2 },
+    { icon: Users, color: 'from-blue-500 to-blue-600', shadow: 'shadow-blue-500/25', t: '매칭 알림', d: '매칭/관심 표현 알림', k: 'match_updates' as const, v: true, sec: 2 },
   ]
 
   const renderRow = (i: typeof items[0]) => (
@@ -78,7 +78,7 @@ export default function NotificationSettingsPage() {
         <div className="container mx-auto px-4 py-4 flex items-center gap-4">
           <button onClick={() => router.back()} className="p-2 hover:bg-gray-100 rounded-lg transition-colors"><ArrowLeft className="w-5 h-5" /></button>
           <h1 className="text-xl font-bold text-gray-900">알림 설정</h1>
-          {isSaving && <Loader2 className="w-4 h-4 text-violet-600 animate-spin ml-auto" />}
+          {isSaving && <Loader2 className="w-4 h-4 text-blue-600 animate-spin ml-auto" />}
         </div>
       </header>
       <main className="container mx-auto px-4 py-6 max-w-lg">
@@ -102,7 +102,7 @@ export default function NotificationSettingsPage() {
         <section className="bg-white rounded-2xl p-6 shadow-sm">
           <h2 className="text-lg font-bold text-gray-900 mb-4">알림 테스트</h2>
           <p className="text-sm text-gray-500 mb-4">알림이 정상적으로 작동하는지 테스트해보세요.</p>
-          <button onClick={handleTest} disabled={isTesting} className="w-full py-3 bg-violet-600 text-white rounded-xl font-semibold hover:bg-violet-700 disabled:opacity-50 flex items-center justify-center gap-2">
+          <button onClick={handleTest} disabled={isTesting} className="w-full py-3 bg-blue-600 text-white rounded-xl font-semibold hover:bg-blue-700 disabled:opacity-50 flex items-center justify-center gap-2">
             {isTesting ? <><Loader2 className="w-5 h-5 animate-spin" />발송 중...</> : <><TestTube className="w-5 h-5" />테스트 알림 발송</>}
           </button>
           {testResult && <p className={`mt-3 text-sm text-center ${testResult.includes('실패') ? 'text-red-600' : 'text-green-600'}`}>{testResult}</p>}

@@ -119,8 +119,8 @@ export default function MultiBranchPage() {
       {/* 헤더 */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div className="flex items-center gap-3">
-          <div className="w-12 h-12 rounded-2xl bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center">
-            <Building2 className="w-6 h-6 text-indigo-600" />
+          <div className="w-12 h-12 rounded-2xl bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
+            <Building2 className="w-6 h-6 text-blue-700" />
           </div>
           <div>
             <h1 className="text-2xl font-bold">멀티 지점 관리</h1>
@@ -128,7 +128,7 @@ export default function MultiBranchPage() {
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <button className="btn-sm text-xs bg-indigo-600 text-white hover:bg-indigo-700">
+          <button className="btn-sm text-xs bg-blue-700 text-white hover:bg-blue-700">
             <Plus className="w-3.5 h-3.5" /> 지점 추가
           </button>
           <button className="btn-sm text-xs bg-secondary text-foreground">
@@ -157,7 +157,7 @@ export default function MultiBranchPage() {
         </div>
         <div className="card p-4">
           <div className="flex items-center justify-between mb-2">
-            <Activity className="w-5 h-5 text-purple-600" />
+            <Activity className="w-5 h-5 text-blue-600" />
           </div>
           <div className="text-2xl font-bold">{totalTodayPatients}명</div>
           <div className="text-xs text-muted-foreground">오늘 전체 환자</div>
@@ -182,7 +182,7 @@ export default function MultiBranchPage() {
             key={tab.key}
             onClick={() => setActiveTab(tab.key as typeof activeTab)}
             className={`flex items-center gap-1.5 px-4 py-2.5 text-sm font-medium border-b-2 transition-colors ${
-              activeTab === tab.key ? 'border-indigo-500 text-indigo-600' : 'border-transparent text-muted-foreground hover:text-foreground'
+              activeTab === tab.key ? 'border-blue-600 text-blue-700' : 'border-transparent text-muted-foreground hover:text-foreground'
             }`}
           >
             <tab.icon className="w-4 h-4" />
@@ -203,9 +203,9 @@ export default function MultiBranchPage() {
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex items-center gap-3">
                     <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
-                      branch.status === 'active' ? 'bg-indigo-100 dark:bg-indigo-900/30' : 'bg-gray-100 dark:bg-gray-800'
+                      branch.status === 'active' ? 'bg-blue-100 dark:bg-blue-900/30' : 'bg-gray-100 dark:bg-gray-800'
                     }`}>
-                      <Building2 className={`w-5 h-5 ${branch.status === 'active' ? 'text-indigo-600' : 'text-gray-400'}`} />
+                      <Building2 className={`w-5 h-5 ${branch.status === 'active' ? 'text-blue-700' : 'text-gray-400'}`} />
                     </div>
                     <div>
                       <div className="flex items-center gap-2">
@@ -294,7 +294,7 @@ export default function MultiBranchPage() {
             <div className="flex items-center gap-3 mb-3 text-2xs">
               <span className="flex items-center gap-1"><span className="w-3 h-1.5 rounded bg-blue-500" /> 강남</span>
               <span className="flex items-center gap-1"><span className="w-3 h-1.5 rounded bg-emerald-500" /> 서초</span>
-              <span className="flex items-center gap-1"><span className="w-3 h-1.5 rounded bg-purple-500" /> 분당</span>
+              <span className="flex items-center gap-1"><span className="w-3 h-1.5 rounded bg-blue-600" /> 분당</span>
             </div>
             <div className="space-y-3">
               {monthlyComparison.map((m, mi) => (
@@ -304,7 +304,7 @@ export default function MultiBranchPage() {
                     {m.branches.map((b, bi) => (
                       <div
                         key={bi}
-                        className={`h-5 rounded ${bi === 0 ? 'bg-blue-500' : bi === 1 ? 'bg-emerald-500' : 'bg-purple-500'}`}
+                        className={`h-5 rounded ${bi === 0 ? 'bg-blue-500' : bi === 1 ? 'bg-emerald-500' : 'bg-blue-600'}`}
                         style={{ width: `${(b.value / maxRevenue) * 100}%` }}
                         title={`${b.name}: ${b.value.toLocaleString()}만원`}
                       />
@@ -365,7 +365,7 @@ export default function MultiBranchPage() {
           {/* AI 인사이트 */}
           <div className="card p-5">
             <h2 className="font-bold text-sm mb-3 flex items-center gap-2">
-              <Target className="w-4 h-4 text-indigo-600" /> AI 지점 분석
+              <Target className="w-4 h-4 text-blue-700" /> AI 지점 분석
             </h2>
             <div className="space-y-2">
               {[
@@ -390,7 +390,7 @@ export default function MultiBranchPage() {
         <div className="space-y-4">
           <div className="card p-5">
             <h2 className="font-bold text-sm mb-4 flex items-center gap-2">
-              <ArrowRight className="w-4 h-4 text-indigo-600" /> 지점 간 환자 이동 현황
+              <ArrowRight className="w-4 h-4 text-blue-700" /> 지점 간 환자 이동 현황
             </h2>
             <p className="text-xs text-muted-foreground mb-4">최근 3개월 간 다른 지점으로 이동한 환자 현황</p>
 
@@ -400,7 +400,7 @@ export default function MultiBranchPage() {
                   <div className="flex items-center gap-2 flex-1">
                     <div className="px-3 py-1.5 rounded-lg bg-blue-100 dark:bg-blue-900/30 text-xs font-bold text-blue-600">{transfer.from}</div>
                     <ArrowRight className="w-4 h-4 text-muted-foreground" />
-                    <div className="px-3 py-1.5 rounded-lg bg-indigo-100 dark:bg-indigo-900/30 text-xs font-bold text-indigo-600">{transfer.to}</div>
+                    <div className="px-3 py-1.5 rounded-lg bg-blue-100 dark:bg-blue-900/30 text-xs font-bold text-blue-700">{transfer.to}</div>
                   </div>
                   <div className="text-right">
                     <div className="font-bold text-sm">{transfer.count}명</div>
@@ -410,9 +410,9 @@ export default function MultiBranchPage() {
               ))}
             </div>
 
-            <div className="mt-4 bg-indigo-50 dark:bg-indigo-900/10 rounded-xl p-3 flex items-start gap-2">
-              <UserCheck className="w-4 h-4 text-indigo-600 flex-shrink-0 mt-0.5" />
-              <p className="text-xs text-indigo-700 dark:text-indigo-300">
+            <div className="mt-4 bg-blue-50 dark:bg-blue-900/10 rounded-xl p-3 flex items-start gap-2">
+              <UserCheck className="w-4 h-4 text-blue-700 flex-shrink-0 mt-0.5" />
+              <p className="text-xs text-blue-700 dark:text-blue-300">
                 지점 간 환자 이동을 통해 환자가 이탈하지 않고 네트워크 내에 유지됩니다.
                 강남↔서초 간 이동이 가장 활발하며, 주로 거리/편의와 원장님 선호도가 이유입니다.
               </p>

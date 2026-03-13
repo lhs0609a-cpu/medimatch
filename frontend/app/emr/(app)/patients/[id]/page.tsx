@@ -222,7 +222,7 @@ export default function PatientDetailPage() {
         </div>
         {patient.currentMeds.length > 0 && (
           <div className="mt-4 pt-4 border-t border-border">
-            <div className="flex items-center gap-2 mb-2"><Pill className="w-4 h-4 text-purple-500" /><span className="text-sm font-semibold">현재 투약</span></div>
+            <div className="flex items-center gap-2 mb-2"><Pill className="w-4 h-4 text-blue-500" /><span className="text-sm font-semibold">현재 투약</span></div>
             <div className="flex flex-wrap gap-2">{patient.currentMeds.map((med, i) => (<span key={i} className="badge-default text-xs">{med}</span>))}</div>
           </div>
         )}
@@ -293,7 +293,7 @@ export default function PatientDetailPage() {
                         <div className="bg-secondary/30 rounded-xl p-4 space-y-2">
                           {visit.rx.map((r, i) => (
                             <div key={i} className="flex items-center justify-between text-sm">
-                              <div className="flex items-center gap-2"><Pill className="w-3.5 h-3.5 text-purple-400 flex-shrink-0" /><span className="font-medium">{r.name}</span></div>
+                              <div className="flex items-center gap-2"><Pill className="w-3.5 h-3.5 text-blue-400 flex-shrink-0" /><span className="font-medium">{r.name}</span></div>
                               <span className="text-xs text-muted-foreground">{r.dose} · {r.days}일분</span>
                             </div>
                           ))}
@@ -327,7 +327,7 @@ export default function PatientDetailPage() {
               { label: '심박수', value: `${vitals[0].hr} bpm`, icon: Activity, color: 'text-blue-500' },
               { label: '체온', value: `${vitals[0].temp}°C`, icon: Thermometer, color: 'text-amber-500' },
               { label: '체중', value: `${vitals[0].weight} kg`, icon: Scale, color: 'text-emerald-500' },
-              { label: '키', value: `${vitals[0].height} cm`, icon: User, color: 'text-purple-500' },
+              { label: '키', value: `${vitals[0].height} cm`, icon: User, color: 'text-blue-500' },
             ].map((v, i) => (
               <div key={i} className="p-3 rounded-xl bg-secondary/30 text-center">
                 <v.icon className={`w-5 h-5 ${v.color} mx-auto mb-2`} />
@@ -415,7 +415,7 @@ export default function PatientDetailPage() {
                 <div className="space-y-1.5">
                   {visit.rx.map((r, i) => (
                     <div key={i} className="flex items-center gap-3 text-sm bg-secondary/30 rounded-lg px-3 py-2">
-                      <Pill className="w-4 h-4 text-purple-400 flex-shrink-0" />
+                      <Pill className="w-4 h-4 text-blue-400 flex-shrink-0" />
                       <span className="font-medium flex-1">{r.name}</span>
                       <span className="text-xs text-muted-foreground">{r.dose}</span>
                       <span className="text-xs text-muted-foreground">{r.days}일분</span>
@@ -443,7 +443,7 @@ export default function PatientDetailPage() {
                 </div>
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-muted-foreground">유입경로</span>
-                  <span className="px-2 py-0.5 rounded text-xs font-medium bg-cyan-50 text-cyan-600 dark:bg-cyan-900/30 dark:text-cyan-400">{patient.inflowPath}</span>
+                  <span className="px-2 py-0.5 rounded text-xs font-medium bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400">{patient.inflowPath}</span>
                 </div>
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-muted-foreground">검색 키워드</span>
@@ -483,7 +483,7 @@ export default function PatientDetailPage() {
 
           {/* 실무자 판단 */}
           <div className="card p-5">
-            <h3 className="font-bold mb-3 flex items-center gap-2"><UserCheck className="w-5 h-5 text-purple-500" /> 실무자 판단</h3>
+            <h3 className="font-bold mb-3 flex items-center gap-2"><UserCheck className="w-5 h-5 text-blue-500" /> 실무자 판단</h3>
             <p className="text-sm leading-relaxed">{patient.staffAssessment}</p>
           </div>
 

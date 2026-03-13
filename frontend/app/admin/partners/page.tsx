@@ -132,7 +132,7 @@ export default function AdminPartnersPage() {
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div className="flex items-center gap-3">
-          <TossIcon icon={HeartHandshake} color="from-red-500 to-pink-500" shadow="shadow-red-500/25" size="md" />
+          <TossIcon icon={HeartHandshake} color="from-blue-500 to-blue-600" shadow="shadow-blue-500/25" size="md" />
           <div>
             <h1 className="text-2xl font-bold text-gray-900">파트너 관리</h1>
             <p className="text-gray-500 text-sm">인테리어, 장비, 컨설팅 등 파트너 업체 관리</p>
@@ -160,7 +160,7 @@ export default function AdminPartnersPage() {
         </div>
         <div className="bg-white rounded-2xl p-5 border border-gray-100">
           <p className="text-sm text-gray-500 mb-1">총 문의</p>
-          <p className="text-2xl font-bold text-violet-600">{items.reduce((a, b) => a + (b.inquiry_count || 0), 0)}</p>
+          <p className="text-2xl font-bold text-blue-600">{items.reduce((a, b) => a + (b.inquiry_count || 0), 0)}</p>
         </div>
       </div>
 
@@ -169,17 +169,17 @@ export default function AdminPartnersPage() {
         <div className="relative flex-1 max-w-md">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
           <input type="text" placeholder="업체명, 대표자로 검색..." value={searchInput} onChange={(e) => setSearchInput(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-            className="w-full pl-10 pr-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-violet-200 focus:border-violet-300" />
+            className="w-full pl-10 pr-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-300" />
         </div>
-        <select value={categoryFilter} onChange={(e) => { setCategoryFilter(e.target.value); setPage(1); }} className="px-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-violet-200">
+        <select value={categoryFilter} onChange={(e) => { setCategoryFilter(e.target.value); setPage(1); }} className="px-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-200">
           <option value="">전체 카테고리</option>
           {Object.entries(CATEGORY_LABELS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
         </select>
-        <select value={statusFilter} onChange={(e) => { setStatusFilter(e.target.value); setPage(1); }} className="px-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-violet-200">
+        <select value={statusFilter} onChange={(e) => { setStatusFilter(e.target.value); setPage(1); }} className="px-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-200">
           <option value="">전체 상태</option>
           {ALL_STATUSES.map((s) => <option key={s} value={s}>{STATUS_CONFIG[s].label}</option>)}
         </select>
-        <button onClick={handleSearch} className="px-4 py-2.5 bg-violet-600 text-white rounded-xl text-sm hover:bg-violet-700 transition-colors">검색</button>
+        <button onClick={handleSearch} className="px-4 py-2.5 bg-blue-600 text-white rounded-xl text-sm hover:bg-blue-700 transition-colors">검색</button>
       </div>
 
       {/* Table */}
@@ -249,7 +249,7 @@ export default function AdminPartnersPage() {
               {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
                 let p: number;
                 if (totalPages <= 5) p = i + 1; else if (page <= 3) p = i + 1; else if (page >= totalPages - 2) p = totalPages - 4 + i; else p = page - 2 + i;
-                return <button key={p} onClick={() => setPage(p)} className={`w-8 h-8 rounded-lg text-sm font-medium transition-colors ${p === page ? 'bg-violet-600 text-white' : 'text-gray-600 hover:bg-gray-100'}`}>{p}</button>;
+                return <button key={p} onClick={() => setPage(p)} className={`w-8 h-8 rounded-lg text-sm font-medium transition-colors ${p === page ? 'bg-blue-600 text-white' : 'text-gray-600 hover:bg-gray-100'}`}>{p}</button>;
               })}
               <button onClick={() => setPage(Math.min(totalPages, page + 1))} disabled={page === totalPages} className="p-2 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 disabled:opacity-30"><ChevronRight className="w-4 h-4" /></button>
             </div>
@@ -322,9 +322,9 @@ export default function AdminPartnersPage() {
                   </div>
                   <p className="text-xs text-amber-600">평점</p>
                 </div>
-                <div className="text-center p-3 bg-violet-50 rounded-xl">
-                  <p className="text-xl font-bold text-violet-700">{detailModal.review_count}</p>
-                  <p className="text-xs text-violet-600">리뷰</p>
+                <div className="text-center p-3 bg-blue-50 rounded-xl">
+                  <p className="text-xl font-bold text-blue-700">{detailModal.review_count}</p>
+                  <p className="text-xs text-blue-600">리뷰</p>
                 </div>
                 <div className="text-center p-3 bg-blue-50 rounded-xl">
                   <p className="text-xl font-bold text-blue-700">{detailModal.inquiry_count}</p>

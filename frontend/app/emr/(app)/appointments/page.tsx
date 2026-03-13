@@ -294,7 +294,7 @@ export default function AppointmentsPage() {
       </div>
 
       {/* ───── 대기 현황 모니터 (환자 표시용) ───── */}
-      <div className="card p-6 bg-gradient-to-r from-primary/5 to-violet-500/5 border border-primary/20">
+      <div className="card p-6 bg-gradient-to-r from-primary/5 to-blue-500/5 border border-primary/20">
         <div className="flex items-center justify-between mb-4">
           <h3 className="font-bold flex items-center gap-2">
             <Bell className="w-5 h-5 text-primary" />

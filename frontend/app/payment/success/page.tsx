@@ -197,7 +197,7 @@ function PaymentSuccessContent() {
         {/* Payment Details Card */}
         <div className="card p-6 mb-6">
           <div className="flex items-center gap-4 mb-4 pb-4 border-b border-border">
-            <TossIcon icon={Icon} color="from-blue-500 to-indigo-500" size="md" shadow="shadow-blue-500/25" />
+            <TossIcon icon={Icon} color="from-blue-500 to-blue-600" size="md" shadow="shadow-blue-500/25" />
             <div>
               <h3 className="font-semibold text-foreground">{productInfo.title}</h3>
               <p className="text-sm text-muted-foreground">주문번호: {result?.orderId}</p>

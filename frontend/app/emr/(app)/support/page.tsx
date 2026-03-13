@@ -49,7 +49,7 @@ const faqCategories = [
   {
     category: 'AI 기능',
     icon: Sparkles,
-    color: 'bg-purple-100 text-purple-600 dark:bg-purple-900/30',
+    color: 'bg-blue-100 text-blue-600 dark:bg-blue-900/30',
     items: [
       { q: 'AI 음성 차트는 어떻게 사용하나요?', a: 'AI 진료차트 메뉴에서 녹음 버튼을 클릭하면 됩니다. 진료 대화를 실시간 인식하여 SOAP 형식의 차트를 자동 작성합니다. 마이크 권한을 허용해주세요.' },
       { q: 'AI 청구 방어가 뭔가요?', a: '보험 청구 전 AI가 삭감 리스크를 자동 분석합니다. 고위험 청구건에 대해 수정 제안, 근거 자료 첨부, 이의신청서 자동 생성을 지원합니다.' },

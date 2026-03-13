@@ -147,7 +147,7 @@ export default function JourneyPhaseCard({
               진행중
             </span>
             {phaseQuizAverage !== undefined && phaseQuizAverage > 0 && (
-              <span className="text-xs font-medium bg-purple-100 dark:bg-purple-900/20 text-purple-600 px-2.5 py-1 rounded-lg flex items-center gap-1">
+              <span className="text-xs font-medium bg-blue-100 dark:bg-blue-900/20 text-blue-600 px-2.5 py-1 rounded-lg flex items-center gap-1">
                 <Brain className="w-3.5 h-3.5" />
                 이해도 {phaseQuizAverage}%
               </span>
@@ -307,8 +307,8 @@ const RESOURCE_TYPE_ICONS: Record<string, { icon: React.ElementType; color: stri
   website: { icon: Globe, color: 'text-blue-500' },
   government: { icon: Building2, color: 'text-green-600' },
   template: { icon: FileText, color: 'text-orange-500' },
-  tool: { icon: Wrench, color: 'text-purple-500' },
-  community: { icon: Users, color: 'text-pink-500' },
+  tool: { icon: Wrench, color: 'text-blue-500' },
+  community: { icon: Users, color: 'text-blue-500' },
 }
 
 function InlineResources({ resources }: { resources: TaskResource[] }) {

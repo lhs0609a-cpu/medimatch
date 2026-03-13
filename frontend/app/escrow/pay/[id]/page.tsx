@@ -114,7 +114,7 @@ export default function EscrowPayPage() {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <Loader2 className="w-12 h-12 text-violet-600 animate-spin mx-auto mb-4" />
+          <Loader2 className="w-12 h-12 text-blue-600 animate-spin mx-auto mb-4" />
           <p className="text-gray-600">처리 중...</p>
         </div>
       </div>
@@ -134,7 +134,7 @@ export default function EscrowPayPage() {
                 setError(null)
                 loadTransaction()
               }}
-              className="w-full py-3 bg-violet-600 text-white rounded-xl font-semibold hover:bg-violet-700"
+              className="w-full py-3 bg-blue-600 text-white rounded-xl font-semibold hover:bg-blue-700"
             >
               다시 시도
             </button>
@@ -156,7 +156,7 @@ export default function EscrowPayPage() {
         <div className="text-center">
           <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
           <h2 className="text-xl font-bold text-gray-900 mb-2">거래를 찾을 수 없습니다</h2>
-          <Link href="/escrow" className="text-violet-600 hover:underline">
+          <Link href="/escrow" className="text-blue-600 hover:underline">
             목록으로 돌아가기
           </Link>
         </div>
@@ -185,7 +185,7 @@ export default function EscrowPayPage() {
         {/* Transaction Info */}
         <div className="bg-white rounded-2xl p-6 shadow-sm mb-6">
           <div className="flex items-center gap-4 mb-6">
-            <TossIcon icon={Building2} color="from-blue-500 to-indigo-500" size="md" shadow="shadow-blue-500/25" />
+            <TossIcon icon={Building2} color="from-blue-500 to-blue-600" size="md" shadow="shadow-blue-500/25" />
             <div>
               <h2 className="font-bold text-gray-900">{transaction.partner_name || '파트너'}</h2>
               <p className="text-sm text-gray-500">{transaction.contract?.title || '에스크로 거래'}</p>
@@ -203,7 +203,7 @@ export default function EscrowPayPage() {
             </div>
             <div className="flex justify-between text-lg font-bold pt-3 border-t">
               <span>총 결제 금액</span>
-              <span className="text-violet-600">{formatAmount(transaction.total_amount)}원</span>
+              <span className="text-blue-600">{formatAmount(transaction.total_amount)}원</span>
             </div>
           </div>
         </div>
@@ -211,7 +211,7 @@ export default function EscrowPayPage() {
         {/* Escrow Info */}
         <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-6">
           <div className="flex items-start gap-3">
-            <TossIcon icon={Shield} color="from-teal-500 to-cyan-500" size="sm" shadow="shadow-teal-500/25" className="flex-shrink-0" />
+            <TossIcon icon={Shield} color="from-blue-500 to-blue-600" size="sm" shadow="shadow-blue-500/25" className="flex-shrink-0" />
             <div className="text-sm text-blue-700">
               <p className="font-medium">에스크로 결제 안내</p>
               <ul className="mt-2 space-y-1 list-disc list-inside">
@@ -262,7 +262,7 @@ export default function EscrowPayPage() {
         <button
           onClick={handlePayment}
           disabled={isPaying || transaction.status !== 'INITIATED'}
-          className="w-full py-4 bg-violet-600 text-white rounded-xl font-bold text-lg hover:bg-violet-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+          className="w-full py-4 bg-blue-600 text-white rounded-xl font-bold text-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
         >
           {isPaying ? (
             <>
@@ -283,8 +283,8 @@ export default function EscrowPayPage() {
         </button>
 
         <p className="text-center text-sm text-gray-500 mt-4">
-          결제 시 <Link href="/terms" className="text-violet-600 hover:underline">이용약관</Link> 및{' '}
-          <Link href="/privacy" className="text-violet-600 hover:underline">개인정보처리방침</Link>에 동의합니다.
+          결제 시 <Link href="/terms" className="text-blue-600 hover:underline">이용약관</Link> 및{' '}
+          <Link href="/privacy" className="text-blue-600 hover:underline">개인정보처리방침</Link>에 동의합니다.
         </p>
       </main>
     </div>

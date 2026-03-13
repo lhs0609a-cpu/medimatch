@@ -27,11 +27,11 @@ export default function AnalysisPack5({ result }: Props) {
           {[
             { stage: '인지', desc: '병원 검색/발견', touchpoint: '네이버, 지인 추천', conversion: 100, color: 'bg-blue-500' },
             { stage: '관심', desc: '리뷰/정보 확인', touchpoint: '블로그, 리뷰, SNS', conversion: 65, color: 'bg-blue-400' },
-            { stage: '예약', desc: '전화/온라인 예약', touchpoint: '네이버 예약, 전화', conversion: 42, color: 'bg-indigo-500' },
-            { stage: '내원', desc: '접수/대기/진료', touchpoint: '키오스크, 대기실', conversion: 38, color: 'bg-violet-500' },
-            { stage: '치료', desc: '진료/시술/처방', touchpoint: '진료실, 물리치료실', conversion: 38, color: 'bg-purple-500' },
+            { stage: '예약', desc: '전화/온라인 예약', touchpoint: '네이버 예약, 전화', conversion: 42, color: 'bg-blue-600' },
+            { stage: '내원', desc: '접수/대기/진료', touchpoint: '키오스크, 대기실', conversion: 38, color: 'bg-blue-500' },
+            { stage: '치료', desc: '진료/시술/처방', touchpoint: '진료실, 물리치료실', conversion: 38, color: 'bg-blue-500' },
             { stage: '수납', desc: '결제/처방전 발행', touchpoint: 'POS, 간편결제', conversion: 38, color: 'bg-fuchsia-500' },
-            { stage: '재방문', desc: '사후관리/재예약', touchpoint: 'CRM, 알림톡', conversion: 26, color: 'bg-pink-500' },
+            { stage: '재방문', desc: '사후관리/재예약', touchpoint: 'CRM, 알림톡', conversion: 26, color: 'bg-blue-500' },
           ].map((s, i) => (
             <div key={s.stage} className="flex items-center gap-3">
               <div className={`w-8 h-8 rounded-full ${s.color} text-white text-xs font-bold flex items-center justify-center flex-shrink-0`}>
@@ -197,10 +197,10 @@ export default function AnalysisPack5({ result }: Props) {
       </Card>
 
       {/* 6. 재방문율 분석 */}
-      <Card icon={Heart} title="재방문율 · 충성도 분석" color="text-pink-500">
+      <Card icon={Heart} title="재방문율 · 충성도 분석" color="text-blue-500">
         <div className="grid grid-cols-2 gap-4 mb-4">
-          <div className="p-4 bg-pink-50 dark:bg-pink-950/20 rounded-xl text-center">
-            <div className="text-3xl font-bold text-pink-600">68%</div>
+          <div className="p-4 bg-blue-50 dark:bg-blue-950/20 rounded-xl text-center">
+            <div className="text-3xl font-bold text-blue-600">68%</div>
             <div className="text-xs text-muted-foreground">예상 재방문율</div>
           </div>
           <div className="p-4 bg-secondary/50 rounded-xl text-center">
@@ -219,7 +219,7 @@ export default function AnalysisPack5({ result }: Props) {
             <div key={v.visit} className="flex items-center gap-2">
               <span className="text-xs text-muted-foreground w-24 flex-shrink-0">{v.visit}</span>
               <div className="flex-1 h-3 bg-muted rounded-full overflow-hidden">
-                <div className="h-full bg-pink-400 rounded-full" style={{ width: `${v.pct * 2.5}%` }} />
+                <div className="h-full bg-blue-400 rounded-full" style={{ width: `${v.pct * 2.5}%` }} />
               </div>
               <span className="text-xs text-foreground w-8 text-right">{v.pct}%</span>
               <span className="text-[10px] text-muted-foreground w-16 text-right">LTV {v.revenue}만</span>
@@ -230,10 +230,10 @@ export default function AnalysisPack5({ result }: Props) {
       </Card>
 
       {/* 7. 구전 효과 */}
-      <Card icon={MessageCircle} title="구전(WOM) 효과 분석" color="text-teal-500">
+      <Card icon={MessageCircle} title="구전(WOM) 효과 분석" color="text-blue-500">
         <div className="grid grid-cols-3 gap-3 mb-4">
-          <div className="text-center p-3 bg-teal-50 dark:bg-teal-950/20 rounded-lg">
-            <div className="text-xl font-bold text-teal-600">3.2명</div>
+          <div className="text-center p-3 bg-blue-50 dark:bg-blue-950/20 rounded-lg">
+            <div className="text-xl font-bold text-blue-600">3.2명</div>
             <div className="text-[10px] text-muted-foreground">1인당 추천 수</div>
           </div>
           <div className="text-center p-3 bg-secondary/50 rounded-lg">
@@ -257,17 +257,17 @@ export default function AnalysisPack5({ result }: Props) {
               <span className="text-xs text-foreground flex-1">{s.source}</span>
               <span className="text-xs text-muted-foreground">{s.pct}%</span>
               <div className="w-16 h-1.5 bg-muted rounded-full overflow-hidden">
-                <div className="h-full bg-teal-500 rounded-full" style={{ width: `${s.quality}%` }} />
+                <div className="h-full bg-blue-500 rounded-full" style={{ width: `${s.quality}%` }} />
               </div>
               <span className="text-[10px] text-muted-foreground w-14 text-right">전환 {s.quality}%</span>
             </div>
           ))}
         </div>
-        <p className="text-xs text-muted-foreground mt-3 p-2 bg-teal-50 dark:bg-teal-950/20 rounded">추천 환자는 일반 환자 대비 LTV <span className="font-bold text-foreground">2.4배</span>, 이탈률 <span className="font-bold text-foreground">50% 낮음</span></p>
+        <p className="text-xs text-muted-foreground mt-3 p-2 bg-blue-50 dark:bg-blue-950/20 rounded">추천 환자는 일반 환자 대비 LTV <span className="font-bold text-foreground">2.4배</span>, 이탈률 <span className="font-bold text-foreground">50% 낮음</span></p>
       </Card>
 
       {/* 8. 로열티 프로그램 */}
-      <Card icon={Gift} title="로열티 프로그램 효과 시뮬레이션" color="text-purple-500">
+      <Card icon={Gift} title="로열티 프로그램 효과 시뮬레이션" color="text-blue-500">
         <div className="space-y-3">
           {[
             { program: '방문 포인트 적립', cost: '월 50만', retention: '+15%', revenue: '+180만', roi: 360 },
@@ -279,7 +279,7 @@ export default function AnalysisPack5({ result }: Props) {
             <div key={p.program} className="p-3 bg-secondary/30 rounded-lg">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-sm font-medium text-foreground">{p.program}</span>
-                <span className="text-xs font-bold text-purple-600">ROI {p.roi}%</span>
+                <span className="text-xs font-bold text-blue-600">ROI {p.roi}%</span>
               </div>
               <div className="grid grid-cols-3 gap-2 text-xs">
                 <div>비용: <span className="font-medium text-foreground">{p.cost}</span></div>

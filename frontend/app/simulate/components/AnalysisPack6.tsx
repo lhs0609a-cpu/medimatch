@@ -82,7 +82,7 @@ export default function AnalysisPack6({ result }: Props) {
       </Card>
 
       {/* 3. 개인정보보호 */}
-      <Card icon={Fingerprint} title="개인정보보호 컴플라이언스" color="text-purple-600">
+      <Card icon={Fingerprint} title="개인정보보호 컴플라이언스" color="text-blue-600">
         <div className="space-y-2">
           {[
             { item: '개인정보처리방침 수립·공개', status: '필수', effort: '1주', cost: '50만' },
@@ -103,9 +103,9 @@ export default function AnalysisPack6({ result }: Props) {
             </div>
           ))}
         </div>
-        <div className="mt-3 p-2 bg-purple-50 dark:bg-purple-950/20 rounded-lg text-center">
+        <div className="mt-3 p-2 bg-blue-50 dark:bg-blue-950/20 rounded-lg text-center">
           <span className="text-xs text-muted-foreground">컴플라이언스 구축 총 비용: </span>
-          <span className="text-sm font-bold text-purple-600">약 275만원</span>
+          <span className="text-sm font-bold text-blue-600">약 275만원</span>
           <span className="text-xs text-muted-foreground"> · 위반 시 최대 과태료: </span>
           <span className="text-sm font-bold text-red-600">5천만원</span>
         </div>
@@ -181,7 +181,7 @@ export default function AnalysisPack6({ result }: Props) {
       </Card>
 
       {/* 6. 근로기준법 체크 */}
-      <Card icon={Scale} title="근로기준법 · 인사관리 체크" color="text-indigo-600">
+      <Card icon={Scale} title="근로기준법 · 인사관리 체크" color="text-blue-700">
         <div className="space-y-2">
           {[
             { item: '근로계약서 작성', detail: '채용 즉시, 2부 작성 (1부 교부)', risk: '500만원 과태료' },
@@ -205,7 +205,7 @@ export default function AnalysisPack6({ result }: Props) {
       </Card>
 
       {/* 7. 감염관리 */}
-      <Card icon={Shield} title="감염관리 · 방역 체계" color="text-teal-600">
+      <Card icon={Shield} title="감염관리 · 방역 체계" color="text-blue-600">
         <div className="grid grid-cols-2 gap-3 mb-4">
           {[
             { item: '손 위생 시설', status: '진료실당 1개', cost: '실당 30만' },
@@ -213,10 +213,10 @@ export default function AnalysisPack6({ result }: Props) {
             { item: '공기 정화', status: '환기 + HEPA 필터', cost: '실당 100만' },
             { item: '방역 계약', status: '격월 정기 방역', cost: '월 15만' },
           ].map((i) => (
-            <div key={i.item} className="p-3 bg-teal-50 dark:bg-teal-950/20 rounded-lg">
+            <div key={i.item} className="p-3 bg-blue-50 dark:bg-blue-950/20 rounded-lg">
               <div className="text-sm font-medium text-foreground">{i.item}</div>
               <div className="text-[10px] text-muted-foreground mt-1">{i.status}</div>
-              <div className="text-[10px] font-medium text-teal-600 mt-0.5">{i.cost}</div>
+              <div className="text-[10px] font-medium text-blue-600 mt-0.5">{i.cost}</div>
             </div>
           ))}
         </div>
@@ -231,7 +231,7 @@ export default function AnalysisPack6({ result }: Props) {
             <div key={p.protocol} className="flex items-center gap-2">
               <span className="text-xs text-muted-foreground w-28 flex-shrink-0">{p.protocol}</span>
               <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden">
-                <div className="h-full bg-teal-500 rounded-full" style={{ width: `${p.compliance}%` }} />
+                <div className="h-full bg-blue-500 rounded-full" style={{ width: `${p.compliance}%` }} />
               </div>
               <span className="text-xs font-medium text-foreground w-10 text-right">{p.compliance}%</span>
             </div>

@@ -234,13 +234,13 @@ const DEFAULT_ERROR: ErrorInfo = {
 const CATEGORY_STYLES: Record<ErrorCategory, { icon: any; gradient: string; shadow: string }> = {
   user_action: {
     icon: HelpCircle,
-    gradient: 'from-blue-500 to-indigo-500',
+    gradient: 'from-blue-500 to-blue-600',
     shadow: 'shadow-blue-500/25'
   },
   card_issue: {
     icon: CreditCard,
-    gradient: 'from-indigo-500 to-purple-500',
-    shadow: 'shadow-indigo-500/25'
+    gradient: 'from-blue-600 to-blue-500',
+    shadow: 'shadow-blue-600/25'
   },
   limit_exceeded: {
     icon: Ban,
@@ -261,9 +261,9 @@ const CATEGORY_STYLES: Record<ErrorCategory, { icon: any; gradient: string; shad
 
 // 대체 결제 수단
 const ALTERNATIVE_METHODS = [
-  { name: '다른 신용카드', description: '보유한 다른 카드 사용', icon: CreditCard, gradient: 'from-indigo-500 to-purple-500', shadow: 'shadow-indigo-500/25' },
+  { name: '다른 신용카드', description: '보유한 다른 카드 사용', icon: CreditCard, gradient: 'from-blue-600 to-blue-500', shadow: 'shadow-blue-600/25' },
   { name: '체크카드', description: '잔액 확인 후 결제', icon: Wallet, gradient: 'from-green-500 to-emerald-500', shadow: 'shadow-green-500/25' },
-  { name: '카카오페이', description: '간편결제 이용', icon: Shield, gradient: 'from-teal-500 to-cyan-500', shadow: 'shadow-teal-500/25' },
+  { name: '카카오페이', description: '간편결제 이용', icon: Shield, gradient: 'from-blue-500 to-blue-600', shadow: 'shadow-blue-500/25' },
 ];
 
 function PaymentFailContent() {

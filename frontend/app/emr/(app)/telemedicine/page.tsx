@@ -194,7 +194,7 @@ export default function TelemedicinePage() {
                   </div>
                   <div className="flex items-center gap-2 mt-1.5">
                     <span className={`px-1.5 py-0.5 rounded text-2xs font-medium ${
-                      session.type === '초진' ? 'bg-purple-100 text-purple-600 dark:bg-purple-900/30' : 'bg-blue-100 text-blue-600 dark:bg-blue-900/30'
+                      session.type === '초진' ? 'bg-blue-100 text-blue-600 dark:bg-blue-900/30' : 'bg-blue-100 text-blue-600 dark:bg-blue-900/30'
                     }`}>{session.type}</span>
                     {session.conditions?.map((c, i) => (
                       <span key={i} className="text-2xs text-muted-foreground">{c}</span>
@@ -326,7 +326,7 @@ export default function TelemedicinePage() {
               <div className="w-px h-8 bg-border mx-1" />
               <button
                 onClick={() => setShowPrescriptionModal(true)}
-                className="px-4 py-2.5 rounded-full bg-purple-500 text-white text-sm font-semibold hover:bg-purple-600 flex items-center gap-2"
+                className="px-4 py-2.5 rounded-full bg-blue-500 text-white text-sm font-semibold hover:bg-blue-600 flex items-center gap-2"
               >
                 <Pill className="w-4 h-4" /> 처방
               </button>
@@ -424,7 +424,7 @@ export default function TelemedicinePage() {
                     <textarea className="input mt-1 text-xs min-h-[60px]" placeholder="검사 결과, 활력징후..." defaultValue="HbA1c 7.8% (이전 7.2%). BP 138/88." />
                   </div>
                   <div>
-                    <label className="text-xs font-semibold text-purple-600">A (평가)</label>
+                    <label className="text-xs font-semibold text-blue-600">A (평가)</label>
                     <textarea className="input mt-1 text-xs min-h-[40px]" placeholder="진단/평가..." defaultValue="제2형 당뇨 혈당 조절 악화. 약물 조절 필요." />
                   </div>
                   <div>
@@ -457,7 +457,7 @@ export default function TelemedicinePage() {
           <div className="bg-card rounded-2xl shadow-xl max-w-lg w-full" onClick={e => e.stopPropagation()}>
             <div className="flex items-center justify-between p-4 border-b border-border">
               <h3 className="font-bold text-lg flex items-center gap-2">
-                <Pill className="w-5 h-5 text-purple-600" /> 비대면 처방
+                <Pill className="w-5 h-5 text-blue-600" /> 비대면 처방
               </h3>
               <button onClick={() => setShowPrescriptionModal(false)} className="btn-icon"><X className="w-4 h-4" /></button>
             </div>
@@ -507,7 +507,7 @@ export default function TelemedicinePage() {
               </div>
 
               <div className="flex gap-2">
-                <button className="flex-1 py-2.5 rounded-xl font-semibold text-sm text-white bg-purple-600 hover:bg-purple-700 flex items-center justify-center gap-2">
+                <button className="flex-1 py-2.5 rounded-xl font-semibold text-sm text-white bg-blue-600 hover:bg-blue-700 flex items-center justify-center gap-2">
                   <Send className="w-4 h-4" /> 약국 전송
                 </button>
                 <button onClick={() => setShowPrescriptionModal(false)} className="px-4 py-2.5 rounded-xl font-semibold text-sm bg-secondary text-foreground">

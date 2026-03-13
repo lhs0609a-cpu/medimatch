@@ -25,7 +25,7 @@ export default function GraduationModal({
       {/* Modal */}
       <div className="relative bg-card rounded-3xl border border-border shadow-2xl max-w-md w-full overflow-hidden animate-fade-in">
         {/* Decorative top gradient */}
-        <div className="h-2 bg-gradient-to-r from-green-500 via-primary to-amber-500" />
+        <div className="h-2 bg-gradient-to-r from-blue-500 via-primary to-blue-600" />
 
         {/* Close button */}
         <button
@@ -37,7 +37,7 @@ export default function GraduationModal({
 
         <div className="p-8 text-center">
           {/* Trophy Icon */}
-          <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center mx-auto mb-6 shadow-lg shadow-amber-500/30 animate-bounce">
+          <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center mx-auto mb-6 shadow-lg shadow-blue-500/25 animate-bounce">
             <Trophy className="w-10 h-10 text-white" />
           </div>
 

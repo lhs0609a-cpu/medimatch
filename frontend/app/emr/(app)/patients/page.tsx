@@ -51,19 +51,19 @@ const tagColors: Record<string, string> = {
   '정기검진': 'bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400',
   'VIP': 'bg-amber-50 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400',
   '알레르기주의': 'bg-red-50 text-red-600 dark:bg-red-900/30 dark:text-red-400',
-  '인슐린': 'bg-purple-50 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400',
+  '인슐린': 'bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400',
   '고령': 'bg-orange-50 text-orange-600 dark:bg-orange-900/30 dark:text-orange-400',
   '건강검진': 'bg-emerald-50 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400',
   '신환': 'bg-primary/10 text-primary',
-  '내시경예정': 'bg-cyan-50 text-cyan-600 dark:bg-cyan-900/30 dark:text-cyan-400',
+  '내시경예정': 'bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400',
 }
 
 const inflowPathColors: Record<string, string> = {
-  '소개': 'bg-cyan-50 text-cyan-600 dark:bg-cyan-900/30 dark:text-cyan-400',
+  '소개': 'bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400',
   '네이버 블로그': 'bg-emerald-50 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400',
   '네이버 광고': 'bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400',
   '구글 광고': 'bg-red-50 text-red-600 dark:bg-red-900/30 dark:text-red-400',
-  '인스타그램': 'bg-purple-50 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400',
+  '인스타그램': 'bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400',
   '카카오톡': 'bg-amber-50 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400',
   '오프라인 전단': 'bg-orange-50 text-orange-600 dark:bg-orange-900/30 dark:text-orange-400',
 }

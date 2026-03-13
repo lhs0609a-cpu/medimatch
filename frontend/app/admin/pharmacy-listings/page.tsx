@@ -21,6 +21,7 @@ import {
   AlertTriangle,
 } from 'lucide-react';
 import { TossIcon } from '@/components/ui/TossIcon';
+import { toast } from 'sonner';
 
 // ============================================================
 // Types
@@ -196,10 +197,10 @@ export default function AdminPharmacyListingsPage() {
         fetchListings();
       } else {
         const err = await res.json();
-        alert(err.detail || '승인 실패');
+        toast.error(err.detail || '승인 실패');
       }
     } catch {
-      alert('요청 실패');
+      toast.error('요청 실패');
     } finally {
       setActionLoading(false);
     }
@@ -220,10 +221,10 @@ export default function AdminPharmacyListingsPage() {
         fetchListings();
       } else {
         const err = await res.json();
-        alert(err.detail || '거부 실패');
+        toast.error(err.detail || '거부 실패');
       }
     } catch {
-      alert('요청 실패');
+      toast.error('요청 실패');
     } finally {
       setActionLoading(false);
     }
@@ -245,10 +246,10 @@ export default function AdminPharmacyListingsPage() {
         fetchListings();
       } else {
         const err = await res.json();
-        alert(err.detail || '상태 변경 실패');
+        toast.error(err.detail || '상태 변경 실패');
       }
     } catch {
-      alert('요청 실패');
+      toast.error('요청 실패');
     } finally {
       setActionLoading(false);
     }
@@ -276,7 +277,7 @@ export default function AdminPharmacyListingsPage() {
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
-          <TossIcon icon={Pill} color="from-rose-500 to-pink-500" shadow="shadow-rose-500/25" size="md" />
+          <TossIcon icon={Pill} color="from-blue-500 to-blue-600" shadow="shadow-blue-500/25" size="md" />
           <div>
             <h1 className="text-2xl font-bold text-gray-900">약국 매물 심사</h1>
             <p className="text-sm text-gray-500">약사 등록 약국 양도 매물의 심사 및 관리</p>
@@ -304,7 +305,7 @@ export default function AdminPharmacyListingsPage() {
                 onClick={() => { setStatusFilter(isSelected ? '' : s); setPage(1); }}
                 className={`p-3 rounded-xl border text-center transition-all ${
                   isSelected
-                    ? 'border-teal-300 bg-teal-50 ring-2 ring-teal-200'
+                    ? 'border-blue-300 bg-blue-50 ring-2 ring-blue-200'
                     : 'border-gray-100 bg-white hover:border-gray-200'
                 }`}
               >
@@ -328,13 +329,13 @@ export default function AdminPharmacyListingsPage() {
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-            className="w-full pl-10 pr-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-teal-200 focus:border-teal-300"
+            className="w-full pl-10 pr-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-300"
           />
         </div>
         <select
           value={statusFilter}
           onChange={(e) => { setStatusFilter(e.target.value); setPage(1); }}
-          className="px-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-teal-200"
+          className="px-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-200"
         >
           <option value="">전체 상태</option>
           {ALL_STATUSES.map((s) => (
@@ -343,7 +344,7 @@ export default function AdminPharmacyListingsPage() {
         </select>
         <button
           onClick={handleSearch}
-          className="px-4 py-2.5 bg-teal-600 text-white rounded-xl text-sm hover:bg-teal-700 transition-colors"
+          className="px-4 py-2.5 bg-blue-600 text-white rounded-xl text-sm hover:bg-blue-700 transition-colors"
         >
           검색
         </button>
@@ -410,7 +411,7 @@ export default function AdminPharmacyListingsPage() {
                         <div className="flex items-center justify-center gap-1">
                           <button
                             onClick={() => openDetail(item.id)}
-                            className="p-1.5 rounded-lg text-gray-400 hover:text-teal-600 hover:bg-teal-50 transition-colors"
+                            className="p-1.5 rounded-lg text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-colors"
                             title="상세보기"
                           >
                             <Eye className="w-4 h-4" />
@@ -503,7 +504,7 @@ export default function AdminPharmacyListingsPage() {
                     key={p}
                     onClick={() => setPage(p)}
                     className={`w-8 h-8 rounded-lg text-sm font-medium transition-colors ${
-                      p === page ? 'bg-teal-600 text-white' : 'text-gray-600 hover:bg-gray-100'
+                      p === page ? 'bg-blue-600 text-white' : 'text-gray-600 hover:bg-gray-100'
                     }`}
                   >
                     {p}
@@ -530,7 +531,7 @@ export default function AdminPharmacyListingsPage() {
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-2xl max-h-[85vh] overflow-y-auto m-4" onClick={(e) => e.stopPropagation()}>
             {detailLoading ? (
               <div className="p-12 text-center">
-                <RefreshCw className="w-8 h-8 animate-spin mx-auto text-teal-500 mb-3" />
+                <RefreshCw className="w-8 h-8 animate-spin mx-auto text-blue-500 mb-3" />
                 <p className="text-gray-500">로딩 중...</p>
               </div>
             ) : detailModal && (
@@ -713,7 +714,7 @@ export default function AdminPharmacyListingsPage() {
               onChange={(e) => setStatusReason(e.target.value)}
               placeholder="사유를 입력하세요 (선택)"
               rows={2}
-              className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-teal-200 focus:border-teal-300 resize-none mb-4"
+              className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-300 resize-none mb-4"
             />
             <div className="flex gap-3">
               <button
@@ -725,7 +726,7 @@ export default function AdminPharmacyListingsPage() {
               <button
                 onClick={handleStatusChange}
                 disabled={actionLoading}
-                className="flex-1 px-4 py-2.5 bg-teal-600 text-white rounded-xl text-sm font-medium hover:bg-teal-700 disabled:opacity-50 transition-colors"
+                className="flex-1 px-4 py-2.5 bg-blue-600 text-white rounded-xl text-sm font-medium hover:bg-blue-700 disabled:opacity-50 transition-colors"
               >
                 {actionLoading ? '처리 중...' : '변경'}
               </button>

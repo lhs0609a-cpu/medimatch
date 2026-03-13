@@ -69,8 +69,8 @@ function formatMoney(value: number): string {
 
 const dataSources = [
   { name: '심평원', color: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300' },
-  { name: '행정안전부', color: 'bg-violet-100 text-violet-700 dark:bg-violet-900/30 dark:text-violet-300' },
-  { name: '소상공인진흥공단', color: 'bg-teal-100 text-teal-700 dark:bg-teal-900/30 dark:text-teal-300' },
+  { name: '행정안전부', color: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300' },
+  { name: '소상공인진흥공단', color: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300' },
 ]
 
 export default function ScoreHero({ result }: ScoreHeroProps) {
@@ -172,9 +172,9 @@ export default function ScoreHero({ result }: ScoreHeroProps) {
 
       {/* AI Analysis Summary */}
       {result.ai_analysis && (
-        <div className="mt-5 bg-gradient-to-r from-indigo-50 to-violet-50 dark:from-indigo-950/30 dark:to-violet-950/30 rounded-xl p-4 border border-indigo-200/50 dark:border-indigo-800/50">
+        <div className="mt-5 bg-gradient-to-r from-blue-50 to-blue-50 dark:from-blue-950/30 dark:to-blue-950/30 rounded-xl p-4 border border-blue-200/50 dark:border-blue-800/50">
           <div className="flex items-start gap-3">
-            <Sparkles className="w-5 h-5 text-indigo-500 flex-shrink-0 mt-0.5" />
+            <Sparkles className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
             <div>
               <h4 className="text-sm font-semibold text-foreground mb-1">AI 분석 요약</h4>
               <p className="text-sm text-foreground leading-relaxed">{result.ai_analysis}</p>

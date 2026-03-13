@@ -32,7 +32,7 @@ export function BlurredListingImage({
   // 이미지 로드 실패 시 폴백
   if (hasError) {
     return (
-      <div className={`bg-gradient-to-br from-blue-100 to-cyan-100 dark:from-blue-900/30 dark:to-cyan-900/30 flex items-center justify-center ${className}`}>
+      <div className={`bg-gradient-to-br from-blue-100 to-blue-100 dark:from-blue-900/30 dark:to-blue-900/30 flex items-center justify-center ${className}`}>
         <div className="text-center text-muted-foreground">
           <Lock className="w-8 h-8 mx-auto mb-2 opacity-50" />
           <span className="text-xs">이미지 준비중</span>

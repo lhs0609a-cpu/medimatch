@@ -14,13 +14,13 @@ import { prospectsService } from '@/lib/api/services'
 const typeLabels: Record<string, { label: string; color: string; bg: string }> = {
   NEW_BUILD: { label: '신축', color: 'text-blue-700', bg: 'bg-blue-100' },
   VACANCY: { label: '공실', color: 'text-orange-700', bg: 'bg-orange-100' },
-  RELOCATION: { label: '이전예정', color: 'text-purple-700', bg: 'bg-purple-100' },
+  RELOCATION: { label: '이전예정', color: 'text-blue-700', bg: 'bg-blue-100' },
 }
 
 const statusLabels: Record<string, { label: string; color: string }> = {
   NEW: { label: '신규', color: 'bg-green-100 text-green-700' },
   CONTACTED: { label: '컨택중', color: 'bg-yellow-100 text-yellow-700' },
-  CONVERTED: { label: '계약완료', color: 'bg-purple-100 text-purple-700' },
+  CONVERTED: { label: '계약완료', color: 'bg-blue-100 text-blue-700' },
   CLOSED: { label: '종료', color: 'bg-gray-100 text-gray-700' },
 }
 

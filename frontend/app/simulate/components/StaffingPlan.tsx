@@ -76,7 +76,7 @@ export default function StaffingPlan({ result }: StaffingPlanProps) {
     <div className="card p-6">
       {/* Header */}
       <div className="flex items-center gap-3 mb-5">
-        <TossIcon icon={UserCheck} color="from-violet-500 to-purple-500" size="sm" shadow="shadow-violet-500/25" />
+        <TossIcon icon={UserCheck} color="from-blue-500 to-blue-600" size="sm" shadow="shadow-blue-500/25" />
         <h3 className="font-semibold text-foreground">인력 구성 및 인건비 분석</h3>
         <span className="ml-auto text-[11px] text-muted-foreground">총 {totalStaff}명</span>
       </div>

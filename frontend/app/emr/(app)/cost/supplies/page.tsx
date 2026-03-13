@@ -127,10 +127,10 @@ export default function SuppliesPage() {
           <div className="space-y-3">
             {supplyItems.sort((a, b) => b.monthlyCost - a.monthlyCost).map((item) => (
               <div key={item.code} className="flex items-center gap-3">
-                <span className="text-xs w-5">{item.type === 'DRUG' ? <Pill className="w-4 h-4 text-purple-400" /> : <Box className="w-4 h-4 text-blue-400" />}</span>
+                <span className="text-xs w-5">{item.type === 'DRUG' ? <Pill className="w-4 h-4 text-blue-400" /> : <Box className="w-4 h-4 text-blue-400" />}</span>
                 <span className="text-sm w-36 truncate">{item.name}</span>
                 <div className="flex-1 h-6 bg-secondary/30 rounded overflow-hidden">
-                  <div className={`h-full rounded ${item.type === 'DRUG' ? 'bg-purple-400/60' : 'bg-blue-400/60'}`} style={{ width: `${(item.monthlyCost / 700_000) * 100}%` }} />
+                  <div className={`h-full rounded ${item.type === 'DRUG' ? 'bg-blue-400/60' : 'bg-blue-400/60'}`} style={{ width: `${(item.monthlyCost / 700_000) * 100}%` }} />
                 </div>
                 <span className="text-xs font-semibold w-16 text-right">{fmtMan(item.monthlyCost)}</span>
               </div>
@@ -172,14 +172,14 @@ export default function SuppliesPage() {
                     </div>
                   </div>
                   <div className="hidden md:flex col-span-3 items-center gap-2">
-                    {item.type === 'DRUG' ? <Pill className="w-4 h-4 text-purple-400 flex-shrink-0" /> : <Box className="w-4 h-4 text-blue-400 flex-shrink-0" />}
+                    {item.type === 'DRUG' ? <Pill className="w-4 h-4 text-blue-400 flex-shrink-0" /> : <Box className="w-4 h-4 text-blue-400 flex-shrink-0" />}
                     <div>
                       <div className="text-sm font-medium">{item.name}</div>
                       <div className="text-2xs text-muted-foreground">{item.vendor} · {item.unit}</div>
                     </div>
                   </div>
                   <div className="hidden md:block col-span-1">
-                    <span className={`px-1.5 py-0.5 rounded text-2xs font-medium ${item.type === 'DRUG' ? 'bg-purple-50 text-purple-600 dark:bg-purple-900/30' : 'bg-blue-50 text-blue-600 dark:bg-blue-900/30'}`}>
+                    <span className={`px-1.5 py-0.5 rounded text-2xs font-medium ${item.type === 'DRUG' ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/30' : 'bg-blue-50 text-blue-600 dark:bg-blue-900/30'}`}>
                       {item.type === 'DRUG' ? '약품' : '소모품'}
                     </span>
                   </div>

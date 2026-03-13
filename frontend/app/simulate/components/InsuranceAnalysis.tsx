@@ -71,7 +71,7 @@ export default function InsuranceAnalysis({ result }: InsuranceAnalysisProps) {
     <div className="card p-6">
       {/* Header */}
       <div className="flex items-center gap-2 mb-5">
-        <FileText className="w-5 h-5 text-cyan-500" />
+        <FileText className="w-5 h-5 text-blue-600" />
         <h3 className="font-semibold text-foreground">보험 / 비보험 수가 분석</h3>
         <span className="ml-auto text-[11px] text-muted-foreground">{result.clinic_type}</span>
       </div>

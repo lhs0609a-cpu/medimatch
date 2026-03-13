@@ -138,7 +138,7 @@ const statusConfig: Record<CorrectionStatus, { label: string; color: string; bg:
 const docStatusConfig: Record<DocStatus, { label: string; color: string; bg: string }> = {
   uploaded: { label: '업로드됨', color: 'text-slate-600', bg: 'bg-slate-100 dark:bg-slate-900/20' },
   ocr_done: { label: 'OCR 완료', color: 'text-blue-600', bg: 'bg-blue-100 dark:bg-blue-900/20' },
-  classified: { label: '분류완료', color: 'text-purple-600', bg: 'bg-purple-100 dark:bg-purple-900/20' },
+  classified: { label: '분류완료', color: 'text-blue-600', bg: 'bg-blue-100 dark:bg-blue-900/20' },
   verified: { label: '검증완료', color: 'text-emerald-600', bg: 'bg-emerald-100 dark:bg-emerald-900/20' },
 }
 

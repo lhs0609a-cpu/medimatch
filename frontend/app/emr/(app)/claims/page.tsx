@@ -107,15 +107,15 @@ async function fetchApi(path: string, options?: RequestInit) {
 const statusConfig: Record<ClaimStatus, { label: string; color: string; bg: string }> = {
   DRAFT: { label: '작성중', color: 'text-slate-600 dark:text-slate-400', bg: 'bg-slate-50 dark:bg-slate-900/20' },
   READY: { label: '청구대기', color: 'text-amber-600 dark:text-amber-400', bg: 'bg-amber-50 dark:bg-amber-900/20' },
-  AI_REVIEWING: { label: 'AI분석중', color: 'text-purple-600 dark:text-purple-400', bg: 'bg-purple-50 dark:bg-purple-900/20' },
+  AI_REVIEWING: { label: 'AI분석중', color: 'text-blue-600 dark:text-blue-400', bg: 'bg-blue-50 dark:bg-blue-900/20' },
   SUBMITTED: { label: '전송완료', color: 'text-blue-600 dark:text-blue-400', bg: 'bg-blue-50 dark:bg-blue-900/20' },
-  EDI_RECEIVED: { label: '접수완료', color: 'text-cyan-600 dark:text-cyan-400', bg: 'bg-cyan-50 dark:bg-cyan-900/20' },
-  UNDER_REVIEW: { label: '심사중', color: 'text-indigo-600 dark:text-indigo-400', bg: 'bg-indigo-50 dark:bg-indigo-900/20' },
+  EDI_RECEIVED: { label: '접수완료', color: 'text-blue-600 dark:text-blue-400', bg: 'bg-blue-50 dark:bg-blue-900/20' },
+  UNDER_REVIEW: { label: '심사중', color: 'text-blue-700 dark:text-blue-500', bg: 'bg-blue-50 dark:bg-blue-900/20' },
   ACCEPTED: { label: '인정', color: 'text-emerald-600 dark:text-emerald-400', bg: 'bg-emerald-50 dark:bg-emerald-900/20' },
   REJECTED: { label: '삭감', color: 'text-red-600 dark:text-red-400', bg: 'bg-red-50 dark:bg-red-900/20' },
   PARTIAL: { label: '일부삭감', color: 'text-orange-600 dark:text-orange-400', bg: 'bg-orange-50 dark:bg-orange-900/20' },
-  APPEALING: { label: '이의신청중', color: 'text-violet-600 dark:text-violet-400', bg: 'bg-violet-50 dark:bg-violet-900/20' },
-  APPEAL_ACCEPTED: { label: '이의인정', color: 'text-teal-600 dark:text-teal-400', bg: 'bg-teal-50 dark:bg-teal-900/20' },
+  APPEALING: { label: '이의신청중', color: 'text-blue-600 dark:text-blue-400', bg: 'bg-blue-50 dark:bg-blue-900/20' },
+  APPEAL_ACCEPTED: { label: '이의인정', color: 'text-blue-600 dark:text-blue-400', bg: 'bg-blue-50 dark:bg-blue-900/20' },
   APPEAL_REJECTED: { label: '이의기각', color: 'text-rose-600 dark:text-rose-400', bg: 'bg-rose-50 dark:bg-rose-900/20' },
 }
 

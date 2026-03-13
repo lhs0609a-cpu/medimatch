@@ -399,7 +399,7 @@ export default function OnboardingPage() {
               <div className="space-y-3">
                 {[
                   { icon: Mic, title: 'AI 차트 체험해보기', description: '진료실에서 "차트 시작"을 말하면 AI가 자동 기록을 시작합니다', color: 'bg-blue-100 text-blue-600' },
-                  { icon: Users, title: '첫 환자 등록하기', description: '환자 관리에서 기존 환자 데이터를 가져오거나 새로 등록하세요', color: 'bg-purple-100 text-purple-600' },
+                  { icon: Users, title: '첫 환자 등록하기', description: '환자 관리에서 기존 환자 데이터를 가져오거나 새로 등록하세요', color: 'bg-blue-100 text-blue-600' },
                   { icon: FileText, title: '모의 청구 검증', description: '과거 청구 데이터로 AI 청구 방어 정확도를 확인해보세요', color: 'bg-emerald-100 text-emerald-600' },
                 ].map((guide, i) => (
                   <div key={i} className="flex items-center gap-3 p-3 rounded-xl hover:bg-secondary/50 transition-colors cursor-pointer">
@@ -416,15 +416,15 @@ export default function OnboardingPage() {
               </div>
             </div>
 
-            <div className="p-4 rounded-xl bg-purple-50 dark:bg-purple-900/10 flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-purple-500 flex items-center justify-center flex-shrink-0">
+            <div className="p-4 rounded-xl bg-blue-50 dark:bg-blue-900/10 flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-blue-500 flex items-center justify-center flex-shrink-0">
                 <HelpCircle className="w-5 h-5 text-white" />
               </div>
               <div className="flex-1">
-                <div className="text-sm font-semibold text-purple-600">도움이 필요하신가요?</div>
-                <div className="text-xs text-purple-500">전담 컨설턴트가 온보딩을 도와드립니다</div>
+                <div className="text-sm font-semibold text-blue-600">도움이 필요하신가요?</div>
+                <div className="text-xs text-blue-500">전담 컨설턴트가 온보딩을 도와드립니다</div>
               </div>
-              <button className="btn-sm text-xs bg-purple-500 text-white hover:bg-purple-600">
+              <button className="btn-sm text-xs bg-blue-500 text-white hover:bg-blue-600">
                 <Phone className="w-3 h-3" /> 상담 요청
               </button>
             </div>

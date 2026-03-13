@@ -89,7 +89,7 @@ const categoriesData: Category[] = [
   {
     id: 'partnership', name: '동업계약서', icon: <HeartHandshake className="w-6 h-6" />,
     description: '공동개원, 지분 배분, 탈퇴 조건 등 동업 관련 계약서',
-    color: 'bg-purple-500/10 text-purple-600',
+    color: 'bg-blue-500/10 text-blue-600',
     templates: [
       {
         id: 'partner-1', name: '공동개원 동업계약서', description: '2인 이상 공동 개원 시 사용하는 동업 계약서',
@@ -108,7 +108,7 @@ const categoriesData: Category[] = [
   {
     id: 'equipment', name: '의료기기 리스계약서', icon: <Monitor className="w-6 h-6" />,
     description: '고가 의료장비 리스, 렌탈, 유지보수 관련 계약서',
-    color: 'bg-cyan-500/10 text-cyan-600',
+    color: 'bg-blue-600/10 text-blue-600',
     templates: [
       {
         id: 'equip-1', name: '의료기기 리스 계약서', description: 'CT, MRI 등 고가 장비 리스(임대) 계약서',

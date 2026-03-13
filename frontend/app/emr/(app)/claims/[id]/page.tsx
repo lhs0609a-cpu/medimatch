@@ -454,7 +454,7 @@ export default function ClaimDetailPage() {
                   <div className="col-span-1">
                     <span className={`text-2xs px-2 py-0.5 rounded-lg font-bold ${
                       item.item_type === 'drug'
-                        ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-600'
+                        ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-600'
                         : 'bg-blue-100 dark:bg-blue-900/30 text-blue-600'
                     }`}>
                       {item.item_type === 'drug' ? '약제' : '수가'}

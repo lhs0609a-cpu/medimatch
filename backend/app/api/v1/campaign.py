@@ -3,6 +3,7 @@
 """
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import select, func
 from typing import List, Optional
 from datetime import datetime
 from pydantic import BaseModel, Field
@@ -11,11 +12,9 @@ import uuid
 from ...core.database import get_db
 from ...core.security import get_current_user
 from ...models.user import User
+from ...models.campaign import Campaign, CampaignStatus, CampaignType
 
 router = APIRouter()
-
-# 메모리 기반 캠페인 이력 (프로덕션에서는 DB 사용)
-_campaign_history: list = []
 
 
 # ===== Schemas =====
@@ -89,7 +88,7 @@ async def create_campaign(
             scheduled_time=campaign_data.scheduled_time,
             limit=campaign_data.limit
         )
-        status = "SCHEDULED"
+        status = CampaignStatus.SCHEDULED
     else:
         # 즉시 발송
         if campaign_data.campaign_type == "SMS":
@@ -104,56 +103,111 @@ async def create_campaign(
                 target_grade=campaign_data.target_grade,
                 limit=campaign_data.limit
             )
-        status = "RUNNING"
+        status = CampaignStatus.RUNNING
 
-    response = CampaignResponse(
+    now = datetime.utcnow()
+
+    # DB에 캠페인 저장
+    campaign = Campaign(
         id=campaign_id,
+        user_id=current_user.id,
         name=campaign_data.name,
-        campaign_type=campaign_data.campaign_type,
+        campaign_type=CampaignType(campaign_data.campaign_type),
         target_grade=campaign_data.target_grade,
         status=status,
         scheduled_time=campaign_data.scheduled_time,
         total_targets=campaign_data.limit,
-        created_at=datetime.now().isoformat()
+        message_template=campaign_data.message_template,
+        created_at=now,
     )
+    db.add(campaign)
+    await db.flush()
 
-    # 이력 저장
-    _campaign_history.insert(0, response.model_dump())
-
-    return response
+    return CampaignResponse(
+        id=campaign_id,
+        name=campaign_data.name,
+        campaign_type=campaign_data.campaign_type,
+        target_grade=campaign_data.target_grade,
+        status=status.value,
+        scheduled_time=campaign_data.scheduled_time,
+        total_targets=campaign_data.limit,
+        created_at=now.isoformat()
+    )
 
 
 @router.get("/stats", response_model=CampaignStatsResponse)
 async def get_campaign_stats(
+    db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
     """캠페인 통계 조회"""
-    from ...tasks.campaign_tasks import get_campaign_stats
+    user_filter = Campaign.user_id == current_user.id
 
-    # Celery 태스크 동기 호출
-    import asyncio
+    # 전체 통계
+    total_q = await db.execute(
+        select(func.count()).select_from(Campaign).where(user_filter)
+    )
+    total_campaigns = total_q.scalar() or 0
 
-    loop = asyncio.new_event_loop()
-    asyncio.set_event_loop(loop)
+    sent_q = await db.execute(
+        select(func.coalesce(func.sum(Campaign.sent_count), 0))
+        .select_from(Campaign).where(user_filter)
+    )
+    total_sent = sent_q.scalar() or 0
 
+    delivered_q = await db.execute(
+        select(func.coalesce(func.sum(Campaign.delivered_count), 0))
+        .select_from(Campaign).where(user_filter)
+    )
+    total_delivered = delivered_q.scalar() or 0
+
+    failed_q = await db.execute(
+        select(func.coalesce(func.sum(Campaign.failed_count), 0))
+        .select_from(Campaign).where(user_filter)
+    )
+    total_failed = failed_q.scalar() or 0
+
+    # 등급별 캠페인 수
+    by_grade = {"HOT": 0, "WARM": 0, "COLD": 0}
+    grade_q = await db.execute(
+        select(Campaign.target_grade, func.count())
+        .where(user_filter)
+        .group_by(Campaign.target_grade)
+    )
+    for grade, cnt in grade_q.all():
+        if grade in by_grade:
+            by_grade[grade] = cnt
+
+    # 상태별 캠페인 수
+    by_status = {"COMPLETED": 0, "RUNNING": 0, "SCHEDULED": 0}
+    status_q = await db.execute(
+        select(Campaign.status, func.count())
+        .where(user_filter)
+        .group_by(Campaign.status)
+    )
+    for st, cnt in status_q.all():
+        st_val = st.value if hasattr(st, "value") else str(st)
+        if st_val in by_status:
+            by_status[st_val] = cnt
+
+    # SMS 잔액 조회
+    sms_balance = 0
     try:
         from ...services.outbound_campaign import solapi_service
-
-        # SMS 잔액 조회
         balance_result = await solapi_service.get_balance()
         sms_balance = balance_result.get("balance", 0) if balance_result.get("success") else 0
+    except Exception:
+        pass
 
-        return CampaignStatsResponse(
-            total_campaigns=0,
-            total_sent=0,
-            total_delivered=0,
-            total_failed=0,
-            sms_balance=sms_balance,
-            by_grade={"HOT": 0, "WARM": 0, "COLD": 0},
-            by_status={"COMPLETED": 0, "RUNNING": 0, "SCHEDULED": 0}
-        )
-    finally:
-        loop.close()
+    return CampaignStatsResponse(
+        total_campaigns=total_campaigns,
+        total_sent=total_sent,
+        total_delivered=total_delivered,
+        total_failed=total_failed,
+        sms_balance=sms_balance,
+        by_grade=by_grade,
+        by_status=by_status,
+    )
 
 
 @router.get("/templates/sms", response_model=SMSTemplateResponse)
@@ -284,12 +338,44 @@ async def preview_message(
 async def get_campaign_history(
     page: int = Query(1, ge=1),
     page_size: int = Query(20, ge=1, le=100),
+    db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
     """캠페인 발송 이력 조회"""
-    total = len(_campaign_history)
-    start = (page - 1) * page_size
-    items = _campaign_history[start:start + page_size]
+    user_filter = Campaign.user_id == current_user.id
+
+    # 총 건수
+    total_q = await db.execute(
+        select(func.count()).select_from(Campaign).where(user_filter)
+    )
+    total = total_q.scalar() or 0
+
+    # 페이지네이션 조회
+    offset = (page - 1) * page_size
+    rows_q = await db.execute(
+        select(Campaign)
+        .where(user_filter)
+        .order_by(Campaign.created_at.desc())
+        .offset(offset)
+        .limit(page_size)
+    )
+    rows = rows_q.scalars().all()
+
+    items = [
+        {
+            "id": c.id,
+            "name": c.name,
+            "campaign_type": c.campaign_type.value if hasattr(c.campaign_type, "value") else str(c.campaign_type),
+            "target_grade": c.target_grade,
+            "status": c.status.value if hasattr(c.status, "value") else str(c.status),
+            "scheduled_time": c.scheduled_time,
+            "total_targets": c.total_targets or 0,
+            "sent_count": c.sent_count or 0,
+            "failed_count": c.failed_count or 0,
+            "created_at": c.created_at.isoformat() if c.created_at else "",
+        }
+        for c in rows
+    ]
 
     return {
         "items": items,

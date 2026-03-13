@@ -156,8 +156,8 @@ export default function AnalyticsPage() {
         <div className="card p-4">
           <div className="flex items-center justify-between mb-2">
             <span className="text-xs text-muted-foreground font-medium">월 처방건수</span>
-            <div className="w-8 h-8 rounded-xl bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
-              <FileText className="w-4 h-4 text-purple-600" />
+            <div className="w-8 h-8 rounded-xl bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
+              <FileText className="w-4 h-4 text-blue-600" />
             </div>
           </div>
           <div className="text-2xl font-bold">{overviewStats.monthlyPrescriptions}</div>
@@ -200,8 +200,8 @@ export default function AnalyticsPage() {
       {/* AI 인사이트 */}
       <div className="card p-5">
         <div className="flex items-center gap-2 mb-4">
-          <div className="w-8 h-8 rounded-xl bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
-            <Brain className="w-4 h-4 text-purple-600" />
+          <div className="w-8 h-8 rounded-xl bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
+            <Brain className="w-4 h-4 text-blue-600" />
           </div>
           <div>
             <h3 className="font-semibold text-sm">AI 경영 인사이트</h3>
@@ -250,12 +250,12 @@ export default function AnalyticsPage() {
                 <div className="w-full relative" style={{ height: '140px' }}>
                   <div
                     className={`absolute bottom-0 w-full rounded-t-lg transition-all ${
-                      i === 2 ? 'bg-purple-500' : day.revenue > 0 ? 'bg-purple-200 dark:bg-purple-800/50' : 'bg-secondary'
+                      i === 2 ? 'bg-blue-500' : day.revenue > 0 ? 'bg-blue-200 dark:bg-blue-800/50' : 'bg-secondary'
                     }`}
                     style={{ height: `${day.revenue > 0 ? (day.revenue / maxDailyRevenue) * 100 : 5}%` }}
                   />
                 </div>
-                <span className={`text-xs font-medium ${i === 2 ? 'text-purple-600' : 'text-muted-foreground'}`}>{day.day}</span>
+                <span className={`text-xs font-medium ${i === 2 ? 'text-blue-600' : 'text-muted-foreground'}`}>{day.day}</span>
                 <span className="text-2xs text-muted-foreground">{day.count}건</span>
               </div>
             ))}
@@ -279,12 +279,12 @@ export default function AnalyticsPage() {
                   <div className="w-full relative" style={{ height: '140px' }}>
                     <div
                       className={`absolute bottom-0 w-full rounded-t-lg transition-all ${
-                        isLatest ? 'bg-purple-500' : 'bg-purple-200 dark:bg-purple-800/50'
+                        isLatest ? 'bg-blue-500' : 'bg-blue-200 dark:bg-blue-800/50'
                       }`}
                       style={{ height: `${(month.revenue / maxMonthlyRevenue) * 100}%` }}
                     />
                   </div>
-                  <span className={`text-xs font-medium ${isLatest ? 'text-purple-600' : 'text-muted-foreground'}`}>{month.month}</span>
+                  <span className={`text-xs font-medium ${isLatest ? 'text-blue-600' : 'text-muted-foreground'}`}>{month.month}</span>
                 </div>
               )
             })}
@@ -297,15 +297,15 @@ export default function AnalyticsPage() {
         <div className="card p-5">
           <div className="flex items-center justify-between mb-4">
             <h3 className="font-semibold text-sm">연동 의원별 실적</h3>
-            <button className="text-2xs text-purple-600 font-medium hover:underline">상세보기</button>
+            <button className="text-2xs text-blue-600 font-medium hover:underline">상세보기</button>
           </div>
           <div className="space-y-4">
             {clinicStats.map((clinic, i) => (
               <div key={i}>
                 <div className="flex items-center justify-between mb-1.5">
                   <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-lg bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
-                      <Building2 className="w-4 h-4 text-purple-600" />
+                    <div className="w-8 h-8 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
+                      <Building2 className="w-4 h-4 text-blue-600" />
                     </div>
                     <div>
                       <span className="text-sm font-medium">{clinic.name}</span>
@@ -321,7 +321,7 @@ export default function AnalyticsPage() {
                   </div>
                 </div>
                 <div className="w-full h-2 rounded-full bg-secondary">
-                  <div className="h-full rounded-full bg-purple-500 transition-all" style={{ width: `${clinic.share}%` }} />
+                  <div className="h-full rounded-full bg-blue-500 transition-all" style={{ width: `${clinic.share}%` }} />
                 </div>
               </div>
             ))}
@@ -343,7 +343,7 @@ export default function AnalyticsPage() {
                   <div className="w-full relative" style={{ height: '100px' }}>
                     <div
                       className={`absolute bottom-0 w-full rounded-t transition-all ${
-                        isPeak ? 'bg-purple-500' : 'bg-purple-200 dark:bg-purple-800/50'
+                        isPeak ? 'bg-blue-500' : 'bg-blue-200 dark:bg-blue-800/50'
                       }`}
                       style={{ height: `${(h.count / maxHourlyCount) * 100}%` }}
                     />
@@ -353,7 +353,7 @@ export default function AnalyticsPage() {
               )
             })}
           </div>
-          <div className="mt-3 p-2.5 rounded-lg bg-purple-50 dark:bg-purple-900/20 text-xs text-purple-600">
+          <div className="mt-3 p-2.5 rounded-lg bg-blue-50 dark:bg-blue-900/20 text-xs text-blue-600">
             <Zap className="w-3 h-3 inline mr-1" />
             피크타임: <strong>14시</strong> (25건) — 조제 인력 배치 최적화 권고
           </div>
@@ -365,13 +365,13 @@ export default function AnalyticsPage() {
         <div className="card p-5">
           <div className="flex items-center justify-between mb-4">
             <h3 className="font-semibold text-sm">상위 처방 약품 (이번 달)</h3>
-            <button className="text-2xs text-purple-600 font-medium hover:underline">전체보기</button>
+            <button className="text-2xs text-blue-600 font-medium hover:underline">전체보기</button>
           </div>
           <div className="space-y-2">
             {topDrugs.map((drug, i) => (
               <div key={i} className="flex items-center gap-3 p-2.5 rounded-xl hover:bg-secondary/50 transition-colors">
                 <span className={`w-6 h-6 rounded-lg flex items-center justify-center text-2xs font-bold ${
-                  i < 3 ? 'bg-purple-500 text-white' : 'bg-secondary text-muted-foreground'
+                  i < 3 ? 'bg-blue-500 text-white' : 'bg-secondary text-muted-foreground'
                 }`}>
                   {i + 1}
                 </span>

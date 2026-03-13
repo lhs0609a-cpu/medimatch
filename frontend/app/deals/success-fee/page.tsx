@@ -125,7 +125,7 @@ export default function SuccessFeePage() {
                 <ArrowLeft className="w-5 h-5" />
               </Link>
               <div className="flex items-center gap-2">
-                <TossIcon icon={TrendingUp} color="from-blue-500 to-indigo-500" size="xs" shadow="shadow-blue-500/25" />
+                <TossIcon icon={TrendingUp} color="from-blue-500 to-blue-600" size="xs" shadow="shadow-blue-500/25" />
                 <span className="text-lg font-bold text-foreground">성사 보수 결제</span>
               </div>
             </div>
@@ -137,7 +137,7 @@ export default function SuccessFeePage() {
         {/* Deal Summary */}
         <div className="card p-6 mb-6">
           <h2 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
-            <TossIcon icon={FileText} color="from-blue-500 to-indigo-500" size="sm" shadow="shadow-blue-500/25" />
+            <TossIcon icon={FileText} color="from-blue-500 to-blue-600" size="sm" shadow="shadow-blue-500/25" />
             거래 정보
           </h2>
           <div className="grid md:grid-cols-2 gap-4">
@@ -180,7 +180,7 @@ export default function SuccessFeePage() {
         {/* Fee Calculation */}
         <div className="card p-6 mb-6">
           <h2 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
-            <TossIcon icon={Calculator} color="from-cyan-500 to-blue-500" size="sm" shadow="shadow-cyan-500/25" />
+            <TossIcon icon={Calculator} color="from-blue-500 to-blue-600" size="sm" shadow="shadow-blue-500/25" />
             성사 보수 계산
           </h2>
 
@@ -240,7 +240,7 @@ export default function SuccessFeePage() {
         {/* 청구 프로세스 안내 */}
         <div className="card p-6 mb-6">
           <h2 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
-            <TossIcon icon={Shield} color="from-teal-500 to-cyan-500" size="sm" shadow="shadow-teal-500/25" />
+            <TossIcon icon={Shield} color="from-blue-500 to-blue-600" size="sm" shadow="shadow-blue-500/25" />
             성사 보수 청구 프로세스
           </h2>
 
@@ -311,7 +311,7 @@ export default function SuccessFeePage() {
         {/* 환불 및 이의제기 안내 */}
         <div className="card p-6 mb-6 border-2 border-blue-200 dark:border-blue-800">
           <h3 className="font-semibold text-foreground mb-3 flex items-center gap-2">
-            <TossIcon icon={Shield} color="from-teal-500 to-cyan-500" size="xs" shadow="shadow-teal-500/25" />
+            <TossIcon icon={Shield} color="from-blue-500 to-blue-600" size="xs" shadow="shadow-blue-500/25" />
             환불 및 이의제기 정책
           </h3>
           <div className="space-y-4 text-sm">

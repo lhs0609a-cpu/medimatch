@@ -15,7 +15,7 @@ import { toast } from 'sonner'
 const statusLabels: Record<string, { label: string; color: string }> = {
   OPEN: { label: '모집중', color: 'bg-green-100 text-green-700' },
   BIDDING: { label: '입찰진행', color: 'bg-blue-100 text-blue-700' },
-  MATCHED: { label: '매칭완료', color: 'bg-purple-100 text-purple-700' },
+  MATCHED: { label: '매칭완료', color: 'bg-blue-100 text-blue-700' },
   CLOSED: { label: '마감', color: 'bg-gray-100 text-gray-700' },
 }
 
@@ -176,9 +176,9 @@ export default function PharmacyDetailPage() {
               <p className="text-sm text-gray-500 mb-1">예상 일일 처방전</p>
               <p className="text-2xl font-bold text-gray-900">{slot.est_daily_rx || '-'}건</p>
             </div>
-            <div className="bg-purple-50 rounded-xl p-4">
+            <div className="bg-blue-50 rounded-xl p-4">
               <p className="text-sm text-gray-500 mb-1">예상 월 조제료</p>
-              <p className="text-2xl font-bold text-purple-600">
+              <p className="text-2xl font-bold text-blue-600">
                 {slot.est_monthly_revenue ? formatCurrency(slot.est_monthly_revenue) : '-'}
               </p>
             </div>
@@ -227,9 +227,9 @@ export default function PharmacyDetailPage() {
               <span className="text-gray-600">월 영업일</span>
               <span className="font-medium">25일</span>
             </div>
-            <div className="flex justify-between items-center py-2 bg-purple-50 rounded-lg px-3">
-              <span className="text-purple-700 font-medium">예상 월 조제료 매출</span>
-              <span className="font-bold text-purple-700">
+            <div className="flex justify-between items-center py-2 bg-blue-50 rounded-lg px-3">
+              <span className="text-blue-700 font-medium">예상 월 조제료 매출</span>
+              <span className="font-bold text-blue-700">
                 {slot.est_monthly_revenue ? formatCurrency(slot.est_monthly_revenue) : '-'}
               </span>
             </div>
@@ -263,7 +263,7 @@ export default function PharmacyDetailPage() {
             ) : !showBidForm ? (
               <button
                 onClick={() => setShowBidForm(true)}
-                className="w-full bg-purple-600 text-white py-4 rounded-xl font-medium hover:bg-purple-700 transition flex items-center justify-center gap-2"
+                className="w-full bg-blue-600 text-white py-4 rounded-xl font-medium hover:bg-blue-700 transition flex items-center justify-center gap-2"
               >
                 <Send className="w-5 h-5" />
                 입찰 참여하기
@@ -280,7 +280,7 @@ export default function PharmacyDetailPage() {
                       value={bidAmount}
                       onChange={(e) => setBidAmount(formatNumber(e.target.value))}
                       placeholder={`최소 ${formatCurrency(slot.min_bid_amount)}`}
-                      className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                      className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     />
                     <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500">원</span>
                   </div>
@@ -296,7 +296,7 @@ export default function PharmacyDetailPage() {
                       value={experienceYears}
                       onChange={(e) => setExperienceYears(e.target.value)}
                       placeholder="예: 5"
-                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     />
                   </div>
                   <div>
@@ -308,7 +308,7 @@ export default function PharmacyDetailPage() {
                       value={pharmacyName}
                       onChange={(e) => setPharmacyName(e.target.value)}
                       placeholder="예: 행복약국"
-                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     />
                   </div>
                 </div>
@@ -322,7 +322,7 @@ export default function PharmacyDetailPage() {
                     onChange={(e) => setBidMessage(e.target.value)}
                     rows={3}
                     placeholder="자기소개, 강점 등을 작성해주세요"
-                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   />
                 </div>
 
@@ -336,7 +336,7 @@ export default function PharmacyDetailPage() {
                   <button
                     onClick={handleBid}
                     disabled={bidMutation.isPending}
-                    className="flex-1 bg-purple-600 text-white py-3 rounded-xl font-medium hover:bg-purple-700 disabled:opacity-50 flex items-center justify-center gap-2"
+                    className="flex-1 bg-blue-600 text-white py-3 rounded-xl font-medium hover:bg-blue-700 disabled:opacity-50 flex items-center justify-center gap-2"
                   >
                     {bidMutation.isPending ? '제출 중...' : '입찰 제출'}
                   </button>

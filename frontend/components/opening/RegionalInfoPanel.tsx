@@ -24,10 +24,10 @@ export default function RegionalInfoPanel({ regionalData, userRegionCode }: Regi
   return (
     <div className="space-y-1.5">
       <div className="flex items-center gap-1.5 text-xs font-medium text-foreground">
-        <MapPin className="w-3.5 h-3.5 text-indigo-500" />
+        <MapPin className="w-3.5 h-3.5 text-blue-600" />
         <span>지역별 정보</span>
         {matchedRegion && (
-          <span className="text-[10px] bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 px-1.5 py-0.5 rounded">
+          <span className="text-[10px] bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-500 px-1.5 py-0.5 rounded">
             내 지역
           </span>
         )}
@@ -41,7 +41,7 @@ export default function RegionalInfoPanel({ regionalData, userRegionCode }: Regi
               key={code}
               className={`rounded-lg px-3 py-2.5 space-y-1.5 ${
                 matchedRegion === code
-                  ? 'bg-indigo-50 dark:bg-indigo-900/10 border border-indigo-200 dark:border-indigo-800/40'
+                  ? 'bg-blue-50 dark:bg-blue-900/10 border border-blue-300 dark:border-blue-900/40'
                   : 'bg-secondary/30'
               }`}
             >

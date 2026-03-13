@@ -33,7 +33,7 @@ export default function BrokerControlPage() {
 
   const kpiCards = [
     { label: '활성 중개사', value: data?.kpi.broker_count || 0, icon: Users, color: 'from-blue-500 to-blue-600' },
-    { label: '활성 딜', value: data?.kpi.active_deals || 0, icon: Target, color: 'from-violet-500 to-violet-600' },
+    { label: '활성 딜', value: data?.kpi.active_deals || 0, icon: Target, color: 'from-blue-500 to-blue-600' },
     { label: '월 매출', value: `${fmt(data?.kpi.monthly_revenue || 0)}원`, icon: DollarSign, color: 'from-green-500 to-green-600' },
     { label: '전환율', value: `${data?.kpi.conversion_rate || 0}%`, icon: TrendingUp, color: 'from-amber-500 to-amber-600' },
   ];

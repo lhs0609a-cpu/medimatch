@@ -60,7 +60,7 @@ const PAYMENT_STATUS: Record<string, { label: string; bg: string; text: string }
   COMPLETED: { label: '완료',   bg: 'bg-emerald-100', text: 'text-emerald-700' },
   FAILED:    { label: '실패',   bg: 'bg-rose-100',    text: 'text-rose-700' },
   CANCELED:  { label: '취소',   bg: 'bg-amber-100',   text: 'text-amber-700' },
-  REFUNDED:  { label: '환불',   bg: 'bg-violet-100',  text: 'text-violet-700' },
+  REFUNDED:  { label: '환불',   bg: 'bg-blue-100',  text: 'text-blue-700' },
 };
 
 const SUB_STATUS: Record<string, { label: string; bg: string; text: string }> = {
@@ -172,7 +172,7 @@ export default function AdminPaymentsPage() {
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
-          <TossIcon icon={CreditCard} color="from-indigo-500 to-purple-500" shadow="shadow-indigo-500/25" size="md" />
+          <TossIcon icon={CreditCard} color="from-blue-500 to-blue-600" shadow="shadow-blue-500/25" size="md" />
           <div>
             <h1 className="text-2xl font-bold text-gray-900">결제/구독 관리</h1>
             <p className="text-sm text-gray-500">결제 내역과 구독 현황을 관리합니다</p>
@@ -232,16 +232,16 @@ export default function AdminPaymentsPage() {
               <input type="text" placeholder="이름, 이메일, 주문번호 검색..."
                 value={paymentSearchInput} onChange={(e) => setPaymentSearchInput(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && (() => { setPaymentSearch(paymentSearchInput); setPaymentPage(1); })()}
-                className="w-full pl-10 pr-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-violet-200"
+                className="w-full pl-10 pr-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-200"
               />
             </div>
             <select value={paymentStatusFilter} onChange={(e) => { setPaymentStatusFilter(e.target.value); setPaymentPage(1); }}
-              className="px-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-violet-200">
+              className="px-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-200">
               <option value="">전체 상태</option>
               {Object.entries(PAYMENT_STATUS).map(([k, v]) => <option key={k} value={k}>{v.label}</option>)}
             </select>
             <button onClick={() => { setPaymentSearch(paymentSearchInput); setPaymentPage(1); }}
-              className="px-4 py-2.5 bg-violet-600 text-white rounded-xl text-sm hover:bg-violet-700">검색</button>
+              className="px-4 py-2.5 bg-blue-600 text-white rounded-xl text-sm hover:bg-blue-700">검색</button>
           </div>
 
           {/* Table */}
@@ -349,7 +349,7 @@ export default function AdminPaymentsPage() {
                           <p className="text-xs text-gray-400">{s.user_email}</p>
                         </td>
                         <td className="px-4 py-3">
-                          <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${s.type === 'listing' ? 'bg-violet-100 text-violet-700' : 'bg-blue-100 text-blue-700'}`}>
+                          <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${s.type === 'listing' ? 'bg-blue-100 text-blue-700' : 'bg-blue-100 text-blue-700'}`}>
                             {s.type === 'listing' ? '매물등록' : '시뮬레이션'}
                           </span>
                         </td>

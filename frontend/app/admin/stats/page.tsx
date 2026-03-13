@@ -131,7 +131,7 @@ export default function AdminStatsPage() {
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="w-8 h-8 text-violet-600 animate-spin" />
+        <Loader2 className="w-8 h-8 text-blue-600 animate-spin" />
       </div>
     )
   }
@@ -151,7 +151,7 @@ export default function AdminStatsPage() {
               onClick={() => setPeriod(p)}
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                 period === p
-                  ? 'bg-violet-600 text-white'
+                  ? 'bg-blue-600 text-white'
                   : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
               }`}
             >
@@ -190,7 +190,7 @@ export default function AdminStatsPage() {
         {/* 총 사용자 */}
         <div className="bg-white rounded-2xl p-6 shadow-sm">
           <div className="flex items-center justify-between mb-4">
-            <TossIcon icon={Users} color="from-purple-500 to-pink-500" shadow="shadow-purple-500/25" size="sm" />
+            <TossIcon icon={Users} color="from-blue-500 to-blue-600" shadow="shadow-blue-500/25" size="sm" />
             <div className="flex items-center gap-1 text-sm font-medium text-green-600">
               <ArrowUpRight className="w-4 h-4" />
               {stats?.users.growth_rate}%
@@ -208,7 +208,7 @@ export default function AdminStatsPage() {
         {/* 프로스펙트 */}
         <div className="bg-white rounded-2xl p-6 shadow-sm">
           <div className="flex items-center justify-between mb-4">
-            <TossIcon icon={TrendingUp} color="from-emerald-500 to-teal-500" shadow="shadow-emerald-500/25" size="sm" />
+            <TossIcon icon={TrendingUp} color="from-emerald-500 to-green-500" shadow="shadow-emerald-500/25" size="sm" />
             <div className="flex items-center gap-1 text-sm font-medium text-orange-600">
               HOT {stats?.prospects.hot}건
             </div>
@@ -225,7 +225,7 @@ export default function AdminStatsPage() {
         {/* DAU */}
         <div className="bg-white rounded-2xl p-6 shadow-sm">
           <div className="flex items-center justify-between mb-4">
-            <TossIcon icon={BarChart3} color="from-cyan-500 to-blue-500" shadow="shadow-cyan-500/25" size="sm" />
+            <TossIcon icon={BarChart3} color="from-blue-500 to-blue-600" shadow="shadow-blue-500/25" size="sm" />
             <div className="text-sm font-medium text-blue-600">
               {stats?.engagement.avg_session_duration}분
             </div>
@@ -254,7 +254,7 @@ export default function AdminStatsPage() {
                 </div>
                 <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
                   <div
-                    className="h-full bg-gradient-to-r from-violet-500 to-indigo-500 rounded-full"
+                    className="h-full bg-gradient-to-r from-blue-500 to-blue-600 rounded-full"
                     style={{
                       width: `${(item.amount / (stats?.revenue.this_month || 1)) * 100}%`,
                     }}
@@ -270,7 +270,7 @@ export default function AdminStatsPage() {
           <h3 className="font-bold text-gray-900 mb-6">사용자 분포</h3>
           <div className="grid grid-cols-2 gap-4">
             {stats?.users.by_role.map((item, idx) => {
-              const colors = ['bg-violet-500', 'bg-blue-500', 'bg-green-500', 'bg-orange-500']
+              const colors = ['bg-blue-500', 'bg-blue-500', 'bg-green-500', 'bg-orange-500']
               const labels: Record<string, string> = {
                 DOCTOR: '의사',
                 PHARMACIST: '약사',
@@ -339,7 +339,7 @@ export default function AdminStatsPage() {
             </div>
             <div className="flex items-center justify-between">
               <span className="text-sm text-gray-600">이번 달 계약</span>
-              <span className="font-bold text-violet-600">{stats?.partners.contracts_this_month}건</span>
+              <span className="font-bold text-blue-600">{stats?.partners.contracts_this_month}건</span>
             </div>
           </div>
         </div>

@@ -100,7 +100,7 @@ export default function FinancialPack2({ result }: Props) {
       </Card>
 
       {/* 3. 비보험 수익 극대화 */}
-      <Card icon={CircleDollarSign} title="비보험 수익 극대화 전략" color="text-violet-600">
+      <Card icon={CircleDollarSign} title="비보험 수익 극대화 전략" color="text-blue-600">
         <div className="space-y-2 mb-4">
           {[
             { item: '도수치료', unitPrice: 80000, freq: 120, monthly: 9600000, margin: 75, color: '#8b5cf6' },
@@ -118,13 +118,13 @@ export default function FinancialPack2({ result }: Props) {
               <div className="w-12 h-2 bg-muted rounded-full overflow-hidden">
                 <div className="h-full rounded-full" style={{ width: `${i.margin}%`, backgroundColor: i.color }} />
               </div>
-              <span className="text-[10px] font-bold text-violet-600 w-10 text-right">{i.margin}%</span>
+              <span className="text-[10px] font-bold text-blue-600 w-10 text-right">{i.margin}%</span>
             </div>
           ))}
         </div>
         <div className="grid grid-cols-2 gap-3">
-          <div className="p-2 bg-violet-50 dark:bg-violet-950/20 rounded-lg text-center">
-            <div className="text-lg font-bold text-violet-600">{fmt(31650000)}</div>
+          <div className="p-2 bg-blue-50 dark:bg-blue-950/20 rounded-lg text-center">
+            <div className="text-lg font-bold text-blue-600">{fmt(31650000)}</div>
             <div className="text-[10px] text-muted-foreground">월 비보험 매출 예상</div>
           </div>
           <div className="p-2 bg-secondary/50 rounded-lg text-center">
@@ -160,7 +160,7 @@ export default function FinancialPack2({ result }: Props) {
       </Card>
 
       {/* 5. 매출 안정화 전략 */}
-      <Card icon={ArrowDownUp} title="매출 변동성 · 안정화 전략" color="text-teal-500">
+      <Card icon={ArrowDownUp} title="매출 변동성 · 안정화 전략" color="text-blue-500">
         <div className="space-y-2 mb-4">
           {Array.from({ length: 12 }, (_, i) => {
             const month = i + 1
@@ -181,16 +181,16 @@ export default function FinancialPack2({ result }: Props) {
             )
           })}
         </div>
-        <p className="text-xs text-muted-foreground p-2 bg-teal-50 dark:bg-teal-950/20 rounded-lg">
+        <p className="text-xs text-muted-foreground p-2 bg-blue-50 dark:bg-blue-950/20 rounded-lg">
           변동폭 {Math.round((1.15 - 0.78) * 100)}%. 비수기(7-8월) 대비: 건강검진 이벤트, 비보험 시술 프로모션 권장
         </p>
       </Card>
 
       {/* 6. 현금 보유고 전략 */}
-      <Card icon={Wallet} title="비상 운전자금 · 현금 관리" color="text-cyan-600">
+      <Card icon={Wallet} title="비상 운전자금 · 현금 관리" color="text-blue-600">
         <div className="grid grid-cols-3 gap-3 mb-4">
-          <div className="text-center p-3 bg-cyan-50 dark:bg-cyan-950/20 rounded-lg">
-            <div className="text-xl font-bold text-cyan-600">3개월</div>
+          <div className="text-center p-3 bg-blue-50 dark:bg-blue-950/20 rounded-lg">
+            <div className="text-xl font-bold text-blue-600">3개월</div>
             <div className="text-[10px] text-muted-foreground">최소 운전자금</div>
           </div>
           <div className="text-center p-3 bg-secondary/50 rounded-lg">
@@ -220,17 +220,17 @@ export default function FinancialPack2({ result }: Props) {
       </Card>
 
       {/* 7. 급여 분배 최적화 */}
-      <Card icon={HandIcon} title="원장 급여 · 배당 최적화" color="text-pink-600">
+      <Card icon={HandIcon} title="원장 급여 · 배당 최적화" color="text-blue-600">
         <div className="space-y-3">
           {[
             { plan: '급여 중심형', salary: '월 1,200만', dividend: '분기 500만', tax: '적음', flexibility: '낮음' },
             { plan: '배당 중심형', salary: '월 500만', dividend: '분기 2,000만', tax: '보통', flexibility: '높음' },
             { plan: '균형형 (추천)', salary: '월 800만', dividend: '분기 1,000만', tax: '최적', flexibility: '보통' },
           ].map((p, i) => (
-            <div key={p.plan} className={`p-4 rounded-xl ${i === 2 ? 'bg-pink-50 dark:bg-pink-950/20 border border-pink-200 dark:border-pink-800' : 'bg-secondary/30'}`}>
+            <div key={p.plan} className={`p-4 rounded-xl ${i === 2 ? 'bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800' : 'bg-secondary/30'}`}>
               <div className="flex items-center justify-between mb-2">
                 <span className="text-sm font-bold text-foreground">{p.plan}</span>
-                {i === 2 && <span className="text-[10px] px-2 py-0.5 bg-pink-500 text-white rounded-full">추천</span>}
+                {i === 2 && <span className="text-[10px] px-2 py-0.5 bg-blue-500 text-white rounded-full">추천</span>}
               </div>
               <div className="grid grid-cols-2 gap-2 text-xs">
                 <div>월 급여: <span className="font-medium text-foreground">{p.salary}</span></div>
@@ -267,7 +267,7 @@ export default function FinancialPack2({ result }: Props) {
       </Card>
 
       {/* 9. 5년 재무 로드맵 */}
-      <Card icon={TrendingDown} title="5년 재무 로드맵" color="text-indigo-600">
+      <Card icon={TrendingDown} title="5년 재무 로드맵" color="text-blue-700">
         <div className="space-y-3">
           {[
             { year: '1년차', goal: '안정화', revenue: rev.avg, profit: profit.monthly_profit_avg * 0.7, debt: '대출 원금 상환 시작', milestone: '월 매출 {r}원 달성' },
@@ -279,7 +279,7 @@ export default function FinancialPack2({ result }: Props) {
             <div key={y.year} className="flex gap-3">
               <div className="flex flex-col items-center">
                 <div className={`w-8 h-8 rounded-full text-white text-xs font-bold flex items-center justify-center ${
-                  ['bg-blue-500', 'bg-indigo-500', 'bg-violet-500', 'bg-purple-500', 'bg-fuchsia-500'][i]
+                  ['bg-blue-500', 'bg-blue-600', 'bg-blue-500', 'bg-blue-500', 'bg-fuchsia-500'][i]
                 }`}>{i + 1}</div>
                 {i < 4 && <div className="w-0.5 flex-1 bg-border mt-1" />}
               </div>
@@ -292,7 +292,7 @@ export default function FinancialPack2({ result }: Props) {
                   <div>월 매출: <span className="font-medium text-foreground">{fmt(y.revenue)}</span></div>
                   <div>월 이익: <span className="font-medium text-green-600">{fmt(y.profit)}</span></div>
                   <div>{y.debt}</div>
-                  <div className="text-indigo-600">{y.milestone.replace('{r}', fmt(y.revenue))}</div>
+                  <div className="text-blue-700">{y.milestone.replace('{r}', fmt(y.revenue))}</div>
                 </div>
               </div>
             </div>

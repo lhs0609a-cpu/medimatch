@@ -19,6 +19,7 @@ import {
   Building2,
 } from 'lucide-react';
 import { TossIcon } from '@/components/ui/TossIcon';
+import { toast } from 'sonner';
 
 interface UserItem {
   id: string;
@@ -59,7 +60,7 @@ const ROLE_CONFIG: Record<string, { label: string; bg: string; text: string }> =
   DOCTOR:     { label: '의사',     bg: 'bg-blue-100',    text: 'text-blue-700' },
   PHARMACIST: { label: '약사',     bg: 'bg-emerald-100', text: 'text-emerald-700' },
   SALES_REP:  { label: '영업사원', bg: 'bg-amber-100',   text: 'text-amber-700' },
-  LANDLORD:   { label: '건물주',   bg: 'bg-violet-100',  text: 'text-violet-700' },
+  LANDLORD:   { label: '건물주',   bg: 'bg-blue-100',  text: 'text-blue-700' },
 };
 
 const ALL_ROLES = ['ADMIN', 'DOCTOR', 'PHARMACIST', 'SALES_REP', 'LANDLORD'];
@@ -133,7 +134,7 @@ export default function AdminUsersPage() {
       });
       if (res.ok) fetchUsers();
     } catch (e) {
-      alert('상태 변경 실패');
+      toast.error('상태 변경 실패');
     } finally {
       setActionLoading(false);
     }
@@ -153,10 +154,10 @@ export default function AdminUsersPage() {
         fetchUsers();
       } else {
         const err = await res.json();
-        alert(err.detail || '역할 변경 실패');
+        toast.error(err.detail || '역할 변경 실패');
       }
     } catch (e) {
-      alert('요청 실패');
+      toast.error('요청 실패');
     } finally {
       setActionLoading(false);
     }
@@ -174,7 +175,7 @@ export default function AdminUsersPage() {
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
-          <TossIcon icon={Users} color="from-purple-500 to-pink-500" shadow="shadow-purple-500/25" size="md" />
+          <TossIcon icon={Users} color="from-blue-500 to-blue-600" shadow="shadow-blue-500/25" size="md" />
           <div>
             <h1 className="text-2xl font-bold text-gray-900">회원 관리</h1>
             <p className="text-sm text-gray-500">전체 회원 목록 조회 및 관리</p>
@@ -189,7 +190,7 @@ export default function AdminUsersPage() {
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 mb-6">
         <button
           onClick={() => { setRoleFilter(''); setPage(1); }}
-          className={`p-3 rounded-xl border text-center transition-all ${!roleFilter ? 'border-violet-300 bg-violet-50 ring-2 ring-violet-200' : 'border-gray-100 bg-white hover:border-gray-200'}`}
+          className={`p-3 rounded-xl border text-center transition-all ${!roleFilter ? 'border-blue-300 bg-blue-50 ring-2 ring-blue-200' : 'border-gray-100 bg-white hover:border-gray-200'}`}
         >
           <p className="text-2xl font-bold text-gray-900">{total}</p>
           <span className="text-xs text-gray-500">전체</span>
@@ -201,7 +202,7 @@ export default function AdminUsersPage() {
             <button
               key={r}
               onClick={() => { setRoleFilter(roleFilter === r ? '' : r); setPage(1); }}
-              className={`p-3 rounded-xl border text-center transition-all ${roleFilter === r ? 'border-violet-300 bg-violet-50 ring-2 ring-violet-200' : 'border-gray-100 bg-white hover:border-gray-200'}`}
+              className={`p-3 rounded-xl border text-center transition-all ${roleFilter === r ? 'border-blue-300 bg-blue-50 ring-2 ring-blue-200' : 'border-gray-100 bg-white hover:border-gray-200'}`}
             >
               <p className="text-2xl font-bold text-gray-900">{count}</p>
               <span className={`inline-block mt-1 px-2 py-0.5 rounded-full text-xs font-medium ${cfg.bg} ${cfg.text}`}>{cfg.label}</span>
@@ -218,10 +219,10 @@ export default function AdminUsersPage() {
             type="text" placeholder="이름, 이메일, 전화번호 검색..."
             value={searchInput} onChange={(e) => setSearchInput(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-            className="w-full pl-10 pr-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-violet-200"
+            className="w-full pl-10 pr-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-200"
           />
         </div>
-        <button onClick={handleSearch} className="px-4 py-2.5 bg-violet-600 text-white rounded-xl text-sm hover:bg-violet-700">검색</button>
+        <button onClick={handleSearch} className="px-4 py-2.5 bg-blue-600 text-white rounded-xl text-sm hover:bg-blue-700">검색</button>
       </div>
 
       {/* Table */}
@@ -273,7 +274,7 @@ export default function AdminUsersPage() {
                     <td className="px-4 py-3 text-gray-500 text-xs">{formatDate(u.last_login)}</td>
                     <td className="px-4 py-3">
                       <div className="flex items-center justify-center gap-1">
-                        <button onClick={() => openDetail(u.id)} className="p-1.5 rounded-lg text-gray-400 hover:text-violet-600 hover:bg-violet-50" title="상세보기">
+                        <button onClick={() => openDetail(u.id)} className="p-1.5 rounded-lg text-gray-400 hover:text-blue-600 hover:bg-blue-50" title="상세보기">
                           <Eye className="w-4 h-4" />
                         </button>
                         <button
@@ -314,7 +315,7 @@ export default function AdminUsersPage() {
                 else if (page >= totalPages - 2) p = totalPages - 4 + i;
                 else p = page - 2 + i;
                 return (
-                  <button key={p} onClick={() => setPage(p)} className={`w-8 h-8 rounded-lg text-sm font-medium ${p === page ? 'bg-violet-600 text-white' : 'text-gray-600 hover:bg-gray-100'}`}>{p}</button>
+                  <button key={p} onClick={() => setPage(p)} className={`w-8 h-8 rounded-lg text-sm font-medium ${p === page ? 'bg-blue-600 text-white' : 'text-gray-600 hover:bg-gray-100'}`}>{p}</button>
                 );
               })}
               <button onClick={() => setPage(Math.min(totalPages, page + 1))} disabled={page === totalPages} className="p-2 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 disabled:opacity-30">
@@ -330,7 +331,7 @@ export default function AdminUsersPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40" onClick={() => { setDetailModal(null); setDetailLoading(false); }}>
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg max-h-[85vh] overflow-y-auto m-4" onClick={(e) => e.stopPropagation()}>
             {detailLoading ? (
-              <div className="p-12 text-center"><RefreshCw className="w-8 h-8 animate-spin mx-auto text-violet-500 mb-3" /><p className="text-gray-500">로딩 중...</p></div>
+              <div className="p-12 text-center"><RefreshCw className="w-8 h-8 animate-spin mx-auto text-blue-500 mb-3" /><p className="text-gray-500">로딩 중...</p></div>
             ) : detailModal && (
               <>
                 <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
@@ -385,8 +386,8 @@ export default function AdminUsersPage() {
                   )}
 
                   {detailModal.listing_subscription && (
-                    <div className="p-3 bg-violet-50 rounded-xl text-sm">
-                      <p className="text-xs font-medium text-violet-600 mb-1 flex items-center gap-1"><Building2 className="w-3 h-3" /> 매물등록 구독</p>
+                    <div className="p-3 bg-blue-50 rounded-xl text-sm">
+                      <p className="text-xs font-medium text-blue-600 mb-1 flex items-center gap-1"><Building2 className="w-3 h-3" /> 매물등록 구독</p>
                       <p>{detailModal.listing_subscription.status} / 크레딧: {detailModal.listing_subscription.used_credits}/{detailModal.listing_subscription.total_credits}</p>
                     </div>
                   )}
@@ -404,7 +405,7 @@ export default function AdminUsersPage() {
             <h3 className="text-lg font-bold text-gray-900 mb-4">역할 변경</h3>
             <select
               value={newRole} onChange={(e) => setNewRole(e.target.value)}
-              className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm mb-4 focus:outline-none focus:ring-2 focus:ring-violet-200"
+              className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm mb-4 focus:outline-none focus:ring-2 focus:ring-blue-200"
             >
               {ALL_ROLES.map((r) => (
                 <option key={r} value={r}>{ROLE_CONFIG[r].label}</option>
@@ -412,7 +413,7 @@ export default function AdminUsersPage() {
             </select>
             <div className="flex gap-3">
               <button onClick={() => setRoleChangeId(null)} className="flex-1 px-4 py-2.5 border border-gray-200 text-gray-700 rounded-xl text-sm hover:bg-gray-50">취소</button>
-              <button onClick={handleRoleChange} disabled={actionLoading} className="flex-1 px-4 py-2.5 bg-violet-600 text-white rounded-xl text-sm font-medium hover:bg-violet-700 disabled:opacity-50">
+              <button onClick={handleRoleChange} disabled={actionLoading} className="flex-1 px-4 py-2.5 bg-blue-600 text-white rounded-xl text-sm font-medium hover:bg-blue-700 disabled:opacity-50">
                 {actionLoading ? '처리 중...' : '변경'}
               </button>
             </div>

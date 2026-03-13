@@ -68,7 +68,7 @@ export default function CommunityPage() {
         <div className="grid lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2">
             {/* Stats Bar */}
-            <div className="bg-gradient-to-r from-blue-600 to-cyan-600 dark:from-blue-700 dark:to-cyan-700 text-white rounded-xl p-6 mb-6">
+            <div className="bg-gradient-to-r from-blue-600 to-blue-600 dark:from-blue-700 dark:to-blue-700 text-white rounded-xl p-6 mb-6">
               <div className="flex items-center justify-between flex-wrap gap-4">
                 <div>
                   <h1 className="text-xl font-bold mb-1">개원/약국 전문 커뮤니티</h1>
@@ -98,7 +98,7 @@ export default function CommunityPage() {
             </div>
 
             {/* Live Activity */}
-            <div className="bg-gradient-to-r from-blue-600/10 to-cyan-600/10 border border-blue-200 dark:border-blue-800 rounded-lg px-4 py-2 mb-6">
+            <div className="bg-gradient-to-r from-blue-600/10 to-blue-600/10 border border-blue-200 dark:border-blue-800 rounded-lg px-4 py-2 mb-6">
               <div className="flex items-center gap-2 text-sm">
                 <span className="relative flex h-2 w-2">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
@@ -227,7 +227,7 @@ export default function CommunityPage() {
               <div className="space-y-3">
                 {['강남내과의사', '10년차약사', '의료컨설턴트', '개원준비중의사', '분당약국장'].map((name, idx) => (
                   <div key={name} className="flex items-center gap-3">
-                    <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-full flex items-center justify-center text-white text-xs font-bold">{name[0]}</div>
+                    <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center text-white text-xs font-bold">{name[0]}</div>
                     <div className="flex-1">
                       <p className="text-sm font-medium text-foreground">{name}</p>
                       <p className="text-xs text-muted-foreground">게시글 {30 - idx * 5}개</p>
@@ -252,7 +252,7 @@ export default function CommunityPage() {
               </div>
             </div>
 
-            <div className="bg-gradient-to-br from-blue-600 to-cyan-600 dark:from-blue-700 dark:to-cyan-700 rounded-xl p-6 text-white">
+            <div className="bg-gradient-to-br from-blue-600 to-blue-600 dark:from-blue-700 dark:to-blue-700 rounded-xl p-6 text-white">
               <h3 className="font-bold mb-2">커뮤니티에 참여하세요</h3>
               <p className="text-sm text-white/80 mb-4">{platformStats.totalMembers.toLocaleString()}명의 의료인과 정보를 공유하세요</p>
               <Link href="/register" className="block w-full py-2 bg-white text-blue-600 rounded-lg font-medium hover:bg-blue-50 transition-colors text-center">

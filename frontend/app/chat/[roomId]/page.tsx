@@ -19,6 +19,7 @@ import {
   CreditCard,
 } from 'lucide-react'
 import { chatService, escrowService } from '@/lib/api/services'
+import { toast } from 'sonner'
 
 interface Message {
   id: string
@@ -272,7 +273,7 @@ export default function ChatRoomPage() {
       setContractForm({ title: '', description: '', total_amount: '', service_start_date: '', service_end_date: '' })
       router.push(`/escrow/${contract.id}`)
     } catch (error) {
-      alert('계약서 생성에 실패했습니다.')
+      toast.error('계약서 생성에 실패했습니다.')
     } finally {
       setIsCreatingContract(false)
     }

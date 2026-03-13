@@ -118,7 +118,7 @@ export default function OTCStrategyPage() {
             {[
               { label: '조제 매출', pct: 72, color: 'bg-blue-500' },
               { label: 'OTC 의약품', pct: 14, color: 'bg-green-500' },
-              { label: '건강기능식품', pct: 9, color: 'bg-purple-500' },
+              { label: '건강기능식품', pct: 9, color: 'bg-blue-500' },
               { label: '의료기기/뷰티', pct: 5, color: 'bg-amber-500' },
             ].map((item, i) => (
               <div key={i}>
@@ -287,7 +287,7 @@ export default function OTCStrategyPage() {
                 <h3 className="font-bold text-foreground mb-1">비대면 상담 확대</h3>
                 <p className="text-muted-foreground">화상/전화 상담 후 택배 배송. 비대면 건기식 상담 매출 급성장</p>
               </div>
-              <div className="border-l-4 border-purple-500 pl-4">
+              <div className="border-l-4 border-blue-500 pl-4">
                 <h3 className="font-bold text-foreground mb-1">약국 전용 코스메슈티컬</h3>
                 <p className="text-muted-foreground">더마 화장품 시장 3조원 규모. 약국만의 전문성이 차별화 포인트</p>
               </div>

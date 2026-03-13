@@ -107,7 +107,7 @@ export default function SimulationHistoryPage() {
           /* Empty State */
           <div className="card p-12 text-center">
             <div className="flex justify-center mb-6">
-              <TossIcon icon={BarChart3} color="from-blue-500 to-indigo-500" size="xl" shadow="shadow-blue-500/25" />
+              <TossIcon icon={BarChart3} color="from-blue-500 to-blue-600" size="xl" shadow="shadow-blue-500/25" />
             </div>
             <h2 className="text-xl font-bold text-foreground mb-2">
               아직 시뮬레이션 내역이 없습니다
@@ -139,7 +139,7 @@ export default function SimulationHistoryPage() {
               </div>
               <div className="p-4 rounded-xl bg-secondary/50">
                 <div className="mb-3">
-                  <TossIcon icon={Building2} color="from-blue-500 to-indigo-500" size="sm" shadow="shadow-blue-500/25" />
+                  <TossIcon icon={Building2} color="from-blue-500 to-blue-600" size="sm" shadow="shadow-blue-500/25" />
                 </div>
                 <h3 className="font-medium text-foreground mb-1">경쟁 분석</h3>
                 <p className="text-sm text-muted-foreground">

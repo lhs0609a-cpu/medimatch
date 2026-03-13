@@ -117,10 +117,13 @@ export default function MyMaintenancePage() {
       if (!res.ok) return;
       const config = await res.json();
 
-      // @ts-ignore - Toss SDK
-      const { default: loadTossPayments } = await import('@tosspayments/payment-sdk');
-      const tossPayments = await loadTossPayments(config.clientKey);
+      // Load Toss SDK via CDN script (consistent with other subscription pages)
+      const script = document.createElement('script');
+      script.src = 'https://js.tosspayments.com/v1/payment';
+      document.head.appendChild(script);
+      await new Promise<void>((resolve) => { script.onload = () => resolve(); });
 
+      const tossPayments = (window as any).TossPayments(config.clientKey);
       await tossPayments.requestBillingAuth('카드', {
         customerKey: config.customerKey,
         successUrl: config.successUrl,

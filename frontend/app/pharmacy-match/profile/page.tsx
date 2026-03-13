@@ -155,7 +155,7 @@ export default function ProfilePage() {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin h-8 w-8 border-4 border-purple-600 border-t-transparent rounded-full mx-auto mb-4" />
+          <div className="animate-spin h-8 w-8 border-4 border-blue-600 border-t-transparent rounded-full mx-auto mb-4" />
           <p className="text-gray-600">프로필을 불러오는 중...</p>
         </div>
       </div>
@@ -174,7 +174,7 @@ export default function ProfilePage() {
               <ArrowLeft className="w-5 h-5" />
             </Link>
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg flex items-center justify-center">
+              <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-500 rounded-lg flex items-center justify-center">
                 <User className="w-4 h-4 text-white" />
               </div>
               <span className="text-xl font-bold text-gray-900">내 프로필</span>
@@ -183,7 +183,7 @@ export default function ProfilePage() {
           {profile && !showForm && (
             <button
               onClick={() => setIsEditing(true)}
-              className="flex items-center gap-2 text-purple-600 hover:text-purple-700"
+              className="flex items-center gap-2 text-blue-600 hover:text-blue-700"
             >
               <Edit2 className="w-4 h-4" />
               수정
@@ -197,8 +197,8 @@ export default function ProfilePage() {
         {showForm ? (
           <div className="space-y-6">
             {/* Info Banner */}
-            <div className="bg-purple-50 border border-purple-200 rounded-xl p-4">
-              <p className="text-sm text-purple-800">
+            <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
+              <p className="text-sm text-blue-800">
                 <strong>프로필 정보는 익명으로 표시됩니다.</strong><br />
                 실명, 연락처, 면허번호는 매칭 성사 후에만 상대방에게 공개됩니다.
               </p>
@@ -207,7 +207,7 @@ export default function ProfilePage() {
             {/* 희망 지역 */}
             <div className="bg-white rounded-2xl border p-6">
               <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-                <MapPin className="w-5 h-5 text-purple-600" />
+                <MapPin className="w-5 h-5 text-blue-600" />
                 희망 지역
               </h2>
               <div className="flex flex-wrap gap-2">
@@ -217,8 +217,8 @@ export default function ProfilePage() {
                     onClick={() => toggleRegion(region)}
                     className={`px-4 py-2 rounded-lg border text-sm transition ${
                       formData.preferred_regions.includes(region.code)
-                        ? 'bg-purple-600 text-white border-purple-600'
-                        : 'bg-white text-gray-700 border-gray-300 hover:border-purple-300'
+                        ? 'bg-blue-600 text-white border-blue-600'
+                        : 'bg-white text-gray-700 border-gray-300 hover:border-blue-300'
                     }`}
                   >
                     {region.name}
@@ -230,7 +230,7 @@ export default function ProfilePage() {
             {/* 예산 */}
             <div className="bg-white rounded-2xl border p-6">
               <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-                <DollarSign className="w-5 h-5 text-purple-600" />
+                <DollarSign className="w-5 h-5 text-blue-600" />
                 예산 (만원)
               </h2>
               <div className="grid grid-cols-2 gap-4">
@@ -241,7 +241,7 @@ export default function ProfilePage() {
                     min="0"
                     value={formData.budget_min || ''}
                     onChange={(e) => updateForm({ budget_min: parseInt(e.target.value) || 0 })}
-                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500"
+                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
                 <div>
@@ -251,7 +251,7 @@ export default function ProfilePage() {
                     min="0"
                     value={formData.budget_max || ''}
                     onChange={(e) => updateForm({ budget_max: parseInt(e.target.value) || 0 })}
-                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500"
+                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
               </div>
@@ -260,7 +260,7 @@ export default function ProfilePage() {
             {/* 경력 */}
             <div className="bg-white rounded-2xl border p-6">
               <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-                <Briefcase className="w-5 h-5 text-purple-600" />
+                <Briefcase className="w-5 h-5 text-blue-600" />
                 경력 정보
               </h2>
               <div className="space-y-4">
@@ -272,7 +272,7 @@ export default function ProfilePage() {
                       min="0"
                       value={formData.experience_years || ''}
                       onChange={(e) => updateForm({ experience_years: parseInt(e.target.value) || 0 })}
-                      className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500"
+                      className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
                     />
                   </div>
                   <div>
@@ -283,7 +283,7 @@ export default function ProfilePage() {
                       max={new Date().getFullYear()}
                       value={formData.license_year || ''}
                       onChange={(e) => updateForm({ license_year: parseInt(e.target.value) || undefined })}
-                      className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500"
+                      className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
                     />
                   </div>
                 </div>
@@ -292,7 +292,7 @@ export default function ProfilePage() {
                     type="checkbox"
                     checked={formData.has_management_experience}
                     onChange={(e) => updateForm({ has_management_experience: e.target.checked })}
-                    className="w-5 h-5 text-purple-600 rounded"
+                    className="w-5 h-5 text-blue-600 rounded"
                   />
                   <span className="text-gray-700">약국 운영 경험 있음</span>
                 </label>
@@ -313,7 +313,7 @@ export default function ProfilePage() {
                         onClick={() => toggleArrayItem('preferred_pharmacy_types', type)}
                         className={`px-3 py-1.5 rounded-full text-sm transition ${
                           formData.preferred_pharmacy_types.includes(type)
-                            ? 'bg-purple-100 text-purple-700 border border-purple-300'
+                            ? 'bg-blue-100 text-blue-700 border border-blue-300'
                             : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                         }`}
                       >
@@ -332,7 +332,7 @@ export default function ProfilePage() {
                         onClick={() => toggleArrayItem('specialty_areas', area)}
                         className={`px-3 py-1.5 rounded-full text-sm transition ${
                           formData.specialty_areas.includes(area)
-                            ? 'bg-purple-100 text-purple-700 border border-purple-300'
+                            ? 'bg-blue-100 text-blue-700 border border-blue-300'
                             : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                         }`}
                       >
@@ -357,7 +357,7 @@ export default function ProfilePage() {
                     type="text"
                     value={formData.full_name}
                     onChange={(e) => updateForm({ full_name: e.target.value })}
-                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500"
+                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
                 <div>
@@ -367,7 +367,7 @@ export default function ProfilePage() {
                     value={formData.phone}
                     onChange={(e) => updateForm({ phone: e.target.value })}
                     placeholder="010-1234-5678"
-                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500"
+                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
                 <div>
@@ -376,7 +376,7 @@ export default function ProfilePage() {
                     type="email"
                     value={formData.email}
                     onChange={(e) => updateForm({ email: e.target.value })}
-                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500"
+                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
               </div>
@@ -390,7 +390,7 @@ export default function ProfilePage() {
                 onChange={(e) => updateForm({ introduction: e.target.value })}
                 rows={4}
                 placeholder="간단한 자기소개를 작성해주세요 (개인정보 자동 마스킹)"
-                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500"
+                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
               />
             </div>
 
@@ -408,7 +408,7 @@ export default function ProfilePage() {
               <button
                 onClick={handleSave}
                 disabled={createMutation.isPending || updateMutation.isPending}
-                className="flex-1 py-3 bg-purple-600 text-white rounded-xl hover:bg-purple-700 disabled:bg-gray-400 flex items-center justify-center gap-2"
+                className="flex-1 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 disabled:bg-gray-400 flex items-center justify-center gap-2"
               >
                 {(createMutation.isPending || updateMutation.isPending) ? (
                   <Loader2 className="w-5 h-5 animate-spin" />
@@ -422,14 +422,14 @@ export default function ProfilePage() {
         ) : profile ? (
           /* Display Profile */
           <div className="bg-white rounded-2xl border overflow-hidden">
-            <div className="bg-gradient-to-r from-purple-600 to-pink-600 p-6 text-white">
+            <div className="bg-gradient-to-r from-blue-600 to-blue-600 p-6 text-white">
               <div className="flex items-center gap-4">
                 <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center">
                   <User className="w-8 h-8" />
                 </div>
                 <div>
                   <p className="text-lg font-bold">{profile.anonymous_id}</p>
-                  <p className="text-purple-100">
+                  <p className="text-blue-100">
                     경력 {profile.experience_years}년
                     {profile.has_management_experience && ' · 운영 경험 있음'}
                   </p>
@@ -442,7 +442,7 @@ export default function ProfilePage() {
                 <h3 className="text-sm font-medium text-gray-500 mb-2">희망 지역</h3>
                 <div className="flex flex-wrap gap-2">
                   {profile.preferred_region_names.map((region) => (
-                    <span key={region} className="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-sm">
+                    <span key={region} className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm">
                       {region}
                     </span>
                   ))}
@@ -484,7 +484,7 @@ export default function ProfilePage() {
             <p className="text-gray-600 mb-4">프로필을 등록하고 약국 매물을 찾아보세요</p>
             <button
               onClick={() => setIsCreating(true)}
-              className="bg-purple-600 text-white px-6 py-2 rounded-lg hover:bg-purple-700"
+              className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700"
             >
               프로필 등록하기
             </button>

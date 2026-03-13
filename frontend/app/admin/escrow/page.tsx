@@ -48,7 +48,7 @@ interface Contract {
 const TX_STATUS_CONFIG: Record<string, { label: string; bg: string; text: string }> = {
   PENDING:     { label: '대기',     bg: 'bg-amber-100',   text: 'text-amber-700' },
   FUNDED:      { label: '입금완료', bg: 'bg-blue-100',    text: 'text-blue-700' },
-  IN_PROGRESS: { label: '진행중',   bg: 'bg-violet-100',  text: 'text-violet-700' },
+  IN_PROGRESS: { label: '진행중',   bg: 'bg-blue-100',  text: 'text-blue-700' },
   COMPLETED:   { label: '완료',     bg: 'bg-emerald-100', text: 'text-emerald-700' },
   DISPUTED:    { label: '분쟁',     bg: 'bg-rose-100',    text: 'text-rose-700' },
   CANCELLED:   { label: '취소',     bg: 'bg-gray-100',    text: 'text-gray-500' },
@@ -164,7 +164,7 @@ export default function AdminEscrowPage() {
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div className="flex items-center gap-3">
-          <TossIcon icon={ShieldCheck} color="from-teal-500 to-cyan-500" shadow="shadow-teal-500/25" size="md" />
+          <TossIcon icon={ShieldCheck} color="from-blue-500 to-blue-600" shadow="shadow-blue-500/25" size="md" />
           <div>
             <h1 className="text-2xl font-bold text-gray-900">에스크로/계약 관리</h1>
             <p className="text-gray-500 text-sm">안전거래, 계약, 분쟁 관리</p>
@@ -204,9 +204,9 @@ export default function AdminEscrowPage() {
         <div className="relative flex-1 max-w-md">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
           <input type="text" placeholder="검색..." value={searchInput} onChange={(e) => setSearchInput(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-            className="w-full pl-10 pr-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-violet-200 focus:border-violet-300" />
+            className="w-full pl-10 pr-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-300" />
         </div>
-        <button onClick={handleSearch} className="px-4 py-2.5 bg-violet-600 text-white rounded-xl text-sm hover:bg-violet-700 transition-colors">검색</button>
+        <button onClick={handleSearch} className="px-4 py-2.5 bg-blue-600 text-white rounded-xl text-sm hover:bg-blue-700 transition-colors">검색</button>
       </div>
 
       {/* Transactions / Disputes Table */}
@@ -336,7 +336,7 @@ export default function AdminEscrowPage() {
                     <span className="text-sm font-medium">{detailModal.milestone_count > 0 ? ((detailModal.completed_milestones / detailModal.milestone_count) * 100).toFixed(0) : 0}%</span>
                   </div>
                   <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
-                    <div className="h-full bg-violet-500 rounded-full transition-all" style={{ width: `${detailModal.milestone_count > 0 ? (detailModal.completed_milestones / detailModal.milestone_count) * 100 : 0}%` }} />
+                    <div className="h-full bg-blue-500 rounded-full transition-all" style={{ width: `${detailModal.milestone_count > 0 ? (detailModal.completed_milestones / detailModal.milestone_count) * 100 : 0}%` }} />
                   </div>
                 </div>
               </div>

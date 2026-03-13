@@ -113,8 +113,8 @@ export default function UpgradeAccessModal({
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
-              <Unlock className="w-5 h-5 text-purple-600" />
+            <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+              <Unlock className="w-5 h-5 text-blue-600" />
             </div>
             <div>
               <h3 className="text-lg font-bold text-gray-900">정보 업그레이드</h3>
@@ -149,13 +149,13 @@ export default function UpgradeAccessModal({
                       onClick={() => setSelectedTarget(upgrade.target)}
                       className={`relative rounded-xl border-2 p-4 cursor-pointer transition-all ${
                         selectedTarget === upgrade.target
-                          ? 'border-purple-600 bg-purple-50'
-                          : 'border-gray-200 hover:border-purple-300'
+                          ? 'border-blue-600 bg-blue-50'
+                          : 'border-gray-200 hover:border-blue-300'
                       }`}
                     >
                       {selectedTarget === upgrade.target && (
                         <div className="absolute top-4 right-4">
-                          <div className="w-6 h-6 bg-purple-600 rounded-full flex items-center justify-center">
+                          <div className="w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center">
                             <Check className="w-4 h-4 text-white" />
                           </div>
                         </div>
@@ -195,7 +195,7 @@ export default function UpgradeAccessModal({
                       </ul>
 
                       <div className="flex items-center justify-between pt-3 border-t border-gray-200">
-                        <span className="text-lg font-bold text-purple-600">
+                        <span className="text-lg font-bold text-blue-600">
                           {upgrade.price.toLocaleString()}원
                         </span>
                         {upgrade.savings && (
@@ -213,7 +213,7 @@ export default function UpgradeAccessModal({
               <button
                 onClick={() => setStep('confirm')}
                 disabled={!selectedTarget}
-                className="w-full py-3 bg-purple-600 text-white rounded-xl font-medium hover:bg-purple-700 disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                className="w-full py-3 bg-blue-600 text-white rounded-xl font-medium hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
                 다음
                 <ArrowRight className="w-4 h-4" />
@@ -223,8 +223,8 @@ export default function UpgradeAccessModal({
             <>
               {/* Confirm Step */}
               <div className="text-center mb-6">
-                <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <CreditCard className="w-8 h-8 text-purple-600" />
+                <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <CreditCard className="w-8 h-8 text-blue-600" />
                 </div>
                 <h4 className="text-lg font-bold text-gray-900 mb-2">결제 확인</h4>
                 <p className="text-gray-500">
@@ -242,7 +242,7 @@ export default function UpgradeAccessModal({
                 </div>
                 <div className="flex justify-between border-t border-gray-200 pt-2 mt-2">
                   <span className="font-semibold">결제 금액</span>
-                  <span className="font-bold text-purple-600">
+                  <span className="font-bold text-blue-600">
                     {selectedUpgrade?.price.toLocaleString()}원
                   </span>
                 </div>
@@ -274,7 +274,7 @@ export default function UpgradeAccessModal({
                 <button
                   onClick={handleUpgrade}
                   disabled={isLoading}
-                  className="flex-1 py-3 bg-purple-600 text-white rounded-xl font-medium hover:bg-purple-700 disabled:bg-gray-400 flex items-center justify-center gap-2"
+                  className="flex-1 py-3 bg-blue-600 text-white rounded-xl font-medium hover:bg-blue-700 disabled:bg-gray-400 flex items-center justify-center gap-2"
                 >
                   {isLoading ? (
                     <>

@@ -155,7 +155,7 @@ export default function EMRLandingPage() {
 
   const demoSteps = [
     { label: '음성 인식 중', icon: Mic, color: 'text-red-500', bg: 'bg-red-50 dark:bg-red-900/20' },
-    { label: 'AI 분석 중', icon: Brain, color: 'text-purple-500', bg: 'bg-purple-50 dark:bg-purple-900/20' },
+    { label: 'AI 분석 중', icon: Brain, color: 'text-blue-500', bg: 'bg-blue-50 dark:bg-blue-900/20' },
     { label: '진단코드 추천', icon: Sparkles, color: 'text-amber-500', bg: 'bg-amber-50 dark:bg-amber-900/20' },
     { label: '처방 자동생성', icon: FileText, color: 'text-blue-500', bg: 'bg-blue-50 dark:bg-blue-900/20' },
     { label: '차트 완성', icon: CheckCircle2, color: 'text-emerald-500', bg: 'bg-emerald-50 dark:bg-emerald-900/20' },
@@ -427,7 +427,7 @@ export default function EMRLandingPage() {
               <div className="stat-label">삭감률 감소</div>
             </div>
             <div className="text-center" ref={stat3.ref}>
-              <div className="stat-value text-violet-500">{stat3.count}<span className="text-2xl">%</span></div>
+              <div className="stat-value text-blue-500">{stat3.count}<span className="text-2xl">%</span></div>
               <div className="stat-label">환자 대기시간 감소</div>
             </div>
             <div className="text-center" ref={stat4.ref}>
@@ -465,21 +465,21 @@ export default function EMRLandingPage() {
               },
               {
                 icon: Shield,
-                color: 'from-emerald-500 to-teal-600',
+                color: 'from-emerald-500 to-blue-600',
                 title: '삭감 방어 AI',
                 desc: '과거 삭감 패턴을 학습해 위험 청구를 실시간 경고. 최적 코드 조합을 추천하여 삭감률을 30% 줄여드립니다.',
                 badge: 'AI 분석',
               },
               {
                 icon: Pill,
-                color: 'from-purple-500 to-violet-600',
+                color: 'from-blue-500 to-blue-600',
                 title: '의원-약국 실시간 브릿지',
                 desc: '처방전 3초 전송, DUR 자동 체크, 조제 완료 알림. 환자 대기시간을 70% 줄이는 실시간 연결.',
                 badge: '업계 최초',
               },
               {
                 icon: CalendarCheck,
-                color: 'from-blue-500 to-indigo-600',
+                color: 'from-blue-500 to-blue-700',
                 title: '스마트 예약/접수',
                 desc: 'QR 체크인, 태블릿 문진, 카톡 대기 알림. 환자가 집에서 미리 문진을 작성하면 도착 즉시 진료.',
               },
@@ -491,20 +491,20 @@ export default function EMRLandingPage() {
               },
               {
                 icon: BarChart3,
-                color: 'from-cyan-500 to-blue-600',
+                color: 'from-blue-600 to-blue-600',
                 title: '경영 대시보드',
                 desc: '매출, 환자수, 삭감률을 한눈에. AI가 공백 시간대, 미방문 환자, 재고 이슈를 자동 분석합니다.',
                 link: '/emr-dashboard',
               },
               {
                 icon: Bell,
-                color: 'from-pink-500 to-rose-600',
+                color: 'from-blue-500 to-rose-600',
                 title: '환자 리콜 자동화',
                 desc: '3개월 미방문 환자 자동 감지. 카톡/문자로 리마인드 발송. 재방문율을 25% 높여드립니다.',
               },
               {
                 icon: Smartphone,
-                color: 'from-indigo-500 to-violet-600',
+                color: 'from-blue-600 to-blue-600',
                 title: '환자 앱 연동',
                 desc: '예약 확인, 복약 알림, 검사결과 조회를 환자가 직접. 문의 전화 50% 감소, 만족도 상승.',
               },
@@ -577,7 +577,7 @@ export default function EMRLandingPage() {
             <div className="space-y-4">
               {[
                 { step: '1', title: '진료 시작', desc: '마이크 버튼 1클릭으로 녹음 시작', icon: Mic, color: 'border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/20' },
-                { step: '2', title: 'AI 실시간 인식', desc: '대화를 텍스트로 변환하고 의미를 분석', icon: Brain, color: 'border-purple-200 dark:border-purple-800 bg-purple-50 dark:bg-purple-900/20' },
+                { step: '2', title: 'AI 실시간 인식', desc: '대화를 텍스트로 변환하고 의미를 분석', icon: Brain, color: 'border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-900/20' },
                 { step: '3', title: '자동 구조화', desc: 'CC, PI, PMH, ROS를 자동으로 분류', icon: FileText, color: 'border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-900/20' },
                 { step: '4', title: '진단/처방 추천', desc: 'ICD-10 코드 + 과거 처방패턴 기반 추천', icon: Sparkles, color: 'border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-900/20' },
                 { step: '5', title: '1클릭 저장', desc: '원장님 확인 후 저장 → 약국 자동 전송', icon: CheckCircle2, color: 'border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-900/20' },
@@ -626,7 +626,7 @@ export default function EMRLandingPage() {
             {/* 의원 측 */}
             <div className="card p-6 border border-blue-200 dark:border-blue-800">
               <div className="flex items-center gap-3 mb-5">
-                <TossIcon icon={Building2} color="from-blue-500 to-indigo-600" />
+                <TossIcon icon={Building2} color="from-blue-500 to-blue-700" />
                 <div>
                   <div className="font-bold">의원</div>
                   <div className="text-xs text-muted-foreground">MediMatch EMR</div>
@@ -675,9 +675,9 @@ export default function EMRLandingPage() {
             </div>
 
             {/* 약국 측 */}
-            <div className="card p-6 border border-purple-200 dark:border-purple-800">
+            <div className="card p-6 border border-blue-200 dark:border-blue-800">
               <div className="flex items-center gap-3 mb-5">
-                <TossIcon icon={Pill} color="from-purple-500 to-violet-600" />
+                <TossIcon icon={Pill} color="from-blue-500 to-blue-600" />
                 <div>
                   <div className="font-bold">약국</div>
                   <div className="text-xs text-muted-foreground">MediMatch Pharmacy</div>
@@ -693,7 +693,7 @@ export default function EMRLandingPage() {
                 ].map((t, i) => (
                   <div key={i} className="flex items-center gap-2 text-sm">
                     <div className={`w-5 h-5 rounded-full flex items-center justify-center text-2xs font-bold ${
-                      i < 4 ? 'bg-purple-100 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400' : 'bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400'
+                      i < 4 ? 'bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400' : 'bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400'
                     }`}>
                       {i + 1}
                     </div>
@@ -705,7 +705,7 @@ export default function EMRLandingPage() {
           </div>
 
           {/* 환자 혜택 */}
-          <div className="mt-12 card p-6 bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-900/20 dark:to-teal-900/20 border border-emerald-200 dark:border-emerald-800">
+          <div className="mt-12 card p-6 bg-gradient-to-r from-emerald-50 to-blue-50 dark:from-emerald-900/20 dark:to-blue-900/20 border border-emerald-200 dark:border-emerald-800">
             <div className="flex items-center gap-3 mb-4">
               <Heart className="w-5 h-5 text-emerald-500" />
               <span className="font-bold">환자 경험</span>
@@ -796,10 +796,10 @@ export default function EMRLandingPage() {
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {[
-              { icon: Lock, title: 'AES-256 암호화', desc: '모든 의료 데이터 군사급 암호화', color: 'from-blue-500 to-indigo-600' },
-              { icon: Monitor, title: 'AWS 서울 리전', desc: '한국 내 데이터 저장, 해외 유출 불가', color: 'from-emerald-500 to-teal-600' },
+              { icon: Lock, title: 'AES-256 암호화', desc: '모든 의료 데이터 군사급 암호화', color: 'from-blue-500 to-blue-700' },
+              { icon: Monitor, title: 'AWS 서울 리전', desc: '한국 내 데이터 저장, 해외 유출 불가', color: 'from-emerald-500 to-blue-600' },
               { icon: WifiOff, title: '오프라인 모드', desc: '인터넷 끊겨도 진료 가능, 자동 동기화', color: 'from-amber-500 to-orange-600' },
-              { icon: RefreshCw, title: '자동 백업', desc: '일일 자동 백업 + 재해복구(DR) 지원', color: 'from-purple-500 to-violet-600' },
+              { icon: RefreshCw, title: '자동 백업', desc: '일일 자동 백업 + 재해복구(DR) 지원', color: 'from-blue-500 to-blue-600' },
             ].map((t, i) => (
               <div key={i} className="feature-card text-center">
                 <div className="flex justify-center mb-4">
@@ -935,10 +935,10 @@ export default function EMRLandingPage() {
 
           {/* 약국 요금 */}
           <div className="mt-8 max-w-5xl mx-auto">
-            <div className="card p-6 border border-purple-200 dark:border-purple-800 bg-purple-50/50 dark:bg-purple-900/10">
+            <div className="card p-6 border border-blue-200 dark:border-blue-800 bg-blue-50/50 dark:bg-blue-900/10">
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div className="flex items-center gap-3">
-                  <TossIcon icon={Pill} color="from-purple-500 to-violet-600" />
+                  <TossIcon icon={Pill} color="from-blue-500 to-blue-600" />
                   <div>
                     <div className="font-bold">Pharmacy 플랜</div>
                     <div className="text-sm text-muted-foreground">조제관리 + 처방전수신 + DUR + 재고ERP</div>
@@ -1051,7 +1051,7 @@ export default function EMRLandingPage() {
       {/* ───── CTA 섹션 ───── */}
       <section className="section">
         <div className="max-w-4xl mx-auto px-5 sm:px-6 lg:px-8 text-center">
-          <div className="card p-12 md:p-16 bg-gradient-to-br from-primary/5 to-violet-500/5 border border-primary/20">
+          <div className="card p-12 md:p-16 bg-gradient-to-br from-primary/5 to-blue-500/5 border border-primary/20">
             <h2 className="mb-4">
               진료에만 집중하는 하루,
               <br />

@@ -39,7 +39,7 @@ interface Consultation {
 const STATUS_CONFIG: Record<string, { label: string; bg: string; text: string }> = {
   NEW:        { label: '신규',     bg: 'bg-blue-100',    text: 'text-blue-700' },
   CONTACTED:  { label: '연락완료', bg: 'bg-amber-100',   text: 'text-amber-700' },
-  IN_PROGRESS:{ label: '진행중',   bg: 'bg-violet-100',  text: 'text-violet-700' },
+  IN_PROGRESS:{ label: '진행중',   bg: 'bg-blue-100',  text: 'text-blue-700' },
   CONVERTED:  { label: '전환',     bg: 'bg-emerald-100', text: 'text-emerald-700' },
   CLOSED:     { label: '종료',     bg: 'bg-gray-100',    text: 'text-gray-500' },
 };
@@ -131,7 +131,7 @@ export default function AdminConsultationsPage() {
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div className="flex items-center gap-3">
-          <TossIcon icon={Stethoscope} color="from-rose-500 to-pink-500" shadow="shadow-rose-500/25" size="md" />
+          <TossIcon icon={Stethoscope} color="from-blue-500 to-blue-600" shadow="shadow-blue-500/25" size="md" />
           <div>
             <h1 className="text-2xl font-bold text-gray-900">상담 신청 관리</h1>
             <p className="text-gray-500 text-sm">개원의 패키지 상담 신청 내역</p>
@@ -158,7 +158,7 @@ export default function AdminConsultationsPage() {
               onClick={() => { setStatusFilter(isSelected ? '' : s); setPage(1); }}
               className={`p-3 rounded-xl border text-center transition-all ${
                 isSelected
-                  ? 'border-violet-300 bg-violet-50 ring-2 ring-violet-200'
+                  ? 'border-blue-300 bg-blue-50 ring-2 ring-blue-200'
                   : 'border-gray-100 bg-white hover:border-gray-200'
               }`}
             >
@@ -181,20 +181,20 @@ export default function AdminConsultationsPage() {
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-            className="w-full pl-10 pr-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-violet-200 focus:border-violet-300"
+            className="w-full pl-10 pr-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-300"
           />
         </div>
         <select
           value={statusFilter}
           onChange={(e) => { setStatusFilter(e.target.value); setPage(1); }}
-          className="px-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-violet-200"
+          className="px-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-200"
         >
           <option value="">전체 상태</option>
           {ALL_STATUSES.map((s) => (
             <option key={s} value={s}>{STATUS_CONFIG[s].label}</option>
           ))}
         </select>
-        <button onClick={handleSearch} className="px-4 py-2.5 bg-violet-600 text-white rounded-xl text-sm hover:bg-violet-700 transition-colors">
+        <button onClick={handleSearch} className="px-4 py-2.5 bg-blue-600 text-white rounded-xl text-sm hover:bg-blue-700 transition-colors">
           검색
         </button>
       </div>
@@ -270,7 +270,7 @@ export default function AdminConsultationsPage() {
                 else if (page >= totalPages - 2) p = totalPages - 4 + i;
                 else p = page - 2 + i;
                 return (
-                  <button key={p} onClick={() => setPage(p)} className={`w-8 h-8 rounded-lg text-sm font-medium transition-colors ${p === page ? 'bg-violet-600 text-white' : 'text-gray-600 hover:bg-gray-100'}`}>
+                  <button key={p} onClick={() => setPage(p)} className={`w-8 h-8 rounded-lg text-sm font-medium transition-colors ${p === page ? 'bg-blue-600 text-white' : 'text-gray-600 hover:bg-gray-100'}`}>
                     {p}
                   </button>
                 );
@@ -375,7 +375,7 @@ export default function AdminConsultationsPage() {
                       disabled={isCurrent}
                       className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
                         isCurrent
-                          ? `${cfg.bg} ${cfg.text} ring-2 ring-offset-1 ring-violet-300`
+                          ? `${cfg.bg} ${cfg.text} ring-2 ring-offset-1 ring-blue-300`
                           : 'bg-white border border-gray-200 text-gray-600 hover:border-gray-300'
                       }`}
                     >

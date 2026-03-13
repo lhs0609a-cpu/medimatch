@@ -13,8 +13,8 @@ const FACILITY_CONFIG = [
   { key: 'bank', label: '은행', icon: Landmark, color: 'text-blue-500', bg: 'bg-blue-50 dark:bg-blue-950/30' },
   { key: 'parking', label: '주차장', icon: CarFront, color: 'text-slate-500', bg: 'bg-slate-50 dark:bg-slate-950/30' },
   { key: 'convenience_store', label: '편의점', icon: Store, color: 'text-red-500', bg: 'bg-red-50 dark:bg-red-950/30' },
-  { key: 'school', label: '학교', icon: GraduationCap, color: 'text-indigo-500', bg: 'bg-indigo-50 dark:bg-indigo-950/30' },
-  { key: 'hospital', label: '병원', icon: Activity, color: 'text-teal-500', bg: 'bg-teal-50 dark:bg-teal-950/30' },
+  { key: 'school', label: '학교', icon: GraduationCap, color: 'text-blue-600', bg: 'bg-blue-50 dark:bg-blue-950/30' },
+  { key: 'hospital', label: '병원', icon: Activity, color: 'text-blue-500', bg: 'bg-blue-50 dark:bg-blue-950/30' },
 ]
 
 const DEFAULT_FACILITIES: Record<string, number> = {
@@ -84,7 +84,7 @@ export default function NearbyFacilities({ result }: { result: SimulationRespons
           </div>
           <div className="h-3 bg-muted rounded-full overflow-hidden mt-1">
             <div
-              className="h-full rounded-full bg-gradient-to-r from-blue-400 to-violet-500 transition-all duration-700"
+              className="h-full rounded-full bg-gradient-to-r from-blue-400 to-blue-500 transition-all duration-700"
               style={{ width: `${commercialScore}%` }}
             />
           </div>

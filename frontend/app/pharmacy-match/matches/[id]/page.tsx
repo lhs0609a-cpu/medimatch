@@ -76,7 +76,7 @@ export default function MatchDetailPage() {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin h-8 w-8 border-4 border-purple-600 border-t-transparent rounded-full mx-auto mb-4" />
+          <div className="animate-spin h-8 w-8 border-4 border-blue-600 border-t-transparent rounded-full mx-auto mb-4" />
           <p className="text-gray-600">매칭 정보를 불러오는 중...</p>
         </div>
       </div>
@@ -88,7 +88,7 @@ export default function MatchDetailPage() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <h2 className="text-xl font-bold text-gray-900 mb-2">매칭을 찾을 수 없습니다</h2>
-          <Link href="/pharmacy-match/matches" className="text-purple-600 hover:underline">
+          <Link href="/pharmacy-match/matches" className="text-blue-600 hover:underline">
             목록으로 돌아가기
           </Link>
         </div>
@@ -134,7 +134,7 @@ export default function MatchDetailPage() {
         <div className="bg-white border-b p-4">
           <div className="flex items-center justify-between mb-4">
             <p className="text-sm text-gray-500">매칭률</p>
-            <p className="text-2xl font-bold text-purple-600">{match.match_score?.toFixed(0) || '-'}%</p>
+            <p className="text-2xl font-bold text-blue-600">{match.match_score?.toFixed(0) || '-'}%</p>
           </div>
 
           {match.match_score_breakdown && (
@@ -194,7 +194,7 @@ export default function MatchDetailPage() {
                     {match.listing_private.owner_phone && (
                       <p className="flex items-center gap-2 text-gray-600">
                         <Phone className="w-4 h-4" />
-                        <a href={`tel:${match.listing_private.owner_phone}`} className="text-purple-600">
+                        <a href={`tel:${match.listing_private.owner_phone}`} className="text-blue-600">
                           {match.listing_private.owner_phone}
                         </a>
                       </p>
@@ -217,7 +217,7 @@ export default function MatchDetailPage() {
                     {match.profile_private.phone && (
                       <p className="flex items-center gap-2 text-gray-600">
                         <Phone className="w-4 h-4" />
-                        <a href={`tel:${match.profile_private.phone}`} className="text-purple-600">
+                        <a href={`tel:${match.profile_private.phone}`} className="text-blue-600">
                           {match.profile_private.phone}
                         </a>
                       </p>
@@ -225,7 +225,7 @@ export default function MatchDetailPage() {
                     {match.profile_private.email && (
                       <p className="flex items-center gap-2 text-gray-600">
                         <Mail className="w-4 h-4" />
-                        <a href={`mailto:${match.profile_private.email}`} className="text-purple-600">
+                        <a href={`mailto:${match.profile_private.email}`} className="text-blue-600">
                           {match.profile_private.email}
                         </a>
                       </p>
@@ -266,7 +266,7 @@ export default function MatchDetailPage() {
                       </p>
                       <div className={`rounded-2xl px-4 py-2 ${
                         isCurrentUser
-                          ? 'bg-purple-600 text-white rounded-br-sm'
+                          ? 'bg-blue-600 text-white rounded-br-sm'
                           : 'bg-white text-gray-900 rounded-bl-sm'
                       }`}>
                         <p>{msg.content}</p>
@@ -294,12 +294,12 @@ export default function MatchDetailPage() {
                 onChange={(e) => setNewMessage(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
                 placeholder="메시지를 입력하세요"
-                className="flex-1 px-4 py-2 border border-gray-300 rounded-full focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                className="flex-1 px-4 py-2 border border-gray-300 rounded-full focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               />
               <button
                 onClick={handleSendMessage}
                 disabled={!newMessage.trim() || sendMutation.isPending}
-                className="w-10 h-10 bg-purple-600 text-white rounded-full flex items-center justify-center hover:bg-purple-700 disabled:bg-gray-300"
+                className="w-10 h-10 bg-blue-600 text-white rounded-full flex items-center justify-center hover:bg-blue-700 disabled:bg-gray-300"
               >
                 {sendMutation.isPending ? (
                   <Loader2 className="w-5 h-5 animate-spin" />
@@ -320,7 +320,7 @@ export default function MatchDetailPage() {
                   <button
                     onClick={() => statusMutation.mutate({ status: 'MEETING' })}
                     disabled={statusMutation.isPending}
-                    className="flex-1 py-2 bg-purple-100 text-purple-700 rounded-lg font-medium hover:bg-purple-200 flex items-center justify-center gap-2"
+                    className="flex-1 py-2 bg-blue-100 text-blue-700 rounded-lg font-medium hover:bg-blue-200 flex items-center justify-center gap-2"
                   >
                     <Calendar className="w-4 h-4" />
                     미팅 예약

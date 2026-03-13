@@ -48,7 +48,7 @@ export default function PharmacistDashboardPage() {
       <header className="bg-white border-b sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <TossIcon icon={Pill} color="from-teal-500 to-cyan-600" size="sm" shadow="shadow-teal-500/25" />
+            <TossIcon icon={Pill} color="from-blue-500 to-blue-600" size="sm" shadow="shadow-blue-500/25" />
             <div>
               <h1 className="text-xl font-bold text-gray-900">약사 센터</h1>
               <p className="text-sm text-gray-500">약국 양도 매물 관리</p>
@@ -56,7 +56,7 @@ export default function PharmacistDashboardPage() {
           </div>
           <Link
             href="/pharmacist/register"
-            className="flex items-center gap-2 px-4 py-2 bg-teal-600 text-white rounded-lg font-medium hover:bg-teal-700 transition-colors"
+            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors"
           >
             <Plus className="w-4 h-4" />
             약국 등록
@@ -69,7 +69,7 @@ export default function PharmacistDashboardPage() {
         <div className="grid md:grid-cols-3 gap-4 mb-8">
           <div className="bg-white rounded-xl p-6 border">
             <div className="flex items-center justify-between mb-4">
-              <TossIcon icon={Home} color="from-blue-500 to-cyan-500" size="md" shadow="shadow-blue-500/25" />
+              <TossIcon icon={Home} color="from-blue-500 to-blue-600" size="md" shadow="shadow-blue-500/25" />
               <span className="text-2xl font-bold text-gray-900">{stats.total}</span>
             </div>
             <p className="text-gray-500">총 등록 매물</p>
@@ -95,7 +95,7 @@ export default function PharmacistDashboardPage() {
           <button
             onClick={() => setStatusFilter('')}
             className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${
-              statusFilter === '' ? 'bg-teal-600 text-white' : 'bg-white text-gray-600 hover:bg-gray-100'
+              statusFilter === '' ? 'bg-blue-600 text-white' : 'bg-white text-gray-600 hover:bg-gray-100'
             }`}
           >
             전체
@@ -105,7 +105,7 @@ export default function PharmacistDashboardPage() {
               key={key}
               onClick={() => setStatusFilter(key)}
               className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${
-                statusFilter === key ? 'bg-teal-600 text-white' : 'bg-white text-gray-600 hover:bg-gray-100'
+                statusFilter === key ? 'bg-blue-600 text-white' : 'bg-white text-gray-600 hover:bg-gray-100'
               }`}
             >
               {config.label}
@@ -116,7 +116,7 @@ export default function PharmacistDashboardPage() {
         {/* Listings */}
         {isLoading ? (
           <div className="text-center py-12">
-            <div className="animate-spin h-8 w-8 border-4 border-teal-600 border-t-transparent rounded-full mx-auto mb-4" />
+            <div className="animate-spin h-8 w-8 border-4 border-blue-600 border-t-transparent rounded-full mx-auto mb-4" />
             <p className="text-gray-500">매물을 불러오는 중...</p>
           </div>
         ) : filteredItems.length === 0 ? (
@@ -128,7 +128,7 @@ export default function PharmacistDashboardPage() {
             </p>
             <Link
               href="/pharmacist/register"
-              className="inline-flex items-center gap-2 px-6 py-3 bg-teal-600 text-white rounded-lg font-medium hover:bg-teal-700"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700"
             >
               <Plus className="w-5 h-5" />
               약국 등록하기
@@ -143,7 +143,7 @@ export default function PharmacistDashboardPage() {
               return (
                 <div
                   key={listing.id}
-                  className="block bg-white rounded-xl border hover:border-teal-300 hover:shadow-md transition-all"
+                  className="block bg-white rounded-xl border hover:border-blue-300 hover:shadow-md transition-all"
                 >
                   <div className="p-6">
                     <div className="flex items-start justify-between mb-4">

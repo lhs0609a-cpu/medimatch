@@ -250,7 +250,7 @@ export default function LandlordDashboardPage() {
               </div>
               <div className="card p-4">
                 <div className="flex items-center gap-3">
-                  <TossIcon icon={Users} color="from-purple-500 to-pink-500" size="sm" />
+                  <TossIcon icon={Users} color="from-blue-500 to-blue-600" size="sm" />
                   <div>
                     <p className="text-2xl font-bold text-foreground">3</p>
                     <p className="text-xs text-muted-foreground">보유 리드</p>
@@ -280,12 +280,12 @@ export default function LandlordDashboardPage() {
                     <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
                       activity.type === 'view' ? 'bg-blue-100 dark:bg-blue-900/30' :
                       activity.type === 'inquiry' ? 'bg-green-100 dark:bg-green-900/30' :
-                      activity.type === 'interest' ? 'bg-purple-100 dark:bg-purple-900/30' :
+                      activity.type === 'interest' ? 'bg-blue-100 dark:bg-blue-900/30' :
                       'bg-amber-100 dark:bg-amber-900/30'
                     }`}>
                       {activity.type === 'view' && <Eye className="w-4 h-4 text-blue-600" />}
                       {activity.type === 'inquiry' && <MessageSquare className="w-4 h-4 text-green-600" />}
-                      {activity.type === 'interest' && <Star className="w-4 h-4 text-purple-600" />}
+                      {activity.type === 'interest' && <Star className="w-4 h-4 text-blue-600" />}
                       {activity.type === 'lead' && <Users className="w-4 h-4 text-amber-600" />}
                     </div>
                     <div className="flex-1">
@@ -301,7 +301,7 @@ export default function LandlordDashboardPage() {
             <div className="grid md:grid-cols-3 gap-4">
               <Link href="/landlord/pricing" className="card p-4 hover:shadow-md transition-shadow">
                 <div className="flex items-center gap-3">
-                  <TossIcon icon={Users} color="from-purple-500 to-pink-500" size="sm" shadow="shadow-purple-500/25" />
+                  <TossIcon icon={Users} color="from-blue-500 to-blue-600" size="sm" shadow="shadow-blue-500/25" />
                   <div className="flex-1">
                     <p className="font-medium text-foreground">매칭 요청권 구매</p>
                     <p className="text-xs text-muted-foreground">관심 회원에게 매칭 요청</p>
@@ -321,7 +321,7 @@ export default function LandlordDashboardPage() {
               </Link>
               <Link href="/landlord/analytics" className="card p-4 hover:shadow-md transition-shadow">
                 <div className="flex items-center gap-3">
-                  <TossIcon icon={BarChart3} color="from-cyan-500 to-blue-500" size="sm" shadow="shadow-cyan-500/25" />
+                  <TossIcon icon={BarChart3} color="from-blue-500 to-blue-600" size="sm" shadow="shadow-blue-500/25" />
                   <div className="flex-1">
                     <p className="font-medium text-foreground">상세 분석</p>
                     <p className="text-xs text-muted-foreground">통계 및 리포트</p>
@@ -443,12 +443,12 @@ export default function LandlordDashboardPage() {
                           ? 'bg-gray-100 dark:bg-gray-900/30'
                           : match.type === 'doctor'
                             ? 'bg-blue-100 dark:bg-blue-900/30'
-                            : 'bg-purple-100 dark:bg-purple-900/30'
+                            : 'bg-blue-100 dark:bg-blue-900/30'
                       }`}>
                         <Users className={`w-6 h-6 ${
                           match.status === 'expired'
                             ? 'text-gray-500'
-                            : match.type === 'doctor' ? 'text-blue-600' : 'text-purple-600'
+                            : match.type === 'doctor' ? 'text-blue-600' : 'text-blue-600'
                         }`} />
                       </div>
                       <div>
@@ -554,7 +554,7 @@ export default function LandlordDashboardPage() {
               <h3 className="font-semibold text-foreground mb-4">현재 진행 중인 광고</h3>
               <div className="bg-amber-50 dark:bg-amber-900/20 rounded-xl p-4 flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <TossIcon icon={TrendingUp} color="from-cyan-500 to-blue-500" size="sm" shadow="shadow-cyan-500/25" />
+                  <TossIcon icon={TrendingUp} color="from-blue-500 to-blue-600" size="sm" shadow="shadow-blue-500/25" />
                   <div>
                     <p className="font-medium text-foreground">강남역 메디컬빌딩 2층 - 검색 상위 노출</p>
                     <p className="text-sm text-muted-foreground">2024.01.20 ~ 2024.01.27 (3일 남음)</p>
@@ -578,15 +578,15 @@ export default function LandlordDashboardPage() {
                   <div key={ad.name} className="border border-border rounded-xl p-4 hover:shadow-md transition-shadow">
                     <div className="flex items-center gap-3 mb-3">
                       <TossIcon icon={ad.icon} color={
-                        ad.icon === TrendingUp ? 'from-cyan-500 to-blue-500' :
+                        ad.icon === TrendingUp ? 'from-blue-500 to-blue-600' :
                         ad.icon === Star ? 'from-amber-500 to-orange-500' :
                         ad.icon === Bell ? 'from-amber-500 to-orange-500' :
-                        'from-indigo-500 to-purple-500'
+                        'from-blue-500 to-blue-600'
                       } size="sm" shadow={
-                        ad.icon === TrendingUp ? 'shadow-cyan-500/25' :
+                        ad.icon === TrendingUp ? 'shadow-blue-500/25' :
                         ad.icon === Star ? 'shadow-amber-500/25' :
                         ad.icon === Bell ? 'shadow-amber-500/25' :
-                        'shadow-indigo-500/25'
+                        'shadow-blue-500/25'
                       } />
                       <div>
                         <p className="font-medium text-foreground">{ad.name}</p>

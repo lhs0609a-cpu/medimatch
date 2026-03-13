@@ -280,8 +280,8 @@ export default function BillingPage() {
         <div className="card p-4">
           <div className="flex items-center justify-between mb-2">
             <span className="text-xs text-muted-foreground font-medium">현금/이체</span>
-            <div className="w-8 h-8 rounded-xl bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
-              <Banknote className="w-4 h-4 text-purple-600" />
+            <div className="w-8 h-8 rounded-xl bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
+              <Banknote className="w-4 h-4 text-blue-600" />
             </div>
           </div>
           <div className="text-2xl font-bold">₩{((todayStats.cashPayments + todayStats.transferPayments) / 10000).toFixed(0)}<span className="text-sm font-normal text-muted-foreground">만</span></div>
@@ -308,12 +308,12 @@ export default function BillingPage() {
         <div className="flex h-3 rounded-full overflow-hidden">
           <div className="bg-blue-500 transition-all" style={{ width: `${(todayStats.cardPayments / todayStats.totalRevenue) * 100}%` }} />
           <div className="bg-emerald-500 transition-all" style={{ width: `${(todayStats.cashPayments / todayStats.totalRevenue) * 100}%` }} />
-          <div className="bg-purple-500 transition-all" style={{ width: `${(todayStats.transferPayments / todayStats.totalRevenue) * 100}%` }} />
+          <div className="bg-blue-500 transition-all" style={{ width: `${(todayStats.transferPayments / todayStats.totalRevenue) * 100}%` }} />
         </div>
         <div className="flex items-center gap-4 mt-2 text-xs">
           <div className="flex items-center gap-1"><div className="w-2 h-2 rounded-full bg-blue-500" /> 카드 {((todayStats.cardPayments / todayStats.totalRevenue) * 100).toFixed(0)}%</div>
           <div className="flex items-center gap-1"><div className="w-2 h-2 rounded-full bg-emerald-500" /> 현금 {((todayStats.cashPayments / todayStats.totalRevenue) * 100).toFixed(0)}%</div>
-          <div className="flex items-center gap-1"><div className="w-2 h-2 rounded-full bg-purple-500" /> 이체 {((todayStats.transferPayments / todayStats.totalRevenue) * 100).toFixed(0)}%</div>
+          <div className="flex items-center gap-1"><div className="w-2 h-2 rounded-full bg-blue-500" /> 이체 {((todayStats.transferPayments / todayStats.totalRevenue) * 100).toFixed(0)}%</div>
         </div>
       </div>
 

@@ -12,6 +12,7 @@ import {
   AlertCircle, Sparkles, MapPin
 } from 'lucide-react'
 import { groupBuyingService, authService } from '@/lib/api/services'
+import { toast } from 'sonner'
 import { CohortStatus, GroupBuyingCategory } from '@/lib/api/client'
 
 // 상태 뱃지
@@ -39,7 +40,7 @@ function ProgressBar({ current, max }: { current: number; max: number }) {
   return (
     <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
       <motion.div
-        className="h-full bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full"
+        className="h-full bg-gradient-to-r from-blue-500 to-blue-700 rounded-full"
         initial={{ width: 0 }}
         animate={{ width: `${percentage}%` }}
         transition={{ duration: 0.8, ease: 'easeOut' }}
@@ -80,15 +81,15 @@ function JoinModal({
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['cohort', cohortId] })
       queryClient.invalidateQueries({ queryKey: ['my-participations'] })
-      alert(`참여 신청이 완료되었습니다!\n예상 절감액: ${(data.estimated_savings / 10000).toLocaleString()}만원`)
+      toast.success('참여 신청이 완료되었습니다!', { description: `예상 절감액: ${(data.estimated_savings / 10000).toLocaleString()}만원` })
       onClose()
     },
     onError: (error: any) => {
       if (error.response?.status === 401) {
-        alert('로그인이 필요합니다.')
+        toast.info('로그인이 필요합니다.')
         router.push('/auth/login?redirect=/group-buying/' + cohortId)
       } else {
-        alert(error.response?.data?.detail || '참여 신청에 실패했습니다.')
+        toast.error(error.response?.data?.detail || '참여 신청에 실패했습니다.')
       }
     },
   })
@@ -295,7 +296,7 @@ function JoinModal({
             <button
               onClick={handleSubmit}
               disabled={joinMutation.isPending}
-              className="w-full py-3.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl font-semibold hover:shadow-lg transition-all disabled:opacity-50"
+              className="w-full py-3.5 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl font-semibold hover:shadow-lg transition-all disabled:opacity-50"
             >
               {joinMutation.isPending ? '처리 중...' : '참여 신청하기'}
             </button>
@@ -582,7 +583,7 @@ export default function CohortDetailPage() {
           ) : cohort.status === 'recruiting' ? (
             <button
               onClick={() => setIsJoinModalOpen(true)}
-              className="w-full py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl font-semibold hover:shadow-lg hover:shadow-blue-500/30 transition-all flex items-center justify-center gap-2"
+              className="w-full py-4 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl font-semibold hover:shadow-lg hover:shadow-blue-500/30 transition-all flex items-center justify-center gap-2"
             >
               <Sparkles className="w-5 h-5" />
               참여 신청하기

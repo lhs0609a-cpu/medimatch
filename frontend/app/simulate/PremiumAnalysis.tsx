@@ -33,7 +33,7 @@ const CHART_COLORS = ['#3b82f6', '#22c55e', '#f59e0b', '#ef4444', '#8b5cf6', '#e
 function SectionHeader({ icon, title, iconColor, iconShadow }: { icon: any; title: string; iconColor?: string; iconShadow?: string }) {
   return (
     <div className="flex items-center gap-3 mb-5">
-      <TossIcon icon={icon} color={iconColor || 'from-blue-500 to-indigo-500'} size="sm" shadow={iconShadow} />
+      <TossIcon icon={icon} color={iconColor || 'from-blue-500 to-blue-600'} size="sm" shadow={iconShadow} />
       <h3 className="text-lg font-semibold text-foreground">{title}</h3>
     </div>
   )
@@ -249,12 +249,12 @@ export default function PremiumAnalysis({ result }: PremiumAnalysisProps) {
       {/* ─── 3. Profitability ─── */}
       {pd && (
         <section className="card p-6">
-          <SectionHeader icon={TrendingUp} title="수익성 분석" iconColor="from-blue-500 to-indigo-500" iconShadow="shadow-blue-500/25" />
+          <SectionHeader icon={TrendingUp} title="수익성 분석" iconColor="from-blue-500 to-blue-600" iconShadow="shadow-blue-500/25" />
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <StatCard label="영업이익률" value={`${pd.profit_margin_percent}%`} color="text-green-600" />
             <StatCard label="연 ROI" value={`${result.profitability.annual_roi_percent}%`} color="text-blue-600" />
-            <StatCard label="IRR" value={`${pd.irr_percent}%`} color="text-violet-600" />
-            <StatCard label="3년 NPV" value={formatCurrency(pd.npv_3years)} color="text-teal-600" />
+            <StatCard label="IRR" value={`${pd.irr_percent}%`} color="text-blue-600" />
+            <StatCard label="3년 NPV" value={formatCurrency(pd.npv_3years)} color="text-blue-600" />
           </div>
           <div className="grid md:grid-cols-3 gap-4 mt-4">
             <StatCard label="월 평균 이익" value={formatCurrency(pd.monthly_profit_avg)} sub={`${formatShortCurrency(pd.monthly_profit_min)} ~ ${formatShortCurrency(pd.monthly_profit_max)}`} />
@@ -320,7 +320,7 @@ export default function PremiumAnalysis({ result }: PremiumAnalysisProps) {
       {/* ─── 5. Demographics Detail ─── */}
       {dd && (
         <section className="card p-6">
-          <SectionHeader icon={Users} title="인구 상세 분석" iconColor="from-purple-500 to-pink-500" iconShadow="shadow-purple-500/25" />
+          <SectionHeader icon={Users} title="인구 상세 분석" iconColor="from-blue-500 to-blue-500" iconShadow="shadow-blue-500/25" />
 
           <div className="grid md:grid-cols-2 gap-6">
             {/* Age Distribution Bar */}
@@ -455,7 +455,7 @@ export default function PremiumAnalysis({ result }: PremiumAnalysisProps) {
       {/* ─── 7. Growth Projection ─── */}
       {gp && (
         <section className="card p-6">
-          <SectionHeader icon={LineIcon} title="3년 성장 전망" iconColor="from-violet-500 to-purple-500" iconShadow="shadow-violet-500/25" />
+          <SectionHeader icon={LineIcon} title="3년 성장 전망" iconColor="from-blue-500 to-blue-500" iconShadow="shadow-blue-500/25" />
 
           <div className="grid md:grid-cols-2 gap-6">
             {/* Revenue/Profit LineChart */}
@@ -595,10 +595,10 @@ export default function PremiumAnalysis({ result }: PremiumAnalysisProps) {
       {/* ─── 9. AI Insights ─── */}
       {ai && (
         <section className="card p-6">
-          <SectionHeader icon={Brain} title="AI 전략 리포트" iconColor="from-indigo-500 to-purple-500" iconShadow="shadow-indigo-500/25" />
+          <SectionHeader icon={Brain} title="AI 전략 리포트" iconColor="from-blue-600 to-blue-500" iconShadow="shadow-blue-600/25" />
 
           {/* Executive Summary */}
-          <div className="bg-gradient-to-r from-indigo-50 to-blue-50 dark:from-indigo-950/20 dark:to-blue-950/20 rounded-xl p-4 mb-6">
+          <div className="bg-gradient-to-r from-blue-50 to-blue-50 dark:from-blue-950/20 dark:to-blue-950/20 rounded-xl p-4 mb-6">
             <p className="text-sm text-foreground leading-relaxed">{ai.executive_summary}</p>
           </div>
 
@@ -640,7 +640,7 @@ export default function PremiumAnalysis({ result }: PremiumAnalysisProps) {
               <h4 className="text-sm font-medium text-foreground mt-5 mb-3">차별화 포인트</h4>
               <div className="flex flex-wrap gap-2">
                 {ai.differentiation_points.map((d, idx) => (
-                  <span key={idx} className="text-xs bg-violet-100 text-violet-700 dark:bg-violet-900/30 dark:text-violet-300 px-2.5 py-1 rounded-full">
+                  <span key={idx} className="text-xs bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 px-2.5 py-1 rounded-full">
                     {d}
                   </span>
                 ))}

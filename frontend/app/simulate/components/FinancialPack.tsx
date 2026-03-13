@@ -204,7 +204,7 @@ export default function FinancialPack({ result }: Props) {
       </Card>
 
       {/* 5. 세금 시뮬레이션 */}
-      <Card icon={Receipt} title="세금 · 4대보험 시뮬레이션" color="text-purple-500">
+      <Card icon={Receipt} title="세금 · 4대보험 시뮬레이션" color="text-blue-500">
         <div className="space-y-3">
           {[
             { name: '종합소득세', amount: Math.round(profit.monthly_profit_avg * 12 * 0.24), rate: '24%', note: '6천만~8,800만 과세표준' },
@@ -219,14 +219,14 @@ export default function FinancialPack({ result }: Props) {
                 <div className="text-[10px] text-muted-foreground">{t.note}</div>
               </div>
               <span className="text-xs text-muted-foreground">{t.rate}</span>
-              <span className="text-sm font-bold text-purple-600">{fmt(t.amount)}</span>
+              <span className="text-sm font-bold text-blue-600">{fmt(t.amount)}</span>
             </div>
           ))}
         </div>
-        <div className="mt-3 p-3 bg-purple-50 dark:bg-purple-950/20 rounded-lg">
+        <div className="mt-3 p-3 bg-blue-50 dark:bg-blue-950/20 rounded-lg">
           <div className="flex items-center justify-between">
             <span className="text-sm font-medium text-foreground">연간 세금 총액 (추정)</span>
-            <span className="text-lg font-bold text-purple-600">
+            <span className="text-lg font-bold text-blue-600">
               {fmt(Math.round(profit.monthly_profit_avg * 12 * 0.264) + Math.round(rev.avg * 0.25 * 12 * 0.1) + Math.round(cost.labor * 0.09 * 12) + 2400000)}
             </span>
           </div>
@@ -273,7 +273,7 @@ export default function FinancialPack({ result }: Props) {
       </Card>
 
       {/* 7. 보험료 분석 */}
-      <Card icon={Scale} title="사업 보험 분석" color="text-cyan-600">
+      <Card icon={Scale} title="사업 보험 분석" color="text-blue-600">
         <div className="space-y-2">
           {[
             { name: '의료배상책임보험', premium: 2400000, coverage: '1억/건', required: true },
@@ -294,14 +294,14 @@ export default function FinancialPack({ result }: Props) {
             </div>
           ))}
         </div>
-        <div className="mt-3 p-2 bg-cyan-50 dark:bg-cyan-950/20 rounded-lg text-center">
+        <div className="mt-3 p-2 bg-blue-50 dark:bg-blue-950/20 rounded-lg text-center">
           <span className="text-sm text-muted-foreground">연간 보험료 합계: </span>
-          <span className="text-lg font-bold text-cyan-600">{fmt(6960000)}</span>
+          <span className="text-lg font-bold text-blue-600">{fmt(6960000)}</span>
         </div>
       </Card>
 
       {/* 8. 마케팅 예산 */}
-      <Card icon={BadgePercent} title="마케팅 예산 최적 배분" color="text-pink-500">
+      <Card icon={BadgePercent} title="마케팅 예산 최적 배분" color="text-blue-500">
         <div className="space-y-2 mb-4">
           {[
             { channel: '네이버 플레이스', budget: 800000, roi: 420, color: '#22c55e' },
@@ -323,8 +323,8 @@ export default function FinancialPack({ result }: Props) {
           ))}
         </div>
         <div className="grid grid-cols-2 gap-3">
-          <div className="p-2 bg-pink-50 dark:bg-pink-950/20 rounded-lg text-center">
-            <div className="text-lg font-bold text-pink-600">{fmt(2700000)}/월</div>
+          <div className="p-2 bg-blue-50 dark:bg-blue-950/20 rounded-lg text-center">
+            <div className="text-lg font-bold text-blue-600">{fmt(2700000)}/월</div>
             <div className="text-[10px] text-muted-foreground">추천 마케팅 예산</div>
           </div>
           <div className="p-2 bg-secondary/50 rounded-lg text-center">

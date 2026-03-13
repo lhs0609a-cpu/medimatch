@@ -156,7 +156,7 @@ export default function ReportPreview({
         </div>
 
         {!isPurchased && (
-          <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/30 dark:to-indigo-950/30 rounded-xl p-4 border border-blue-200 dark:border-blue-800">
+          <div className="bg-gradient-to-r from-blue-50 to-blue-50 dark:from-blue-950/30 dark:to-blue-950/30 rounded-xl p-4 border border-blue-200 dark:border-blue-800">
             <div className="flex items-center justify-between">
               <div>
                 <h3 className="font-semibold text-foreground">프리미엄 리포트 잠금 해제</h3>

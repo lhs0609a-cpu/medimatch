@@ -17,7 +17,7 @@ const statusConfig: Record<string, { label: string; color: string; icon: any }> 
   REJECTED: { label: '거절됨', color: 'bg-red-100 text-red-700', icon: XCircle },
   EXPIRED: { label: '만료됨', color: 'bg-gray-100 text-gray-700', icon: Clock },
   REFUNDED: { label: '환불됨', color: 'bg-blue-100 text-blue-700', icon: DollarSign },
-  CONTACT_MADE: { label: '컨택 완료', color: 'bg-purple-100 text-purple-700', icon: CheckCircle2 },
+  CONTACT_MADE: { label: '컨택 완료', color: 'bg-blue-100 text-blue-700', icon: CheckCircle2 },
   COMPLETED: { label: '완료', color: 'bg-green-100 text-green-700', icon: CheckCircle2 },
 }
 
@@ -91,7 +91,7 @@ export default function SalesDashboardPage() {
         <div className="grid md:grid-cols-4 gap-4 mb-8">
           <div className="bg-white rounded-xl p-6 border">
             <div className="flex items-center justify-between mb-4">
-              <TossIcon icon={Users} color="from-purple-500 to-pink-500" size="sm" shadow="shadow-purple-500/25" />
+              <TossIcon icon={Users} color="from-blue-500 to-blue-600" size="sm" shadow="shadow-blue-500/25" />
               <span className="text-2xl font-bold text-gray-900">{profile.total_requests || 0}</span>
             </div>
             <p className="text-gray-500">총 매칭 요청</p>
@@ -105,7 +105,7 @@ export default function SalesDashboardPage() {
           </div>
           <div className="bg-white rounded-xl p-6 border">
             <div className="flex items-center justify-between mb-4">
-              <TossIcon icon={TrendingUp} color="from-blue-500 to-indigo-500" size="sm" shadow="shadow-blue-500/25" />
+              <TossIcon icon={TrendingUp} color="from-blue-500 to-blue-600" size="sm" shadow="shadow-blue-500/25" />
               <span className="text-2xl font-bold text-gray-900">
                 {profile.total_requests > 0
                   ? Math.round((profile.accepted_requests / profile.total_requests) * 100)

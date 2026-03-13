@@ -55,7 +55,7 @@ export default function BrokerDashboardPage() {
         {[
           { label: '활성 딜', value: data?.kpi.active_deals || 0, icon: Target, color: 'from-blue-500 to-blue-600' },
           { label: '성사 건', value: data?.kpi.closed_won || 0, icon: CheckCircle2, color: 'from-green-500 to-green-600' },
-          { label: '누적 커미션', value: `${fmt(data?.kpi.total_commission_earned || 0)}원`, icon: DollarSign, color: 'from-violet-500 to-violet-600' },
+          { label: '누적 커미션', value: `${fmt(data?.kpi.total_commission_earned || 0)}원`, icon: DollarSign, color: 'from-blue-500 to-blue-600' },
           { label: '성공률', value: `${data?.kpi.success_rate || 0}%`, icon: TrendingUp, color: 'from-amber-500 to-amber-600' },
         ].map((card) => (
           <div key={card.label} className="bg-white rounded-xl border border-gray-100 p-4">

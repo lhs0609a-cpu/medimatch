@@ -67,7 +67,7 @@ function SkeletonCard() {
 }
 
 // ── AreaDetail component ─────────────────────────────────────────
-const barColors = ['bg-blue-400', 'bg-indigo-500', 'bg-violet-500', 'bg-purple-500', 'bg-fuchsia-500', 'bg-rose-500', 'bg-pink-500']
+const barColors = ['bg-blue-400', 'bg-blue-600', 'bg-blue-500', 'bg-blue-500', 'bg-fuchsia-500', 'bg-rose-500', 'bg-blue-500']
 
 function AreaDetail({ data }: { data: AreaData }) {
   const dayNightRatio = data.nightPopulation > 0
@@ -131,7 +131,7 @@ function AreaDetail({ data }: { data: AreaData }) {
           <div className="bg-blue-500 flex items-center justify-center" style={{ width: `${data.maleRatio}%` }}>
             <span className="text-[10px] text-white font-medium">남 {data.maleRatio}%</span>
           </div>
-          <div className="bg-pink-500 flex items-center justify-center" style={{ width: `${data.femaleRatio}%` }}>
+          <div className="bg-blue-500 flex items-center justify-center" style={{ width: `${data.femaleRatio}%` }}>
             <span className="text-[10px] text-white font-medium">여 {data.femaleRatio}%</span>
           </div>
         </div>
@@ -207,7 +207,7 @@ function AreaDetail({ data }: { data: AreaData }) {
       <div>
         <p className="text-sm font-medium mb-2">주거 vs 상업 비율</p>
         <div className="flex h-5 rounded-full overflow-hidden">
-          <div className="bg-teal-500 flex items-center justify-center" style={{ width: `${data.residentialRatio}%` }}>
+          <div className="bg-blue-500 flex items-center justify-center" style={{ width: `${data.residentialRatio}%` }}>
             <span className="text-[10px] text-white font-medium">주거 {data.residentialRatio}%</span>
           </div>
           <div className="bg-orange-500 flex items-center justify-center" style={{ width: `${data.commercialRatio}%` }}>
@@ -379,7 +379,7 @@ export default function DemographicsPage() {
               ) : secondary.error ? (
                 <ErrorCard message={secondary.error} onRetry={secondary.retry} />
               ) : secondary.data ? (
-                <div className="card p-5 border-t-2 border-t-violet-600">
+                <div className="card p-5 border-t-2 border-t-blue-600">
                   <AreaDetail data={secondary.data} />
                 </div>
               ) : (

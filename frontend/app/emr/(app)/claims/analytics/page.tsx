@@ -192,7 +192,7 @@ export default function ClaimsAnalyticsPage() {
       {/* ───── 헤더 ───── */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex items-center gap-3">
-          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-violet-500 to-blue-500 flex items-center justify-center">
+          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-500 flex items-center justify-center">
             <BarChart3 className="w-6 h-6 text-white" />
           </div>
           <div>
@@ -255,11 +255,11 @@ export default function ClaimsAnalyticsPage() {
         <div className="card p-4">
           <div className="flex items-center justify-between mb-2">
             <span className="text-xs text-muted-foreground">AI 방어 절감</span>
-            <div className="w-8 h-8 rounded-xl bg-violet-100 dark:bg-violet-900/30 flex items-center justify-center">
-              <Brain className="w-4 h-4 text-violet-600" />
+            <div className="w-8 h-8 rounded-xl bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
+              <Brain className="w-4 h-4 text-blue-600" />
             </div>
           </div>
-          <div className="text-2xl font-bold text-violet-600">{formatAmount(totalOptimImpact)}<span className="text-sm text-muted-foreground">원</span></div>
+          <div className="text-2xl font-bold text-blue-600">{formatAmount(totalOptimImpact)}<span className="text-sm text-muted-foreground">원</span></div>
           <div className="text-xs text-muted-foreground mt-1">월 예상 추가 수익</div>
         </div>
       </div>
@@ -471,7 +471,7 @@ export default function ClaimsAnalyticsPage() {
       <div className="card p-5">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
-            <Target className="w-5 h-5 text-violet-600" />
+            <Target className="w-5 h-5 text-blue-600" />
             <h3 className="font-semibold">코드 효율성 분석</h3>
           </div>
           <span className="text-2xs text-muted-foreground">사용 빈도 순</span>

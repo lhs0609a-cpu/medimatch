@@ -36,15 +36,15 @@ const roles = [
     label: '의사',
     icon: Stethoscope,
     description: '개원 시뮬레이션, 매물 탐색',
-    gradient: 'from-violet-500 to-purple-600',
-    bgLight: 'bg-violet-50',
+    gradient: 'from-blue-500 to-blue-600',
+    bgLight: 'bg-blue-50',
   },
   {
     value: 'PHARMACIST',
     label: '약사',
     icon: Pill,
     description: '약국 자리 입찰, 처방전 예측',
-    gradient: 'from-emerald-500 to-teal-600',
+    gradient: 'from-emerald-500 to-blue-600',
     bgLight: 'bg-emerald-50',
   },
   {
@@ -60,7 +60,7 @@ const roles = [
     label: '건물주/일반인',
     icon: Building2,
     description: '병원 매물 등록, 임차인 모집',
-    gradient: 'from-blue-500 to-indigo-600',
+    gradient: 'from-blue-500 to-blue-700',
     bgLight: 'bg-blue-50',
   },
 ]
@@ -125,7 +125,7 @@ export default function RegisterPage() {
         <div className="max-w-md w-full mx-auto">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-3 mb-8">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-600 to-indigo-600 flex items-center justify-center shadow-lg shadow-violet-500/30">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 to-blue-700 flex items-center justify-center shadow-lg shadow-blue-500/30">
               <Sparkles className="w-5 h-5 text-white" />
             </div>
             <span className="text-xl font-bold text-gray-900">메디플라톤</span>
@@ -135,7 +135,7 @@ export default function RegisterPage() {
           <div className="flex items-center gap-4 mb-8">
             <div className="flex items-center gap-2">
               <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold transition-all ${
-                step >= 1 ? 'bg-gradient-to-br from-violet-600 to-indigo-600 text-white' : 'bg-gray-200 text-gray-500'
+                step >= 1 ? 'bg-gradient-to-br from-blue-600 to-blue-700 text-white' : 'bg-gray-200 text-gray-500'
               }`}>
                 {step > 1 ? <Check className="w-4 h-4" /> : '1'}
               </div>
@@ -143,10 +143,10 @@ export default function RegisterPage() {
                 회원 유형
               </span>
             </div>
-            <div className={`flex-1 h-0.5 ${step >= 2 ? 'bg-violet-600' : 'bg-gray-200'}`} />
+            <div className={`flex-1 h-0.5 ${step >= 2 ? 'bg-blue-600' : 'bg-gray-200'}`} />
             <div className="flex items-center gap-2">
               <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold transition-all ${
-                step >= 2 ? 'bg-gradient-to-br from-violet-600 to-indigo-600 text-white' : 'bg-gray-200 text-gray-500'
+                step >= 2 ? 'bg-gradient-to-br from-blue-600 to-blue-700 text-white' : 'bg-gray-200 text-gray-500'
               }`}>
                 2
               </div>
@@ -179,7 +179,7 @@ export default function RegisterPage() {
                       key={role.value}
                       className={`block p-4 border-2 rounded-2xl cursor-pointer transition-all duration-300 ${
                         isSelected
-                          ? 'border-violet-600 bg-violet-50/50 shadow-lg shadow-violet-500/10'
+                          ? 'border-blue-600 bg-blue-50/50 shadow-lg shadow-blue-500/10'
                           : 'border-gray-200 hover:border-gray-300 hover:shadow-md'
                       }`}
                     >
@@ -201,7 +201,7 @@ export default function RegisterPage() {
                           <div className="flex items-center gap-2">
                             <span className="font-semibold text-gray-900">{role.label}</span>
                             {isSelected && (
-                              <span className="w-5 h-5 rounded-full bg-violet-600 flex items-center justify-center">
+                              <span className="w-5 h-5 rounded-full bg-blue-600 flex items-center justify-center">
                                 <Check className="w-3 h-3 text-white" />
                               </span>
                             )}
@@ -228,7 +228,7 @@ export default function RegisterPage() {
                 {/* Email */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    이메일 <span className="text-violet-600">*</span>
+                    이메일 <span className="text-blue-600">*</span>
                   </label>
                   <div className="relative">
                     <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -250,7 +250,7 @@ export default function RegisterPage() {
                 {/* Name */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    이름 <span className="text-violet-600">*</span>
+                    이름 <span className="text-blue-600">*</span>
                   </label>
                   <div className="relative">
                     <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -323,7 +323,7 @@ export default function RegisterPage() {
                 {/* Password */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    비밀번호 <span className="text-violet-600">*</span>
+                    비밀번호 <span className="text-blue-600">*</span>
                   </label>
                   <div className="relative">
                     <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -352,7 +352,7 @@ export default function RegisterPage() {
                 {/* Password Confirm */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    비밀번호 확인 <span className="text-violet-600">*</span>
+                    비밀번호 확인 <span className="text-blue-600">*</span>
                   </label>
                   <div className="relative">
                     <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -420,7 +420,7 @@ export default function RegisterPage() {
           {/* Login Link */}
           <p className="text-center text-gray-500 mt-8">
             이미 계정이 있으신가요?{' '}
-            <Link href="/login" className="text-violet-600 font-semibold hover:text-violet-700">
+            <Link href="/login" className="text-blue-600 font-semibold hover:text-blue-700">
               로그인
             </Link>
           </p>

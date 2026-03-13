@@ -9,6 +9,7 @@ import {
   Crown, Sparkles, Shield, Edit2, Check, X, Heart, Settings
 } from 'lucide-react'
 import { useSubscription, SubscriptionBadge } from '@/lib/contexts/SubscriptionContext'
+import { toast } from 'sonner'
 
 interface UserProfile {
   id: number
@@ -125,7 +126,7 @@ export default function MyPage() {
       setIsEditing(false)
     } catch (err) {
       console.error('Failed to save profile:', err)
-      alert('프로필 저장에 실패했습니다.')
+      toast.error('프로필 저장에 실패했습니다.')
     } finally {
       setSaving(false)
     }
@@ -199,7 +200,7 @@ export default function MyPage() {
           subscription.tier === 'vip'
             ? 'bg-gradient-to-br from-amber-500 to-orange-600 text-white'
             : subscription.tier === 'premium'
-            ? 'bg-gradient-to-br from-blue-500 to-cyan-600 text-white'
+            ? 'bg-gradient-to-br from-blue-500 to-blue-600 text-white'
             : 'bg-card border'
         }`}>
           <div className="flex items-center justify-between mb-4">

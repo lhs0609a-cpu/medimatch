@@ -148,7 +148,7 @@ export default function AdminInquiriesPage() {
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div className="flex items-center gap-3">
-          <TossIcon icon={MessageCircle} color="from-violet-500 to-purple-500" shadow="shadow-violet-500/25" size="md" />
+          <TossIcon icon={MessageCircle} color="from-blue-500 to-blue-500" shadow="shadow-blue-500/25" size="md" />
           <div>
             <h1 className="text-2xl font-bold text-gray-900">문의 관리</h1>
             <p className="text-gray-500 text-sm">고객 문의 및 연락 폼 관리</p>
@@ -171,7 +171,7 @@ export default function AdminInquiriesPage() {
               key={s}
               onClick={() => { setStatusFilter(isSelected ? '' : s); setPage(1); }}
               className={`p-3 rounded-xl border text-center transition-all ${
-                isSelected ? 'border-violet-300 bg-violet-50 ring-2 ring-violet-200' : 'border-gray-100 bg-white hover:border-gray-200'
+                isSelected ? 'border-blue-300 bg-blue-50 ring-2 ring-blue-200' : 'border-gray-100 bg-white hover:border-gray-200'
               }`}
             >
               <p className="text-2xl font-bold text-gray-900">{count}</p>
@@ -191,22 +191,22 @@ export default function AdminInquiriesPage() {
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-            className="w-full pl-10 pr-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-violet-200 focus:border-violet-300"
+            className="w-full pl-10 pr-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-300"
           />
         </div>
-        <select value={typeFilter} onChange={(e) => { setTypeFilter(e.target.value); setPage(1); }} className="px-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-violet-200">
+        <select value={typeFilter} onChange={(e) => { setTypeFilter(e.target.value); setPage(1); }} className="px-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-200">
           <option value="">전체 유형</option>
           {Object.entries(TYPE_LABELS).map(([k, v]) => (
             <option key={k} value={k}>{v}</option>
           ))}
         </select>
-        <select value={statusFilter} onChange={(e) => { setStatusFilter(e.target.value); setPage(1); }} className="px-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-violet-200">
+        <select value={statusFilter} onChange={(e) => { setStatusFilter(e.target.value); setPage(1); }} className="px-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-200">
           <option value="">전체 상태</option>
           {ALL_STATUSES.map((s) => (
             <option key={s} value={s}>{STATUS_CONFIG[s].label}</option>
           ))}
         </select>
-        <button onClick={handleSearch} className="px-4 py-2.5 bg-violet-600 text-white rounded-xl text-sm hover:bg-violet-700 transition-colors">검색</button>
+        <button onClick={handleSearch} className="px-4 py-2.5 bg-blue-600 text-white rounded-xl text-sm hover:bg-blue-700 transition-colors">검색</button>
       </div>
 
       {/* Table */}
@@ -264,7 +264,7 @@ export default function AdminInquiriesPage() {
                 else if (page <= 3) p = i + 1;
                 else if (page >= totalPages - 2) p = totalPages - 4 + i;
                 else p = page - 2 + i;
-                return <button key={p} onClick={() => setPage(p)} className={`w-8 h-8 rounded-lg text-sm font-medium transition-colors ${p === page ? 'bg-violet-600 text-white' : 'text-gray-600 hover:bg-gray-100'}`}>{p}</button>;
+                return <button key={p} onClick={() => setPage(p)} className={`w-8 h-8 rounded-lg text-sm font-medium transition-colors ${p === page ? 'bg-blue-600 text-white' : 'text-gray-600 hover:bg-gray-100'}`}>{p}</button>;
               })}
               <button onClick={() => setPage(Math.min(totalPages, page + 1))} disabled={page === totalPages} className="p-2 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 disabled:opacity-30 transition-colors"><ChevronRight className="w-4 h-4" /></button>
             </div>
@@ -329,7 +329,7 @@ export default function AdminInquiriesPage() {
               {detailModal.admin_reply && (
                 <div>
                   <h3 className="text-sm font-semibold text-gray-700 mb-2">관리자 답변</h3>
-                  <div className="bg-violet-50 rounded-xl p-4 border border-violet-100">
+                  <div className="bg-blue-50 rounded-xl p-4 border border-blue-100">
                     <p className="text-gray-700 whitespace-pre-wrap">{detailModal.admin_reply}</p>
                     {detailModal.replied_at && (
                       <p className="text-xs text-gray-400 mt-2">{formatDate(detailModal.replied_at)}</p>
@@ -347,12 +347,12 @@ export default function AdminInquiriesPage() {
                     onChange={(e) => setReplyText(e.target.value)}
                     placeholder="답변을 입력하세요..."
                     rows={4}
-                    className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-violet-200 focus:border-violet-300 resize-none"
+                    className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-300 resize-none"
                   />
                   <button
                     onClick={handleReply}
                     disabled={!replyText.trim() || replying}
-                    className="mt-2 flex items-center gap-2 px-4 py-2 bg-violet-600 text-white rounded-xl text-sm hover:bg-violet-700 transition-colors disabled:opacity-50"
+                    className="mt-2 flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-xl text-sm hover:bg-blue-700 transition-colors disabled:opacity-50"
                   >
                     <Send className="w-4 h-4" />
                     {replying ? '전송 중...' : '답변 전송'}
@@ -369,7 +369,7 @@ export default function AdminInquiriesPage() {
                   const isCurrent = detailModal.status === s;
                   return (
                     <button key={s} onClick={() => !isCurrent && handleStatusChange(detailModal.id, s)} disabled={isCurrent}
-                      className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${isCurrent ? `${cfg.bg} ${cfg.text} ring-2 ring-offset-1 ring-violet-300` : 'bg-white border border-gray-200 text-gray-600 hover:border-gray-300'}`}>
+                      className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${isCurrent ? `${cfg.bg} ${cfg.text} ring-2 ring-offset-1 ring-blue-300` : 'bg-white border border-gray-200 text-gray-600 hover:border-gray-300'}`}>
                       {cfg.label}
                     </button>
                   );

@@ -119,7 +119,7 @@ export default function GrowthPack({ result }: Props) {
       </Card>
 
       {/* 4. 직원 성장 계획 */}
-      <Card icon={GraduationCap} title="직원 교육 · 성장 계획" color="text-violet-500">
+      <Card icon={GraduationCap} title="직원 교육 · 성장 계획" color="text-blue-500">
         <div className="space-y-2">
           {[
             { program: '의료 서비스 교육', freq: '월 1회', duration: '2시간', cost: '내부', target: '전 직원', impact: 92 },
@@ -136,7 +136,7 @@ export default function GrowthPack({ result }: Props) {
               </div>
               <span className="text-[10px] text-muted-foreground">{p.cost}</span>
               <div className="w-12 h-2 bg-muted rounded-full overflow-hidden">
-                <div className="h-full bg-violet-500 rounded-full" style={{ width: `${p.impact}%` }} />
+                <div className="h-full bg-blue-500 rounded-full" style={{ width: `${p.impact}%` }} />
               </div>
             </div>
           ))}
@@ -145,7 +145,7 @@ export default function GrowthPack({ result }: Props) {
       </Card>
 
       {/* 5. 브랜드 구축 전략 */}
-      <Card icon={Crown} title="지역 브랜드 구축 전략" color="text-pink-500">
+      <Card icon={Crown} title="지역 브랜드 구축 전략" color="text-blue-500">
         <div className="space-y-3">
           {[
             { phase: '1단계: 인지도 (0-6개월)', items: ['병원명 + 로고 디자인 (200만)', '네이버 플레이스 완성도 100%', '진료과 특화 블로그 50편', '오프닝 이벤트 + 지역 커뮤니티 활동'], budget: '500만' },
@@ -156,12 +156,12 @@ export default function GrowthPack({ result }: Props) {
             <div key={p.phase} className="p-3 rounded-xl bg-secondary/30">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-sm font-medium text-foreground">{p.phase}</span>
-                <span className="text-[10px] text-pink-600 font-medium">월 {p.budget}</span>
+                <span className="text-[10px] text-blue-600 font-medium">월 {p.budget}</span>
               </div>
               <div className="grid grid-cols-2 gap-1">
                 {p.items.map((item) => (
                   <div key={item} className="flex items-start gap-1.5">
-                    <span className="w-1 h-1 rounded-full bg-pink-500 flex-shrink-0 mt-1.5" />
+                    <span className="w-1 h-1 rounded-full bg-blue-500 flex-shrink-0 mt-1.5" />
                     <span className="text-[10px] text-muted-foreground">{item}</span>
                   </div>
                 ))}
@@ -172,7 +172,7 @@ export default function GrowthPack({ result }: Props) {
       </Card>
 
       {/* 6. 지역 커뮤니티 전략 */}
-      <Card icon={Users2} title="지역 커뮤니티 참여 전략" color="text-teal-500">
+      <Card icon={Users2} title="지역 커뮤니티 참여 전략" color="text-blue-500">
         <div className="space-y-2">
           {[
             { activity: '무료 건강 강좌 (월 1회)', target: '주민 센터', attendees: '20-30명', cost: '20만', effect: '인지도 + 신뢰' },
@@ -188,14 +188,14 @@ export default function GrowthPack({ result }: Props) {
                 <div className="text-[10px] text-muted-foreground">{a.target} · {a.attendees}</div>
               </div>
               <span className="text-[10px] text-muted-foreground">{a.cost}</span>
-              <span className="text-[10px] text-teal-600 font-medium w-20 text-right">{a.effect}</span>
+              <span className="text-[10px] text-blue-600 font-medium w-20 text-right">{a.effect}</span>
             </div>
           ))}
         </div>
       </Card>
 
       {/* 7. 매출 성장 시뮬레이션 */}
-      <Card icon={LineChart} title="5년 매출 성장 시뮬레이션" color="text-indigo-500">
+      <Card icon={LineChart} title="5년 매출 성장 시뮬레이션" color="text-blue-600">
         <div className="space-y-2">
           {[
             { year: '1년차', quarterly: [rev * 0.7, rev * 0.85, rev * 0.95, rev * 1.05] },
@@ -209,7 +209,7 @@ export default function GrowthPack({ result }: Props) {
               <div className="flex-1 flex gap-1">
                 {y.quarterly.map((q, i) => (
                   <div key={i} className="flex-1 h-6 bg-muted rounded overflow-hidden">
-                    <div className="h-full bg-indigo-500 rounded" style={{ width: `${(q / (rev * 1.7)) * 100}%`, opacity: 0.5 + i * 0.15 }} />
+                    <div className="h-full bg-blue-600 rounded" style={{ width: `${(q / (rev * 1.7)) * 100}%`, opacity: 0.5 + i * 0.15 }} />
                   </div>
                 ))}
               </div>
@@ -218,8 +218,8 @@ export default function GrowthPack({ result }: Props) {
           ))}
         </div>
         <div className="mt-3 grid grid-cols-3 gap-3">
-          <div className="text-center p-2 bg-indigo-50 dark:bg-indigo-950/20 rounded-lg">
-            <div className="text-lg font-bold text-indigo-600">{fmt(rev * 1.65)}</div>
+          <div className="text-center p-2 bg-blue-50 dark:bg-blue-950/20 rounded-lg">
+            <div className="text-lg font-bold text-blue-700">{fmt(rev * 1.65)}</div>
             <div className="text-[10px] text-muted-foreground">5년차 월 매출</div>
           </div>
           <div className="text-center p-2 bg-secondary/50 rounded-lg">
@@ -234,7 +234,7 @@ export default function GrowthPack({ result }: Props) {
       </Card>
 
       {/* 8. 디지털 전환 로드맵 */}
-      <Card icon={Globe2} title="디지털 전환 로드맵" color="text-cyan-600">
+      <Card icon={Globe2} title="디지털 전환 로드맵" color="text-blue-600">
         <div className="space-y-3">
           {[
             { phase: 'Phase 1: 기본 디지털화', items: ['EMR + PACS 도입', '온라인 예약 시스템', '카카오 알림톡', '네이버 플레이스'], timeline: '개원 시', cost: '500만' },
@@ -245,7 +245,7 @@ export default function GrowthPack({ result }: Props) {
             <div key={p.phase} className="flex gap-3">
               <div className="flex flex-col items-center">
                 <div className={`w-7 h-7 rounded-full text-white text-xs font-bold flex items-center justify-center ${
-                  ['bg-cyan-400', 'bg-cyan-500', 'bg-cyan-600', 'bg-cyan-700'][i]
+                  ['bg-blue-400', 'bg-blue-600', 'bg-blue-600', 'bg-blue-700'][i]
                 }`}>{i + 1}</div>
                 {i < 3 && <div className="w-0.5 flex-1 bg-border mt-1" />}
               </div>
@@ -256,7 +256,7 @@ export default function GrowthPack({ result }: Props) {
                 </div>
                 <div className="flex flex-wrap gap-1">
                   {p.items.map((item) => (
-                    <span key={item} className="text-[10px] px-2 py-0.5 bg-cyan-50 dark:bg-cyan-950/20 text-cyan-700 dark:text-cyan-300 rounded-full">{item}</span>
+                    <span key={item} className="text-[10px] px-2 py-0.5 bg-blue-50 dark:bg-blue-950/20 text-blue-700 dark:text-blue-300 rounded-full">{item}</span>
                   ))}
                 </div>
               </div>

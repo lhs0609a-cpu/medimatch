@@ -156,7 +156,7 @@ export default function AdminSettingsPage() {
     <button
       onClick={onChange}
       className={`relative w-12 h-6 rounded-full transition-colors ${
-        enabled ? 'bg-violet-600' : 'bg-gray-300'
+        enabled ? 'bg-blue-600' : 'bg-gray-300'
       }`}
     >
       <div
@@ -170,7 +170,7 @@ export default function AdminSettingsPage() {
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="w-8 h-8 text-violet-600 animate-spin" />
+        <Loader2 className="w-8 h-8 text-blue-600 animate-spin" />
       </div>
     )
   }
@@ -194,7 +194,7 @@ export default function AdminSettingsPage() {
         <button
           onClick={handleSave}
           disabled={isSaving}
-          className="flex items-center gap-2 px-6 py-2.5 bg-violet-600 text-white rounded-xl font-medium hover:bg-violet-700 disabled:opacity-50"
+          className="flex items-center gap-2 px-6 py-2.5 bg-blue-600 text-white rounded-xl font-medium hover:bg-blue-700 disabled:opacity-50"
         >
           {isSaving ? (
             <Loader2 className="w-4 h-4 animate-spin" />
@@ -231,7 +231,7 @@ export default function AdminSettingsPage() {
             onClick={() => setActiveTab(tab.key)}
             className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
               activeTab === tab.key
-                ? 'bg-violet-100 text-violet-700'
+                ? 'bg-blue-100 text-blue-700'
                 : 'text-gray-600 hover:bg-gray-100'
             }`}
           >
@@ -260,7 +260,7 @@ export default function AdminSettingsPage() {
                     general: { ...settings.general, site_name: e.target.value },
                   })
                 }
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-violet-500 focus:border-transparent"
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             </div>
 
@@ -277,7 +277,7 @@ export default function AdminSettingsPage() {
                     general: { ...settings.general, site_url: e.target.value },
                   })
                 }
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-violet-500 focus:border-transparent"
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             </div>
 
@@ -294,7 +294,7 @@ export default function AdminSettingsPage() {
                     general: { ...settings.general, support_email: e.target.value },
                   })
                 }
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-violet-500 focus:border-transparent"
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             </div>
 
@@ -397,7 +397,7 @@ export default function AdminSettingsPage() {
                   })
                 }
                 placeholder="https://hooks.slack.com/services/..."
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-violet-500 focus:border-transparent"
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
               <p className="text-sm text-gray-400 mt-1">내부 알림용 Slack 웹훅 URL</p>
             </div>
@@ -446,7 +446,7 @@ export default function AdminSettingsPage() {
                     },
                   })
                 }
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-violet-500 focus:border-transparent"
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             </div>
 
@@ -467,7 +467,7 @@ export default function AdminSettingsPage() {
                     },
                   })
                 }
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-violet-500 focus:border-transparent"
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             </div>
           </div>
@@ -514,7 +514,7 @@ export default function AdminSettingsPage() {
                     },
                   })
                 }
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-violet-500 focus:border-transparent"
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             </div>
 
@@ -536,7 +536,7 @@ export default function AdminSettingsPage() {
                     },
                   })
                 }
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-violet-500 focus:border-transparent"
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
               <p className="text-sm text-gray-400 mt-1">
                 초과 시 계정이 일시 잠금됩니다
@@ -586,7 +586,7 @@ export default function AdminSettingsPage() {
                     },
                   })
                 }
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-violet-500 focus:border-transparent"
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             </div>
 
@@ -601,7 +601,7 @@ export default function AdminSettingsPage() {
                 <select
                   value={crawlType}
                   onChange={(e) => setCrawlType(e.target.value as 'all' | 'hospitals' | 'closed')}
-                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-violet-500 focus:border-transparent bg-white"
+                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
                 >
                   <option value="all">전체 크롤링 (병원 + 건물 + 상권)</option>
                   <option value="hospitals">병원 데이터만 (심평원)</option>
@@ -619,7 +619,7 @@ export default function AdminSettingsPage() {
                 <button
                   onClick={handleTriggerCrawl}
                   disabled={isCrawling}
-                  className="flex items-center gap-2 px-4 py-2 bg-violet-600 text-white rounded-lg text-sm font-medium hover:bg-violet-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {isCrawling ? (
                     <Loader2 className="w-4 h-4 animate-spin" />
@@ -632,11 +632,11 @@ export default function AdminSettingsPage() {
 
               {/* 마지막 실행 결과 */}
               {lastCrawlResult && (
-                <div className="mt-4 p-3 bg-violet-50 rounded-lg">
-                  <p className="text-sm text-violet-700">
+                <div className="mt-4 p-3 bg-blue-50 rounded-lg">
+                  <p className="text-sm text-blue-700">
                     <span className="font-medium">{lastCrawlResult.task_name}</span> 실행됨
                   </p>
-                  <p className="text-xs text-violet-500 mt-1">
+                  <p className="text-xs text-blue-500 mt-1">
                     Task ID: {lastCrawlResult.task_id}
                   </p>
                 </div>

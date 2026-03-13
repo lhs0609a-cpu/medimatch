@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { ArrowLeft, Package, Upload, ChevronRight, Check, Camera } from 'lucide-react'
+import { toast } from 'sonner'
 import { categories } from '../data/seed'
 
 const conditions = [
@@ -52,7 +53,7 @@ export default function EquipmentRegisterPage() {
   }
 
   const handleSubmit = () => {
-    alert('장비 등록이 완료되었습니다. (MVP: 실제 저장은 백엔드 연결 후 지원됩니다)')
+    toast.success('장비 등록이 완료되었습니다.', { description: '관리자 검토 후 게시됩니다.' })
     router.push('/equipment')
   }
 

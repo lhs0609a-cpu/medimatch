@@ -44,15 +44,15 @@ export default function MarketingROI({ result }: { result: SimulationResponse })
   return (
     <div className="card p-6">
       <div className="flex items-center gap-2 mb-5">
-        <Megaphone className="w-5 h-5 text-violet-500" />
+        <Megaphone className="w-5 h-5 text-blue-500" />
         <h3 className="font-semibold text-foreground">마케팅 채널별 ROI 분석</h3>
         <span className="ml-auto text-[11px] text-muted-foreground">월 예산 {formatMoney(estimatedBudget)}원</span>
       </div>
 
       {/* Summary */}
       <div className="grid grid-cols-3 gap-2 mb-5">
-        <div className="text-center p-3 bg-violet-50 dark:bg-violet-950/30 rounded-xl">
-          <div className="text-xl font-bold text-violet-600 dark:text-violet-400">{formatMoney(estimatedBudget)}원</div>
+        <div className="text-center p-3 bg-blue-50 dark:bg-blue-950/30 rounded-xl">
+          <div className="text-xl font-bold text-blue-600 dark:text-blue-400">{formatMoney(estimatedBudget)}원</div>
           <div className="text-[11px] text-muted-foreground">추천 마케팅 예산</div>
         </div>
         <div className="text-center p-3 bg-green-50 dark:bg-green-950/30 rounded-xl">
@@ -142,8 +142,8 @@ export default function MarketingROI({ result }: { result: SimulationResponse })
         </table>
       </div>
 
-      <div className="mt-4 p-3 bg-violet-50 dark:bg-violet-950/20 rounded-lg text-xs text-muted-foreground">
-        <span className="font-semibold text-violet-700 dark:text-violet-300">최적 채널 조합:</span>{' '}
+      <div className="mt-4 p-3 bg-blue-50 dark:bg-blue-950/20 rounded-lg text-xs text-muted-foreground">
+        <span className="font-semibold text-blue-700 dark:text-blue-300">최적 채널 조합:</span>{' '}
         네이버플레이스(30%) + 블로그(15%) 중심으로 온라인 가시성 확보 후, 인스타그램으로 브랜딩 강화를 추천합니다.
       </div>
     </div>

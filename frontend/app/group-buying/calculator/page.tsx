@@ -9,6 +9,7 @@ import {
   CheckCircle, Sparkles, ArrowRight, RefreshCw
 } from 'lucide-react'
 import { groupBuyingService } from '@/lib/api/services'
+import { toast } from 'sonner'
 import { SavingsCalculation } from '@/lib/api/client'
 
 export default function SavingsCalculatorPage() {
@@ -37,7 +38,7 @@ export default function SavingsCalculatorPage() {
       setResult(data)
     },
     onError: () => {
-      alert('계산에 실패했습니다. 다시 시도해주세요.')
+      toast.error('계산에 실패했습니다. 다시 시도해주세요.')
     },
   })
 
@@ -53,11 +54,11 @@ export default function SavingsCalculatorPage() {
 
   const handleCalculate = () => {
     if (!formData.specialty) {
-      alert('진료과목을 선택해주세요')
+      toast.info('진료과목을 선택해주세요')
       return
     }
     if (formData.category_ids.length === 0) {
-      alert('최소 1개 카테고리를 선택해주세요')
+      toast.info('최소 1개 카테고리를 선택해주세요')
       return
     }
     calculateMutation.mutate()
@@ -206,7 +207,7 @@ export default function SavingsCalculatorPage() {
         <button
           onClick={handleCalculate}
           disabled={calculateMutation.isPending}
-          className="w-full py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl font-semibold hover:shadow-lg hover:shadow-blue-500/30 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+          className="w-full py-4 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl font-semibold hover:shadow-lg hover:shadow-blue-500/30 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
         >
           {calculateMutation.isPending ? (
             <>

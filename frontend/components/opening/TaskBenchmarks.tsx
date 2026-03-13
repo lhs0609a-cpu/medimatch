@@ -17,7 +17,7 @@ export default function TaskBenchmarks({ benchmarks, title = '벤치마크/수�
   return (
     <div className="space-y-1.5">
       <div className="flex items-center gap-1.5 text-xs font-medium text-foreground">
-        <Icon className="w-3.5 h-3.5 text-indigo-500" />
+        <Icon className="w-3.5 h-3.5 text-blue-600" />
         <span>{title}</span>
       </div>
       <div className="bg-secondary/30 rounded-lg overflow-hidden">

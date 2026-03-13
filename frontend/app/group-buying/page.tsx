@@ -38,7 +38,7 @@ function ProgressBar({ current, max }: { current: number; max: number }) {
   return (
     <div className="w-full bg-gray-200 rounded-full h-2.5 overflow-hidden">
       <motion.div
-        className="h-full bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full"
+        className="h-full bg-gradient-to-r from-blue-500 to-blue-700 rounded-full"
         initial={{ width: 0 }}
         animate={{ width: `${percentage}%` }}
         transition={{ duration: 0.8, ease: 'easeOut' }}
@@ -170,7 +170,7 @@ function StatCard({
   return (
     <div className="bg-white rounded-xl border border-gray-200 p-5">
       <div className="flex items-center gap-3 mb-2">
-        <TossIcon icon={icon} color={iconColor || 'from-blue-500 to-indigo-500'} size="sm" shadow={iconShadow} />
+        <TossIcon icon={icon} color={iconColor || 'from-blue-500 to-blue-600'} size="sm" shadow={iconShadow} />
         <span className="text-sm text-gray-600">{label}</span>
       </div>
       <div className="text-2xl font-bold text-gray-900">
@@ -233,8 +233,8 @@ export default function GroupBuyingPage() {
           {/* 주요 특징 */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-3xl mx-auto mb-8">
             {[
-              { icon: Users, color: 'from-purple-500 to-pink-500', shadow: 'shadow-purple-500/25', text: '30명+ 공동 구매력' },
-              { icon: ShieldCheck, color: 'from-teal-500 to-cyan-500', shadow: 'shadow-teal-500/25', text: '검증된 우수 업체' },
+              { icon: Users, color: 'from-blue-500 to-blue-500', shadow: 'shadow-blue-500/25', text: '30명+ 공동 구매력' },
+              { icon: ShieldCheck, color: 'from-blue-500 to-blue-600', shadow: 'shadow-blue-500/25', text: '검증된 우수 업체' },
               { icon: TrendingDown, color: 'from-red-500 to-rose-500', shadow: 'shadow-red-500/25', text: '평균 15~30% 절감' },
             ].map((item, idx) => (
               <motion.div
@@ -258,7 +258,7 @@ export default function GroupBuyingPage() {
           >
             <Link
               href="/group-buying/calculator"
-              className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl font-semibold hover:shadow-lg hover:shadow-blue-500/30 transition-all"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl font-semibold hover:shadow-lg hover:shadow-blue-500/30 transition-all"
             >
               <Calculator className="w-5 h-5" />
               내 예상 절감액 계산하기
@@ -275,8 +275,8 @@ export default function GroupBuyingPage() {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <StatCard
                 icon={Users}
-                iconColor="from-purple-500 to-pink-500"
-                iconShadow="shadow-purple-500/25"
+                iconColor="from-blue-500 to-blue-500"
+                iconShadow="shadow-blue-500/25"
                 label="총 참여자"
                 value={stats.total_participants}
                 suffix="명"
@@ -299,8 +299,8 @@ export default function GroupBuyingPage() {
               />
               <StatCard
                 icon={Calculator}
-                iconColor="from-cyan-500 to-blue-500"
-                iconShadow="shadow-cyan-500/25"
+                iconColor="from-blue-600 to-blue-500"
+                iconShadow="shadow-blue-600/25"
                 label="평균 절감액"
                 value={(stats.avg_savings_per_participant / 10000).toFixed(0)}
                 suffix="만원/인"
@@ -388,9 +388,9 @@ export default function GroupBuyingPage() {
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
             {[
-              { step: 1, icon: Calendar, color: 'from-blue-400 to-indigo-500', shadow: 'shadow-blue-500/25', title: '코호트 선택', desc: '개원 예정월에 맞는 코호트를 선택하세요' },
+              { step: 1, icon: Calendar, color: 'from-blue-400 to-blue-600', shadow: 'shadow-blue-500/25', title: '코호트 선택', desc: '개원 예정월에 맞는 코호트를 선택하세요' },
               { step: 2, icon: CheckCircle, color: 'from-green-500 to-emerald-500', shadow: 'shadow-green-500/25', title: '카테고리 선택', desc: '필요한 품목 카테고리를 선택하세요' },
-              { step: 3, icon: Users, color: 'from-purple-500 to-pink-500', shadow: 'shadow-purple-500/25', title: '참여 신청', desc: '간단한 정보 입력 후 참여 신청을 완료하세요' },
+              { step: 3, icon: Users, color: 'from-blue-500 to-blue-500', shadow: 'shadow-blue-500/25', title: '참여 신청', desc: '간단한 정보 입력 후 참여 신청을 완료하세요' },
               { step: 4, icon: TrendingDown, color: 'from-red-500 to-rose-500', shadow: 'shadow-red-500/25', title: '할인 혜택', desc: '인원이 모이면 자동으로 할인이 적용됩니다' },
             ].map((item) => (
               <div key={item.step} className="text-center">
@@ -442,7 +442,7 @@ export default function GroupBuyingPage() {
       )}
 
       {/* CTA 섹션 */}
-      <section className="py-16 px-4 bg-gradient-to-r from-blue-600 to-indigo-600">
+      <section className="py-16 px-4 bg-gradient-to-r from-blue-600 to-blue-700">
         <div className="max-w-4xl mx-auto text-center text-white">
           <h2 className="text-3xl font-bold mb-4">
             지금 바로 시작하세요

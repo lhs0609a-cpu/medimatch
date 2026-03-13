@@ -87,7 +87,7 @@ const typeColors: Record<string, string> = {
   DOCTOR: 'bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400',
   NURSE: 'bg-emerald-50 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400',
   ADMIN: 'bg-amber-50 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400',
-  TECH: 'bg-purple-50 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400',
+  TECH: 'bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400',
 }
 const typeLabels: Record<string, string> = { DOCTOR: '의사', NURSE: '간호사', ADMIN: '행정', TECH: '기사' }
 const priorityColors: Record<string, string> = {

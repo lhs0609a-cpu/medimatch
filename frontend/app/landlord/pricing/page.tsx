@@ -64,7 +64,7 @@ const subscriptionPlans = [
       { text: '전담 매니저 배정', included: true },
     ],
     badge: 'VIP',
-    color: 'purple',
+    color: 'blue',
   },
 ]
 
@@ -144,10 +144,10 @@ export default function LandlordPricingPage() {
         {/* Stats */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
           {[
-            { label: '등록 의사·약사', value: '18,742명', icon: Users, color: 'from-purple-500 to-pink-500', shadow: 'shadow-purple-500/25' },
+            { label: '등록 의사·약사', value: '18,742명', icon: Users, color: 'from-blue-500 to-blue-600', shadow: 'shadow-blue-500/25' },
             { label: '평균 매칭 기간', value: '14일', icon: Zap, color: 'from-amber-500 to-orange-500', shadow: 'shadow-amber-500/25' },
             { label: '입주 성사율', value: '87%', icon: Target, color: 'from-orange-500 to-red-500', shadow: 'shadow-orange-500/25' },
-            { label: '누적 거래', value: '2,847건', icon: BarChart3, color: 'from-cyan-500 to-blue-500', shadow: 'shadow-cyan-500/25' },
+            { label: '누적 거래', value: '2,847건', icon: BarChart3, color: 'from-blue-500 to-blue-600', shadow: 'shadow-blue-500/25' },
           ].map((stat) => (
             <div key={stat.label} className="card p-4 text-center">
               <div className="flex justify-center mb-2">
@@ -200,7 +200,7 @@ export default function LandlordPricingPage() {
               {plan.badge && (
                 <div className={`absolute top-4 right-4 px-3 py-1 rounded-full text-xs font-medium ${
                   plan.badge === 'VIP'
-                    ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400'
+                    ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400'
                     : 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400'
                 }`}>
                   {plan.badge}
@@ -305,18 +305,18 @@ export default function LandlordPricingPage() {
               <div key={product.id} className="card p-5 hover:shadow-md transition-shadow">
                 <div className="flex items-start gap-4">
                   <TossIcon icon={product.icon} color={
-                    product.icon === TrendingUp ? 'from-cyan-500 to-blue-500' :
+                    product.icon === TrendingUp ? 'from-blue-500 to-blue-600' :
                     product.icon === Star ? 'from-amber-500 to-orange-500' :
                     product.icon === Megaphone ? 'from-orange-500 to-red-500' :
                     product.icon === Bell ? 'from-amber-500 to-orange-500' :
-                    product.icon === Mail ? 'from-indigo-500 to-purple-500' :
+                    product.icon === Mail ? 'from-blue-500 to-blue-600' :
                     'from-green-500 to-emerald-500'
                   } size="md" shadow={
-                    product.icon === TrendingUp ? 'shadow-cyan-500/25' :
+                    product.icon === TrendingUp ? 'shadow-blue-500/25' :
                     product.icon === Star ? 'shadow-amber-500/25' :
                     product.icon === Megaphone ? 'shadow-orange-500/25' :
                     product.icon === Bell ? 'shadow-amber-500/25' :
-                    product.icon === Mail ? 'shadow-indigo-500/25' :
+                    product.icon === Mail ? 'shadow-blue-500/25' :
                     'shadow-green-500/25'
                   } />
                   <div className="flex-1">

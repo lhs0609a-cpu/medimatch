@@ -23,7 +23,7 @@ export default function HomepageOpeningCTA() {
   return (
     <section className="py-20 md:py-28 relative overflow-hidden">
       {/* Background Gradient */}
-      <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/5 via-blue-500/5 to-green-500/5" />
+      <div className="absolute inset-0 bg-gradient-to-br from-blue-600/5 via-blue-500/5 to-blue-400/5" />
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-primary/5 via-transparent to-transparent" />
 
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative">

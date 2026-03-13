@@ -35,7 +35,7 @@ function CommentItem({ comment, depth = 0 }: { comment: Comment; depth?: number 
     <div className={`${depth > 0 ? 'ml-8 border-l-2 border-muted pl-4' : ''}`}>
       <div className="py-3">
         <div className="flex items-center gap-2 mb-2">
-          <div className="w-7 h-7 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-full flex items-center justify-center text-white text-xs font-bold">
+          <div className="w-7 h-7 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center text-white text-xs font-bold">
             {comment.author[0]}
           </div>
           <span className="text-sm font-medium text-foreground">{comment.author}</span>

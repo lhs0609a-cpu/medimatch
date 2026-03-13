@@ -20,8 +20,8 @@ interface Deal {
 const PIPELINE_STAGES = [
   { key: 'LEAD', label: '리드', color: 'border-gray-300' },
   { key: 'CONTACTED', label: '컨택', color: 'border-sky-400' },
-  { key: 'VIEWING_SCHEDULED', label: '내방예정', color: 'border-indigo-400' },
-  { key: 'VIEWED', label: '내방완료', color: 'border-violet-400' },
+  { key: 'VIEWING_SCHEDULED', label: '내방예정', color: 'border-blue-400' },
+  { key: 'VIEWED', label: '내방완료', color: 'border-blue-400' },
   { key: 'NEGOTIATING', label: '협상중', color: 'border-amber-400' },
   { key: 'CONTRACT_PENDING', label: '계약대기', color: 'border-orange-400' },
   { key: 'CONTRACTED', label: '계약완료', color: 'border-blue-400' },

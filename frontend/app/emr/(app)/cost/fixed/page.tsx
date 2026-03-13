@@ -174,7 +174,7 @@ export default function FixedCostPage() {
                 <div className="flex-1 flex h-7 rounded-lg overflow-hidden bg-secondary/30">
                   <div className="bg-primary/70 h-full" style={{ width: `${(m.rent / maxTrend) * 100}%` }} />
                   <div className="bg-amber-400 h-full" style={{ width: `${(m.utilities / maxTrend) * 100}%` }} />
-                  <div className="bg-purple-400 h-full" style={{ width: `${(m.lease / maxTrend) * 100}%` }} />
+                  <div className="bg-blue-400 h-full" style={{ width: `${(m.lease / maxTrend) * 100}%` }} />
                   <div className="bg-gray-400 h-full" style={{ width: `${(m.other / maxTrend) * 100}%` }} />
                 </div>
                 <span className="text-xs font-semibold w-16 text-right">{fmtMan(m.total)}</span>
@@ -184,7 +184,7 @@ export default function FixedCostPage() {
           <div className="flex items-center gap-6 pt-2 text-xs text-muted-foreground">
             <div className="flex items-center gap-1.5"><div className="w-3 h-3 rounded bg-primary/70" /> 임대료</div>
             <div className="flex items-center gap-1.5"><div className="w-3 h-3 rounded bg-amber-400" /> 공과금</div>
-            <div className="flex items-center gap-1.5"><div className="w-3 h-3 rounded bg-purple-400" /> 장비리스</div>
+            <div className="flex items-center gap-1.5"><div className="w-3 h-3 rounded bg-blue-400" /> 장비리스</div>
             <div className="flex items-center gap-1.5"><div className="w-3 h-3 rounded bg-gray-400" /> 기타</div>
           </div>
         </div>

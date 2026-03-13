@@ -15,6 +15,7 @@ import {
   X,
 } from 'lucide-react';
 import { TossIcon } from '@/components/ui/TossIcon';
+import { toast } from 'sonner';
 
 interface Listing {
   id: string;
@@ -127,7 +128,7 @@ export default function RealEstateManagePage() {
         method: 'POST',
         headers: { Authorization: `Bearer ${getToken()}` },
       });
-      if (response.ok) alert('크롤링이 시작되었습니다.');
+      if (response.ok) toast.success('크롤링이 시작되었습니다.');
     } catch (error) {
       console.error('Failed to trigger crawl:', error);
     }
@@ -227,10 +228,10 @@ export default function RealEstateManagePage() {
         fetchStats();
       } else {
         const err = await res.json();
-        alert(err.detail || '저장 실패');
+        toast.error(err.detail || '저장 실패');
       }
     } catch (e) {
-      alert('요청 실패');
+      toast.error('요청 실패');
     } finally {
       setActionLoading(false);
     }
@@ -249,10 +250,10 @@ export default function RealEstateManagePage() {
         fetchListings();
         fetchStats();
       } else {
-        alert('삭제 실패');
+        toast.error('삭제 실패');
       }
     } catch (e) {
-      alert('요청 실패');
+      toast.error('요청 실패');
     } finally {
       setActionLoading(false);
     }
@@ -267,7 +268,7 @@ export default function RealEstateManagePage() {
   const getStatusBadge = (status: string) => {
     const styles: Record<string, string> = {
       AVAILABLE: 'bg-emerald-100 text-emerald-700', RESERVED: 'bg-amber-100 text-amber-700',
-      CONTRACTED: 'bg-violet-100 text-violet-700', CLOSED: 'bg-gray-100 text-gray-700',
+      CONTRACTED: 'bg-blue-100 text-blue-700', CLOSED: 'bg-gray-100 text-gray-700',
     };
     const labels: Record<string, string> = { AVAILABLE: '가능', RESERVED: '예약', CONTRACTED: '계약', CLOSED: '마감' };
     return <span className={`px-2 py-1 rounded-full text-xs font-medium ${styles[status] || 'bg-gray-100'}`}>{labels[status] || status}</span>;
@@ -284,64 +285,64 @@ export default function RealEstateManagePage() {
           <div className="col-span-2">
             <label className="block text-sm font-medium text-gray-700 mb-1">제목 *</label>
             <input value={form.title} onChange={(e) => setForm({...form, title: e.target.value})}
-              className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-violet-200" />
+              className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-200" />
           </div>
           <div className="col-span-2">
             <label className="block text-sm font-medium text-gray-700 mb-1">주소 *</label>
             <input value={form.address} onChange={(e) => setForm({...form, address: e.target.value})}
-              className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-violet-200" />
+              className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-200" />
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">건물명</label>
             <input value={form.building_name} onChange={(e) => setForm({...form, building_name: e.target.value})}
-              className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-violet-200" />
+              className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-200" />
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">층</label>
             <input value={form.floor} onChange={(e) => setForm({...form, floor: e.target.value})}
-              className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-violet-200" />
+              className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-200" />
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">면적 (평)</label>
             <input type="number" value={form.area_pyeong} onChange={(e) => setForm({...form, area_pyeong: e.target.value})}
-              className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-violet-200" />
+              className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-200" />
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">유형</label>
             <select value={form.listing_type} onChange={(e) => setForm({...form, listing_type: e.target.value})}
-              className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-violet-200">
+              className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-200">
               <option value="RENT">임대</option><option value="SALE">매매</option><option value="SUBLEASE">전대</option>
             </select>
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">보증금</label>
             <input type="number" value={form.rent_deposit} onChange={(e) => setForm({...form, rent_deposit: e.target.value})}
-              className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-violet-200" />
+              className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-200" />
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">월세</label>
             <input type="number" value={form.rent_monthly} onChange={(e) => setForm({...form, rent_monthly: e.target.value})}
-              className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-violet-200" />
+              className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-200" />
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">매매가</label>
             <input type="number" value={form.sale_price} onChange={(e) => setForm({...form, sale_price: e.target.value})}
-              className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-violet-200" />
+              className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-200" />
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">권리금</label>
             <input type="number" value={form.premium} onChange={(e) => setForm({...form, premium: e.target.value})}
-              className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-violet-200" />
+              className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-200" />
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">추천 진료과 (쉼표 구분)</label>
             <input value={form.suitable_for} onChange={(e) => setForm({...form, suitable_for: e.target.value})}
-              placeholder="내과, 피부과, 치과" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-violet-200" />
+              placeholder="내과, 피부과, 치과" className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-200" />
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">이전용도</label>
             <input value={form.previous_use} onChange={(e) => setForm({...form, previous_use: e.target.value})}
-              className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-violet-200" />
+              className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-200" />
           </div>
           <div className="flex items-center gap-6">
             <label className="flex items-center gap-2 text-sm">
@@ -356,19 +357,19 @@ export default function RealEstateManagePage() {
           <div className="col-span-2">
             <label className="block text-sm font-medium text-gray-700 mb-1">설명</label>
             <textarea value={form.description} onChange={(e) => setForm({...form, description: e.target.value})} rows={3}
-              className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-violet-200 resize-none" />
+              className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-200 resize-none" />
           </div>
           <div><label className="block text-sm font-medium text-gray-700 mb-1">담당자명</label>
             <input value={form.contact_name} onChange={(e) => setForm({...form, contact_name: e.target.value})}
-              className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-violet-200" /></div>
+              className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-200" /></div>
           <div><label className="block text-sm font-medium text-gray-700 mb-1">연락처</label>
             <input value={form.contact_phone} onChange={(e) => setForm({...form, contact_phone: e.target.value})}
-              className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-violet-200" /></div>
+              className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-200" /></div>
         </div>
         <div className="flex justify-end gap-3 px-6 py-4 border-t border-gray-100">
           <button onClick={onClose} className="px-4 py-2 border border-gray-200 text-gray-700 rounded-xl text-sm hover:bg-gray-50">취소</button>
           <button onClick={handleSave} disabled={actionLoading || !form.title || !form.address}
-            className="px-6 py-2 bg-violet-600 text-white rounded-xl text-sm font-medium hover:bg-violet-700 disabled:opacity-50">
+            className="px-6 py-2 bg-blue-600 text-white rounded-xl text-sm font-medium hover:bg-blue-700 disabled:opacity-50">
             {actionLoading ? '저장 중...' : '저장'}
           </button>
         </div>
@@ -381,7 +382,7 @@ export default function RealEstateManagePage() {
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div className="flex items-center gap-3">
-          <TossIcon icon={Building2} color="from-blue-500 to-indigo-500" shadow="shadow-blue-500/25" size="md" />
+          <TossIcon icon={Building2} color="from-blue-500 to-blue-600" shadow="shadow-blue-500/25" size="md" />
           <div>
             <h1 className="text-2xl font-bold text-gray-900">부동산 매물 관리</h1>
             <p className="text-gray-500 mt-1">의료시설 적합 부동산 매물을 관리합니다.</p>
@@ -391,7 +392,7 @@ export default function RealEstateManagePage() {
           <button onClick={triggerCrawl} className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-xl text-gray-700 hover:bg-gray-50">
             <RefreshCw className="w-4 h-4" /> 크롤링 시작
           </button>
-          <button onClick={openCreate} className="flex items-center gap-2 px-4 py-2 bg-violet-600 text-white rounded-xl hover:bg-violet-700">
+          <button onClick={openCreate} className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700">
             <Plus className="w-4 h-4" /> 매물 등록
           </button>
         </div>
@@ -414,7 +415,7 @@ export default function RealEstateManagePage() {
           </div>
           <div className="bg-white rounded-xl p-4 border border-gray-100">
             <p className="text-sm text-gray-500 mb-1">계약</p>
-            <p className="text-2xl font-bold text-violet-600">{stats.contracted}</p>
+            <p className="text-2xl font-bold text-blue-600">{stats.contracted}</p>
           </div>
         </div>
       )}
@@ -426,14 +427,14 @@ export default function RealEstateManagePage() {
             <Search className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
             <input type="text" placeholder="주소, 건물명으로 검색..." value={search}
               onChange={(e) => setSearch(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && fetchListings()}
-              className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent" />
+              className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
           </div>
           <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}
-            className="px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-500">
+            className="px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
             <option value="">모든 상태</option><option value="AVAILABLE">가능</option><option value="RESERVED">예약</option><option value="CONTRACTED">계약</option><option value="CLOSED">마감</option>
           </select>
           <select value={typeFilter} onChange={(e) => setTypeFilter(e.target.value)}
-            className="px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-500">
+            className="px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
             <option value="">모든 유형</option><option value="RENT">임대</option><option value="SALE">매매</option><option value="SUBLEASE">전대</option>
           </select>
           <button onClick={fetchListings} className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200">검색</button>
@@ -478,7 +479,7 @@ export default function RealEstateManagePage() {
                 <td className="px-6 py-4">
                   <div className="flex flex-wrap gap-1">
                     {listing.suitable_for?.slice(0, 2).map((dept) => (
-                      <span key={dept} className="px-2 py-0.5 bg-violet-50 text-violet-700 text-xs rounded-full">{dept}</span>
+                      <span key={dept} className="px-2 py-0.5 bg-blue-50 text-blue-700 text-xs rounded-full">{dept}</span>
                     ))}
                   </div>
                 </td>
@@ -486,7 +487,7 @@ export default function RealEstateManagePage() {
                 <td className="px-6 py-4 text-sm text-gray-500">{listing.view_count}</td>
                 <td className="px-6 py-4 text-right">
                   <div className="flex items-center justify-end gap-2">
-                    <button onClick={() => openView(listing.id)} className="p-1 text-gray-400 hover:text-violet-600" title="상세보기"><Eye className="w-4 h-4" /></button>
+                    <button onClick={() => openView(listing.id)} className="p-1 text-gray-400 hover:text-blue-600" title="상세보기"><Eye className="w-4 h-4" /></button>
                     <button onClick={() => openEdit(listing)} className="p-1 text-gray-400 hover:text-blue-600" title="수정"><Edit className="w-4 h-4" /></button>
                     <button onClick={() => setDeleteId(listing.id)} className="p-1 text-gray-400 hover:text-rose-600" title="삭제"><Trash2 className="w-4 h-4" /></button>
                   </div>

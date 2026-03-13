@@ -138,7 +138,7 @@ export default function EMRDashboardPage() {
         <div className="card p-5">
           <div className="flex items-center justify-between mb-3">
             <span className="text-sm text-muted-foreground">오늘 예약</span>
-            <TossIcon icon={CalendarCheck} color="from-blue-500 to-indigo-600" size="sm" />
+            <TossIcon icon={CalendarCheck} color="from-blue-500 to-blue-700" size="sm" />
           </div>
           <div className="text-3xl font-bold">{todayStats.appointments}<span className="text-lg text-muted-foreground">명</span></div>
           <div className="flex items-center gap-2 mt-2">
@@ -151,7 +151,7 @@ export default function EMRDashboardPage() {
         <div className="card p-5">
           <div className="flex items-center justify-between mb-3">
             <span className="text-sm text-muted-foreground">오늘 매출</span>
-            <TossIcon icon={DollarSign} color="from-emerald-500 to-teal-600" size="sm" />
+            <TossIcon icon={DollarSign} color="from-emerald-500 to-blue-600" size="sm" />
           </div>
           <div className="text-3xl font-bold">{(todayStats.revenue / 10000).toFixed(0)}<span className="text-lg text-muted-foreground">만원</span></div>
           <div className="flex items-center gap-1 mt-2 text-sm">
@@ -275,7 +275,7 @@ export default function EMRDashboardPage() {
           {/* 약국 연동 현황 */}
           <div className="card">
             <div className="flex items-center gap-2 p-5 border-b border-border">
-              <Pill className="w-5 h-5 text-purple-500" />
+              <Pill className="w-5 h-5 text-blue-500" />
               <h3 className="text-lg font-bold">약국 연동</h3>
             </div>
 
@@ -305,11 +305,11 @@ export default function EMRDashboardPage() {
       {/* ───── 비즈니스 분석 배너 ───── */}
       <Link
         href="/emr-dashboard"
-        className="block card p-5 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border border-blue-200 dark:border-blue-800 hover:shadow-md transition-all group"
+        className="block card p-5 bg-gradient-to-r from-blue-50 to-blue-50 dark:from-blue-900/20 dark:to-blue-900/20 border border-blue-200 dark:border-blue-800 hover:shadow-md transition-all group"
       >
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <TossIcon icon={BarChart3} color="from-blue-500 to-indigo-600" size="sm" />
+            <TossIcon icon={BarChart3} color="from-blue-500 to-blue-700" size="sm" />
             <div>
               <div className="font-bold text-sm">비즈니스 분석 대시보드</div>
               <div className="text-xs text-muted-foreground">매출 추이, 환자 분석, 보험 비율, 지역 벤치마크를 한눈에</div>

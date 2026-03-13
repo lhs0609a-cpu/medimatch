@@ -179,7 +179,7 @@ export default function MapPage() {
       case 'building':
         return 'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900/20 dark:text-blue-400 dark:border-blue-800';
       case 'pharmacy':
-        return 'bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-900/20 dark:text-purple-400 dark:border-purple-800';
+        return 'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900/20 dark:text-blue-400 dark:border-blue-800';
       default:
         return 'bg-secondary text-secondary-foreground border-border';
     }
@@ -342,7 +342,7 @@ export default function MapPage() {
                               className={`px-2 py-0.5 rounded text-xs font-medium ${
                                 isBuilding
                                   ? 'bg-blue-500 text-white'
-                                  : 'bg-purple-500 text-white'
+                                  : 'bg-blue-500 text-white'
                               }`}
                             >
                               {isBuilding ? '병원' : '약국'}
@@ -468,7 +468,7 @@ export default function MapPage() {
                       className={`px-2 py-0.5 rounded text-xs font-medium ${
                         selectedMarker.type === 'building'
                           ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400'
-                          : 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400'
+                          : 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400'
                       }`}
                     >
                       {selectedMarker.type === 'building' ? '병원' : '약국'}
@@ -502,7 +502,7 @@ export default function MapPage() {
               </div>
               <div className="w-px h-4 bg-border" />
               <div className="flex items-center gap-2">
-                <Pill className="w-4 h-4 text-purple-500" />
+                <Pill className="w-4 h-4 text-blue-500" />
                 <span className="font-medium">
                   약국 {visibleMarkers.filter((m) => m.type === 'pharmacy').length}
                 </span>

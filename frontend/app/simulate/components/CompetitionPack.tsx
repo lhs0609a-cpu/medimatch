@@ -175,7 +175,7 @@ export default function CompetitionPack({ result }: Props) {
       </Card>
 
       {/* 5. 환자 획득 비용 */}
-      <Card icon={Users} title="환자 획득 비용(CAC) 비교" color="text-violet-500">
+      <Card icon={Users} title="환자 획득 비용(CAC) 비교" color="text-blue-500">
         <div className="space-y-2 mb-4">
           {[
             { channel: '지인 추천', cac: 0, ltv: 1200000, ratio: 999, quality: 95, color: '#22c55e' },
@@ -197,7 +197,7 @@ export default function CompetitionPack({ result }: Props) {
             </div>
           ))}
         </div>
-        <p className="text-xs text-muted-foreground p-2 bg-violet-50 dark:bg-violet-950/20 rounded">평균 CAC: <span className="font-bold text-foreground">약 1.9만원</span> · 목표 LTV/CAC 비율: <span className="font-bold text-green-600">40x 이상</span></p>
+        <p className="text-xs text-muted-foreground p-2 bg-blue-50 dark:bg-blue-950/20 rounded">평균 CAC: <span className="font-bold text-foreground">약 1.9만원</span> · 목표 LTV/CAC 비율: <span className="font-bold text-green-600">40x 이상</span></p>
       </Card>
 
       {/* 6. 서비스 차별화 매트릭스 */}
@@ -314,20 +314,20 @@ export default function CompetitionPack({ result }: Props) {
       </Card>
 
       {/* 10. 경쟁 우위 전략 */}
-      <Card icon={Award} title="경쟁 우위 확보 전략 로드맵" color="text-indigo-600">
+      <Card icon={Award} title="경쟁 우위 확보 전략 로드맵" color="text-blue-700">
         <div className="space-y-3">
           {[
             { phase: '1단계: 진입 (0-3개월)', strategies: ['공격적 가격 책정 (시장가 -10%)', '오프라인 인지도 확보 (배너, 전단)', '네이버 플레이스 최적화', '개원 이벤트 + SNS 바이럴'], color: 'bg-blue-100 dark:bg-blue-900/30' },
-            { phase: '2단계: 안착 (4-6개월)', strategies: ['리뷰 100건 달성 목표', '블로그 건강 콘텐츠 30편 발행', '기업 검진 2-3개사 제휴', '추천 환자 리워드 프로그램'], color: 'bg-indigo-100 dark:bg-indigo-900/30' },
-            { phase: '3단계: 성장 (7-12개월)', strategies: ['비보험 특화 분야 브랜딩', 'CRM 기반 재방문 유도 자동화', '인스타/유튜브 콘텐츠 강화', '가격 정상화 + 프리미엄 라인 도입'], color: 'bg-violet-100 dark:bg-violet-900/30' },
-            { phase: '4단계: 확장 (2-3년차)', strategies: ['지역 1위 {ct} 브랜드 확립'.replace('{ct}', result.clinic_type), '비대면 진료 + 원격 관리 도입', '제2 진료실 또는 2호점 검토', '후배 의사 네트워크 구축'], color: 'bg-purple-100 dark:bg-purple-900/30' },
+            { phase: '2단계: 안착 (4-6개월)', strategies: ['리뷰 100건 달성 목표', '블로그 건강 콘텐츠 30편 발행', '기업 검진 2-3개사 제휴', '추천 환자 리워드 프로그램'], color: 'bg-blue-100 dark:bg-blue-900/30' },
+            { phase: '3단계: 성장 (7-12개월)', strategies: ['비보험 특화 분야 브랜딩', 'CRM 기반 재방문 유도 자동화', '인스타/유튜브 콘텐츠 강화', '가격 정상화 + 프리미엄 라인 도입'], color: 'bg-blue-100 dark:bg-blue-900/30' },
+            { phase: '4단계: 확장 (2-3년차)', strategies: ['지역 1위 {ct} 브랜드 확립'.replace('{ct}', result.clinic_type), '비대면 진료 + 원격 관리 도입', '제2 진료실 또는 2호점 검토', '후배 의사 네트워크 구축'], color: 'bg-blue-100 dark:bg-blue-900/30' },
           ].map((p) => (
             <div key={p.phase} className={`p-3 rounded-xl ${p.color}`}>
               <div className="text-sm font-medium text-foreground mb-2">{p.phase}</div>
               <div className="grid grid-cols-2 gap-1">
                 {p.strategies.map((s) => (
                   <div key={s} className="flex items-start gap-1.5">
-                    <span className="w-1 h-1 rounded-full bg-indigo-500 flex-shrink-0 mt-1.5" />
+                    <span className="w-1 h-1 rounded-full bg-blue-600 flex-shrink-0 mt-1.5" />
                     <span className="text-[10px] text-muted-foreground">{s}</span>
                   </div>
                 ))}

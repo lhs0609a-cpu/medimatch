@@ -65,7 +65,7 @@ const statusConfig: Record<WaitingStatus, { label: string; color: string; bg: st
   checked_in: { label: '접수', color: 'text-gray-600', bg: 'bg-gray-100 dark:bg-gray-800', step: 0 },
   waiting: { label: '대기', color: 'text-blue-600', bg: 'bg-blue-100 dark:bg-blue-900/30', step: 1 },
   in_consultation: { label: '진료 중', color: 'text-emerald-600', bg: 'bg-emerald-100 dark:bg-emerald-900/30', step: 2 },
-  billing: { label: '수납', color: 'text-purple-600', bg: 'bg-purple-100 dark:bg-purple-900/30', step: 3 },
+  billing: { label: '수납', color: 'text-blue-600', bg: 'bg-blue-100 dark:bg-blue-900/30', step: 3 },
   completed: { label: '완료', color: 'text-gray-400', bg: 'bg-gray-50 dark:bg-gray-900/20', step: 4 },
   no_show: { label: '미도착', color: 'text-red-600', bg: 'bg-red-100 dark:bg-red-900/30', step: -1 },
 }
@@ -222,8 +222,8 @@ export default function WaitingPage() {
         </div>
         <div className="card p-4">
           <div className="flex items-center justify-between mb-2">
-            <div className="w-9 h-9 rounded-xl bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
-              <CheckCircle2 className="w-4.5 h-4.5 text-purple-600" />
+            <div className="w-9 h-9 rounded-xl bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
+              <CheckCircle2 className="w-4.5 h-4.5 text-blue-600" />
             </div>
           </div>
           <div className="text-2xl font-bold">{completedToday}명</div>
@@ -262,7 +262,7 @@ export default function WaitingPage() {
                             <span className="text-xs font-bold">#{p.queueNumber}</span>
                             <span className="text-xs font-medium">{p.name}</span>
                           </div>
-                          {p.type === '초진' && <span className="px-1 py-0.5 rounded text-2xs bg-purple-100 text-purple-600 dark:bg-purple-900/30">초진</span>}
+                          {p.type === '초진' && <span className="px-1 py-0.5 rounded text-2xs bg-blue-100 text-blue-600 dark:bg-blue-900/30">초진</span>}
                         </div>
                         <div className="text-2xs text-muted-foreground truncate">{p.reason}</div>
                         {p.status === 'waiting' && (
@@ -331,7 +331,7 @@ export default function WaitingPage() {
         {/* AI 인사이트 */}
         <div className="card p-4">
           <h2 className="font-bold text-sm mb-4 flex items-center gap-2">
-            <Megaphone className="w-4 h-4 text-purple-600" /> AI 동선 최적화
+            <Megaphone className="w-4 h-4 text-blue-600" /> AI 동선 최적화
           </h2>
           <div className="space-y-3">
             <div className="flex items-start gap-3 p-3 bg-amber-50 dark:bg-amber-900/10 rounded-xl">

@@ -5,6 +5,7 @@ import {
   Globe, Cog, Search, Filter, Play, Pause,
   Loader2, RefreshCw, ChevronLeft, ChevronRight, Stethoscope
 } from 'lucide-react';
+import { toast } from 'sonner';
 
 interface ServiceSub {
   id: number;
@@ -92,7 +93,7 @@ export default function AdminServiceSubscriptionsPage() {
       });
       await fetchData();
     } catch {
-      alert('작업에 실패했습니다.');
+      toast.error('작업에 실패했습니다.');
     } finally {
       setActionLoading(null);
     }

@@ -28,6 +28,7 @@ import {
   Building2,
 } from 'lucide-react'
 import { TossIcon } from '@/components/ui/TossIcon'
+import { toast } from 'sonner'
 
 /* ─── API ─── */
 const API_URL = process.env.NEXT_PUBLIC_API_URL || ''
@@ -249,7 +250,7 @@ export default function TaxCorrectionNewPage() {
         window.location.href = '/emr/tax-correction'
       }
     } catch {
-      alert('경정청구가 생성되었습니다. (데모)')
+      toast.success('경정청구가 생성되었습니다. (데모)')
       if (typeof window !== 'undefined') {
         window.location.href = '/emr/tax-correction'
       }
@@ -459,7 +460,7 @@ export default function TaxCorrectionNewPage() {
                   <div className="flex items-center gap-2">
                     <span className="text-sm font-semibold">{cat.name}</span>
                     {cat.ai_suggested && (
-                      <span className="px-1.5 py-0.5 rounded text-2xs font-bold bg-violet-100 dark:bg-violet-900/30 text-violet-600">
+                      <span className="px-1.5 py-0.5 rounded text-2xs font-bold bg-blue-100 dark:bg-blue-900/30 text-blue-600">
                         <Sparkles className="w-2.5 h-2.5 inline mr-0.5" />AI
                       </span>
                     )}
@@ -600,7 +601,7 @@ export default function TaxCorrectionNewPage() {
       {currentStep === 3 && (
         <div className="card p-6 space-y-5">
           <h2 className="font-bold text-lg flex items-center gap-2">
-            <User className="w-5 h-5 text-purple-600" /> 세무사 검토
+            <User className="w-5 h-5 text-blue-600" /> 세무사 검토
           </h2>
 
           <div className="space-y-4">
@@ -691,7 +692,7 @@ export default function TaxCorrectionNewPage() {
                   <div key={cat.id} className="flex items-center justify-between py-1.5 px-3 bg-secondary/20 rounded-lg">
                     <div className="flex items-center gap-2">
                       <span className="text-sm">{cat.name}</span>
-                      {cat.ai_suggested && <Sparkles className="w-3 h-3 text-violet-500" />}
+                      {cat.ai_suggested && <Sparkles className="w-3 h-3 text-blue-500" />}
                     </div>
                     <span className="text-sm font-semibold">{formatAmount(cat.custom_amount ?? cat.estimated_amount)}</span>
                   </div>
@@ -727,7 +728,7 @@ export default function TaxCorrectionNewPage() {
             </div>
 
             {/* 최종 금액 */}
-            <div className="p-4 rounded-xl bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-900/10 dark:to-teal-900/10 border border-emerald-200 dark:border-emerald-800">
+            <div className="p-4 rounded-xl bg-gradient-to-r from-emerald-50 to-blue-50 dark:from-emerald-900/10 dark:to-blue-900/10 border border-emerald-200 dark:border-emerald-800">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-sm text-muted-foreground">예상 환급액</span>
                 <span className="text-lg font-bold text-emerald-600">{formatAmount(estimatedRefund)}</span>
@@ -747,7 +748,7 @@ export default function TaxCorrectionNewPage() {
           <button
             onClick={handleFinalSubmit}
             disabled={submitting}
-            className="w-full py-4 rounded-2xl font-bold text-lg text-white bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 disabled:opacity-50 flex items-center justify-center gap-3 transition-all shadow-lg shadow-emerald-500/20"
+            className="w-full py-4 rounded-2xl font-bold text-lg text-white bg-gradient-to-r from-emerald-600 to-blue-600 hover:from-emerald-700 hover:to-blue-700 disabled:opacity-50 flex items-center justify-center gap-3 transition-all shadow-lg shadow-emerald-500/20"
           >
             {submitting ? <Loader2 className="w-5 h-5 animate-spin" /> : <CheckCircle2 className="w-5 h-5" />}
             경정청구 제출

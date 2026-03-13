@@ -24,20 +24,20 @@ const sizeMap: Record<TossSize, { box: string; icon: string }> = {
 const colorHex: Record<string, string> = {
   'blue-500': '#3182f6',
   'blue-600': '#2563eb',
-  'indigo-500': '#6366f1',
-  'indigo-600': '#4f46e5',
-  'purple-500': '#a855f7',
-  'purple-600': '#9333ea',
-  'violet-500': '#8b5cf6',
-  'violet-600': '#7c3aed',
+  'indigo-500': '#3182f6',
+  'indigo-600': '#2563eb',
+  'purple-500': '#3182f6',
+  'purple-600': '#2563eb',
+  'violet-500': '#3182f6',
+  'violet-600': '#2563eb',
   'green-500': '#22c55e',
   'green-600': '#16a34a',
   'emerald-500': '#10b981',
   'emerald-600': '#059669',
-  'teal-500': '#14b8a6',
-  'teal-600': '#0d9488',
-  'cyan-500': '#06b6d4',
-  'cyan-600': '#0891b2',
+  'teal-500': '#3182f6',
+  'teal-600': '#2563eb',
+  'cyan-500': '#2563eb',
+  'cyan-600': '#2563eb',
   'orange-500': '#f97316',
   'orange-600': '#ea580c',
   'amber-500': '#f59e0b',
@@ -46,8 +46,8 @@ const colorHex: Record<string, string> = {
   'red-600': '#dc2626',
   'rose-500': '#f43f5e',
   'rose-600': '#e11d48',
-  'pink-500': '#ec4899',
-  'pink-600': '#db2777',
+  'pink-500': '#3182f6',
+  'pink-600': '#2563eb',
   'slate-500': '#64748b',
   'slate-600': '#475569',
   'gray-500': '#6b7280',
@@ -56,14 +56,14 @@ const colorHex: Record<string, string> = {
 
 export function TossIcon({
   icon: Icon,
-  color = 'from-blue-500 to-indigo-500',
+  color = 'from-blue-500 to-blue-600',
   size = 'md',
   shadow: _shadow,
   className,
 }: TossIconProps) {
   const s = sizeMap[size]
 
-  // Extract primary color from gradient prop (e.g. 'from-blue-500 to-indigo-500' → 'blue-500')
+  // Extract primary color from gradient prop (e.g. 'from-blue-500 to-blue-600' → 'blue-500')
   const match = color.match(/from-([a-z]+-\d+)/)
   const colorKey = match?.[1] || 'blue-500'
   const hex = colorHex[colorKey] || '#3182f6'
