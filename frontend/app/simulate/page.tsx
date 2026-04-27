@@ -408,6 +408,7 @@ export default function SimulatePage() {
             ) : (
               <>
                 {/* 1. 시장/경쟁 — 실 API 데이터 */}
+                <RegionBenchmark result={result} />
                 <CompetitorDistance result={result} />
                 <DemographicsPreview result={result} isUnlocked={true} />
 

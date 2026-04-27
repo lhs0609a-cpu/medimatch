@@ -28,6 +28,7 @@ from .prediction import PredictionService
 from ..core.config import settings
 from ..data import clinic_profiles
 from ..data import marketing_plans
+from ..data import regional_rent
 
 import logging
 logger = logging.getLogger(__name__)
@@ -303,33 +304,24 @@ class SimulationService:
         longitude: float,
         clinic_type: str
     ) -> Dict[str, int]:
-        """비용 추정"""
+        """비용 추정 — regional_rent (한국부동산원 통계 기반) + clinic_profiles 표준."""
         size = size_pyeong or 30
 
-        # Base rent estimation (서울 기준, 지역에 따라 조정)
-        base_rent_per_pyeong = 150000  # 15만원/평
-        if 37.49 <= latitude <= 37.53 and 127.0 <= longitude <= 127.1:  # 강남권
-            base_rent_per_pyeong = 300000
+        # 지역 임대료 시세 (한국부동산원 2024 Q3 + 부동산플래닛/직방 평균)
+        rent_info = regional_rent.get_regional_rent(latitude, longitude)
+        rent = int(rent_info["monthly_rent_per_pyeong"] * size)
 
-        rent = int(base_rent_per_pyeong * size)
+        # 인건비: clinic_profiles 표준 인력 × 평균 월급 (원장 제외)
+        st = clinic_profiles.get_staffing_profile(clinic_type)
+        labor = (
+            st["nurses"] * st["avg_nurse_salary_monthly"]
+            + st["admins"] * st["avg_admin_salary_monthly"]
+            + st["technicians"] * st["avg_nurse_salary_monthly"]
+        )
 
-        # Labor costs based on clinic type
-        labor_multiplier = {
-            "내과": 1.0,
-            "정형외과": 1.3,
-            "피부과": 1.2,
-            "성형외과": 1.5,
-            "이비인후과": 0.9,
-            "소아청소년과": 1.0,
-            "안과": 1.1,
-            "치과": 1.2,
-        }
-        base_labor = 12000000  # 기본 인건비 1,200만원
-        labor = int(base_labor * labor_multiplier.get(clinic_type, 1.0))
-
-        utilities = int(size * 50000)  # 평당 5만원
-        supplies = int(size * 100000)  # 평당 10만원
-        other = 2000000  # 기타 200만원
+        utilities = int(size * 50_000)        # 평당 전기·수도·관리비 5만원
+        supplies = int(size * 100_000)        # 평당 진료재료비 10만원
+        other = 2_000_000                     # 통신·세금·기타 200만원
 
         return {
             "rent": rent,
@@ -337,7 +329,7 @@ class SimulationService:
             "utilities": utilities,
             "supplies": supplies,
             "other": other,
-            "total": rent + labor + utilities + supplies + other
+            "total": rent + labor + utilities + supplies + other,
         }
 
     def _calculate_profitability(
@@ -963,26 +955,57 @@ class SimulationService:
             clinic_growth_rate=round(random.uniform(-2, 5), 1)
         )
 
+    def _build_region_stats(self, clinic_type: str, revenue_avg: int) -> RegionStats:
+        """HIRA 통계 기반 진료과 평균 매출 비교 (지역 순위는 미제공)."""
+        national_avg = external_api_service._get_default_clinic_stats(clinic_type).get(
+            "avg_monthly_revenue", 55_000_000
+        )
+        if national_avg > 0:
+            vs_national = ((revenue_avg - national_avg) / national_avg) * 100
+        else:
+            vs_national = 0.0
+        return RegionStats(
+            region_rank=None,           # 실 ranking DB 부재
+            total_regions=17,
+            rank_percentile=None,       # 동일
+            vs_national_percent=round(vs_national, 1),
+            national_avg_revenue=national_avg,
+        )
+
     def _generate_capital_plan(
         self,
         clinic_type: str,
         size_pyeong: Optional[float],
         revenue_avg: int,
+        latitude: Optional[float] = None,
+        longitude: Optional[float] = None,
     ) -> CapitalPlan:
-        """진료과 표준 + 사용자 평수 기반 초기 투자비 + 대출 시뮬"""
+        """진료과 표준 + 지역 시세 기반 초기 투자비 + 대출 시뮬"""
         cap = clinic_profiles.get_capital_profile(clinic_type)
         target = int(size_pyeong) if size_pyeong else cap["standard_size_pyeong"]
 
+        # 지역 시세 (한국부동산원 기반)
+        deposit_per_pyeong = cap["deposit_per_pyeong"]
+        monthly_rent_per_pyeong = cap["monthly_rent_per_pyeong"]
+        region_label = "수도권 평균"
+        data_source = "한국의료기기협회·대한개원의협의회 표준 + HIRA 진료비 통계"
+        if latitude is not None and longitude is not None:
+            rent_info = regional_rent.get_regional_rent(latitude, longitude)
+            deposit_per_pyeong = rent_info["deposit_per_pyeong"]
+            monthly_rent_per_pyeong = rent_info["monthly_rent_per_pyeong"]
+            region_label = rent_info["region_name"]
+            data_source = f"한국의료기기협회·대한개원의협의회 표준 + 한국부동산원 {rent_info['sample_period']} ({region_label})"
+
         interior = cap["interior_per_pyeong"] * target
         equipment = cap["equipment_typical"]
-        deposit = cap["deposit_per_pyeong"] * target
-        monthly_rent = cap["monthly_rent_per_pyeong"] * target
-        misc = int(interior * 0.05) + 5_000_000  # 등록·법무·예비비
+        deposit = deposit_per_pyeong * target
+        monthly_rent = monthly_rent_per_pyeong * target
+        misc = int(interior * 0.05) + 5_000_000
 
         breakdown = [
             CapitalLineItem(label="인테리어·시설공사", amount=interior, note=f"평당 {cap['interior_per_pyeong']:,}원 × {target}평"),
             CapitalLineItem(label="의료장비 (표준)", amount=equipment, note=f"진료과 표준 구성, 최저가 ~ {cap['equipment_min']:,}원까지 압축 가능"),
-            CapitalLineItem(label="임대 보증금", amount=deposit, note=f"평당 {cap['deposit_per_pyeong']:,}원 × {target}평 (수도권 평균)"),
+            CapitalLineItem(label="임대 보증금", amount=deposit, note=f"평당 {deposit_per_pyeong:,}원 × {target}평 ({region_label})"),
             CapitalLineItem(label="등록·인허가·예비비", amount=misc, note="개설신고·세무·법무·간판 등"),
         ]
         initial_total = sum(item.amount for item in breakdown)
@@ -1026,6 +1049,7 @@ class SimulationService:
             working_capital_recommended=working_capital,
             grand_total=grand_total,
             financing_scenarios=scenarios,
+            data_source=data_source,
         )
 
     def _generate_staffing_plan(self, clinic_type: str) -> StaffingPlanSchema:
@@ -1392,7 +1416,7 @@ class SimulationService:
                 age_40_plus_ratio=simulation.age_40_plus_ratio or 0.4,
                 floating_population_daily=simulation.floating_population_daily or 50000
             ),
-            region_stats=None,  # region_rank/percentile은 실 ranking DB 부재로 미제공
+            region_stats=self._build_region_stats(clinic_type, revenue_avg),
 
             # 상세 분석 (새로 추가)
             revenue_detail=self._generate_revenue_detail(clinic_type, revenue_avg, demographics_data),
@@ -1411,8 +1435,8 @@ class SimulationService:
             ),
             region_stats_detail=self._generate_region_stats_detail(clinic_type, revenue_avg),
 
-            # 신규: 개원 실행 모듈 (clinic_profiles 표준 기반)
-            capital_plan=self._generate_capital_plan(clinic_type, simulation.size_pyeong, revenue_avg),
+            # 신규: 개원 실행 모듈 (clinic_profiles 표준 + 지역 시세 기반)
+            capital_plan=self._generate_capital_plan(clinic_type, simulation.size_pyeong, revenue_avg, lat, lng),
             staffing_plan=self._generate_staffing_plan(clinic_type),
             permit_checklist=self._generate_permit_checklist(clinic_type),
             equipment_checklist=self._generate_equipment_checklist(clinic_type),
@@ -1423,7 +1447,7 @@ class SimulationService:
                 clinic_type,
                 revenue_avg,
                 simulation.est_cost_total or 0,
-                self._generate_capital_plan(clinic_type, simulation.size_pyeong, revenue_avg).grand_total,
+                self._generate_capital_plan(clinic_type, simulation.size_pyeong, revenue_avg, lat, lng).grand_total,
             ),
             tax_comparison=self._generate_tax_comparison(
                 annual_revenue=revenue_avg * 12,

@@ -51,7 +51,8 @@ export default function RentAnalysis({ result }: RentAnalysisProps) {
       </div>
 
       <p className="text-[11px] text-muted-foreground">
-        ※ 월 임대료는 진료과·평수 기반 추정값입니다. 실제 계약 전 부동산 시세를 확인하세요.
+        ※ 한국부동산원 상업용 부동산 임대시장동향조사 (2024 Q3) + 부동산플래닛/직방 시세 평균 기반.
+        실제 계약 전 부동산 시세를 확인하세요.
       </p>
     </div>
   )
