@@ -352,6 +352,111 @@ class ExternalAPIService:
             return {k: 0 for k in categories}
         return result
 
+    async def get_nearby_by_keyword(
+        self,
+        latitude: float,
+        longitude: float,
+        keyword: str,
+        radius_m: int = 1000,
+        size: int = 5,
+    ) -> List[Dict[str, Any]]:
+        """카카오 키워드 검색으로 반경 내 시설 상세 (이름/거리/주소 포함)."""
+        try:
+            async with httpx.AsyncClient() as client:
+                headers = {"Authorization": f"KakaoAK {settings.KAKAO_MAP_API_KEY}"}
+                params = {
+                    "query": keyword,
+                    "x": str(longitude),
+                    "y": str(latitude),
+                    "radius": str(min(radius_m, 20000)),
+                    "size": str(min(size, 15)),
+                    "sort": "distance",
+                }
+                resp = await client.get(
+                    f"{self.kakao_base_url}/search/keyword.json",
+                    headers=headers,
+                    params=params,
+                    timeout=8.0,
+                )
+                resp.raise_for_status()
+                data = resp.json()
+                docs = data.get("documents", [])
+                return [
+                    {
+                        "name": d.get("place_name", ""),
+                        "distance_m": int(d.get("distance", "0") or 0),
+                        "address": d.get("road_address_name") or d.get("address_name", ""),
+                        "phone": d.get("phone", ""),
+                        "category": d.get("category_name", ""),
+                        "lat": float(d.get("y", 0)),
+                        "lng": float(d.get("x", 0)),
+                    }
+                    for d in docs
+                ]
+        except Exception as e:
+            logger.warning(f"카카오 키워드 검색 실패 ({keyword}): {e}")
+            return []
+
+    async def get_clinic_environment_data(
+        self,
+        latitude: float,
+        longitude: float,
+    ) -> Dict[str, Any]:
+        """개원 의사결정에 필요한 주변 환경 종합 데이터 (카카오 키워드 검색)."""
+        # 진료과 영업·동선에 핵심 영향
+        keywords = {
+            "general_hospitals":  ("종합병원", 3000, 3),     # 응급·협진
+            "pharmacies":         ("약국", 500, 5),           # 처방 동선 (가까울수록 ↑)
+            "schools":            ("초등학교", 1500, 5),      # 소아·치과
+            "kindergartens":      ("어린이집", 1000, 5),       # 소아과
+            "senior_centers":     ("요양원", 2000, 5),         # 노인 진료
+            "subway_stations":    ("지하철역", 800, 3),         # 접근성
+            "bus_stops":          ("버스정류장", 300, 5),       # 도보 환자
+            "office_buildings":   ("오피스", 800, 5),          # 직장인 검진
+            "apartments":         ("아파트", 500, 5),          # 주거 환자
+        }
+        results: Dict[str, Any] = {}
+        async with httpx.AsyncClient() as client:
+            headers = {"Authorization": f"KakaoAK {settings.KAKAO_MAP_API_KEY}"}
+            for key, (kw, radius, size) in keywords.items():
+                try:
+                    params = {
+                        "query": kw,
+                        "x": str(longitude),
+                        "y": str(latitude),
+                        "radius": str(radius),
+                        "size": str(size),
+                        "sort": "distance",
+                    }
+                    resp = await client.get(
+                        f"{self.kakao_base_url}/search/keyword.json",
+                        headers=headers,
+                        params=params,
+                        timeout=8.0,
+                    )
+                    resp.raise_for_status()
+                    data = resp.json()
+                    docs = data.get("documents", [])
+                    total = int(data.get("meta", {}).get("total_count", 0))
+                    items = [
+                        {
+                            "name": d.get("place_name", ""),
+                            "distance_m": int(d.get("distance", "0") or 0),
+                            "address": d.get("road_address_name") or d.get("address_name", ""),
+                        }
+                        for d in docs[:size]
+                    ]
+                    results[key] = {
+                        "count_total": total,
+                        "nearest": items[0] if items else None,
+                        "items": items,
+                        "search_radius_m": radius,
+                    }
+                except Exception as e:
+                    logger.warning(f"카카오 검색 실패 ({key}): {e}")
+                    results[key] = {"count_total": 0, "nearest": None, "items": [], "search_radius_m": radius}
+        return results
+
     async def reverse_geocode(self, latitude: float, longitude: float) -> Optional[Dict[str, Any]]:
         """좌표 → 주소 변환 (카카오 API)"""
         try:

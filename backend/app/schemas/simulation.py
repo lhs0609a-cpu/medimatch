@@ -522,6 +522,8 @@ class SimulationResponse(BaseModel):
     marketing_plan: Optional[MarketingPlan] = None
     # 카카오 Local API 실데이터: 반경 500m 시설 카운트
     nearby_facility_counts: Optional[Dict[str, int]] = None
+    # 카카오 키워드 검색 종합 (의료협력·영업타겟·교통·주거)
+    clinic_environment: Optional[Dict[str, Any]] = None
 
     confidence_score: int = Field(..., ge=0, le=100)
     recommendation: RecommendationType

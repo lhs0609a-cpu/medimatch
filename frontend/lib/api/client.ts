@@ -331,6 +331,30 @@ export interface OpeningTimelineStep {
   duration_weeks: number
   deliverables: string[]
 }
+// 개원 환경 (카카오 키워드 검색 통합)
+export interface ClinicEnvFacility {
+  name: string
+  distance_m: number
+  address: string
+}
+export interface ClinicEnvCategory {
+  count_total: number
+  nearest: ClinicEnvFacility | null
+  items: ClinicEnvFacility[]
+  search_radius_m: number
+}
+export interface ClinicEnvironment {
+  general_hospitals?: ClinicEnvCategory
+  pharmacies?: ClinicEnvCategory
+  schools?: ClinicEnvCategory
+  kindergartens?: ClinicEnvCategory
+  senior_centers?: ClinicEnvCategory
+  subway_stations?: ClinicEnvCategory
+  bus_stops?: ClinicEnvCategory
+  office_buildings?: ClinicEnvCategory
+  apartments?: ClinicEnvCategory
+}
+
 export interface OpeningTimelinePlan {
   total_months: number
   steps: OpeningTimelineStep[]
@@ -475,6 +499,7 @@ export interface SimulationResponse {
   tax_comparison?: TaxComparison
   marketing_plan?: MarketingPlan
   nearby_facility_counts?: Record<string, number>  // pharmacy/hospital/bank/cafe/restaurant
+  clinic_environment?: ClinicEnvironment
   // 결제/잠금 상태 (서버에서 관리)
   is_unlocked: boolean
   unlock_price: number

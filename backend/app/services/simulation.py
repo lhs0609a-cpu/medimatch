@@ -92,7 +92,7 @@ class SimulationService:
             latitude, longitude, stdg_cd=region_code
         )
 
-        # 5-1. 카카오 Local API로 주변 시설 실데이터 수집
+        # 5-1. 카카오 Local API로 주변 시설 실데이터 수집 (카운트)
         try:
             nearby_facilities_real = await external_api_service.get_nearby_facility_counts(
                 latitude, longitude, radius_m=500
@@ -100,6 +100,15 @@ class SimulationService:
             demographics_data["nearby_facilities_real"] = nearby_facilities_real
         except Exception as e:
             logger.warning(f"카카오 nearby 호출 실패: {e}")
+
+        # 5-2. 카카오 키워드 검색으로 개원 환경 종합 데이터 수집
+        try:
+            clinic_env = await external_api_service.get_clinic_environment_data(
+                latitude, longitude
+            )
+            demographics_data["clinic_environment"] = clinic_env
+        except Exception as e:
+            logger.warning(f"카카오 키워드 검색 실패: {e}")
 
         # 5. 예측 모델 실행
         prediction = await self.prediction_service.predict_revenue(
@@ -1451,6 +1460,10 @@ class SimulationService:
             marketing_plan=self._generate_marketing_plan(clinic_type),
             nearby_facility_counts=(
                 (simulation.demographics_data or {}).get("nearby_facilities_real")
+                if isinstance(simulation.demographics_data, dict) else None
+            ),
+            clinic_environment=(
+                (simulation.demographics_data or {}).get("clinic_environment")
                 if isinstance(simulation.demographics_data, dict) else None
             ),
 
