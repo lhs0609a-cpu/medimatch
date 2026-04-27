@@ -31,6 +31,8 @@ import NearbyFacilitiesReal from './components/NearbyFacilitiesReal'
 import ClinicEnvironment from './components/ClinicEnvironment'
 import MarketContext from './components/MarketContext'
 import OpeningExecutionPack from './components/OpeningExecutionPack'
+import TransitScore from './components/TransitScore'
+import BreakevenTimeline from './components/BreakevenTimeline'
 import ShareResult from './components/ShareResult'
 import PaywallCTA from './components/PaywallCTA'
 
@@ -421,6 +423,12 @@ export default function SimulatePage() {
 
                 {/* 3. 종합 점수 */}
                 <OverallRadar result={result} />
+
+                {/* 3-0. 손익분기 타임라인 (5년 누적 손익) */}
+                <BreakevenTimeline result={result} />
+
+                {/* 3-0-1. 대중교통 접근성 (카카오 키워드 기반 진짜 점수) */}
+                <TransitScore result={result} />
 
                 {/* 3-1. 주변 시설 (카카오 실데이터) */}
                 <NearbyFacilitiesReal result={result} />
