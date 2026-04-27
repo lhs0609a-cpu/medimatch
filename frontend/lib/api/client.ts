@@ -85,6 +85,14 @@ export interface SimulationRequest {
   clinic_type: string
   size_pyeong?: number
   budget_million?: number
+  // 고급 입력 (선택)
+  deposit_won?: number
+  monthly_rent_won?: number
+  interior_cost_won?: number
+  equipment_cost_won?: number
+  own_capital_ratio?: number
+  loan_interest_rate?: number
+  monthly_payroll_won?: number
 }
 
 // 상세 매출 분석
@@ -512,6 +520,7 @@ export interface SimulationResponse {
   ai_insights?: AIInsights
   region_stats_detail?: RegionStatsDetail
   // 신규: 개원 실행 모듈
+  user_inputs?: Record<string, number | null>
   capital_plan?: CapitalPlan
   staffing_plan?: StaffingPlan
   permit_checklist?: PermitChecklist

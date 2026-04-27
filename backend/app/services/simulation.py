@@ -112,6 +112,17 @@ class SimulationService:
         except Exception as e:
             logger.warning(f"카카오 키워드 검색 실패: {e}")
 
+        # 5-3. 사용자 고급 입력 저장 (재조회 시에도 유지되도록)
+        demographics_data["user_inputs"] = {
+            "deposit_won": request.deposit_won,
+            "monthly_rent_won": request.monthly_rent_won,
+            "interior_cost_won": request.interior_cost_won,
+            "equipment_cost_won": request.equipment_cost_won,
+            "own_capital_ratio": request.own_capital_ratio,
+            "loan_interest_rate": request.loan_interest_rate,
+            "monthly_payroll_won": request.monthly_payroll_won,
+        }
+
         # 5. 예측 모델 실행
         prediction = await self.prediction_service.predict_revenue(
             clinic_type=request.clinic_type,
@@ -126,13 +137,26 @@ class SimulationService:
         # 6. 경쟁 분석
         competitors = self._analyze_competitors(nearby_hospitals, request.clinic_type)
 
-        # 7. 비용 추정
+        # 7. 비용 추정 — 사용자 입력값 우선
         estimated_cost = self._estimate_costs(
             request.size_pyeong,
             latitude,
             longitude,
-            request.clinic_type
+            request.clinic_type,
+            user_monthly_rent=request.monthly_rent_won,
+            user_monthly_payroll=request.monthly_payroll_won,
         )
+
+        # 사용자 입력 추적 — 어떤 게 본인 데이터인지 응답에 보존
+        user_inputs = {
+            "deposit_won": request.deposit_won,
+            "monthly_rent_won": request.monthly_rent_won,
+            "interior_cost_won": request.interior_cost_won,
+            "equipment_cost_won": request.equipment_cost_won,
+            "own_capital_ratio": request.own_capital_ratio,
+            "loan_interest_rate": request.loan_interest_rate,
+            "monthly_payroll_won": request.monthly_payroll_won,
+        }
 
         # 8. 수익성 분석
         profitability = self._calculate_profitability(
@@ -313,22 +337,30 @@ class SimulationService:
         size_pyeong: Optional[float],
         latitude: float,
         longitude: float,
-        clinic_type: str
+        clinic_type: str,
+        user_monthly_rent: Optional[int] = None,
+        user_monthly_payroll: Optional[int] = None,
     ) -> Dict[str, int]:
-        """비용 추정 — regional_rent (한국부동산원 통계 기반) + clinic_profiles 표준."""
+        """비용 추정 — 사용자 입력 우선, 미입력 시 regional_rent + clinic_profiles 표준."""
         size = size_pyeong or 30
 
-        # 지역 임대료 시세 (한국부동산원 2024 Q3 + 부동산플래닛/직방 평균)
-        rent_info = regional_rent.get_regional_rent(latitude, longitude)
-        rent = int(rent_info["monthly_rent_per_pyeong"] * size)
+        # 임대료: 사용자 입력 → 지역 시세
+        if user_monthly_rent is not None and user_monthly_rent > 0:
+            rent = user_monthly_rent
+        else:
+            rent_info = regional_rent.get_regional_rent(latitude, longitude)
+            rent = int(rent_info["monthly_rent_per_pyeong"] * size)
 
-        # 인건비: clinic_profiles 표준 인력 × 평균 월급 (원장 제외)
-        st = clinic_profiles.get_staffing_profile(clinic_type)
-        labor = (
-            st["nurses"] * st["avg_nurse_salary_monthly"]
-            + st["admins"] * st["avg_admin_salary_monthly"]
-            + st["technicians"] * st["avg_nurse_salary_monthly"]
-        )
+        # 인건비: 사용자 입력 → 진료과 표준
+        if user_monthly_payroll is not None and user_monthly_payroll > 0:
+            labor = user_monthly_payroll
+        else:
+            st = clinic_profiles.get_staffing_profile(clinic_type)
+            labor = (
+                st["nurses"] * st["avg_nurse_salary_monthly"]
+                + st["admins"] * st["avg_admin_salary_monthly"]
+                + st["technicians"] * st["avg_nurse_salary_monthly"]
+            )
 
         utilities = int(size * 50_000)        # 평당 전기·수도·관리비 5만원
         supplies = int(size * 100_000)        # 평당 진료재료비 10만원
@@ -990,10 +1022,12 @@ class SimulationService:
         revenue_avg: int,
         latitude: Optional[float] = None,
         longitude: Optional[float] = None,
+        user_inputs: Optional[Dict[str, Any]] = None,
     ) -> CapitalPlan:
-        """진료과 표준 + 지역 시세 기반 초기 투자비 + 대출 시뮬"""
+        """진료과 표준 + 지역 시세 + 사용자 입력 기반 초기 투자비 + 대출 시뮬"""
         cap = clinic_profiles.get_capital_profile(clinic_type)
         target = int(size_pyeong) if size_pyeong else cap["standard_size_pyeong"]
+        ui = user_inputs or {}
 
         # 지역 시세 (한국부동산원 기반)
         deposit_per_pyeong = cap["deposit_per_pyeong"]
@@ -1007,28 +1041,64 @@ class SimulationService:
             region_label = rent_info["region_name"]
             data_source = f"한국의료기기협회·대한개원의협의회 표준 + 한국부동산원 {rent_info['sample_period']} ({region_label})"
 
-        interior = cap["interior_per_pyeong"] * target
-        equipment = cap["equipment_typical"]
-        deposit = deposit_per_pyeong * target
-        monthly_rent = monthly_rent_per_pyeong * target
+        # 각 항목: 사용자 입력 → 표준 추정. note에 출처 명시
+        if ui.get("interior_cost_won") and ui["interior_cost_won"] > 0:
+            interior = ui["interior_cost_won"]
+            interior_note = "본인 입력 (시공사 견적)"
+        else:
+            interior = cap["interior_per_pyeong"] * target
+            interior_note = f"평당 {cap['interior_per_pyeong']:,}원 × {target}평 (진료과 표준)"
+
+        if ui.get("equipment_cost_won") and ui["equipment_cost_won"] > 0:
+            equipment = ui["equipment_cost_won"]
+            equipment_note = "본인 입력 (장비업체 견적)"
+        else:
+            equipment = cap["equipment_typical"]
+            equipment_note = f"진료과 표준 구성, 최저가 ~ {cap['equipment_min']:,}원까지 압축 가능"
+
+        if ui.get("deposit_won") and ui["deposit_won"] > 0:
+            deposit = ui["deposit_won"]
+            deposit_note = "본인 입력 (실제 계약 보증금)"
+        else:
+            deposit = deposit_per_pyeong * target
+            deposit_note = f"평당 {deposit_per_pyeong:,}원 × {target}평 ({region_label})"
+
+        if ui.get("monthly_rent_won") and ui["monthly_rent_won"] > 0:
+            monthly_rent = ui["monthly_rent_won"]
+        else:
+            monthly_rent = monthly_rent_per_pyeong * target
+
         misc = int(interior * 0.05) + 5_000_000
 
         breakdown = [
-            CapitalLineItem(label="인테리어·시설공사", amount=interior, note=f"평당 {cap['interior_per_pyeong']:,}원 × {target}평"),
-            CapitalLineItem(label="의료장비 (표준)", amount=equipment, note=f"진료과 표준 구성, 최저가 ~ {cap['equipment_min']:,}원까지 압축 가능"),
-            CapitalLineItem(label="임대 보증금", amount=deposit, note=f"평당 {deposit_per_pyeong:,}원 × {target}평 ({region_label})"),
-            CapitalLineItem(label="등록·인허가·예비비", amount=misc, note="개설신고·세무·법무·간판 등"),
+            CapitalLineItem(label="인테리어·시설공사", amount=interior, note=interior_note),
+            CapitalLineItem(label="의료장비", amount=equipment, note=equipment_note),
+            CapitalLineItem(label="임대 보증금", amount=deposit, note=deposit_note),
+            CapitalLineItem(label="등록·인허가·예비비", amount=misc, note="개설신고·세무·법무·간판 등 (인테리어 5%)"),
         ]
         initial_total = sum(item.amount for item in breakdown)
         working_capital = monthly_rent * cap["working_capital_months"] + 30_000_000  # 월세 + 인건비 약간
         grand_total = initial_total + working_capital
 
-        # 대출 시뮬 — 원금균등 가정 단순화 (이자율 5.5%, 5년)
+        # 대출 시뮬 — 사용자 입력 own_capital_ratio + loan_interest_rate 우선
+        user_own_ratio = ui.get("own_capital_ratio")
+        user_rate = ui.get("loan_interest_rate")
+        scenarios_input: List[tuple] = []
+        if user_own_ratio is not None and 0.0 <= user_own_ratio <= 1.0:
+            ratio_pct = int(user_own_ratio * 100)
+            loan_pct = 100 - ratio_pct
+            scenarios_input.append((user_own_ratio, f"본인 입력: 자기자본 {ratio_pct}% / 대출 {loan_pct}%"))
+        else:
+            scenarios_input = [
+                (1.0, "자기자본 100%"),
+                (0.5, "자기자본 50% / 대출 50%"),
+                (0.3, "자기자본 30% / 대출 70%"),
+            ]
         scenarios: List[FinancingScenario] = []
-        for own_ratio, label in [(1.0, "자기자본 100%"), (0.5, "자기자본 50% / 대출 50%"), (0.3, "자기자본 30% / 대출 70%")]:
+        for own_ratio, label in scenarios_input:
             own = int(grand_total * own_ratio)
             loan = grand_total - own
-            rate = 0.055
+            rate = user_rate if user_rate is not None and user_rate > 0 else 0.055
             term = 5
             if loan > 0:
                 # 원리금균등 월상환액
@@ -1111,6 +1181,7 @@ class SimulationService:
         revenue_avg: int,
         cost_total: int,
         capital_grand_total: int,
+        user_inputs: Optional[Dict[str, Any]] = None,
     ) -> FiveYearPnLSummary:
         """
         신규개원 표준 환자증가 곡선 기반 5년 손익.
@@ -1125,8 +1196,10 @@ class SimulationService:
         대출 가정: 자기자본 50% / 대출 50%, 연 5.5%, 5년 원리금균등.
         """
         ramp = [0.60, 0.80, 0.95, 1.00, 1.00]
-        loan = capital_grand_total // 2
-        rate = 0.055
+        ui = user_inputs or {}
+        own_ratio = ui.get("own_capital_ratio") if ui.get("own_capital_ratio") is not None else 0.5
+        loan = int(capital_grand_total * (1.0 - own_ratio))
+        rate = ui.get("loan_interest_rate") if ui.get("loan_interest_rate") and ui["loan_interest_rate"] > 0 else 0.055
         n = 60
         if loan > 0:
             r = rate / 12
@@ -1369,6 +1442,12 @@ class SimulationService:
 
         revenue_avg = simulation.est_revenue_avg or 80000000
 
+        # 사용자 입력 추출 (재조회 시에도 demographics_data에서 복원)
+        user_inputs_dict = (
+            (simulation.demographics_data or {}).get("user_inputs")
+            if isinstance(simulation.demographics_data, dict) else None
+        ) or {}
+
         cost = estimated_cost or {
             "rent": simulation.est_cost_rent or 0,
             "labor": simulation.est_cost_labor or 0,
@@ -1441,8 +1520,8 @@ class SimulationService:
             ai_insights=None,
             region_stats_detail=None,
 
-            # 신규: 개원 실행 모듈 (clinic_profiles 표준 + 지역 시세 기반)
-            capital_plan=self._generate_capital_plan(clinic_type, simulation.size_pyeong, revenue_avg, lat, lng),
+            # 신규: 개원 실행 모듈 (clinic_profiles 표준 + 지역 시세 + 사용자 입력 기반)
+            capital_plan=self._generate_capital_plan(clinic_type, simulation.size_pyeong, revenue_avg, lat, lng, user_inputs_dict),
             staffing_plan=self._generate_staffing_plan(clinic_type),
             permit_checklist=self._generate_permit_checklist(clinic_type),
             equipment_checklist=self._generate_equipment_checklist(clinic_type),
@@ -1453,13 +1532,15 @@ class SimulationService:
                 clinic_type,
                 revenue_avg,
                 simulation.est_cost_total or 0,
-                self._generate_capital_plan(clinic_type, simulation.size_pyeong, revenue_avg, lat, lng).grand_total,
+                self._generate_capital_plan(clinic_type, simulation.size_pyeong, revenue_avg, lat, lng, user_inputs_dict).grand_total,
+                user_inputs_dict,
             ),
             tax_comparison=self._generate_tax_comparison(
                 annual_revenue=revenue_avg * 12,
                 annual_profit_before_tax=(simulation.monthly_profit_avg or 0) * 12,
             ),
             marketing_plan=self._generate_marketing_plan(clinic_type),
+            user_inputs=user_inputs_dict if user_inputs_dict else None,
             nearby_facility_counts=(
                 (simulation.demographics_data or {}).get("nearby_facilities_real")
                 if isinstance(simulation.demographics_data, dict) else None

@@ -29,6 +29,15 @@ class SimulationRequest(BaseModel):
     size_pyeong: Optional[float] = Field(None, gt=0, description="면적(평)")
     budget_million: Optional[int] = Field(None, gt=0, description="예산(백만원)")
 
+    # 고급 입력 (선택) — 입력 시 진짜 본인 데이터로 계산, 미입력 시 표준 추정
+    deposit_won: Optional[int] = Field(None, ge=0, description="실제 임대 보증금 (원)")
+    monthly_rent_won: Optional[int] = Field(None, ge=0, description="실제 월 임대료 (원)")
+    interior_cost_won: Optional[int] = Field(None, ge=0, description="실제 인테리어 견적 (원)")
+    equipment_cost_won: Optional[int] = Field(None, ge=0, description="실제 의료장비 견적 (원)")
+    own_capital_ratio: Optional[float] = Field(None, ge=0.0, le=1.0, description="자기자본 비율 (0.0~1.0)")
+    loan_interest_rate: Optional[float] = Field(None, ge=0.0, le=0.20, description="대출 연이자율 (0.055=5.5%)")
+    monthly_payroll_won: Optional[int] = Field(None, ge=0, description="실제 월 인건비 (원, 원장 제외)")
+
 
 class CompetitorInfo(BaseModel):
     """경쟁 병원 정보"""
@@ -520,6 +529,8 @@ class SimulationResponse(BaseModel):
     five_year_pnl: Optional[FiveYearPnLSummary] = None
     tax_comparison: Optional[TaxComparison] = None
     marketing_plan: Optional[MarketingPlan] = None
+    # 사용자 입력 추적 — 어떤 값이 본인 데이터인지 표시
+    user_inputs: Optional[Dict[str, Any]] = None
     # 카카오 Local API 실데이터: 반경 500m 시설 카운트
     nearby_facility_counts: Optional[Dict[str, int]] = None
     # 카카오 키워드 검색 종합 (의료협력·영업타겟·교통·주거)

@@ -44,6 +44,14 @@ const simulationSchema = z.object({
   clinic_type: z.string().min(1, '진료과목을 선택해주세요'),
   size_pyeong: z.number().optional(),
   budget_million: z.number().optional(),
+  // 고급 입력 (선택)
+  deposit_won: z.number().optional(),
+  monthly_rent_won: z.number().optional(),
+  interior_cost_won: z.number().optional(),
+  equipment_cost_won: z.number().optional(),
+  own_capital_ratio: z.number().min(0).max(1).optional(),
+  loan_interest_rate: z.number().min(0).max(0.20).optional(),
+  monthly_payroll_won: z.number().optional(),
 })
 
 type SimulationForm = z.infer<typeof simulationSchema>
@@ -302,6 +310,93 @@ export default function SimulatePage() {
                     />
                   </div>
                 </div>
+
+                {/* 고급 입력 (선택) — 본인 견적/계약 데이터로 진짜 분석 */}
+                <details className="group border border-border rounded-xl overflow-hidden">
+                  <summary className="cursor-pointer p-4 bg-muted/30 hover:bg-muted/50 transition-colors flex items-center justify-between text-sm font-medium">
+                    <span>📋 고급 입력 (선택) — 본인 견적·계약 데이터 입력 시 진짜 값으로 계산</span>
+                    <ChevronRight className="w-4 h-4 transition-transform group-open:rotate-90" />
+                  </summary>
+                  <div className="p-4 space-y-3 bg-muted/10">
+                    <p className="text-xs text-muted-foreground mb-2">
+                      미입력 항목은 지역 평균/진료과 표준으로 계산됩니다. 본인 데이터를 넣으면 자금계획·5년 손익·세금이 정확하게 산출됩니다.
+                    </p>
+                    <div className="grid md:grid-cols-2 gap-3">
+                      <div>
+                        <label className="label text-xs mb-1 block">실제 임대 보증금 (원)</label>
+                        <input
+                          {...register('deposit_won', { setValueAs: (v) => v === '' ? undefined : Number(v) })}
+                          type="number"
+                          placeholder="예: 100000000"
+                          className="input text-sm"
+                        />
+                      </div>
+                      <div>
+                        <label className="label text-xs mb-1 block">실제 월 임대료 (원)</label>
+                        <input
+                          {...register('monthly_rent_won', { setValueAs: (v) => v === '' ? undefined : Number(v) })}
+                          type="number"
+                          placeholder="예: 8000000"
+                          className="input text-sm"
+                        />
+                      </div>
+                      <div>
+                        <label className="label text-xs mb-1 block">인테리어 견적 (원)</label>
+                        <input
+                          {...register('interior_cost_won', { setValueAs: (v) => v === '' ? undefined : Number(v) })}
+                          type="number"
+                          placeholder="예: 100000000"
+                          className="input text-sm"
+                        />
+                      </div>
+                      <div>
+                        <label className="label text-xs mb-1 block">의료장비 견적 (원)</label>
+                        <input
+                          {...register('equipment_cost_won', { setValueAs: (v) => v === '' ? undefined : Number(v) })}
+                          type="number"
+                          placeholder="예: 200000000"
+                          className="input text-sm"
+                        />
+                      </div>
+                      <div>
+                        <label className="label text-xs mb-1 block">자기자본 비율 (%)</label>
+                        <input
+                          {...register('own_capital_ratio', {
+                            setValueAs: (v) => v === '' ? undefined : Number(v) / 100,
+                          })}
+                          type="number"
+                          min={0}
+                          max={100}
+                          placeholder="예: 50 (50%)"
+                          className="input text-sm"
+                        />
+                      </div>
+                      <div>
+                        <label className="label text-xs mb-1 block">대출 연이자율 (%)</label>
+                        <input
+                          {...register('loan_interest_rate', {
+                            setValueAs: (v) => v === '' ? undefined : Number(v) / 100,
+                          })}
+                          type="number"
+                          step="0.1"
+                          min={0}
+                          max={15}
+                          placeholder="예: 5.5 (5.5%)"
+                          className="input text-sm"
+                        />
+                      </div>
+                      <div className="md:col-span-2">
+                        <label className="label text-xs mb-1 block">월 인건비 — 원장 제외 (원)</label>
+                        <input
+                          {...register('monthly_payroll_won', { setValueAs: (v) => v === '' ? undefined : Number(v) })}
+                          type="number"
+                          placeholder="예: 10000000"
+                          className="input text-sm"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </details>
 
                 <button type="submit" disabled={mutation.isPending} className="btn-primary w-full h-12 text-base">
                   {mutation.isPending ? (
