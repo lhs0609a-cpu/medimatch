@@ -1,8 +1,14 @@
 'use client'
 
 import Link from 'next/link'
+import dynamic from 'next/dynamic'
 import { motion } from 'framer-motion'
 import { ArrowRight } from 'lucide-react'
+
+const KakaoMap = dynamic(() => import('@/components/map/KakaoMap'), {
+  ssr: false,
+  loading: () => null,
+})
 
 const stats = [
   { value: '470+', label: '매물' },
@@ -10,14 +16,32 @@ const stats = [
   { value: '8년', label: '경험' },
 ]
 
-export function HeroSection() {
+interface HeroSectionProps {
+  markers?: Array<{
+    id: string | number
+    lat: number
+    lng: number
+    title: string
+    type: 'hospital' | 'pharmacy' | 'prospect' | 'default' | 'closed_hospital' | 'listing'
+  }>
+}
+
+export function HeroSection({ markers = [] }: HeroSectionProps) {
   return (
     <section className="relative min-h-[100dvh] flex items-center justify-center overflow-hidden" aria-label="히어로 섹션">
-      {/* Gradient background */}
+      {/* 배경 지도 + gradient 오버레이 */}
       <div className="absolute inset-0 -z-10">
-        <div className="absolute inset-0 bg-gradient-to-br from-[#3182f6]/5 via-background to-[#3182f6]/10" />
-        <div className="absolute top-1/4 left-1/4 w-[600px] h-[600px] bg-[#3182f6]/5 rounded-full blur-3xl" />
-        <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] bg-[#3182f6]/8 rounded-full blur-3xl" />
+        <div className="absolute inset-0">
+          <KakaoMap
+            center={{ lat: 37.5172, lng: 127.0473 }}
+            level={8}
+            markers={markers}
+            className="w-full h-full opacity-50"
+          />
+        </div>
+        <div className="absolute inset-0 bg-gradient-to-b from-background/70 via-background/55 to-background pointer-events-none" />
+        <div className="absolute top-1/4 left-1/4 w-[600px] h-[600px] bg-[#3182f6]/5 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] bg-[#3182f6]/8 rounded-full blur-3xl pointer-events-none" />
       </div>
 
       <div className="relative max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-16 text-center">

@@ -53,7 +53,7 @@ export default function HomePage() {
         <HomeHeader />
 
         <main id="main-content" role="main">
-          <HeroSection />
+          <HeroSection markers={mapMarkers} />
           <ServiceCards />
           <InteractiveDemo />
           <SocialProof />
