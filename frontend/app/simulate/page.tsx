@@ -24,15 +24,9 @@ import FreeInsights from './components/FreeInsights'
 import DemographicsPreview from './components/DemographicsPreview'
 import OverallRadar from './components/OverallRadar'
 import RevenueSimulator from './components/RevenueSimulator'
-import BreakevenTimeline from './components/BreakevenTimeline'
-import MonthlyForecast from './components/MonthlyForecast'
 import CostPreview from './components/CostPreview'
 import CompetitorDistance from './components/CompetitorDistance'
 import RentAnalysis from './components/RentAnalysis'
-import NearbyFacilities from './components/NearbyFacilities'
-import TransitScore from './components/TransitScore'
-import FinancialStatement from './components/FinancialStatement'
-import OpeningTimeline from './components/OpeningTimeline'
 import ShareResult from './components/ShareResult'
 import PaywallCTA from './components/PaywallCTA'
 
@@ -383,16 +377,13 @@ export default function SimulatePage() {
             {!isUnlocked ? (
               <div className="relative">
                 <div className="paywall-blur space-y-6">
-                  {/* 시장/경쟁 — 가장 중요 */}
-                  <RegionBenchmark result={DEMO_RESULT} />
                   <CompetitorDistance result={DEMO_RESULT} />
                   <DemographicsPreview result={DEMO_RESULT} isUnlocked={false} />
 
-                  {/* 잠금 리마인더 */}
                   <div className="flex items-center gap-3 p-4 bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-950/30 dark:to-orange-950/30 border border-amber-200 dark:border-amber-800 rounded-xl">
                     <Lock className="w-5 h-5 text-amber-600 flex-shrink-0" />
                     <div className="flex-1">
-                      <span className="text-sm font-medium text-foreground">매출·비용·재무 분석을 확인하려면 잠금해제</span>
+                      <span className="text-sm font-medium text-foreground">매출·비용 시뮬레이션을 확인하려면 잠금해제</span>
                     </div>
                     <button onClick={handleUnlock} className="btn-primary text-xs px-4 py-2">
                       <Sparkles className="w-3 h-3" />
@@ -400,21 +391,10 @@ export default function SimulatePage() {
                     </button>
                   </div>
 
-                  {/* 매출/비용/수익성 */}
                   <RevenueSimulator result={DEMO_RESULT} />
                   <CostPreview result={DEMO_RESULT} />
-                  <BreakevenTimeline result={DEMO_RESULT} />
-                  <MonthlyForecast result={DEMO_RESULT} />
                   <RentAnalysis result={DEMO_RESULT} />
-                  <FinancialStatement result={DEMO_RESULT} />
-
-                  {/* 입지 */}
-                  <TransitScore result={DEMO_RESULT} />
-                  <NearbyFacilities result={DEMO_RESULT} />
-
-                  {/* 종합 + 일정 */}
                   <OverallRadar result={DEMO_RESULT} />
-                  <OpeningTimeline result={DEMO_RESULT} />
                 </div>
                 <PaywallCTA
                   onUnlock={handleUnlock}
@@ -424,26 +404,17 @@ export default function SimulatePage() {
               </div>
             ) : (
               <>
-                {/* 1. 시장/경쟁 — 개원 의사결정의 핵심 */}
-                <RegionBenchmark result={result} />
+                {/* 1. 시장/경쟁 — 실 API 데이터 */}
                 <CompetitorDistance result={result} />
                 <DemographicsPreview result={result} isUnlocked={true} />
 
-                {/* 2. 매출/비용/수익성 */}
+                {/* 2. 매출/비용 */}
                 <RevenueSimulator result={result} />
                 <CostPreview result={result} />
-                <BreakevenTimeline result={result} />
-                <MonthlyForecast result={result} />
                 <RentAnalysis result={result} />
-                <FinancialStatement result={result} />
 
-                {/* 3. 입지 */}
-                <TransitScore result={result} />
-                <NearbyFacilities result={result} />
-
-                {/* 4. 종합 + 일정 */}
+                {/* 3. 종합 점수 */}
                 <OverallRadar result={result} />
-                <OpeningTimeline result={result} />
               </>
             )}
 

@@ -1,7 +1,7 @@
 'use client'
 
 import React from 'react'
-import { Target, Shield, Lock } from 'lucide-react'
+import { Target, Shield } from 'lucide-react'
 import { SimulationResponse } from '@/lib/api/client'
 
 interface FreeInsightsProps {
@@ -71,16 +71,10 @@ export default function FreeInsights({ result }: FreeInsightsProps) {
                   <th className="text-left py-2 px-2 text-xs text-muted-foreground font-medium">의원명</th>
                   <th className="text-right py-2 px-2 text-xs text-muted-foreground font-medium">거리</th>
                   <th className="text-left py-2 px-2 text-xs text-muted-foreground font-medium">진료과</th>
-                  <th className="text-right py-2 px-2 text-xs text-muted-foreground font-medium">
-                    <span className="flex items-center gap-1 justify-end text-muted-foreground/60">
-                      추정 매출
-                      <Lock className="w-3 h-3" />
-                    </span>
-                  </th>
                 </tr>
               </thead>
               <tbody>
-                {competitors.slice(0, 6).map((comp, idx) => (
+                {competitors.slice(0, 10).map((comp, idx) => (
                   <tr key={idx} className="border-b border-border/50 last:border-0 hover:bg-muted/30 transition-colors">
                     <td className="py-2.5 px-2">
                       <div className="flex items-center gap-2">
@@ -99,19 +93,14 @@ export default function FreeInsights({ result }: FreeInsightsProps) {
                       <span className="font-medium text-foreground">{comp.distance_m}m</span>
                     </td>
                     <td className="py-2.5 px-2 text-muted-foreground text-xs">{comp.clinic_type}</td>
-                    <td className="py-2.5 px-2 text-right">
-                      <span className="text-muted-foreground/30 blur-[4px] select-none text-xs">5,000만원</span>
-                    </td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
-          {competitors.length > 6 && (
-            <p className="text-xs text-muted-foreground text-center mt-3">
-              외 {competitors.length - 6}개 의원 더보기는 프리미엄에서
-            </p>
-          )}
+          <p className="text-[10px] text-muted-foreground mt-3">
+            출처: 건강보험심사평가원 (HIRA)
+          </p>
         </div>
       ) : (
         <div className="text-center py-6">
@@ -119,17 +108,8 @@ export default function FreeInsights({ result }: FreeInsightsProps) {
           <p className="font-medium text-foreground mb-1">
             반경 {radius_m}m 내 동일과 {same_dept_count}개 의원 존재
           </p>
-          <p className="text-sm text-muted-foreground">
-            경쟁 의원 상세 정보(실명·매출·점유율)는 프리미엄에서 확인하세요.
-          </p>
         </div>
       )}
-
-      {/* Teaser */}
-      <div className="mt-4 pt-3 border-t border-border flex items-center gap-2 text-xs text-muted-foreground">
-        <Lock className="w-3 h-3 flex-shrink-0" />
-        <span>경쟁병원 실명 · 추정 매출 · 시장점유율 · 경쟁강도 지수는 프리미엄에서 확인</span>
-      </div>
     </div>
   )
 }

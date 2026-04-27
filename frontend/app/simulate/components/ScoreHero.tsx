@@ -3,24 +3,12 @@
 import React from 'react'
 import {
   CheckCircle2, MinusCircle, AlertCircle, Database,
-  DollarSign, Receipt, Wallet, Sparkles, TrendingUp, TrendingDown,
+  DollarSign, Receipt, TrendingUp, TrendingDown,
 } from 'lucide-react'
 import { SimulationResponse } from '@/lib/api/client'
-import ScoreGauge from './ScoreGauge'
 
 interface ScoreHeroProps {
   result: SimulationResponse
-}
-
-function getGaugeColor(rec: string): string {
-  switch (rec) {
-    case 'VERY_POSITIVE': return '#16a34a'
-    case 'POSITIVE': return '#22c55e'
-    case 'NEUTRAL': return '#f59e0b'
-    case 'NEGATIVE': return '#ef4444'
-    case 'VERY_NEGATIVE': return '#dc2626'
-    default: return '#3b82f6'
-  }
 }
 
 function getBadgeStyle(rec: string): string {
@@ -74,7 +62,6 @@ const dataSources = [
 ]
 
 export default function ScoreHero({ result }: ScoreHeroProps) {
-  const gaugeColor = getGaugeColor(result.recommendation)
   const revenue = result.estimated_monthly_revenue.avg
   const cost = result.estimated_monthly_cost.total
   const profit = result.profitability.monthly_profit_avg
@@ -84,41 +71,24 @@ export default function ScoreHero({ result }: ScoreHeroProps) {
 
   return (
     <div className="card p-6 md:p-8">
-      {/* Top: Gauge + Recommendation */}
-      <div className="flex flex-col md:flex-row items-center gap-6 md:gap-8">
-        <div className="flex-shrink-0">
-          <ScoreGauge
-            score={result.confidence_score}
-            max={100}
-            size={160}
-            color={gaugeColor}
-            label="신뢰도"
-          />
-        </div>
-
-        <div className="flex-1 text-center md:text-left">
-          <div className="flex items-center justify-center md:justify-start gap-2 mb-3">
-            <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-semibold ${getBadgeStyle(result.recommendation)}`}>
-              {getRecommendationIcon(result.recommendation)}
-              개원 추천: {getRecommendationText(result.recommendation)}
+      <div className="flex flex-col items-start gap-3">
+        <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-semibold ${getBadgeStyle(result.recommendation)}`}>
+          {getRecommendationIcon(result.recommendation)}
+          개원 추천: {getRecommendationText(result.recommendation)}
+        </span>
+        <p className="text-foreground leading-relaxed">
+          {result.recommendation_reason}
+        </p>
+        <div className="flex items-center gap-2 flex-wrap">
+          <div className="flex items-center gap-1 text-xs text-muted-foreground mr-1">
+            <Database className="w-3 h-3" />
+            <span>데이터 출처:</span>
+          </div>
+          {dataSources.map((src) => (
+            <span key={src.name} className={`text-[11px] px-2 py-0.5 rounded-full font-medium ${src.color}`}>
+              {src.name}
             </span>
-          </div>
-
-          <p className="text-foreground leading-relaxed mb-4">
-            {result.recommendation_reason}
-          </p>
-
-          <div className="flex items-center justify-center md:justify-start gap-2 flex-wrap">
-            <div className="flex items-center gap-1 text-xs text-muted-foreground mr-1">
-              <Database className="w-3 h-3" />
-              <span>데이터 출처:</span>
-            </div>
-            {dataSources.map((src) => (
-              <span key={src.name} className={`text-[11px] px-2 py-0.5 rounded-full font-medium ${src.color}`}>
-                {src.name}
-              </span>
-            ))}
-          </div>
+          ))}
         </div>
       </div>
 
@@ -144,9 +114,6 @@ export default function ScoreHero({ result }: ScoreHeroProps) {
             <div className="text-base md:text-xl font-bold text-amber-600 dark:text-amber-400">
               ~{formatMoney(cost)}원
             </div>
-            <div className="text-[10px] text-muted-foreground mt-0.5">
-              항목별 상세 → 프리미엄
-            </div>
           </div>
 
           {/* Profit */}
@@ -163,25 +130,9 @@ export default function ScoreHero({ result }: ScoreHeroProps) {
             }`}>
               {isProfitable ? '+' : ''}{formatMoney(profit)}원
             </div>
-            <div className="text-[10px] text-muted-foreground mt-0.5">
-              ROI · 손익분기 → 프리미엄
-            </div>
           </div>
         </div>
       </div>
-
-      {/* AI Analysis Summary */}
-      {result.ai_analysis && (
-        <div className="mt-5 bg-gradient-to-r from-blue-50 to-blue-50 dark:from-blue-950/30 dark:to-blue-950/30 rounded-xl p-4 border border-blue-200/50 dark:border-blue-800/50">
-          <div className="flex items-start gap-3">
-            <Sparkles className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
-            <div>
-              <h4 className="text-sm font-semibold text-foreground mb-1">AI 분석 요약</h4>
-              <p className="text-sm text-foreground leading-relaxed">{result.ai_analysis}</p>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Revenue Range Visualization */}
       {revenueMin > 0 && revenueMax > 0 && (
