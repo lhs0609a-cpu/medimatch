@@ -5,10 +5,18 @@ FROM python:3.11-slim
 WORKDIR /app
 
 # Install system dependencies
+# WeasyPrint (PDF 생성)에 GTK+/Pango/Cairo + 한글 폰트 필요
 RUN apt-get update && apt-get install -y \
     gcc \
     libpq-dev \
     curl \
+    libpango-1.0-0 \
+    libpangoft2-1.0-0 \
+    libcairo2 \
+    libgdk-pixbuf-2.0-0 \
+    libffi-dev \
+    shared-mime-info \
+    fonts-noto-cjk \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy requirements first for caching
