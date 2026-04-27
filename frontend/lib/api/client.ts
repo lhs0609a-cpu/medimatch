@@ -474,6 +474,7 @@ export interface SimulationResponse {
   five_year_pnl?: FiveYearPnLSummary
   tax_comparison?: TaxComparison
   marketing_plan?: MarketingPlan
+  nearby_facility_counts?: Record<string, number>  // pharmacy/hospital/bank/cafe/restaurant
   // 결제/잠금 상태 (서버에서 관리)
   is_unlocked: boolean
   unlock_price: number

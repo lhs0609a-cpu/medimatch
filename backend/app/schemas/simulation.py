@@ -520,6 +520,8 @@ class SimulationResponse(BaseModel):
     five_year_pnl: Optional[FiveYearPnLSummary] = None
     tax_comparison: Optional[TaxComparison] = None
     marketing_plan: Optional[MarketingPlan] = None
+    # 카카오 Local API 실데이터: 반경 500m 시설 카운트
+    nearby_facility_counts: Optional[Dict[str, int]] = None
 
     confidence_score: int = Field(..., ge=0, le=100)
     recommendation: RecommendationType

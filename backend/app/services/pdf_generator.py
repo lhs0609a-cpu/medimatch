@@ -1,12 +1,24 @@
 """
-PDF 생성 서비스 - WeasyPrint를 사용한 상권분석 리포트 PDF 생성
+PDF 생성 서비스 - WeasyPrint를 사용한 상권분석 + 개원 실행 계획 리포트.
+
+8개 핵심 모듈 모두 포함:
+1. 분석 요약 (위치/진료과/매출/비용/순이익)
+2. 인구·경쟁 (행안부 + HIRA 실데이터)
+3. 자금 계획 (초기 투자비 + 대출 시뮬)
+4. 인력 구성
+5. 인허가 체크리스트
+6. 의료장비
+7. 개원 일정
+8. 5년 손익 시뮬
+9. 세금 (개인 vs 법인)
+10. 마케팅 플랜
 """
 import os
 import uuid
 from io import BytesIO
 from datetime import datetime
 from pathlib import Path
-from typing import Optional
+from typing import Optional, Any
 
 from jinja2 import Environment, FileSystemLoader
 
@@ -29,11 +41,28 @@ from ..core.config import settings
 from ..models.simulation import Simulation
 
 
+def _won(v: int) -> str:
+    """원 단위를 한글로 (억/만)"""
+    if not v:
+        return "0원"
+    if v >= 100_000_000:
+        return f"{v / 100_000_000:.1f}억원"
+    if v >= 10_000:
+        return f"{v / 10_000:,.0f}만원"
+    return f"{v:,}원"
+
+
+def _esc(s: Any) -> str:
+    """HTML escape"""
+    if s is None:
+        return ""
+    return str(s).replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+
+
 class PDFGeneratorService:
     """WeasyPrint 기반 PDF 생성 서비스"""
 
     def __init__(self):
-        # 템플릿 디렉토리 설정
         template_dir = Path(__file__).parent.parent / "templates" / "pdf"
         template_dir.mkdir(parents=True, exist_ok=True)
 
@@ -42,7 +71,6 @@ class PDFGeneratorService:
             autoescape=True
         )
 
-        # S3 클라이언트
         self.s3_client = None
         if boto3 and settings.AWS_ACCESS_KEY_ID and settings.AWS_SECRET_ACCESS_KEY:
             self.s3_client = boto3.client(
@@ -55,696 +83,397 @@ class PDFGeneratorService:
     def generate_simulation_report_pdf(
         self,
         simulation: Simulation,
-        ai_analysis: dict
+        ai_analysis_or_response: Any = None,
     ) -> bytes:
-        """시뮬레이션 리포트 PDF 생성"""
+        """
+        시뮬레이션 리포트 PDF 생성.
+        ai_analysis_or_response가 SimulationResponse면 8개 모듈 모두 렌더링,
+        아니면 기본 정보만 렌더링.
+        """
         if not WEASYPRINT_AVAILABLE:
             raise RuntimeError(
-                "WeasyPrint is not available. Please install GTK+ dependencies. "
-                "See: https://doc.courtbouillon.org/weasyprint/stable/first_steps.html"
+                "WeasyPrint is not available. Please install GTK+ dependencies."
             )
 
-        # 템플릿 데이터 준비
-        context = self._prepare_context(simulation, ai_analysis)
+        # SimulationResponse가 들어왔는지 확인 (capital_plan 같은 필드 존재)
+        response = ai_analysis_or_response
+        has_modules = hasattr(response, 'capital_plan') and response.capital_plan is not None
 
-        # HTML 렌더링
-        try:
-            template = self.jinja_env.get_template("report_template.html")
-            html_content = template.render(**context)
-        except Exception:
-            # 템플릿 파일이 없으면 내장 HTML 사용
-            html_content = self._generate_inline_html(context)
+        # SimulationResponse가 없으면 simulation_service로 빌드
+        if not has_modules:
+            try:
+                from .simulation import simulation_service
+                response = simulation_service._build_response(
+                    simulation,
+                    simulation.competitors_data or [],
+                    simulation.clinic_type,
+                )
+                has_modules = True
+            except Exception:
+                response = None
+                has_modules = False
 
-        # PDF 생성
+        html_content = self._build_html(simulation, response, has_modules)
+
         pdf_bytes = HTML(string=html_content, base_url=".").write_pdf(
             stylesheets=[CSS(string=self._get_pdf_styles())]
         )
-
         return pdf_bytes
 
-    def _prepare_context(self, sim: Simulation, ai_analysis: dict) -> dict:
-        """템플릿 컨텍스트 준비"""
-        # 경쟁 병원 목록
-        competitors = []
-        if sim.competitors_data:
-            for comp in sim.competitors_data[:10]:
-                competitors.append({
-                    "name": comp.get("name", "미상"),
-                    "distance": comp.get("distance", "N/A"),
-                    "address": comp.get("address", ""),
-                })
-
-        # 추천 등급 한글화
-        recommendation_map = {
+    def _build_html(self, sim: Simulation, response: Any, has_modules: bool) -> str:
+        report_id = str(sim.id)[:8].upper()
+        now = datetime.now().strftime("%Y년 %m월 %d일 %H:%M")
+        rec_map = {
             "VERY_POSITIVE": "매우 긍정적",
             "POSITIVE": "긍정적",
             "NEUTRAL": "중립",
             "NEGATIVE": "부정적",
             "VERY_NEGATIVE": "매우 부정적",
         }
-        recommendation_kr = recommendation_map.get(
-            sim.recommendation.value if sim.recommendation else "",
-            "분석 중"
-        )
+        rec_kr = rec_map.get(sim.recommendation.value if sim.recommendation else "", "분석 중")
 
-        return {
-            "generated_at": datetime.now().strftime("%Y년 %m월 %d일 %H:%M"),
-            "report_id": str(sim.id)[:8].upper(),
+        sections = []
+        sections.append(self._section_summary(sim, rec_kr))
+        sections.append(self._section_market(sim, response))
 
-            # 기본 정보
-            "address": sim.address,
-            "clinic_type": sim.clinic_type,
-            "size_pyeong": sim.size_pyeong or "미정",
-            "budget_million": sim.budget_million or "미정",
+        if has_modules and response:
+            if response.capital_plan:
+                sections.append(self._section_capital(response.capital_plan))
+            if response.staffing_plan:
+                sections.append(self._section_staffing(response.staffing_plan))
+            if response.permit_checklist:
+                sections.append(self._section_permit(response.permit_checklist))
+            if response.equipment_checklist:
+                sections.append(self._section_equipment(response.equipment_checklist))
+            if response.opening_timeline:
+                sections.append(self._section_timeline(response.opening_timeline))
+            if response.five_year_pnl:
+                sections.append(self._section_5yr_pnl(response.five_year_pnl))
+            if response.tax_comparison:
+                sections.append(self._section_tax(response.tax_comparison))
+            if response.marketing_plan:
+                sections.append(self._section_marketing(response.marketing_plan))
 
-            # 좌표
-            "latitude": sim.latitude,
-            "longitude": sim.longitude,
-
-            # 예상 매출
-            "revenue_min": f"{sim.est_revenue_min:,}" if sim.est_revenue_min else "N/A",
-            "revenue_avg": f"{sim.est_revenue_avg:,}" if sim.est_revenue_avg else "N/A",
-            "revenue_max": f"{sim.est_revenue_max:,}" if sim.est_revenue_max else "N/A",
-
-            # 예상 비용
-            "cost_rent": f"{sim.est_cost_rent:,}" if sim.est_cost_rent else "N/A",
-            "cost_labor": f"{sim.est_cost_labor:,}" if sim.est_cost_labor else "N/A",
-            "cost_utilities": f"{sim.est_cost_utilities:,}" if sim.est_cost_utilities else "N/A",
-            "cost_supplies": f"{sim.est_cost_supplies:,}" if sim.est_cost_supplies else "N/A",
-            "cost_other": f"{sim.est_cost_other:,}" if sim.est_cost_other else "N/A",
-            "cost_total": f"{sim.est_cost_total:,}" if sim.est_cost_total else "N/A",
-
-            # 수익성
-            "monthly_profit": f"{sim.monthly_profit_avg:,}" if sim.monthly_profit_avg else "N/A",
-            "breakeven_months": sim.breakeven_months or "N/A",
-            "annual_roi": f"{sim.annual_roi_percent:.1f}" if sim.annual_roi_percent else "N/A",
-
-            # 경쟁 현황
-            "same_dept_count": sim.same_dept_count or 0,
-            "total_clinic_count": sim.total_clinic_count or 0,
-            "competitors": competitors,
-
-            # 인구통계
-            "population_1km": f"{sim.population_1km:,}" if sim.population_1km else "N/A",
-            "age_40_plus_ratio": f"{(sim.age_40_plus_ratio or 0) * 100:.1f}",
-            "floating_population": f"{sim.floating_population_daily:,}" if sim.floating_population_daily else "N/A",
-
-            # 분석 결과
-            "confidence_score": sim.confidence_score or 0,
-            "recommendation": recommendation_kr,
-            "recommendation_reason": sim.recommendation_reason or "",
-
-            # AI 분석
-            "ai": ai_analysis,
-        }
-
-    def _generate_inline_html(self, ctx: dict) -> str:
-        """내장 HTML 템플릿 생성"""
-        # SWOT 분석 HTML
-        swot = ctx.get("ai", {}).get("swot", {})
-        swot_html = ""
-        if swot:
-            strengths = "".join([f"<li>{s}</li>" for s in swot.get("strengths", [])])
-            weaknesses = "".join([f"<li>{w}</li>" for w in swot.get("weaknesses", [])])
-            opportunities = "".join([f"<li>{o}</li>" for o in swot.get("opportunities", [])])
-            threats = "".join([f"<li>{t}</li>" for t in swot.get("threats", [])])
-
-            swot_html = f"""
-            <div class="swot-grid">
-                <div class="swot-box strength">
-                    <h4>강점 (Strengths)</h4>
-                    <ul>{strengths}</ul>
-                </div>
-                <div class="swot-box weakness">
-                    <h4>약점 (Weaknesses)</h4>
-                    <ul>{weaknesses}</ul>
-                </div>
-                <div class="swot-box opportunity">
-                    <h4>기회 (Opportunities)</h4>
-                    <ul>{opportunities}</ul>
-                </div>
-                <div class="swot-box threat">
-                    <h4>위협 (Threats)</h4>
-                    <ul>{threats}</ul>
-                </div>
-            </div>
-            """
-
-        # 리스크 요인 HTML
-        risks = ctx.get("ai", {}).get("risk_factors", [])
-        risks_html = ""
-        for risk in risks:
-            impact_class = risk.get("impact", "MEDIUM").lower()
-            risks_html += f"""
-            <tr>
-                <td>{risk.get("risk", "")}</td>
-                <td class="impact-{impact_class}">{risk.get("impact", "")}</td>
-                <td>{risk.get("mitigation", "")}</td>
-            </tr>
-            """
-
-        # 성공 전략 HTML
-        strategies = ctx.get("ai", {}).get("success_strategies", [])
-        strategies_html = ""
-        for strat in strategies:
-            priority_class = strat.get("priority", "MEDIUM").lower()
-            strategies_html += f"""
-            <tr>
-                <td>{strat.get("strategy", "")}</td>
-                <td class="priority-{priority_class}">{strat.get("priority", "")}</td>
-                <td>{strat.get("description", "")}</td>
-            </tr>
-            """
-
-        # 경쟁 병원 HTML
-        competitors_html = ""
-        for comp in ctx.get("competitors", [])[:5]:
-            competitors_html += f"""
-            <tr>
-                <td>{comp.get("name", "")}</td>
-                <td>{comp.get("distance", "")}m</td>
-                <td>{comp.get("address", "")}</td>
-            </tr>
-            """
-
-        # 액션 플랜 HTML
-        action_plan = ctx.get("ai", {}).get("action_plan", [])
-        action_html = ""
-        for phase in action_plan:
-            actions = "".join([f"<li>{a}</li>" for a in phase.get("actions", [])])
-            action_html += f"""
-            <div class="action-phase">
-                <h4>{phase.get("phase", "")}</h4>
-                <ul>{actions}</ul>
-            </div>
-            """
+        body = "\n".join(sections)
 
         return f"""<!DOCTYPE html>
 <html lang="ko">
-<head>
-    <meta charset="UTF-8">
-    <title>메디플라톤 상권분석 리포트</title>
-</head>
+<head><meta charset="UTF-8"><title>메디플라톤 개원 분석 리포트</title></head>
 <body>
-    <div class="report-container">
-        <!-- 헤더 -->
-        <header class="report-header">
-            <div class="logo">
-                <h1>메디플라톤</h1>
-                <p>AI 상권분석 리포트</p>
-            </div>
-            <div class="report-meta">
-                <p>리포트 ID: {ctx.get("report_id", "")}</p>
-                <p>생성일: {ctx.get("generated_at", "")}</p>
-            </div>
-        </header>
-
-        <!-- 요약 섹션 -->
-        <section class="executive-summary">
-            <h2>Executive Summary</h2>
-            <div class="summary-box">
-                <p>{ctx.get("ai", {}).get("executive_summary", "분석 결과를 불러오는 중입니다...")}</p>
-            </div>
-            <div class="key-metrics">
-                <div class="metric">
-                    <span class="label">추천 등급</span>
-                    <span class="value highlight">{ctx.get("recommendation", "")}</span>
-                </div>
-                <div class="metric">
-                    <span class="label">신뢰도</span>
-                    <span class="value">{ctx.get("confidence_score", 0)}점</span>
-                </div>
-                <div class="metric">
-                    <span class="label">예상 월 순이익</span>
-                    <span class="value">{ctx.get("monthly_profit", "N/A")}원</span>
-                </div>
-                <div class="metric">
-                    <span class="label">손익분기점</span>
-                    <span class="value">{ctx.get("breakeven_months", "N/A")}개월</span>
-                </div>
-            </div>
-        </section>
-
-        <!-- 기본 정보 -->
-        <section class="basic-info">
-            <h2>1. 분석 대상 정보</h2>
-            <table class="info-table">
-                <tr><th>주소</th><td>{ctx.get("address", "")}</td></tr>
-                <tr><th>진료과목</th><td>{ctx.get("clinic_type", "")}</td></tr>
-                <tr><th>면적</th><td>{ctx.get("size_pyeong", "")}평</td></tr>
-                <tr><th>예산</th><td>{ctx.get("budget_million", "")}백만원</td></tr>
-            </table>
-        </section>
-
-        <!-- 입지 분석 -->
-        <section class="location-analysis">
-            <h2>2. 입지 분석</h2>
-            <p>{ctx.get("ai", {}).get("location_analysis", "")}</p>
-
-            <h3>인구통계</h3>
-            <table class="data-table">
-                <tr>
-                    <th>반경 1km 인구</th>
-                    <td>{ctx.get("population_1km", "N/A")}명</td>
-                </tr>
-                <tr>
-                    <th>40대 이상 비율</th>
-                    <td>{ctx.get("age_40_plus_ratio", "0")}%</td>
-                </tr>
-                <tr>
-                    <th>일일 유동인구</th>
-                    <td>{ctx.get("floating_population", "N/A")}명</td>
-                </tr>
-            </table>
-        </section>
-
-        <!-- 재무 분석 -->
-        <section class="financial-analysis">
-            <h2>3. 재무 분석</h2>
-            <p>{ctx.get("ai", {}).get("financial_outlook", "")}</p>
-
-            <div class="financial-grid">
-                <div class="fin-box revenue">
-                    <h4>예상 월 매출</h4>
-                    <p class="main-value">{ctx.get("revenue_avg", "N/A")}원</p>
-                    <p class="sub-value">범위: {ctx.get("revenue_min", "N/A")} ~ {ctx.get("revenue_max", "N/A")}원</p>
-                </div>
-                <div class="fin-box cost">
-                    <h4>예상 월 비용</h4>
-                    <p class="main-value">{ctx.get("cost_total", "N/A")}원</p>
-                    <ul class="cost-breakdown">
-                        <li>임차료: {ctx.get("cost_rent", "N/A")}원</li>
-                        <li>인건비: {ctx.get("cost_labor", "N/A")}원</li>
-                        <li>유틸리티: {ctx.get("cost_utilities", "N/A")}원</li>
-                        <li>의료용품: {ctx.get("cost_supplies", "N/A")}원</li>
-                    </ul>
-                </div>
-                <div class="fin-box profit">
-                    <h4>예상 월 순이익</h4>
-                    <p class="main-value">{ctx.get("monthly_profit", "N/A")}원</p>
-                    <p class="sub-value">연간 ROI: {ctx.get("annual_roi", "N/A")}%</p>
-                </div>
-            </div>
-        </section>
-
-        <!-- 경쟁 분석 -->
-        <section class="competition-analysis">
-            <h2>4. 경쟁 분석</h2>
-            <p>{ctx.get("ai", {}).get("competition_analysis", "")}</p>
-
-            <div class="competition-summary">
-                <div class="comp-stat">
-                    <span class="label">동일 진료과 병원</span>
-                    <span class="value">{ctx.get("same_dept_count", 0)}개</span>
-                </div>
-                <div class="comp-stat">
-                    <span class="label">전체 의료기관</span>
-                    <span class="value">{ctx.get("total_clinic_count", 0)}개</span>
-                </div>
-            </div>
-
-            {"<h3>주변 경쟁 병원</h3><table class='data-table'><tr><th>병원명</th><th>거리</th><th>주소</th></tr>" + competitors_html + "</table>" if competitors_html else ""}
-        </section>
-
-        <!-- SWOT 분석 -->
-        <section class="swot-analysis">
-            <h2>5. SWOT 분석</h2>
-            {swot_html if swot_html else "<p>SWOT 분석 데이터를 불러오는 중입니다.</p>"}
-        </section>
-
-        <!-- 리스크 분석 -->
-        <section class="risk-analysis">
-            <h2>6. 리스크 분석</h2>
-            {"<table class='data-table'><tr><th>리스크</th><th>영향도</th><th>대응 방안</th></tr>" + risks_html + "</table>" if risks_html else "<p>리스크 분석 데이터 없음</p>"}
-        </section>
-
-        <!-- 성공 전략 -->
-        <section class="success-strategies">
-            <h2>7. 성공 전략</h2>
-            {"<table class='data-table'><tr><th>전략</th><th>우선순위</th><th>설명</th></tr>" + strategies_html + "</table>" if strategies_html else "<p>전략 데이터 없음</p>"}
-        </section>
-
-        <!-- 액션 플랜 -->
-        <section class="action-plan">
-            <h2>8. 액션 플랜</h2>
-            {action_html if action_html else "<p>액션 플랜 데이터 없음</p>"}
-        </section>
-
-        <!-- 최종 권고 -->
-        <section class="final-recommendation">
-            <h2>9. 최종 권고사항</h2>
-            <div class="recommendation-box">
-                <p>{ctx.get("ai", {}).get("final_recommendation", "")}</p>
-            </div>
-            <p class="confidence-note">{ctx.get("ai", {}).get("confidence_note", "")}</p>
-        </section>
-
-        <!-- 푸터 -->
-        <footer class="report-footer">
-            <p>본 리포트는 공공데이터 및 AI 분석을 기반으로 생성되었습니다.</p>
-            <p>실제 개원 결정 시 추가적인 현장 조사 및 전문가 상담을 권장합니다.</p>
-            <p class="copyright">© {datetime.now().year} 메디플라톤. All rights reserved.</p>
-        </footer>
-    </div>
+  <div class="report">
+    <header class="head">
+      <div>
+        <h1>메디플라톤</h1>
+        <p>개원 분석 리포트</p>
+      </div>
+      <div class="meta">
+        <p>리포트 ID: {report_id}</p>
+        <p>생성일: {now}</p>
+      </div>
+    </header>
+    {body}
+    <footer>
+      <p>본 리포트는 행정안전부, 건강보험심사평가원, 카카오 Local API, 의료기기협회·대한개원의협의회 표준 데이터를 기반으로 생성되었습니다.</p>
+      <p>실제 개원 결정 시 추가적인 현장 조사 및 세무·법무 전문가 상담을 권장합니다.</p>
+      <p class="copyright">© {datetime.now().year} 메디플라톤. All rights reserved.</p>
+    </footer>
+  </div>
 </body>
 </html>"""
 
+    def _section_summary(self, sim: Simulation, rec_kr: str) -> str:
+        rev = _won(sim.est_revenue_avg or 0)
+        cost = _won(sim.est_cost_total or 0)
+        profit = _won(sim.monthly_profit_avg or 0)
+        return f"""
+<section class="summary">
+  <h2>분석 요약</h2>
+  <div class="kv">
+    <div><span class="k">주소</span><span class="v">{_esc(sim.address)}</span></div>
+    <div><span class="k">진료과</span><span class="v">{_esc(sim.clinic_type)}</span></div>
+    <div><span class="k">면적</span><span class="v">{_esc(sim.size_pyeong)}평</span></div>
+    <div><span class="k">추천 등급</span><span class="v hi">{rec_kr}</span></div>
+  </div>
+  <div class="big-num">
+    <div class="card"><div class="lbl">예상 월 매출</div><div class="val">{rev}</div></div>
+    <div class="card"><div class="lbl">예상 월 비용</div><div class="val">{cost}</div></div>
+    <div class="card"><div class="lbl">예상 월 순이익</div><div class="val">{profit}</div></div>
+  </div>
+  <p class="reason">{_esc(sim.recommendation_reason or "")}</p>
+</section>"""
+
+    def _section_market(self, sim: Simulation, response: Any) -> str:
+        comp_rows = ""
+        if response and response.competitors:
+            for i, c in enumerate(response.competitors[:10]):
+                comp_rows += f"<tr><td>{chr(65 + i)}</td><td>{_esc(c.name)}</td><td>{c.distance_m}m</td><td>{_esc(c.clinic_type)}</td></tr>"
+        comp_table = f"<table class='dt'><thead><tr><th>#</th><th>의원명</th><th>거리</th><th>진료과</th></tr></thead><tbody>{comp_rows}</tbody></table>" if comp_rows else "<p class='note'>반경 내 동일 진료과 의원이 없습니다 (블루오션).</p>"
+
+        return f"""
+<section>
+  <h2>1. 시장 · 경쟁 분석</h2>
+  <div class="kv">
+    <div><span class="k">반경 1km 인구</span><span class="v">{(sim.population_1km or 0):,}명</span></div>
+    <div><span class="k">40대+ 비율</span><span class="v">{(sim.age_40_plus_ratio or 0) * 100:.1f}%</span></div>
+    <div><span class="k">동일과 의원 (반경 1km)</span><span class="v">{sim.same_dept_count or 0}개</span></div>
+    <div><span class="k">전체 의료기관</span><span class="v">{sim.total_clinic_count or 0}개</span></div>
+  </div>
+  <h3>주변 경쟁 의원 (HIRA)</h3>
+  {comp_table}
+</section>"""
+
+    def _section_capital(self, cap: Any) -> str:
+        rows = "".join(f"<tr><td>{_esc(b.label)}</td><td class='r'>{_won(b.amount)}</td><td class='note'>{_esc(b.note or '')}</td></tr>" for b in cap.breakdown)
+        scen = "".join(
+            f"<tr><td>{_esc(s.scenario)}</td><td class='r'>{_won(s.own_capital)}</td><td class='r'>{_won(s.loan_amount)}</td><td class='r'>{_won(s.monthly_payment)}</td><td class='r'>{s.monthly_burden_ratio*100:.1f}%</td></tr>"
+            for s in cap.financing_scenarios
+        )
+        return f"""
+<section>
+  <h2>2. 자금 계획</h2>
+  <div class="kv">
+    <div><span class="k">목표 면적</span><span class="v">{cap.target_size_pyeong}평 (표준 {cap.standard_size_pyeong}평 / 최소 {cap.min_size_pyeong}평)</span></div>
+    <div><span class="k">초기 투자비</span><span class="v">{_won(cap.initial_investment_total)}</span></div>
+    <div><span class="k">권장 운영자금</span><span class="v">{_won(cap.working_capital_recommended)}</span></div>
+    <div><span class="k">총 필요자금</span><span class="v hi">{_won(cap.grand_total)}</span></div>
+  </div>
+  <h3>투자비 항목별 상세</h3>
+  <table class="dt"><thead><tr><th>항목</th><th>금액</th><th>비고</th></tr></thead><tbody>{rows}</tbody></table>
+  <h3>자금 조달 시나리오 (연 5.5%, 5년 원리금균등)</h3>
+  <table class="dt"><thead><tr><th>구성</th><th>자기자본</th><th>대출금</th><th>월 상환</th><th>매출 대비</th></tr></thead><tbody>{scen}</tbody></table>
+  <p class="note">출처: {_esc(cap.data_source)}</p>
+</section>"""
+
+    def _section_staffing(self, st: Any) -> str:
+        return f"""
+<section>
+  <h2>3. 인력 구성</h2>
+  <div class="kv">
+    <div><span class="k">의사</span><span class="v">{st.doctors}명</span></div>
+    <div><span class="k">간호사</span><span class="v">{st.nurses}명</span></div>
+    <div><span class="k">행정·접수</span><span class="v">{st.admins}명</span></div>
+    <div><span class="k">기사·검사</span><span class="v">{st.technicians}명</span></div>
+    <div><span class="k">총 인원 (원장 포함)</span><span class="v">{st.total_headcount}명</span></div>
+    <div><span class="k">월 인건비 (원장 제외)</span><span class="v hi">{_won(st.monthly_payroll)}</span></div>
+  </div>
+</section>"""
+
+    def _section_permit(self, pm: Any) -> str:
+        rows = "".join(
+            f"<tr><td>{_esc(p.name)}</td><td>{_esc(p.authority)}</td><td class='r'>{p.duration_days}일</td><td class='r'>{_won(p.cost) if p.cost else '무료'}</td><td class='note'>{_esc(p.description)}</td></tr>"
+            for p in pm.common_permits
+        )
+        specifics = "".join(f"<li>{_esc(s)}</li>" for s in pm.specific_permits)
+        spec_html = f"<h3>진료과별 추가 인허가</h3><ul>{specifics}</ul>" if specifics else ""
+        return f"""
+<section>
+  <h2>4. 인허가 체크리스트</h2>
+  <table class="dt"><thead><tr><th>항목</th><th>담당기관</th><th>처리기간</th><th>수수료</th><th>설명</th></tr></thead><tbody>{rows}</tbody></table>
+  {spec_html}
+</section>"""
+
+    def _section_equipment(self, eq: Any) -> str:
+        rows = "".join(
+            f"<tr><td>{_esc(it.name)}</td><td class='c'>{'필수' if it.is_essential else '선택'}</td><td class='r'>{_won(it.price_min)}</td><td class='r'>{_won(it.price_typical)}</td></tr>"
+            for it in eq.items
+        )
+        return f"""
+<section>
+  <h2>5. 의료장비</h2>
+  <div class="kv">
+    <div><span class="k">필수 장비 합계</span><span class="v">{_won(eq.essential_total_min)} ~ {_won(eq.essential_total_typical)}</span></div>
+    <div><span class="k">선택 장비 합계 (표준)</span><span class="v">+{_won(eq.optional_total_typical)}</span></div>
+  </div>
+  <table class="dt"><thead><tr><th>장비</th><th>구분</th><th>최저가</th><th>표준가</th></tr></thead><tbody>{rows}</tbody></table>
+</section>"""
+
+    def _section_timeline(self, tl: Any) -> str:
+        steps = ""
+        for st in tl.steps:
+            deliv = "".join(f"<li>{_esc(d)}</li>" for d in st.deliverables)
+            steps += f"""
+<div class="step">
+  <div class="step-no">{st.step_no}</div>
+  <div class="step-body">
+    <h4>{_esc(st.title)}</h4>
+    <p class="note">시작 +{st.months_from_start}개월 · 기간 {st.duration_weeks}주</p>
+    <ul>{deliv}</ul>
+  </div>
+</div>"""
+        return f"""
+<section>
+  <h2>6. 개원 일정 (총 {tl.total_months}개월)</h2>
+  <div class="steps">{steps}</div>
+</section>"""
+
+    def _section_5yr_pnl(self, pnl: Any) -> str:
+        rows = "".join(
+            f"<tr><td>{p.year}년차</td><td class='r'>{p.patient_ratio_of_capacity*100:.0f}%</td><td class='r'>{_won(p.monthly_revenue)}</td><td class='r'>-{_won(p.monthly_cost)}</td><td class='r'>-{_won(p.monthly_loan_payment)}</td><td class='r {('pos' if p.monthly_profit_before_tax > 0 else 'neg')}'>{'+' if p.monthly_profit_before_tax >= 0 else ''}{_won(p.monthly_profit_before_tax)}</td></tr>"
+            for p in pnl.projections
+        )
+        assumptions = "".join(f"<li>{_esc(a)}</li>" for a in pnl.assumptions)
+        be = f"{pnl.breakeven_month}개월" if pnl.breakeven_month else "5년 내 미회수"
+        return f"""
+<section>
+  <h2>7. 5년 손익 시뮬레이션</h2>
+  <div class="kv">
+    <div><span class="k">5년 누적 세전이익</span><span class="v hi">{_won(pnl.total_5yr_profit_before_tax)}</span></div>
+    <div><span class="k">연평균 이익</span><span class="v">{_won(pnl.avg_annual_profit)}</span></div>
+    <div><span class="k">자기자본 회수</span><span class="v">{be}</span></div>
+  </div>
+  <table class="dt"><thead><tr><th>연차</th><th>정상화율</th><th>월 매출</th><th>월 비용</th><th>대출 상환</th><th>월 순이익</th></tr></thead><tbody>{rows}</tbody></table>
+  <h3>계산 가정</h3>
+  <ul class="note">{assumptions}</ul>
+</section>"""
+
+    def _section_tax(self, tax: Any) -> str:
+        def card(sc: Any) -> str:
+            div_row = f"<tr><td>배당소득세 (인출 70% 가정)</td><td class='r'>-{_won(sc.dividend_tax)}</td></tr>" if sc.dividend_tax else ""
+            return f"""
+<div class="tax-card">
+  <h4>{_esc(sc.type)}</h4>
+  <table class="dt sm">
+    <tr><td>연 매출</td><td class="r">{_won(sc.annual_revenue)}</td></tr>
+    <tr><td>세전 이익</td><td class="r">{_won(sc.annual_profit_before_tax)}</td></tr>
+    <tr><td>{'종합소득세' if sc.type == '개인의원' else '법인세'}</td><td class="r">-{_won(sc.income_tax)}</td></tr>
+    <tr><td>지방소득세 (10%)</td><td class="r">-{_won(sc.local_tax)}</td></tr>
+    {div_row}
+    <tr class="total"><td>총 세금</td><td class="r neg">{_won(sc.total_tax)}</td></tr>
+    <tr class="total"><td>세후 본인 수령</td><td class="r pos">{_won(sc.after_tax_profit)}</td></tr>
+    <tr><td>실효세율</td><td class="r">{sc.effective_tax_rate*100:.1f}%</td></tr>
+  </table>
+</div>"""
+        notes = "".join(f"<li>{_esc(n)}</li>" for n in tax.notes)
+        return f"""
+<section>
+  <h2>8. 세금 (개인의원 vs 의료법인)</h2>
+  <div class="hi-box">
+    결론: <strong>{_esc(tax.advantage)}</strong> · 연 {_won(tax.advantage_amount)} 차이
+  </div>
+  <div class="tax-grid">{card(tax.individual)}{card(tax.corporation)}</div>
+  <h3>유의사항</h3>
+  <ul class="note">{notes}</ul>
+</section>"""
+
+    def _section_marketing(self, mkt: Any) -> str:
+        ch_rows = ""
+        for c in mkt.recommended_channels:
+            steps = "".join(f"<li>{_esc(s)}</li>" for s in c.setup_steps)
+            cost = "무료" if c.monthly_cost_min == 0 and c.monthly_cost_typical == 0 else f"{_won(c.monthly_cost_min)} ~ {_won(c.monthly_cost_typical)}"
+            ch_rows += f"""
+<div class="ch">
+  <h4>{_esc(c.name)} <span class="badge {c.priority}">{_esc(c.priority)}</span></h4>
+  <p class="note">월 {cost} · {_esc(c.expected_effect)}</p>
+  <ol>{steps}</ol>
+</div>"""
+        law = "".join(
+            f"<li><strong>{_esc(r.rule)}</strong> — {_esc(r.description)} <span class='neg'>(처벌: {_esc(r.penalty)})</span></li>"
+            for r in mkt.law_compliance
+        )
+        tips = "".join(f"<li>{_esc(t)}</li>" for t in mkt.clinic_type_tips)
+        return f"""
+<section>
+  <h2>9. 마케팅 플랜</h2>
+  <div class="kv">
+    <div><span class="k">최소 월 마케팅비</span><span class="v">{_won(mkt.monthly_budget_min)}</span></div>
+    <div><span class="k">표준 월 마케팅비</span><span class="v">{_won(mkt.monthly_budget_typical)}</span></div>
+  </div>
+  <h3>추천 채널</h3>
+  {ch_rows}
+  <h3 class="warn">의료광고법 준수 (위반 시 행정처분)</h3>
+  <ul class="law">{law}</ul>
+  <h3>진료과별 마케팅 팁</h3>
+  <ul>{tips}</ul>
+</section>"""
+
     def _get_pdf_styles(self) -> str:
-        """PDF 스타일시트"""
         return """
-        @page {
-            size: A4;
-            margin: 2cm;
-            @bottom-center {
-                content: counter(page) " / " counter(pages);
-                font-size: 10px;
-                color: #666;
-            }
-        }
+@page { size: A4; margin: 1.8cm; @bottom-center { content: counter(page) " / " counter(pages); font-size: 9pt; color: #999; } }
+body { font-family: 'Noto Sans KR', 'Malgun Gothic', sans-serif; font-size: 10.5pt; line-height: 1.55; color: #222; }
+.report { max-width: 100%; }
+.head { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 3px solid #2563eb; padding-bottom: 14px; margin-bottom: 24px; }
+.head h1 { color: #2563eb; font-size: 24pt; margin: 0; }
+.head p { margin: 4px 0 0; color: #666; font-size: 11pt; }
+.meta { text-align: right; font-size: 9pt; color: #666; }
+h2 { color: #1e3a8a; border-bottom: 2px solid #e5e7eb; padding-bottom: 8px; margin: 28px 0 14px; font-size: 14pt; page-break-after: avoid; }
+h3 { color: #374151; margin: 18px 0 8px; font-size: 11pt; }
+h3.warn { color: #b91c1c; }
+h4 { margin: 10px 0 4px; font-size: 10.5pt; }
+section { page-break-inside: avoid; margin-bottom: 14px; }
 
-        body {
-            font-family: 'Noto Sans KR', 'Malgun Gothic', sans-serif;
-            font-size: 11pt;
-            line-height: 1.6;
-            color: #333;
-        }
+/* Key-Value grid */
+.kv { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 16px; margin: 8px 0 14px; }
+.kv > div { display: flex; justify-content: space-between; padding: 6px 10px; background: #f8fafc; border-radius: 4px; }
+.kv .k { color: #6b7280; font-size: 10pt; }
+.kv .v { font-weight: 600; }
+.kv .v.hi { color: #2563eb; }
 
-        .report-container {
-            max-width: 100%;
-        }
+/* Big-num cards (summary) */
+.big-num { display: flex; gap: 10px; margin: 14px 0; }
+.big-num .card { flex: 1; padding: 14px; background: #f0f9ff; border-left: 4px solid #2563eb; border-radius: 6px; text-align: center; }
+.big-num .lbl { color: #6b7280; font-size: 9pt; }
+.big-num .val { font-size: 14pt; font-weight: 700; color: #1e3a8a; margin-top: 4px; }
+.reason { padding: 10px 14px; background: #fffbeb; border-left: 3px solid #f59e0b; font-style: italic; }
 
-        .report-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 3px solid #2563eb;
-            padding-bottom: 20px;
-            margin-bottom: 30px;
-        }
+/* Tables */
+.dt { width: 100%; border-collapse: collapse; margin: 10px 0; font-size: 9.5pt; }
+.dt th, .dt td { border: 1px solid #e5e7eb; padding: 6px 8px; }
+.dt th { background: #f3f4f6; font-weight: 600; text-align: left; }
+.dt td.r { text-align: right; }
+.dt td.c { text-align: center; }
+.dt td.note { color: #6b7280; font-size: 9pt; }
+.dt sm { font-size: 9pt; }
+.dt tr.total { background: #f9fafb; font-weight: 700; }
+.note { color: #6b7280; font-size: 9pt; }
+.pos { color: #059669; font-weight: 600; }
+.neg { color: #dc2626; }
 
-        .report-header h1 {
-            color: #2563eb;
-            font-size: 28pt;
-            margin: 0;
-        }
+/* Steps timeline */
+.steps { display: flex; flex-direction: column; gap: 8px; }
+.step { display: flex; gap: 10px; padding: 10px; border: 1px solid #e5e7eb; border-radius: 6px; }
+.step-no { width: 28px; height: 28px; background: #ddd6fe; color: #5b21b6; font-weight: 700; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.step-body { flex: 1; }
+.step-body h4 { margin: 0; }
+.step-body ul { margin: 4px 0 0 16px; padding: 0; }
 
-        .report-header .logo p {
-            color: #666;
-            margin: 5px 0 0 0;
-        }
+/* Tax cards */
+.tax-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 12px 0; }
+.tax-card { border: 1px solid #e5e7eb; border-radius: 6px; padding: 10px; }
+.tax-card h4 { margin: 0 0 8px; color: #374151; }
+.hi-box { padding: 10px 14px; background: #ecfdf5; border-left: 4px solid #059669; margin: 10px 0; border-radius: 4px; }
 
-        .report-meta {
-            text-align: right;
-            font-size: 10pt;
-            color: #666;
-        }
+/* Marketing channels */
+.ch { padding: 10px 12px; border: 1px solid #e5e7eb; border-radius: 6px; margin: 8px 0; page-break-inside: avoid; }
+.ch h4 { margin: 0 0 4px; }
+.badge { font-size: 8pt; padding: 1px 6px; border-radius: 3px; margin-left: 6px; vertical-align: middle; }
+.badge.필수 { background: #fee2e2; color: #b91c1c; }
+.badge.권장 { background: #fef3c7; color: #b45309; }
+.badge.선택 { background: #e5e7eb; color: #6b7280; }
+.ch ol { margin: 4px 0 0 18px; padding: 0; font-size: 9pt; color: #4b5563; }
+.law li { margin: 4px 0; padding-left: 4px; }
 
-        h2 {
-            color: #1e40af;
-            border-bottom: 2px solid #e5e7eb;
-            padding-bottom: 10px;
-            margin-top: 30px;
-            page-break-after: avoid;
-        }
+footer { margin-top: 30px; padding-top: 14px; border-top: 1px solid #e5e7eb; text-align: center; font-size: 8.5pt; color: #9ca3af; }
+footer .copyright { margin-top: 6px; font-weight: 500; }
 
-        h3 {
-            color: #374151;
-            margin-top: 20px;
-        }
-
-        h4 {
-            color: #4b5563;
-            margin: 10px 0;
-        }
-
-        /* Executive Summary */
-        .executive-summary {
-            background: #f0f9ff;
-            padding: 20px;
-            border-radius: 8px;
-            margin-bottom: 30px;
-        }
-
-        .summary-box {
-            background: white;
-            padding: 15px;
-            border-left: 4px solid #2563eb;
-            margin-bottom: 20px;
-        }
-
-        .key-metrics {
-            display: flex;
-            justify-content: space-between;
-            gap: 15px;
-        }
-
-        .metric {
-            flex: 1;
-            text-align: center;
-            background: white;
-            padding: 15px;
-            border-radius: 8px;
-        }
-
-        .metric .label {
-            display: block;
-            font-size: 10pt;
-            color: #666;
-            margin-bottom: 5px;
-        }
-
-        .metric .value {
-            display: block;
-            font-size: 14pt;
-            font-weight: bold;
-            color: #1e40af;
-        }
-
-        .metric .value.highlight {
-            color: #059669;
-        }
-
-        /* Tables */
-        .info-table, .data-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 15px 0;
-        }
-
-        .info-table th, .info-table td,
-        .data-table th, .data-table td {
-            padding: 10px 12px;
-            text-align: left;
-            border: 1px solid #e5e7eb;
-        }
-
-        .info-table th, .data-table th {
-            background: #f3f4f6;
-            font-weight: 600;
-            width: 30%;
-        }
-
-        .data-table th {
-            width: auto;
-        }
-
-        /* Financial Grid */
-        .financial-grid {
-            display: flex;
-            gap: 15px;
-            margin: 20px 0;
-        }
-
-        .fin-box {
-            flex: 1;
-            padding: 15px;
-            border-radius: 8px;
-            background: #f9fafb;
-        }
-
-        .fin-box.revenue {
-            border-left: 4px solid #10b981;
-        }
-
-        .fin-box.cost {
-            border-left: 4px solid #ef4444;
-        }
-
-        .fin-box.profit {
-            border-left: 4px solid #2563eb;
-        }
-
-        .fin-box h4 {
-            margin-top: 0;
-        }
-
-        .fin-box .main-value {
-            font-size: 16pt;
-            font-weight: bold;
-            color: #1f2937;
-            margin: 10px 0 5px 0;
-        }
-
-        .fin-box .sub-value {
-            font-size: 10pt;
-            color: #6b7280;
-        }
-
-        .cost-breakdown {
-            font-size: 10pt;
-            padding-left: 20px;
-            color: #6b7280;
-        }
-
-        /* SWOT Grid */
-        .swot-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin: 20px 0;
-        }
-
-        .swot-box {
-            padding: 15px;
-            border-radius: 8px;
-        }
-
-        .swot-box h4 {
-            margin-top: 0;
-            color: white;
-            padding: 5px 10px;
-            border-radius: 4px;
-            display: inline-block;
-        }
-
-        .swot-box.strength { background: #ecfdf5; }
-        .swot-box.strength h4 { background: #10b981; }
-
-        .swot-box.weakness { background: #fef2f2; }
-        .swot-box.weakness h4 { background: #ef4444; }
-
-        .swot-box.opportunity { background: #eff6ff; }
-        .swot-box.opportunity h4 { background: #2563eb; }
-
-        .swot-box.threat { background: #fefce8; }
-        .swot-box.threat h4 { background: #f59e0b; }
-
-        .swot-box ul {
-            margin: 10px 0;
-            padding-left: 20px;
-        }
-
-        /* Impact/Priority badges */
-        .impact-high, .priority-high { color: #dc2626; font-weight: bold; }
-        .impact-medium, .priority-medium { color: #f59e0b; }
-        .impact-low, .priority-low { color: #10b981; }
-
-        /* Competition */
-        .competition-summary {
-            display: flex;
-            gap: 30px;
-            margin: 15px 0;
-        }
-
-        .comp-stat {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .comp-stat .label {
-            color: #6b7280;
-        }
-
-        .comp-stat .value {
-            font-size: 18pt;
-            font-weight: bold;
-            color: #1e40af;
-        }
-
-        /* Action Plan */
-        .action-phase {
-            background: #f9fafb;
-            padding: 15px;
-            border-radius: 8px;
-            margin: 15px 0;
-        }
-
-        .action-phase h4 {
-            margin-top: 0;
-            color: #2563eb;
-        }
-
-        /* Final Recommendation */
-        .recommendation-box {
-            background: #fef3c7;
-            border: 2px solid #f59e0b;
-            padding: 20px;
-            border-radius: 8px;
-            margin: 15px 0;
-        }
-
-        .recommendation-box p {
-            margin: 0;
-            font-size: 12pt;
-        }
-
-        .confidence-note {
-            font-size: 10pt;
-            color: #6b7280;
-            font-style: italic;
-        }
-
-        /* Footer */
-        .report-footer {
-            margin-top: 40px;
-            padding-top: 20px;
-            border-top: 1px solid #e5e7eb;
-            text-align: center;
-            font-size: 9pt;
-            color: #9ca3af;
-        }
-
-        .report-footer .copyright {
-            margin-top: 10px;
-            font-weight: 500;
-        }
-
-        /* Page breaks */
-        section {
-            page-break-inside: avoid;
-        }
-
-        .swot-analysis, .risk-analysis {
-            page-break-before: auto;
-        }
-        """
+ul, ol { margin: 4px 0 8px 18px; padding: 0; }
+ul li, ol li { margin: 2px 0; }
+"""
 
     async def upload_to_s3(self, pdf_bytes: bytes, filename: str) -> Optional[str]:
-        """S3에 PDF 업로드 및 URL 반환"""
         if not self.s3_client:
             return None
-
         try:
             key = f"reports/{filename}"
             self.s3_client.upload_fileobj(
                 BytesIO(pdf_bytes),
                 settings.S3_BUCKET_NAME,
                 key,
-                ExtraArgs={
-                    "ContentType": "application/pdf",
-                    "ContentDisposition": f"attachment; filename={filename}"
-                }
+                ExtraArgs={"ContentType": "application/pdf", "ContentDisposition": f"attachment; filename={filename}"}
             )
-
-            # Pre-signed URL 생성 (7일 유효)
             url = self.s3_client.generate_presigned_url(
                 "get_object",
-                Params={
-                    "Bucket": settings.S3_BUCKET_NAME,
-                    "Key": key
-                },
-                ExpiresIn=7 * 24 * 60 * 60  # 7일
+                Params={"Bucket": settings.S3_BUCKET_NAME, "Key": key},
+                ExpiresIn=7 * 24 * 60 * 60
             )
             return url
         except Exception as e:
@@ -752,16 +481,12 @@ class PDFGeneratorService:
             return None
 
     def save_locally(self, pdf_bytes: bytes, filename: str) -> str:
-        """로컬에 PDF 저장 (개발용)"""
         output_dir = Path(__file__).parent.parent.parent / "tmp" / "reports"
         output_dir.mkdir(parents=True, exist_ok=True)
-
         filepath = output_dir / filename
         with open(filepath, "wb") as f:
             f.write(pdf_bytes)
-
         return str(filepath)
 
 
-# 서비스 인스턴스
 pdf_generator_service = PDFGeneratorService()
