@@ -10,6 +10,7 @@ import {
 } from 'lucide-react'
 import { simulationService, paymentService } from '@/lib/api/services'
 import ReportPreview from '@/components/report/ReportPreview'
+import { useAuth } from '@/lib/hooks/useAuth'
 import { toast } from 'sonner'
 
 export default function ReportPage() {
@@ -20,6 +21,8 @@ export default function ReportPage() {
 
   const [isPurchased, setIsPurchased] = useState(false)
   const [isPaymentProcessing, setIsPaymentProcessing] = useState(false)
+  const { user } = useAuth()
+  const isAdmin = user?.role === 'ADMIN'
 
   // Check for payment success from redirect
   useEffect(() => {
@@ -58,6 +61,10 @@ export default function ReportPage() {
       setIsPurchased(true)
     }
   }, [reportStatus])
+
+  useEffect(() => {
+    if (isAdmin) setIsPurchased(true)
+  }, [isAdmin])
 
   // Purchase mutation
   const purchaseMutation = useMutation({
@@ -102,9 +109,33 @@ export default function ReportPage() {
 
   // Download PDF mutation
   const downloadMutation = useMutation({
-    mutationFn: () => simulationService.downloadReport(simulationId),
+    mutationFn: async () => {
+      if (isAdmin) {
+        // Admin direct PDF stream — bypass purchase/report record
+        const API_BASE = process.env.NEXT_PUBLIC_API_URL || '/api/v1'
+        const token = localStorage.getItem('access_token')
+        const res = await fetch(`${API_BASE}/simulate/reports/${simulationId}/admin-pdf`, {
+          headers: { Authorization: `Bearer ${token}` },
+        })
+        if (!res.ok) throw new Error('관리자 다운로드 실패')
+        const blob = await res.blob()
+        const url = URL.createObjectURL(blob)
+        const a = document.createElement('a')
+        a.href = url
+        a.download = `메디플라톤_상권분석_${simulation?.clinic_type || ''}_${new Date().toISOString().slice(0, 10).replace(/-/g, '')}.pdf`
+        document.body.appendChild(a)
+        a.click()
+        a.remove()
+        URL.revokeObjectURL(url)
+        return { download_url: '' }
+      }
+      return simulationService.downloadReport(simulationId)
+    },
     onSuccess: (data) => {
-      // Create download link
+      if (isAdmin) {
+        toast.success('관리자 권한으로 PDF가 다운로드되었습니다.')
+        return
+      }
       if (data.download_url) {
         window.open(data.download_url, '_blank')
         toast.success('PDF 다운로드가 시작됩니다.')

@@ -491,7 +491,10 @@ async def download_report(
             detail="Report not found"
         )
 
-    if report.payment_status != "completed":
+    from ...models.user import UserRole as _UR
+    is_admin = current_user.role == _UR.ADMIN
+
+    if report.payment_status != "completed" and not is_admin:
         raise HTTPException(
             status_code=status.HTTP_402_PAYMENT_REQUIRED,
             detail="Payment required to download report"
@@ -748,6 +751,51 @@ async def pay_report(
     }
 
 
+@router.get("/reports/{simulation_id}/admin-pdf")
+async def admin_download_simulation_pdf(
+    simulation_id: UUID,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_active_user)
+):
+    """
+    관리자 전용: 시뮬레이션 PDF 즉시 다운로드 (결제 우회)
+
+    SimulationReport 레코드 없이 시뮬레이션 데이터만으로 PDF를 생성해서 반환합니다.
+    """
+    from ...models.user import UserRole
+
+    if current_user.role != UserRole.ADMIN:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="관리자 권한이 필요합니다.",
+        )
+
+    sim_result = await db.execute(
+        select(Simulation).where(Simulation.id == simulation_id)
+    )
+    simulation = sim_result.scalar_one_or_none()
+
+    if not simulation:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Simulation not found",
+        )
+
+    pdf_bytes = pdf_generator_service.generate_simulation_report_pdf(
+        simulation, simulation.demographics_data or {}
+    )
+
+    filename = f"메디플라톤_상권분석_{simulation.clinic_type}_{datetime.now().strftime('%Y%m%d')}.pdf"
+
+    return StreamingResponse(
+        BytesIO(pdf_bytes),
+        media_type="application/pdf",
+        headers={
+            "Content-Disposition": f"attachment; filename*=UTF-8''{filename}"
+        },
+    )
+
+
 @router.get("/reports/{report_id}/download/pdf")
 async def download_report_pdf(
     report_id: UUID,
@@ -770,7 +818,8 @@ async def download_report_pdf(
             detail="Report not found"
         )
 
-    if report.payment_status != "completed":
+    from ...models.user import UserRole as _UR2
+    if report.payment_status != "completed" and current_user.role != _UR2.ADMIN:
         raise HTTPException(
             status_code=status.HTTP_402_PAYMENT_REQUIRED,
             detail="Payment required to download report"
