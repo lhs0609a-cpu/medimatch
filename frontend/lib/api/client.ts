@@ -336,6 +336,68 @@ export interface OpeningTimelinePlan {
   steps: OpeningTimelineStep[]
 }
 
+// 5년 손익 시뮬
+export interface FiveYearProjection {
+  year: number
+  patient_ratio_of_capacity: number
+  monthly_revenue: number
+  monthly_cost: number
+  monthly_loan_payment: number
+  monthly_profit_before_tax: number
+  annual_profit_before_tax: number
+}
+export interface FiveYearPnLSummary {
+  projections: FiveYearProjection[]
+  breakeven_month: number | null
+  total_5yr_profit_before_tax: number
+  avg_annual_profit: number
+  assumptions: string[]
+}
+
+// 세금 시뮬
+export interface TaxScenario {
+  type: string
+  annual_revenue: number
+  annual_profit_before_tax: number
+  income_tax: number
+  local_tax: number
+  dividend_tax: number
+  total_tax: number
+  after_tax_profit: number
+  effective_tax_rate: number
+}
+export interface TaxComparison {
+  annual_revenue: number
+  individual: TaxScenario
+  corporation: TaxScenario
+  advantage: string
+  advantage_amount: number
+  breakeven_revenue: number
+  notes: string[]
+}
+
+// 마케팅 플랜
+export interface MarketingChannel {
+  name: string
+  priority: string
+  monthly_cost_min: number
+  monthly_cost_typical: number
+  expected_effect: string
+  setup_steps: string[]
+}
+export interface MarketingLawRule {
+  rule: string
+  description: string
+  penalty: string
+}
+export interface MarketingPlan {
+  recommended_channels: MarketingChannel[]
+  monthly_budget_min: number
+  monthly_budget_typical: number
+  law_compliance: MarketingLawRule[]
+  clinic_type_tips: string[]
+}
+
 export interface SimulationResponse {
   simulation_id: string
   address: string
@@ -409,6 +471,9 @@ export interface SimulationResponse {
   permit_checklist?: PermitChecklist
   equipment_checklist?: EquipmentChecklist
   opening_timeline?: OpeningTimelinePlan
+  five_year_pnl?: FiveYearPnLSummary
+  tax_comparison?: TaxComparison
+  marketing_plan?: MarketingPlan
   // 결제/잠금 상태 (서버에서 관리)
   is_unlocked: boolean
   unlock_price: number

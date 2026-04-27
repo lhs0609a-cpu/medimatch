@@ -19,11 +19,15 @@ from ..schemas.simulation import (
     PermitChecklist, PermitChecklistItem,
     EquipmentChecklist, EquipmentListItem,
     OpeningTimelinePlan, OpeningTimelineStep,
+    FiveYearProjection, FiveYearPnLSummary,
+    TaxScenario, TaxComparison,
+    MarketingChannel, MarketingLawRule, MarketingPlan,
 )
 from .external_api import external_api_service
 from .prediction import PredictionService
 from ..core.config import settings
 from ..data import clinic_profiles
+from ..data import marketing_plans
 
 import logging
 logger = logging.getLogger(__name__)
@@ -1057,6 +1061,221 @@ class SimulationService:
             optional_total_typical=optional_typ,
         )
 
+    def _generate_five_year_pnl(
+        self,
+        clinic_type: str,
+        revenue_avg: int,
+        cost_total: int,
+        capital_grand_total: int,
+    ) -> FiveYearPnLSummary:
+        """
+        신규개원 표준 환자증가 곡선 기반 5년 손익.
+
+        곡선 (의원급 신규개원 표준):
+        - 1년차: 정상화의 60% (인지도·환자기반 부족)
+        - 2년차: 80%
+        - 3년차: 95%
+        - 4년차: 100%
+        - 5년차: 100% (안정기)
+
+        대출 가정: 자기자본 50% / 대출 50%, 연 5.5%, 5년 원리금균등.
+        """
+        ramp = [0.60, 0.80, 0.95, 1.00, 1.00]
+        loan = capital_grand_total // 2
+        rate = 0.055
+        n = 60
+        if loan > 0:
+            r = rate / 12
+            monthly_payment = int(loan * r * (1 + r) ** n / ((1 + r) ** n - 1))
+        else:
+            monthly_payment = 0
+
+        # 변동비 비율: 매출의 30% (진료재료·마케팅·일부 인건비)
+        variable_cost_ratio = 0.30
+        # 고정비: cost_total에서 변동비 제외
+        fixed_cost = max(int(cost_total * 0.70), 0)
+
+        projections: List[FiveYearProjection] = []
+        cumulative_profit = 0
+        breakeven_month: Optional[int] = None
+
+        for year in range(1, 6):
+            ratio = ramp[year - 1]
+            monthly_rev = int(revenue_avg * ratio)
+            variable_cost = int(monthly_rev * variable_cost_ratio)
+            monthly_cost_y = fixed_cost + variable_cost
+            monthly_loan = monthly_payment if year <= 5 else 0
+            monthly_profit = monthly_rev - monthly_cost_y - monthly_loan
+            annual_profit = monthly_profit * 12
+
+            # breakeven 계산 (월 단위)
+            if breakeven_month is None and monthly_profit > 0:
+                for m in range(1, 13):
+                    cumulative_profit += monthly_profit
+                    if cumulative_profit >= capital_grand_total // 2:  # 자기자본 회수 시점
+                        breakeven_month = (year - 1) * 12 + m
+                        break
+                if breakeven_month is None:
+                    cumulative_profit = annual_profit + (cumulative_profit - monthly_profit * 12)
+            else:
+                cumulative_profit += annual_profit
+
+            projections.append(FiveYearProjection(
+                year=year,
+                patient_ratio_of_capacity=ratio,
+                monthly_revenue=monthly_rev,
+                monthly_cost=monthly_cost_y,
+                monthly_loan_payment=monthly_loan,
+                monthly_profit_before_tax=monthly_profit,
+                annual_profit_before_tax=annual_profit,
+            ))
+
+        total_5yr = sum(p.annual_profit_before_tax for p in projections)
+        avg_annual = total_5yr // 5
+
+        return FiveYearPnLSummary(
+            projections=projections,
+            breakeven_month=breakeven_month,
+            total_5yr_profit_before_tax=total_5yr,
+            avg_annual_profit=avg_annual,
+            assumptions=[
+                "신규개원 표준 환자증가: 1년 60% → 2년 80% → 3년 95% → 4-5년 100%",
+                "자기자본 50% / 대출 50% (연 5.5%, 60개월 원리금균등) 가정",
+                "변동비(진료재료·마케팅): 매출의 30%",
+                "세전 기준. 세금은 별도 시뮬 참고",
+            ],
+        )
+
+    def _generate_tax_comparison(
+        self,
+        annual_revenue: int,
+        annual_profit_before_tax: int,
+    ) -> TaxComparison:
+        """
+        개인의원 (종합소득세) vs 의료법인 (법인세 + 배당세) 세후 수익 비교.
+
+        2024년 기준 세율:
+        - 종합소득세 (누진세): 1.4천 6%, 5천 15%, 8.8천 24%, 1.5억 35%, 3억 38%, 5억 40%, 10억 42%, 10억+ 45%
+        - 법인세: 2억 9%, 200억 19%, 3000억 21%, 3000억+ 24%
+        - 지방소득세: 본세의 10%
+        - 배당소득세 (법인 본인 인출 시): 15.4% (지방세 포함)
+        """
+        # 개인의원 — 종합소득세 누진 계산
+        def personal_income_tax(taxable: int) -> int:
+            brackets = [
+                (14_000_000, 0.06, 0),
+                (50_000_000, 0.15, 1_260_000),
+                (88_000_000, 0.24, 5_760_000),
+                (150_000_000, 0.35, 15_440_000),
+                (300_000_000, 0.38, 19_940_000),
+                (500_000_000, 0.40, 25_940_000),
+                (1_000_000_000, 0.42, 35_940_000),
+                (float('inf'), 0.45, 65_940_000),
+            ]
+            for limit, rate, deduct in brackets:
+                if taxable <= limit:
+                    return max(int(taxable * rate - deduct), 0)
+            return 0
+
+        # 법인세
+        def corporate_tax(taxable: int) -> int:
+            if taxable <= 200_000_000:
+                return int(taxable * 0.09)
+            if taxable <= 20_000_000_000:
+                return int(200_000_000 * 0.09 + (taxable - 200_000_000) * 0.19)
+            return int(200_000_000 * 0.09 + (20_000_000_000 - 200_000_000) * 0.19 + (taxable - 20_000_000_000) * 0.21)
+
+        # 개인의원
+        ind_income_tax = personal_income_tax(annual_profit_before_tax)
+        ind_local_tax = int(ind_income_tax * 0.10)
+        ind_total = ind_income_tax + ind_local_tax
+        ind_after = annual_profit_before_tax - ind_total
+
+        individual = TaxScenario(
+            type="개인의원",
+            annual_revenue=annual_revenue,
+            annual_profit_before_tax=annual_profit_before_tax,
+            income_tax=ind_income_tax,
+            local_tax=ind_local_tax,
+            dividend_tax=0,
+            total_tax=ind_total,
+            after_tax_profit=ind_after,
+            effective_tax_rate=round(ind_total / annual_profit_before_tax, 4) if annual_profit_before_tax > 0 else 0,
+        )
+
+        # 의료법인: 법인세 + 본인 인출분 배당세
+        # 가정: 법인이익의 70%를 본인 급여/배당으로 인출, 30%는 법인 유보
+        corp_income_tax = corporate_tax(annual_profit_before_tax)
+        corp_local_tax = int(corp_income_tax * 0.10)
+        corp_after_corp_tax = annual_profit_before_tax - corp_income_tax - corp_local_tax
+        withdrawal = int(corp_after_corp_tax * 0.70)
+        dividend_tax = int(withdrawal * 0.154)
+        corp_total_tax = corp_income_tax + corp_local_tax + dividend_tax
+        corp_after = annual_profit_before_tax - corp_total_tax
+
+        corporation = TaxScenario(
+            type="의료법인",
+            annual_revenue=annual_revenue,
+            annual_profit_before_tax=annual_profit_before_tax,
+            income_tax=corp_income_tax,
+            local_tax=corp_local_tax,
+            dividend_tax=dividend_tax,
+            total_tax=corp_total_tax,
+            after_tax_profit=corp_after,
+            effective_tax_rate=round(corp_total_tax / annual_profit_before_tax, 4) if annual_profit_before_tax > 0 else 0,
+        )
+
+        if ind_after >= corp_after:
+            advantage = "개인의원 유리"
+            advantage_amount = ind_after - corp_after
+        else:
+            advantage = "의료법인 유리"
+            advantage_amount = corp_after - ind_after
+
+        # 손익분기 매출 (대략): 세전이익이 약 1.5억 이상일 때 법인이 유리해지는 경향
+        breakeven_revenue = 600_000_000  # 표준값
+
+        notes = [
+            "본인 급여/배당으로 70% 인출 가정 (30% 법인 유보)",
+            "지방소득세 본세의 10%, 배당소득세 15.4% 적용",
+            "법인 설립비·운영비(법인세 신고 등) 별도 발생 (연 200~500만)",
+            "의료법인은 의료법 제48조에 따라 비영리법인. 잉여금 처분 제한 있음.",
+            "실제 세무는 세무사 상담 권장",
+        ]
+
+        return TaxComparison(
+            annual_revenue=annual_revenue,
+            individual=individual,
+            corporation=corporation,
+            advantage=advantage,
+            advantage_amount=advantage_amount,
+            breakeven_revenue=breakeven_revenue,
+            notes=notes,
+        )
+
+    def _generate_marketing_plan(self, clinic_type: str) -> MarketingPlan:
+        channels = [
+            MarketingChannel(**c) for c in marketing_plans.get_channels()
+        ]
+        # 필수 채널 비용만 합산 (최소/표준)
+        essential = [c for c in channels if c.priority == "필수"]
+        recommended = [c for c in channels if c.priority == "권장"]
+        budget_min = sum(c.monthly_cost_min for c in essential)
+        budget_typical = sum(c.monthly_cost_typical for c in essential + recommended)
+
+        rules = [
+            MarketingLawRule(**r) for r in marketing_plans.get_law_rules()
+        ]
+        tips = marketing_plans.get_clinic_tips(clinic_type)
+
+        return MarketingPlan(
+            recommended_channels=channels,
+            monthly_budget_min=budget_min,
+            monthly_budget_typical=budget_typical,
+            law_compliance=rules,
+            clinic_type_tips=tips,
+        )
+
     def _generate_opening_timeline(self, clinic_type: str) -> OpeningTimelinePlan:
         total_months = clinic_profiles.get_timeline_months(clinic_type)
         # 표준 5단계 일정 (개원 절차 표준)
@@ -1189,6 +1408,19 @@ class SimulationService:
             permit_checklist=self._generate_permit_checklist(clinic_type),
             equipment_checklist=self._generate_equipment_checklist(clinic_type),
             opening_timeline=self._generate_opening_timeline(clinic_type),
+
+            # 신규: 운영 시뮬 (5년 손익/세금/마케팅)
+            five_year_pnl=self._generate_five_year_pnl(
+                clinic_type,
+                revenue_avg,
+                simulation.est_cost_total or 0,
+                self._generate_capital_plan(clinic_type, simulation.size_pyeong, revenue_avg).grand_total,
+            ),
+            tax_comparison=self._generate_tax_comparison(
+                annual_revenue=revenue_avg * 12,
+                annual_profit_before_tax=(simulation.monthly_profit_avg or 0) * 12,
+            ),
+            marketing_plan=self._generate_marketing_plan(clinic_type),
 
             confidence_score=simulation.confidence_score or 0,
             recommendation=simulation.recommendation or RecommendationType.NEUTRAL,

@@ -411,6 +411,76 @@ class OpeningTimelinePlan(BaseModel):
     steps: List[OpeningTimelineStep]
 
 
+class FiveYearProjection(BaseModel):
+    """5년 손익 시뮬 — 신규개원 환자 증가 곡선 기반"""
+    year: int                       # 1~5
+    patient_ratio_of_capacity: float  # 정상화 비율 (1년차 ~ 5년차)
+    monthly_revenue: int
+    monthly_cost: int
+    monthly_loan_payment: int       # 대출 월 상환액 (자기자본 50% 기준)
+    monthly_profit_before_tax: int
+    annual_profit_before_tax: int
+
+
+class FiveYearPnLSummary(BaseModel):
+    """5년 손익 종합"""
+    projections: List[FiveYearProjection]
+    breakeven_month: Optional[int] = None       # 누적 순이익이 초기투자비 회수되는 시점 (개월)
+    total_5yr_profit_before_tax: int
+    avg_annual_profit: int
+    assumptions: List[str]                       # 가정 명시
+
+
+class TaxScenario(BaseModel):
+    """세금 시나리오"""
+    type: str                              # "개인의원" or "의료법인"
+    annual_revenue: int                    # 연 매출
+    annual_profit_before_tax: int          # 세전 이익
+    income_tax: int                        # 종합소득세 또는 법인세
+    local_tax: int                         # 지방소득세 (10%)
+    dividend_tax: int                      # 배당소득세 (의료법인 본인 인출 시)
+    total_tax: int
+    after_tax_profit: int                  # 세후 본인 수령액
+    effective_tax_rate: float              # 실효세율
+
+
+class TaxComparison(BaseModel):
+    """개인의원 vs 의료법인 세후 수익 비교"""
+    annual_revenue: int
+    individual: TaxScenario
+    corporation: TaxScenario
+    advantage: str                         # "개인의원 유리" or "의료법인 유리"
+    advantage_amount: int                  # 유리한 금액 차이
+    breakeven_revenue: int                 # 법인 전환 손익분기 매출
+    notes: List[str]
+
+
+class MarketingChannel(BaseModel):
+    """마케팅 채널"""
+    name: str                              # 네이버 플레이스, 블로그 등
+    priority: str                          # "필수", "권장", "선택"
+    monthly_cost_min: int                  # 최소 비용 (원)
+    monthly_cost_typical: int              # 표준 비용 (원)
+    expected_effect: str                   # 기대 효과
+    setup_steps: List[str]                 # 설정 단계
+
+
+class MarketingLawRule(BaseModel):
+    """의료광고법 준수 규칙"""
+    rule: str
+    description: str
+    penalty: str                           # 위반 시 처벌
+
+
+class MarketingPlan(BaseModel):
+    """진료과별 마케팅 플랜"""
+    recommended_channels: List[MarketingChannel]
+    monthly_budget_min: int
+    monthly_budget_typical: int
+    law_compliance: List[MarketingLawRule]
+    clinic_type_tips: List[str]            # 진료과별 마케팅 팁
+
+
 class SimulationResponse(BaseModel):
     """시뮬레이션 결과 응답 - 확장된 버전"""
     simulation_id: UUID
@@ -446,6 +516,10 @@ class SimulationResponse(BaseModel):
     permit_checklist: Optional[PermitChecklist] = None
     equipment_checklist: Optional[EquipmentChecklist] = None
     opening_timeline: Optional[OpeningTimelinePlan] = None
+    # 신규: 운영 시뮬 (5년 손익/세금/마케팅)
+    five_year_pnl: Optional[FiveYearPnLSummary] = None
+    tax_comparison: Optional[TaxComparison] = None
+    marketing_plan: Optional[MarketingPlan] = None
 
     confidence_score: int = Field(..., ge=0, le=100)
     recommendation: RecommendationType

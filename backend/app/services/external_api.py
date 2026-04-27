@@ -308,6 +308,50 @@ class ExternalAPIService:
             logger.error(f"Failed to get floating population: {e}")
             return {}
 
+    async def get_nearby_facility_counts(
+        self,
+        latitude: float,
+        longitude: float,
+        radius_m: int = 500,
+    ) -> Dict[str, int]:
+        """카카오 Local API로 반경 내 시설 카운트 (실데이터)."""
+        categories = {
+            "pharmacy": "PM9",
+            "hospital": "HP8",
+            "bank": "BK9",
+            "cafe": "CE7",
+            "restaurant": "FD6",
+        }
+        result: Dict[str, int] = {}
+        try:
+            async with httpx.AsyncClient() as client:
+                headers = {"Authorization": f"KakaoAK {settings.KAKAO_MAP_API_KEY}"}
+                for key, code in categories.items():
+                    params = {
+                        "category_group_code": code,
+                        "x": str(longitude),
+                        "y": str(latitude),
+                        "radius": str(min(radius_m, 20000)),  # max 20km
+                        "size": "1",  # total_count만 필요
+                    }
+                    try:
+                        resp = await client.get(
+                            f"{self.kakao_base_url}/search/category.json",
+                            headers=headers,
+                            params=params,
+                            timeout=8.0,
+                        )
+                        resp.raise_for_status()
+                        data = resp.json()
+                        result[key] = int(data.get("meta", {}).get("total_count", 0))
+                    except Exception as e:
+                        logger.warning(f"Kakao category search failed ({key}): {e}")
+                        result[key] = 0
+        except Exception as e:
+            logger.error(f"get_nearby_facility_counts failed: {e}")
+            return {k: 0 for k in categories}
+        return result
+
     async def reverse_geocode(self, latitude: float, longitude: float) -> Optional[Dict[str, Any]]:
         """좌표 → 주소 변환 (카카오 API)"""
         try:
