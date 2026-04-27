@@ -20,7 +20,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ko">
-      <body className="bg-slate-50 min-h-screen">
+      <body className="min-h-screen" style={{ background: '#fafaf7' }}>
         {children}
       </body>
     </html>

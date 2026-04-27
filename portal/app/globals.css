@@ -1,4 +1,5 @@
 @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css');
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=Noto+Serif+KR:wght@300;400;500&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -23,13 +24,22 @@ body {
   font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background: #ffffff;
+  background: #fafaf7;
+}
+
+.font-serif-kr {
+  font-family: 'Noto Serif KR', 'Cormorant Garamond', serif;
+  letter-spacing: -0.01em;
+}
+
+.font-serif-en {
+  font-family: 'Cormorant Garamond', 'Noto Serif KR', serif;
 }
 
 /* Selection */
 ::selection {
-  background: rgba(14, 165, 233, 0.2);
-  color: #0ea5e9;
+  background: rgba(184, 149, 106, 0.18);
+  color: #8a6f4d;
 }
 
 /* Smooth transitions */
