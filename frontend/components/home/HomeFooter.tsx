@@ -9,8 +9,6 @@ const footerLinks = {
     { label: 'PharmMatch', href: '/pharmacy-match' },
     { label: '지도', href: '/map' },
     { label: '개원의 패키지', href: '/opening-package' },
-    { label: '홈페이지 무료제작', href: '/services/homepage', badge: 'NEW' },
-    { label: '프로그램 무료제작', href: '/services/program', badge: 'NEW' },
     { label: '클라우드 EMR', href: '/services/emr', badge: 'NEW' },
     { label: 'PlatonEMR 프로그램', href: '/emr', badge: 'LIVE' },
     { label: 'EMR 비즈니스 분석', href: '/emr-dashboard', badge: 'NEW' },

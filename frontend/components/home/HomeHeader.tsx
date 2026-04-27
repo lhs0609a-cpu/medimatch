@@ -95,26 +95,6 @@ export function HomeHeader() {
                     <div>
                       <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">제작 서비스</p>
                       <div className="space-y-1">
-                        <Link href="/services/homepage" className="flex items-center gap-3 p-3 rounded-xl hover:bg-accent transition-colors group">
-                          <TossIcon icon={Globe} color="from-blue-500 to-blue-600" size="xs" shadow="shadow-blue-500/25" className="flex-shrink-0" />
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2">
-                              <span className="text-sm font-medium group-hover:text-[#3182f6]">홈페이지 무료제작</span>
-                              <span className="px-1.5 py-0.5 text-[10px] font-bold bg-[#3182f6]/10 text-[#3182f6] rounded">NEW</span>
-                            </div>
-                            <p className="text-xs text-muted-foreground">제작비 0원, 전환형 홈페이지</p>
-                          </div>
-                        </Link>
-                        <Link href="/services/program" className="flex items-center gap-3 p-3 rounded-xl hover:bg-accent transition-colors group">
-                          <TossIcon icon={Settings} color="from-blue-500 to-blue-600" size="xs" shadow="shadow-blue-500/25" className="flex-shrink-0" />
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2">
-                              <span className="text-sm font-medium group-hover:text-[#3182f6]">프로그램 무료제작</span>
-                              <span className="px-1.5 py-0.5 text-[10px] font-bold bg-[#3182f6]/10 text-[#3182f6] rounded">NEW</span>
-                            </div>
-                            <p className="text-xs text-muted-foreground">업무 자동화 월 30만원</p>
-                          </div>
-                        </Link>
                         <Link href="/services/emr" className="flex items-center gap-3 p-3 rounded-xl hover:bg-accent transition-colors group">
                           <TossIcon icon={Stethoscope} color="from-blue-500 to-blue-600" size="xs" shadow="shadow-blue-500/25" className="flex-shrink-0" />
                           <div className="flex-1">
