@@ -1418,22 +1418,17 @@ class SimulationService:
             ),
             region_stats=self._build_region_stats(clinic_type, revenue_avg),
 
-            # 상세 분석 (새로 추가)
-            revenue_detail=self._generate_revenue_detail(clinic_type, revenue_avg, demographics_data),
-            cost_detail=self._generate_cost_detail(clinic_type, simulation.size_pyeong or 30, cost),
-            profitability_detail=self._generate_profitability_detail(revenue, cost, profitability, simulation.budget_million),
-            competition_detail=self._generate_competition_detail(competitors, nearby_hospitals or [], clinic_type, demographics_data),
-            demographics_detail=self._generate_demographics_detail(demographics_data),
-            location_analysis=self._generate_location_analysis(lat, lng, commercial_data),
-            growth_projection=self._generate_growth_projection(revenue_avg, profitability, clinic_type),
-            risk_analysis=self._generate_risk_analysis(competitors, profitability, clinic_type),
-            ai_insights=self._generate_ai_insights(
-                clinic_type,
-                simulation.recommendation or RecommendationType.NEUTRAL,
-                competitors,
-                profitability
-            ),
-            region_stats_detail=self._generate_region_stats_detail(clinic_type, revenue_avg),
+            # 가짜/템플릿 필드 제거 (UI/PDF 미사용 + 검증 불가능한 값)
+            revenue_detail=None,
+            cost_detail=None,
+            profitability_detail=None,
+            competition_detail=None,
+            demographics_detail=None,
+            location_analysis=None,
+            growth_projection=None,
+            risk_analysis=None,
+            ai_insights=None,
+            region_stats_detail=None,
 
             # 신규: 개원 실행 모듈 (clinic_profiles 표준 + 지역 시세 기반)
             capital_plan=self._generate_capital_plan(clinic_type, simulation.size_pyeong, revenue_avg, lat, lng),
