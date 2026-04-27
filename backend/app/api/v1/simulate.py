@@ -126,8 +126,16 @@ async def check_simulation_unlock_status(
     4. 무료 체험 (사용자당 또는 IP당 1회, 30일 기준)
     """
     from ...models.payment import Subscription, UsageCredit
+    from ...models.user import UserRole
 
     cutoff_date = datetime.utcnow() - timedelta(days=FREE_TRIAL_WINDOW_DAYS)
+
+    # === 0. 관리자 무제한 우회 ===
+    if user_id:
+        admin_user = await db.get(User, user_id)
+        if admin_user and admin_user.role == UserRole.ADMIN:
+            logger.info(f"관리자로 잠금해제: user={user_id}")
+            return True
 
     # === 1. 구독 상태 확인 (로그인 사용자만) ===
     if user_id:

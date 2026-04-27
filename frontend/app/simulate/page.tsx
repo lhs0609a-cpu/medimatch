@@ -15,8 +15,9 @@ import { simulationService } from '@/lib/api/services'
 import { SimulationResponse } from '@/lib/api/client'
 import { toast } from 'sonner'
 import { useSimulationUnlock } from '@/lib/hooks/usePayment'
+import { useAuth } from '@/lib/hooks/useAuth'
 import { DEMO_RESULT } from './demo-data'
-import AddressSelector from './components/AddressSelector'
+import MapLocationPicker from './components/MapLocationPicker'
 import ScoreHero from './components/ScoreHero'
 import RegionBenchmark from './components/RegionBenchmark'
 import FreeInsights from './components/FreeInsights'
@@ -57,7 +58,10 @@ import PaywallCTA from './components/PaywallCTA'
 import PremiumAnalysis from './PremiumAnalysis'
 
 const simulationSchema = z.object({
-  address: z.string().min(5, '주소를 입력해주세요'),
+  address: z.string().optional(),
+  latitude: z.number({ invalid_type_error: '지도에서 위치를 선택해주세요' }).min(33).max(39),
+  longitude: z.number({ invalid_type_error: '지도에서 위치를 선택해주세요' }).min(124).max(132),
+  radius_m: z.number().min(300).max(5000),
   clinic_type: z.string().min(1, '진료과목을 선택해주세요'),
   size_pyeong: z.number().optional(),
   budget_million: z.number().optional(),
@@ -136,6 +140,8 @@ export default function SimulatePage() {
   const [result, setResult] = useState<SimulationResponse | null>(null)
   const [isAuthRequired, setIsAuthRequired] = useState(false)
   const [isUnlocked, setIsUnlocked] = useState(false)
+  const { user } = useAuth()
+  const isAdmin = user?.role === 'ADMIN'
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -148,6 +154,10 @@ export default function SimulatePage() {
     }
   }, [])
 
+  useEffect(() => {
+    if (isAdmin) setIsUnlocked(true)
+  }, [isAdmin])
+
   const {
     register,
     handleSubmit,
@@ -155,6 +165,7 @@ export default function SimulatePage() {
     formState: { errors },
   } = useForm<SimulationForm>({
     resolver: zodResolver(simulationSchema),
+    defaultValues: { radius_m: 1000 },
   })
 
   const mutation = useMutation({
@@ -162,10 +173,10 @@ export default function SimulatePage() {
     onSuccess: (data) => {
       setResult(data)
       setIsAuthRequired(false)
-      const unlocked = data.is_unlocked ?? false
+      const unlocked = isAdmin || (data.is_unlocked ?? false)
       setIsUnlocked(unlocked)
       if (unlocked) {
-        toast.success('시뮬레이션이 완료되었습니다!')
+        toast.success(isAdmin ? '관리자 권한: 전체 분석이 잠금해제되었습니다.' : '시뮬레이션이 완료되었습니다!')
       } else {
         toast.success('시뮬레이션이 완료되었습니다! 전체 결과를 확인하려면 결제가 필요합니다.')
       }
@@ -259,13 +270,19 @@ export default function SimulatePage() {
                 3분 개원 시뮬레이션
               </h1>
               <p className="text-muted-foreground mb-8">
-                주소와 진료과목만 입력하면 예상 매출, 비용, 손익분기점을 분석해드립니다.
+                지도에 위치를 찍고 분석 반경을 지정하면 해당 상권의 매출·비용·손익분기점을 분석해드립니다.
               </p>
 
               <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-                <AddressSelector
-                  onChange={(addr) => setValue('address', addr, { shouldValidate: !!addr })}
-                  error={errors.address?.message}
+                <MapLocationPicker
+                  defaultRadius={1000}
+                  onChange={({ latitude, longitude, radius_m, address }) => {
+                    setValue('latitude', latitude, { shouldValidate: true })
+                    setValue('longitude', longitude, { shouldValidate: true })
+                    setValue('radius_m', radius_m, { shouldValidate: true })
+                    setValue('address', address)
+                  }}
+                  error={errors.latitude?.message || errors.longitude?.message}
                 />
 
                 <div>

@@ -21,7 +21,10 @@ class RiskLevel(str, Enum):
 
 class SimulationRequest(BaseModel):
     """시뮬레이션 요청 스키마"""
-    address: str = Field(..., max_length=500, description="상세 주소")
+    address: Optional[str] = Field(None, max_length=500, description="상세 주소 (좌표 없을 때 사용)")
+    latitude: Optional[float] = Field(None, ge=33.0, le=39.0, description="위도 (지도 클릭)")
+    longitude: Optional[float] = Field(None, ge=124.0, le=132.0, description="경도 (지도 클릭)")
+    radius_m: Optional[int] = Field(1000, ge=300, le=5000, description="상권 분석 반경(m)")
     clinic_type: str = Field(..., max_length=50, description="진료과목")
     size_pyeong: Optional[float] = Field(None, gt=0, description="면적(평)")
     budget_million: Optional[int] = Field(None, gt=0, description="예산(백만원)")

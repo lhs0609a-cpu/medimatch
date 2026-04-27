@@ -308,6 +308,41 @@ class ExternalAPIService:
             logger.error(f"Failed to get floating population: {e}")
             return {}
 
+    async def reverse_geocode(self, latitude: float, longitude: float) -> Optional[Dict[str, Any]]:
+        """좌표 → 주소 변환 (카카오 API)"""
+        try:
+            async with httpx.AsyncClient() as client:
+                headers = {"Authorization": f"KakaoAK {settings.KAKAO_MAP_API_KEY}"}
+                params = {"x": str(longitude), "y": str(latitude)}
+
+                response = await client.get(
+                    f"{self.kakao_base_url}/geo/coord2regioncode.json",
+                    headers=headers,
+                    params=params,
+                    timeout=10.0
+                )
+                response.raise_for_status()
+                data = response.json()
+
+                documents = data.get("documents", [])
+                if not documents:
+                    return None
+
+                # B(법정동) 우선, 없으면 첫 항목
+                b_doc = next((d for d in documents if d.get("region_type") == "B"), documents[0])
+                h_doc = next((d for d in documents if d.get("region_type") == "H"), b_doc)
+
+                return {
+                    "latitude": latitude,
+                    "longitude": longitude,
+                    "region_code": b_doc.get("code", ""),
+                    "bjdong_code": h_doc.get("code", ""),
+                    "formatted_address": b_doc.get("address_name", f"{latitude:.5f}, {longitude:.5f}"),
+                }
+        except Exception as e:
+            logger.error(f"Failed to reverse geocode: {e}")
+            return None
+
     async def geocode_address(self, address: str) -> Optional[Dict[str, Any]]:
         """주소 → 좌표 변환 (카카오 API)"""
         try:

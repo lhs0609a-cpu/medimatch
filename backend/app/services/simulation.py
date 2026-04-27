@@ -37,21 +37,32 @@ class SimulationService:
     ) -> SimulationResponse:
         """새 시뮬레이션 생성 및 분석 수행"""
 
-        # 1. 주소를 좌표로 변환
-        geo_data = await external_api_service.geocode_address(request.address)
-        latitude = geo_data.get("latitude", 37.5665) if geo_data else 37.5665
-        longitude = geo_data.get("longitude", 126.9780) if geo_data else 126.9780
-        region_code = geo_data.get("region_code", "") if geo_data else ""
+        # 1. 좌표 확보: 지도 클릭 좌표 우선, 없으면 주소 지오코딩
+        radius_m = request.radius_m or 1000
+        if request.latitude is not None and request.longitude is not None:
+            geo_data = await external_api_service.reverse_geocode(
+                request.latitude, request.longitude
+            )
+            latitude = request.latitude
+            longitude = request.longitude
+            region_code = geo_data.get("region_code", "") if geo_data else ""
+        elif request.address:
+            geo_data = await external_api_service.geocode_address(request.address)
+            latitude = geo_data.get("latitude", 37.5665) if geo_data else 37.5665
+            longitude = geo_data.get("longitude", 126.9780) if geo_data else 126.9780
+            region_code = geo_data.get("region_code", "") if geo_data else ""
+        else:
+            raise ValueError("주소 또는 좌표(latitude/longitude) 중 하나는 필수입니다.")
 
         # 2. 주변 병원 데이터 수집 (동일 진료과 — 매출 데이터 포함)
         nearby_hospitals = await external_api_service.get_nearby_hospitals_with_revenue(
-            latitude, longitude, 1000, request.clinic_type,
+            latitude, longitude, radius_m, request.clinic_type,
             region_code=region_code,
         )
 
         # 2-1. 전체 의료기관 수 조회 (진료과 무관)
         all_nearby = await external_api_service.get_nearby_hospitals(
-            latitude, longitude, 1000, clinic_type=None,
+            latitude, longitude, radius_m, clinic_type=None,
             region_code=region_code,
         )
 
@@ -105,9 +116,14 @@ class SimulationService:
         )
 
         # 10. DB에 저장
+        resolved_address = (
+            (geo_data.get("formatted_address") if geo_data else None)
+            or request.address
+            or f"{latitude:.5f}, {longitude:.5f}"
+        )
         simulation = Simulation(
             user_id=user_id,
-            address=geo_data.get("formatted_address", request.address) if geo_data else request.address,
+            address=resolved_address,
             latitude=latitude,
             longitude=longitude,
             clinic_type=request.clinic_type,
@@ -125,7 +141,7 @@ class SimulationService:
             monthly_profit_avg=profitability["monthly_profit_avg"],
             breakeven_months=profitability["breakeven_months"],
             annual_roi_percent=profitability["annual_roi_percent"],
-            competition_radius_m=1000,
+            competition_radius_m=radius_m,
             same_dept_count=len(competitors),
             total_clinic_count=len(all_nearby),
             competitors_data=competitors,

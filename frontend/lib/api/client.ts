@@ -78,7 +78,10 @@ export interface Token {
 }
 
 export interface SimulationRequest {
-  address: string
+  address?: string
+  latitude?: number
+  longitude?: number
+  radius_m?: number
   clinic_type: string
   size_pyeong?: number
   budget_million?: number
