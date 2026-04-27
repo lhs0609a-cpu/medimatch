@@ -322,6 +322,95 @@ class RegionStatsDetail(BaseModel):
     clinic_growth_rate: float = 0  # 의원 수 증감률
 
 
+class CapitalLineItem(BaseModel):
+    """초기 투자비 라인 항목"""
+    label: str
+    amount: int                  # 원 단위
+    note: Optional[str] = None
+
+
+class FinancingScenario(BaseModel):
+    """대출 시나리오"""
+    scenario: str                  # "자기자본 100%", "자기자본 50% / 대출 50%", "자기자본 30% / 대출 70%"
+    own_capital: int
+    loan_amount: int
+    interest_rate_annual: float    # 연이자율
+    loan_term_years: int
+    monthly_payment: int           # 원금균등 기준 월 상환액
+    total_interest: int            # 총 이자 부담
+    monthly_burden_ratio: float    # 월 매출 대비 부담률 (0.0-1.0)
+
+
+class CapitalPlan(BaseModel):
+    """진료과별 표준 자본 요건 + 대출 시뮬레이션"""
+    standard_size_pyeong: int                  # 표준 면적
+    min_size_pyeong: int                       # 의료법상 최소
+    target_size_pyeong: int                    # 사용자 입력 또는 표준
+    breakdown: List[CapitalLineItem]           # 항목별 투자비
+    initial_investment_total: int              # 합계 (원)
+    working_capital_recommended: int           # 권장 운영자금 (원)
+    grand_total: int                           # 초기 투자비 + 운영자금
+    financing_scenarios: List[FinancingScenario]
+    data_source: str = "한국의료기기협회·대한개원의협의회 표준 + HIRA 진료비 통계"
+
+
+class StaffingPlan(BaseModel):
+    """진료과별 표준 인력 + 인건비"""
+    doctors: int
+    nurses: int
+    admins: int
+    technicians: int
+    total_headcount: int
+    monthly_payroll: int           # 본인 제외 월 인건비 합계 (원)
+
+
+class PermitChecklistItem(BaseModel):
+    """인허가 체크리스트 항목"""
+    name: str
+    authority: str
+    duration_days: int
+    cost: int
+    description: str
+
+
+class PermitChecklist(BaseModel):
+    """진료과별 인허가 체크리스트"""
+    common_permits: List[PermitChecklistItem]    # 공통 인허가
+    specific_permits: List[str]                  # 진료과별 추가 인허가 (이름만)
+    total_estimated_days: int                    # 총 처리 기간 (병렬 가정)
+    total_estimated_cost: int                    # 총 수수료
+
+
+class EquipmentListItem(BaseModel):
+    name: str
+    price_min: int
+    price_typical: int
+    is_essential: bool
+
+
+class EquipmentChecklist(BaseModel):
+    """진료과별 의료장비 목록"""
+    items: List[EquipmentListItem]
+    essential_total_min: int        # 필수 장비 최저가 합계
+    essential_total_typical: int    # 필수 장비 표준가 합계
+    optional_total_typical: int     # 선택 장비 표준가 합계
+
+
+class OpeningTimelineStep(BaseModel):
+    """개원 일정 단계"""
+    step_no: int
+    title: str
+    months_from_start: int
+    duration_weeks: int
+    deliverables: List[str]
+
+
+class OpeningTimelinePlan(BaseModel):
+    """진료과별 개원 일정"""
+    total_months: int
+    steps: List[OpeningTimelineStep]
+
+
 class SimulationResponse(BaseModel):
     """시뮬레이션 결과 응답 - 확장된 버전"""
     simulation_id: UUID
@@ -350,6 +439,13 @@ class SimulationResponse(BaseModel):
     risk_analysis: Optional[RiskAnalysis] = None
     ai_insights: Optional[AIInsights] = None
     region_stats_detail: Optional[RegionStatsDetail] = None
+
+    # 신규: 개원 실행 모듈 (자금/인력/인허가/장비/일정)
+    capital_plan: Optional[CapitalPlan] = None
+    staffing_plan: Optional[StaffingPlan] = None
+    permit_checklist: Optional[PermitChecklist] = None
+    equipment_checklist: Optional[EquipmentChecklist] = None
+    opening_timeline: Optional[OpeningTimelinePlan] = None
 
     confidence_score: int = Field(..., ge=0, le=100)
     recommendation: RecommendationType

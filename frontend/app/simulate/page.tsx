@@ -27,6 +27,7 @@ import RevenueSimulator from './components/RevenueSimulator'
 import CostPreview from './components/CostPreview'
 import CompetitorDistance from './components/CompetitorDistance'
 import RentAnalysis from './components/RentAnalysis'
+import OpeningExecutionPack from './components/OpeningExecutionPack'
 import ShareResult from './components/ShareResult'
 import PaywallCTA from './components/PaywallCTA'
 
@@ -395,6 +396,7 @@ export default function SimulatePage() {
                   <CostPreview result={DEMO_RESULT} />
                   <RentAnalysis result={DEMO_RESULT} />
                   <OverallRadar result={DEMO_RESULT} />
+                  <OpeningExecutionPack result={DEMO_RESULT} />
                 </div>
                 <PaywallCTA
                   onUnlock={handleUnlock}
@@ -415,6 +417,9 @@ export default function SimulatePage() {
 
                 {/* 3. 종합 점수 */}
                 <OverallRadar result={result} />
+
+                {/* 4. 개원 실행 계획 (자금/인력/인허가/장비/일정) */}
+                <OpeningExecutionPack result={result} />
               </>
             )}
 

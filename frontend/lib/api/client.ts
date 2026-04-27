@@ -264,6 +264,78 @@ export interface RegionStatsDetail {
   clinic_growth_rate: number
 }
 
+// 개원 실행 모듈
+export interface CapitalLineItem {
+  label: string
+  amount: number
+  note?: string | null
+}
+export interface FinancingScenario {
+  scenario: string
+  own_capital: number
+  loan_amount: number
+  interest_rate_annual: number
+  loan_term_years: number
+  monthly_payment: number
+  total_interest: number
+  monthly_burden_ratio: number
+}
+export interface CapitalPlan {
+  standard_size_pyeong: number
+  min_size_pyeong: number
+  target_size_pyeong: number
+  breakdown: CapitalLineItem[]
+  initial_investment_total: number
+  working_capital_recommended: number
+  grand_total: number
+  financing_scenarios: FinancingScenario[]
+  data_source: string
+}
+export interface StaffingPlan {
+  doctors: number
+  nurses: number
+  admins: number
+  technicians: number
+  total_headcount: number
+  monthly_payroll: number
+}
+export interface PermitChecklistItem {
+  name: string
+  authority: string
+  duration_days: number
+  cost: number
+  description: string
+}
+export interface PermitChecklist {
+  common_permits: PermitChecklistItem[]
+  specific_permits: string[]
+  total_estimated_days: number
+  total_estimated_cost: number
+}
+export interface EquipmentListItem {
+  name: string
+  price_min: number
+  price_typical: number
+  is_essential: boolean
+}
+export interface EquipmentChecklist {
+  items: EquipmentListItem[]
+  essential_total_min: number
+  essential_total_typical: number
+  optional_total_typical: number
+}
+export interface OpeningTimelineStep {
+  step_no: number
+  title: string
+  months_from_start: number
+  duration_weeks: number
+  deliverables: string[]
+}
+export interface OpeningTimelinePlan {
+  total_months: number
+  steps: OpeningTimelineStep[]
+}
+
 export interface SimulationResponse {
   simulation_id: string
   address: string
@@ -331,6 +403,12 @@ export interface SimulationResponse {
   risk_analysis?: RiskAnalysis
   ai_insights?: AIInsights
   region_stats_detail?: RegionStatsDetail
+  // 신규: 개원 실행 모듈
+  capital_plan?: CapitalPlan
+  staffing_plan?: StaffingPlan
+  permit_checklist?: PermitChecklist
+  equipment_checklist?: EquipmentChecklist
+  opening_timeline?: OpeningTimelinePlan
   // 결제/잠금 상태 (서버에서 관리)
   is_unlocked: boolean
   unlock_price: number

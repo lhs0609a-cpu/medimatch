@@ -13,11 +13,17 @@ from ..schemas.simulation import (
     EstimatedRevenue, EstimatedCost, Profitability, Competition, Demographics,
     RevenueDetail, CostDetail, ProfitabilityDetail, CompetitionDetail,
     DemographicsDetail, LocationAnalysis, GrowthProjection, RiskAnalysis,
-    AIInsights, RegionStats, RegionStatsDetail, RiskLevel
+    AIInsights, RegionStats, RegionStatsDetail, RiskLevel,
+    CapitalPlan, CapitalLineItem, FinancingScenario,
+    StaffingPlan as StaffingPlanSchema,
+    PermitChecklist, PermitChecklistItem,
+    EquipmentChecklist, EquipmentListItem,
+    OpeningTimelinePlan, OpeningTimelineStep,
 )
 from .external_api import external_api_service
 from .prediction import PredictionService
 from ..core.config import settings
+from ..data import clinic_profiles
 
 import logging
 logger = logging.getLogger(__name__)
@@ -944,6 +950,140 @@ class SimulationService:
             clinic_growth_rate=round(random.uniform(-2, 5), 1)
         )
 
+    def _generate_capital_plan(
+        self,
+        clinic_type: str,
+        size_pyeong: Optional[float],
+        revenue_avg: int,
+    ) -> CapitalPlan:
+        """진료과 표준 + 사용자 평수 기반 초기 투자비 + 대출 시뮬"""
+        cap = clinic_profiles.get_capital_profile(clinic_type)
+        target = int(size_pyeong) if size_pyeong else cap["standard_size_pyeong"]
+
+        interior = cap["interior_per_pyeong"] * target
+        equipment = cap["equipment_typical"]
+        deposit = cap["deposit_per_pyeong"] * target
+        monthly_rent = cap["monthly_rent_per_pyeong"] * target
+        misc = int(interior * 0.05) + 5_000_000  # 등록·법무·예비비
+
+        breakdown = [
+            CapitalLineItem(label="인테리어·시설공사", amount=interior, note=f"평당 {cap['interior_per_pyeong']:,}원 × {target}평"),
+            CapitalLineItem(label="의료장비 (표준)", amount=equipment, note=f"진료과 표준 구성, 최저가 ~ {cap['equipment_min']:,}원까지 압축 가능"),
+            CapitalLineItem(label="임대 보증금", amount=deposit, note=f"평당 {cap['deposit_per_pyeong']:,}원 × {target}평 (수도권 평균)"),
+            CapitalLineItem(label="등록·인허가·예비비", amount=misc, note="개설신고·세무·법무·간판 등"),
+        ]
+        initial_total = sum(item.amount for item in breakdown)
+        working_capital = monthly_rent * cap["working_capital_months"] + 30_000_000  # 월세 + 인건비 약간
+        grand_total = initial_total + working_capital
+
+        # 대출 시뮬 — 원금균등 가정 단순화 (이자율 5.5%, 5년)
+        scenarios: List[FinancingScenario] = []
+        for own_ratio, label in [(1.0, "자기자본 100%"), (0.5, "자기자본 50% / 대출 50%"), (0.3, "자기자본 30% / 대출 70%")]:
+            own = int(grand_total * own_ratio)
+            loan = grand_total - own
+            rate = 0.055
+            term = 5
+            if loan > 0:
+                # 원리금균등 월상환액
+                r = rate / 12
+                n = term * 12
+                monthly = int(loan * r * (1 + r) ** n / ((1 + r) ** n - 1))
+                total_interest = monthly * n - loan
+            else:
+                monthly = 0
+                total_interest = 0
+            burden = (monthly / revenue_avg) if revenue_avg > 0 else 0
+            scenarios.append(FinancingScenario(
+                scenario=label,
+                own_capital=own,
+                loan_amount=loan,
+                interest_rate_annual=rate,
+                loan_term_years=term,
+                monthly_payment=monthly,
+                total_interest=total_interest,
+                monthly_burden_ratio=round(burden, 3),
+            ))
+
+        return CapitalPlan(
+            standard_size_pyeong=cap["standard_size_pyeong"],
+            min_size_pyeong=cap["min_size_pyeong"],
+            target_size_pyeong=target,
+            breakdown=breakdown,
+            initial_investment_total=initial_total,
+            working_capital_recommended=working_capital,
+            grand_total=grand_total,
+            financing_scenarios=scenarios,
+        )
+
+    def _generate_staffing_plan(self, clinic_type: str) -> StaffingPlanSchema:
+        s = clinic_profiles.get_staffing_profile(clinic_type)
+        # 본인(원장) 제외 인건비
+        payroll = (
+            s["nurses"] * s["avg_nurse_salary_monthly"]
+            + s["admins"] * s["avg_admin_salary_monthly"]
+            + s["technicians"] * s["avg_nurse_salary_monthly"]  # 보조 인력
+        )
+        return StaffingPlanSchema(
+            doctors=s["doctors"],
+            nurses=s["nurses"],
+            admins=s["admins"],
+            technicians=s["technicians"],
+            total_headcount=s["doctors"] + s["nurses"] + s["admins"] + s["technicians"],
+            monthly_payroll=payroll,
+        )
+
+    def _generate_permit_checklist(self, clinic_type: str) -> PermitChecklist:
+        common = [
+            PermitChecklistItem(**p) for p in clinic_profiles.get_permits(clinic_type)
+        ]
+        specifics = clinic_profiles.get_specific_permits(clinic_type)
+        return PermitChecklist(
+            common_permits=common,
+            specific_permits=specifics,
+            total_estimated_days=max((p.duration_days for p in common), default=0),  # 병렬 진행 가정
+            total_estimated_cost=sum(p.cost for p in common),
+        )
+
+    def _generate_equipment_checklist(self, clinic_type: str) -> EquipmentChecklist:
+        items_raw = clinic_profiles.get_equipment_list(clinic_type)
+        items = [EquipmentListItem(**e) for e in items_raw]
+        essential_min = sum(e.price_min for e in items if e.is_essential)
+        essential_typ = sum(e.price_typical for e in items if e.is_essential)
+        optional_typ = sum(e.price_typical for e in items if not e.is_essential)
+        return EquipmentChecklist(
+            items=items,
+            essential_total_min=essential_min,
+            essential_total_typical=essential_typ,
+            optional_total_typical=optional_typ,
+        )
+
+    def _generate_opening_timeline(self, clinic_type: str) -> OpeningTimelinePlan:
+        total_months = clinic_profiles.get_timeline_months(clinic_type)
+        # 표준 5단계 일정 (개원 절차 표준)
+        steps = [
+            OpeningTimelineStep(
+                step_no=1, title="입지 확정 + 임대 계약", months_from_start=0, duration_weeks=2,
+                deliverables=["부동산 시세 조사", "임대차 계약서 체결", "보증금 납부"],
+            ),
+            OpeningTimelineStep(
+                step_no=2, title="설계·인허가·인테리어", months_from_start=1, duration_weeks=8,
+                deliverables=["의료시설 설계도", "건축물 사용승인", "인테리어 완공", "소방·전기 검사"],
+            ),
+            OpeningTimelineStep(
+                step_no=3, title="의료장비 도입 + 시운전", months_from_start=int(total_months * 0.5), duration_weeks=4,
+                deliverables=["장비 발주·설치", "방사선 안전 신고", "EMR 시스템 구축"],
+            ),
+            OpeningTimelineStep(
+                step_no=4, title="인허가 신청 + 인력 채용", months_from_start=max(total_months - 2, 1), duration_weeks=4,
+                deliverables=["사업자등록", "의료기관 개설신고", "심평원 등록", "직원 채용 + 4대보험"],
+            ),
+            OpeningTimelineStep(
+                step_no=5, title="개원 + 마케팅 시작", months_from_start=total_months, duration_weeks=2,
+                deliverables=["네이버 플레이스 등록", "초진 환자 유치 캠페인", "보험청구 시작"],
+            ),
+        ]
+        return OpeningTimelinePlan(total_months=total_months, steps=steps)
+
     def _build_response(
         self,
         simulation: Simulation,
@@ -1024,13 +1164,7 @@ class SimulationService:
                 age_40_plus_ratio=simulation.age_40_plus_ratio or 0.4,
                 floating_population_daily=simulation.floating_population_daily or 50000
             ),
-            region_stats=RegionStats(
-                region_rank=random.randint(1, 10),
-                total_regions=17,
-                rank_percentile=round(random.uniform(10, 50), 1),
-                vs_national_percent=round(random.uniform(-5, 25), 1),
-                national_avg_revenue=int(revenue_avg * 0.9)
-            ),
+            region_stats=None,  # region_rank/percentile은 실 ranking DB 부재로 미제공
 
             # 상세 분석 (새로 추가)
             revenue_detail=self._generate_revenue_detail(clinic_type, revenue_avg, demographics_data),
@@ -1048,6 +1182,13 @@ class SimulationService:
                 profitability
             ),
             region_stats_detail=self._generate_region_stats_detail(clinic_type, revenue_avg),
+
+            # 신규: 개원 실행 모듈 (clinic_profiles 표준 기반)
+            capital_plan=self._generate_capital_plan(clinic_type, simulation.size_pyeong, revenue_avg),
+            staffing_plan=self._generate_staffing_plan(clinic_type),
+            permit_checklist=self._generate_permit_checklist(clinic_type),
+            equipment_checklist=self._generate_equipment_checklist(clinic_type),
+            opening_timeline=self._generate_opening_timeline(clinic_type),
 
             confidence_score=simulation.confidence_score or 0,
             recommendation=simulation.recommendation or RecommendationType.NEUTRAL,
