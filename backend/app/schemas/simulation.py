@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field
-from typing import Optional, List, Dict
+from typing import Optional, List, Dict, Any
 from datetime import datetime
 from uuid import UUID
 from enum import Enum
@@ -524,6 +524,10 @@ class SimulationResponse(BaseModel):
     nearby_facility_counts: Optional[Dict[str, int]] = None
     # 카카오 키워드 검색 종합 (의료협력·영업타겟·교통·주거)
     clinic_environment: Optional[Dict[str, Any]] = None
+    # 지역 가구소득 + 진료과 적합도
+    regional_income_info: Optional[Dict[str, Any]] = None
+    # 진료과 신규개원/폐업/생존율 통계
+    market_lifecycle: Optional[Dict[str, Any]] = None
 
     confidence_score: int = Field(..., ge=0, le=100)
     recommendation: RecommendationType

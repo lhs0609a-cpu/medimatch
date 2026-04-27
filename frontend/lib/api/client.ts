@@ -331,6 +331,28 @@ export interface OpeningTimelineStep {
   duration_weeks: number
   deliverables: string[]
 }
+// 지역 가구소득
+export interface RegionalIncomeInfo {
+  region_name: string
+  avg_monthly_household_income: number
+  median_monthly_income: number
+  income_quartile: number          // 1-4
+  high_income_household_ratio: number
+  sample_period: string
+  clinic_fit: { target: string; '비고': string }
+}
+
+// 진료과 시장 라이프사이클
+export interface MarketLifecycle {
+  annual_open_rate: number
+  annual_close_rate: number
+  avg_operating_years: number
+  survival_rate_5yr: number
+  note: string
+  market_trend: string
+  trend_color: string  // positive | neutral | warning | negative
+}
+
 // 개원 환경 (카카오 키워드 검색 통합)
 export interface ClinicEnvFacility {
   name: string
@@ -500,6 +522,8 @@ export interface SimulationResponse {
   marketing_plan?: MarketingPlan
   nearby_facility_counts?: Record<string, number>  // pharmacy/hospital/bank/cafe/restaurant
   clinic_environment?: ClinicEnvironment
+  regional_income_info?: RegionalIncomeInfo
+  market_lifecycle?: MarketLifecycle
   // 결제/잠금 상태 (서버에서 관리)
   is_unlocked: boolean
   unlock_price: number

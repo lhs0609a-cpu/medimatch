@@ -29,6 +29,8 @@ from ..core.config import settings
 from ..data import clinic_profiles
 from ..data import marketing_plans
 from ..data import regional_rent
+from ..data import regional_income
+from ..data import clinic_lifecycle
 
 import logging
 logger = logging.getLogger(__name__)
@@ -1466,6 +1468,14 @@ class SimulationService:
                 (simulation.demographics_data or {}).get("clinic_environment")
                 if isinstance(simulation.demographics_data, dict) else None
             ),
+            regional_income_info={
+                **regional_income.get_regional_income(lat, lng),
+                "clinic_fit": regional_income.get_clinic_income_fit(clinic_type),
+            },
+            market_lifecycle={
+                **clinic_lifecycle.get_lifecycle(clinic_type),
+                **clinic_lifecycle.assess_market_dynamics(clinic_type),
+            },
 
             confidence_score=simulation.confidence_score or 0,
             recommendation=simulation.recommendation or RecommendationType.NEUTRAL,

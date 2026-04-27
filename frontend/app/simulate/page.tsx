@@ -29,6 +29,7 @@ import CompetitorDistance from './components/CompetitorDistance'
 import RentAnalysis from './components/RentAnalysis'
 import NearbyFacilitiesReal from './components/NearbyFacilitiesReal'
 import ClinicEnvironment from './components/ClinicEnvironment'
+import MarketContext from './components/MarketContext'
 import OpeningExecutionPack from './components/OpeningExecutionPack'
 import ShareResult from './components/ShareResult'
 import PaywallCTA from './components/PaywallCTA'
@@ -426,6 +427,9 @@ export default function SimulatePage() {
 
                 {/* 3-2. 개원 환경 — 진료과별 핵심 영업 타겟 */}
                 <ClinicEnvironment result={result} />
+
+                {/* 3-3. 가구소득 + 진료과 시장 라이프사이클 */}
+                <MarketContext result={result} />
 
                 {/* 4. 개원 실행 계획 (자금/인력/인허가/장비/일정/5년/세금/마케팅) */}
                 <OpeningExecutionPack result={result} />
