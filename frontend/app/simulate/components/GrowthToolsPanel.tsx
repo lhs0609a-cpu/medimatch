@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react'
 import {
   Megaphone, MapPin, Sparkles, TrendingUp, Users, Clock,
-  Palette, ChevronDown, Loader2, AlertTriangle, CheckCircle2,
+  Palette, Loader2, AlertTriangle, CheckCircle2,
 } from 'lucide-react'
 import { SimulationResponse, apiClient } from '@/lib/api/client'
 
@@ -31,8 +31,6 @@ const TOOLS = [
 ]
 
 export default function GrowthToolsPanel({ result }: Props) {
-  const [openTool, setOpenTool] = useState<ToolKey | null>(null)
-
   return (
     <div className="card overflow-hidden">
       <div className="p-6 border-b border-border bg-gradient-to-r from-violet-50/60 to-pink-50/60 dark:from-violet-950/20 dark:to-pink-950/20">
@@ -48,31 +46,24 @@ export default function GrowthToolsPanel({ result }: Props) {
       <div className="divide-y divide-border">
         {TOOLS.map((t) => {
           const Icon = t.icon
-          const isOpen = openTool === t.key
           return (
             <div key={t.key}>
-              <button
-                onClick={() => setOpenTool(isOpen ? null : t.key)}
-                className="w-full px-6 py-4 flex items-center gap-3 hover:bg-muted/40 transition-colors text-left"
-              >
+              <div className="px-6 py-4 flex items-center gap-3 bg-muted/20">
                 <Icon className={`w-5 h-5 ${t.color}`} />
                 <div className="flex-1 min-w-0">
                   <div className="font-semibold text-foreground">{t.label}</div>
                   <div className="text-xs text-muted-foreground truncate">{t.desc}</div>
                 </div>
-                <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform ${isOpen ? 'rotate-180' : ''}`} />
-              </button>
-              {isOpen && (
-                <div className="px-6 pb-6 pt-2 border-t border-border/50">
-                  {t.key === 'closure' && <ClosureCases result={result} />}
-                  {t.key === 'marketing' && <MarketingROAS result={result} />}
-                  {t.key === 'procedure' && <ProcedureSim result={result} />}
-                  {t.key === 'price' && <PriceOptimizer result={result} />}
-                  {t.key === 'hiring' && <HiringROI result={result} />}
-                  {t.key === 'hours' && <WorkingHours result={result} />}
-                  {t.key === 'branding' && <BrandingBuilder result={result} />}
-                </div>
-              )}
+              </div>
+              <div className="px-6 pb-6 pt-2 border-t border-border/50">
+                {t.key === 'closure' && <ClosureCases result={result} />}
+                {t.key === 'marketing' && <MarketingROAS result={result} />}
+                {t.key === 'procedure' && <ProcedureSim result={result} />}
+                {t.key === 'price' && <PriceOptimizer result={result} />}
+                {t.key === 'hiring' && <HiringROI result={result} />}
+                {t.key === 'hours' && <WorkingHours result={result} />}
+                {t.key === 'branding' && <BrandingBuilder result={result} />}
+              </div>
             </div>
           )
         })}

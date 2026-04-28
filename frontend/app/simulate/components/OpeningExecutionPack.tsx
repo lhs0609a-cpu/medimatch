@@ -369,12 +369,12 @@ export default function OpeningExecutionPack({ result }: Props) {
                               <div className="text-[11px] text-muted-foreground mb-1">
                                 월 {c.monthly_cost_min === 0 ? '무료' : `${won(c.monthly_cost_min)}~${won(c.monthly_cost_typical)}원`} · {c.expected_effect}
                               </div>
-                              <details className="text-[11px]">
-                                <summary className="cursor-pointer text-indigo-600 dark:text-indigo-400">설정 단계 보기</summary>
-                                <ul className="mt-1 list-disc list-inside text-muted-foreground space-y-0.5">
+                              <div className="text-[11px] mt-1.5">
+                                <div className="text-indigo-600 dark:text-indigo-400 font-medium mb-0.5">설정 단계</div>
+                                <ul className="list-disc list-inside text-muted-foreground space-y-0.5">
                                   {c.setup_steps.map((s, j) => <li key={j}>{s}</li>)}
                                 </ul>
-                              </details>
+                              </div>
                             </div>
                           ))}
                         </div>

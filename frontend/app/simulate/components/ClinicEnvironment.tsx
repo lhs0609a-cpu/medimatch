@@ -107,14 +107,14 @@ export default function ClinicEnvironment({ result }: Props) {
         {priorityKeys.map((k) => renderCategory(k, true))}
       </div>
 
-      <details className="mt-2">
-        <summary className="cursor-pointer text-sm text-muted-foreground hover:text-foreground">
-          기타 시설 정보 ({otherKeys.length}개) 펼치기
-        </summary>
+      <div className="mt-2">
+        <div className="text-sm text-muted-foreground mb-2">
+          기타 시설 정보 ({otherKeys.length}개)
+        </div>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-3">
           {otherKeys.map((k) => renderCategory(k, false))}
         </div>
-      </details>
+      </div>
     </div>
   )
 }
