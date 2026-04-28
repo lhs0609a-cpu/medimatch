@@ -24,9 +24,9 @@ export default function ReportPreview({
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
     summary: true,
     revenue: true,
-    competition: false,
-    demographics: false,
-    ai: false,
+    competition: true,
+    demographics: true,
+    ai: true,
   })
 
   const toggleSection = (section: string) => {

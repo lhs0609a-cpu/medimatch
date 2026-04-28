@@ -147,6 +147,28 @@ class ExternalAPIService:
         self.kakao_base_url = "https://dapi.kakao.com/v2/local"
 
     @staticmethod
+    def _extract_items_safe(data: Dict[str, Any]) -> List[Dict[str, Any]]:
+        """
+        공공데이터포털 응답에서 items 안전 추출.
+        items가 빈 문자열, None, dict, list 모두 처리.
+        결과 없을 때 HIRA가 items=""(빈 문자열) 반환하는 케이스 방어.
+        """
+        body_items = data.get("response", {}).get("body", {}).get("items")
+        if not body_items or isinstance(body_items, str):
+            return []
+        if isinstance(body_items, list):
+            return body_items
+        if isinstance(body_items, dict):
+            inner = body_items.get("item", [])
+            if not inner or isinstance(inner, str):
+                return []
+            if isinstance(inner, dict):
+                return [inner]
+            if isinstance(inner, list):
+                return inner
+        return []
+
+    @staticmethod
     def _haversine(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
         """두 좌표 간 거리(m) 계산 — Haversine 공식"""
         R = 6371000
@@ -187,9 +209,7 @@ class ExternalAPIService:
                 response.raise_for_status()
                 data = response.json()
 
-                items = data.get("response", {}).get("body", {}).get("items", {}).get("item", [])
-                if isinstance(items, dict):
-                    items = [items]
+                items = self._extract_items_safe(data)
 
                 return [self._parse_hospital_data(item) for item in items]
         except Exception as e:
@@ -247,9 +267,7 @@ class ExternalAPIService:
                 response.raise_for_status()
                 data = response.json()
 
-                items = data.get("response", {}).get("body", {}).get("items", {}).get("item", [])
-                if isinstance(items, dict):
-                    items = [items]
+                items = self._extract_items_safe(data)
 
                 return items[0] if items else None
         except Exception as e:
@@ -1008,9 +1026,7 @@ class ExternalAPIService:
                 response.raise_for_status()
                 data = response.json()
 
-                items = data.get("response", {}).get("body", {}).get("items", {}).get("item", [])
-                if isinstance(items, dict):
-                    items = [items]
+                items = self._extract_items_safe(data)
 
                 if items:
                     item = items[0]
@@ -1058,9 +1074,7 @@ class ExternalAPIService:
                 response.raise_for_status()
                 data = response.json()
 
-                items = data.get("response", {}).get("body", {}).get("items", {}).get("item", [])
-                if isinstance(items, dict):
-                    items = [items]
+                items = self._extract_items_safe(data)
 
                 if items:
                     # 통계 데이터 집계
@@ -1188,9 +1202,7 @@ class ExternalAPIService:
                 response.raise_for_status()
                 data = response.json()
 
-                items = data.get("response", {}).get("body", {}).get("items", {}).get("item", [])
-                if isinstance(items, dict):
-                    items = [items]
+                items = self._extract_items_safe(data)
 
                 return [self._parse_hospital_data(item) for item in items]
         except Exception as e:
@@ -1222,9 +1234,7 @@ class ExternalAPIService:
                 response.raise_for_status()
                 data = response.json()
 
-                items = data.get("response", {}).get("body", {}).get("items", {}).get("item", [])
-                if isinstance(items, dict):
-                    items = [items]
+                items = self._extract_items_safe(data)
 
                 return [self._parse_pharmacy_data(item) for item in items]
         except Exception as e:
@@ -1268,9 +1278,7 @@ class ExternalAPIService:
                 response.raise_for_status()
                 data = response.json()
 
-                items = data.get("response", {}).get("body", {}).get("items", {}).get("item", [])
-                if isinstance(items, dict):
-                    items = [items]
+                items = self._extract_items_safe(data)
 
                 if items:
                     item = items[0]
@@ -1314,9 +1322,7 @@ class ExternalAPIService:
                 response.raise_for_status()
                 data = response.json()
 
-                items = data.get("response", {}).get("body", {}).get("items", {}).get("item", [])
-                if isinstance(items, dict):
-                    items = [items]
+                items = self._extract_items_safe(data)
 
                 return [self._parse_pharmacy_data(item) for item in items]
         except Exception as e:

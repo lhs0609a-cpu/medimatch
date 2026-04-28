@@ -476,34 +476,88 @@ async def download_report(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_active_user)
 ):
-    """PDF 리포트 다운로드"""
-    from ...models.simulation import SimulationReport
+    """
+    PDF 리포트 다운로드.
+    UUID는 SimulationReport.id 또는 Simulation.id 둘 다 허용 (프론트 호환).
+    관리자는 결제 없이 즉시 PDF 스트림 반환.
+    """
+    from ...models.simulation import SimulationReport, Simulation
+    from ...models.user import UserRole as _UR
     from sqlalchemy import select
 
-    result = await db.execute(
-        select(SimulationReport).where(SimulationReport.id == report_id)
-    )
-    report = result.scalar_one_or_none()
-
-    if not report:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Report not found"
-        )
-
-    from ...models.user import UserRole as _UR
     is_admin = current_user.role == _UR.ADMIN
 
-    if report.payment_status != "completed" and not is_admin:
+    # 1) report_id로 먼저 조회
+    report_q = await db.execute(
+        select(SimulationReport).where(SimulationReport.id == report_id)
+    )
+    report = report_q.scalar_one_or_none()
+
+    simulation = None
+
+    # 2) 없으면 simulation_id로 폴백 조회 (프론트가 simulation id 보내는 케이스)
+    if not report:
+        sim_q = await db.execute(
+            select(Simulation).where(Simulation.id == report_id)
+        )
+        simulation = sim_q.scalar_one_or_none()
+
+        if not simulation:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Report or simulation not found",
+            )
+
+        # simulation에 연결된 가장 최근 결제 완료 report 조회
+        latest_q = await db.execute(
+            select(SimulationReport)
+            .where(SimulationReport.simulation_id == simulation.id)
+            .order_by(SimulationReport.created_at.desc())
+        )
+        report = latest_q.scalars().first()
+
+    # 3) 관리자 권한이면 결제 우회 + PDF 즉시 생성/스트림
+    if is_admin:
+        if not simulation:
+            sim_q2 = await db.execute(
+                select(Simulation).where(Simulation.id == report.simulation_id)
+            )
+            simulation = sim_q2.scalar_one_or_none()
+        if not simulation:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Simulation not found for admin PDF generation",
+            )
+
+        pdf_bytes = pdf_generator_service.generate_simulation_report_pdf(
+            simulation, simulation.demographics_data or {}
+        )
+        filename = f"메디플라톤_상권분석_{simulation.clinic_type}_{datetime.now().strftime('%Y%m%d')}.pdf"
+        return StreamingResponse(
+            BytesIO(pdf_bytes),
+            media_type="application/pdf",
+            headers={
+                "Content-Disposition": f"attachment; filename*=UTF-8''{filename}",
+            },
+        )
+
+    # 4) 일반 사용자: 결제 필요
+    if not report:
         raise HTTPException(
             status_code=status.HTTP_402_PAYMENT_REQUIRED,
-            detail="Payment required to download report"
+            detail="결제 후 다운로드 가능합니다.",
+        )
+
+    if report.payment_status != "completed":
+        raise HTTPException(
+            status_code=status.HTTP_402_PAYMENT_REQUIRED,
+            detail="결제가 완료되지 않았습니다.",
         )
 
     if not report.pdf_url:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Report PDF not yet generated"
+            detail="PDF가 아직 생성되지 않았습니다.",
         )
 
     return {"download_url": report.pdf_url}

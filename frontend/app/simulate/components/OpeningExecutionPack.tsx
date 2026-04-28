@@ -1,9 +1,9 @@
 'use client'
 
-import React, { useState } from 'react'
+import React from 'react'
 import {
   Wallet, Users, ShieldCheck, Stethoscope, CalendarDays,
-  CheckCircle2, Clock, ChevronDown,
+  CheckCircle2, Clock,
   TrendingUp, Receipt, Megaphone, AlertTriangle,
 } from 'lucide-react'
 import { SimulationResponse } from '@/lib/api/client'
@@ -32,7 +32,6 @@ const SECTIONS: { key: SectionKey; title: string; icon: React.ComponentType<{ cl
 ]
 
 export default function OpeningExecutionPack({ result }: Props) {
-  const [openKey, setOpenKey] = useState<SectionKey>('capital')
   const cap = result.capital_plan
   const st = result.staffing_plan
   const pm = result.permit_checklist
@@ -43,8 +42,6 @@ export default function OpeningExecutionPack({ result }: Props) {
   const mkt = result.marketing_plan
 
   if (!cap && !st && !pm && !eq && !tl && !pnl5 && !tax && !mkt) return null
-
-  const toggle = (k: SectionKey) => setOpenKey(openKey === k ? openKey : k)
 
   return (
     <div className="card overflow-hidden">
@@ -58,20 +55,15 @@ export default function OpeningExecutionPack({ result }: Props) {
       <div className="divide-y divide-border">
         {SECTIONS.map((s) => {
           const Icon = s.icon
-          const isOpen = openKey === s.key
           return (
             <div key={s.key}>
-              <button
-                onClick={() => toggle(s.key)}
-                className="w-full px-6 py-4 flex items-center gap-3 hover:bg-muted/40 transition-colors"
-              >
+              <div className="px-6 py-4 flex items-center gap-3 bg-muted/20">
                 <Icon className={`w-5 h-5 ${s.color}`} />
                 <span className="flex-1 text-left font-semibold text-foreground">{s.title}</span>
-                <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform ${isOpen ? 'rotate-180' : ''}`} />
-              </button>
+              </div>
 
-              {isOpen && (
-                <div className="px-6 pb-6">
+              {(
+                <div className="px-6 pb-6 pt-2">
                   {/* 1. 자금 계획 */}
                   {s.key === 'capital' && cap && (
                     <div className="space-y-4">
