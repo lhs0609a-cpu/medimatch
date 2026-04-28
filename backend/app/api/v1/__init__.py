@@ -50,6 +50,7 @@ from .opening_project import router as opening_project_router
 from .admin_contacts import router as admin_contacts_router
 from .community import router as community_router
 from .maintenance import router as maintenance_router
+from .growth_tools import router as growth_tools_router
 
 api_router = APIRouter()
 
@@ -105,3 +106,4 @@ api_router.include_router(opening_project_router, prefix="/opening-projects", ta
 api_router.include_router(admin_contacts_router, prefix="/admin", tags=["Admin Contacts - 상담/문의 관리"])
 api_router.include_router(community_router, prefix="/community", tags=["Community - 커뮤니티"])
 api_router.include_router(maintenance_router, prefix="/maintenance", tags=["Maintenance - 관리유지비"])
+api_router.include_router(growth_tools_router, tags=["Growth Tools - 성장/생존 도구 7종"])

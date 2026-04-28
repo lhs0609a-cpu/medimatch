@@ -33,6 +33,7 @@ import MarketContext from './components/MarketContext'
 import OpeningExecutionPack from './components/OpeningExecutionPack'
 import SurvivalPrediction from './components/SurvivalPrediction'
 import DataSourcePanel from './components/DataSourcePanel'
+import GrowthToolsPanel from './components/GrowthToolsPanel'
 import TransitScore from './components/TransitScore'
 import BreakevenTimeline from './components/BreakevenTimeline'
 import ShareResult from './components/ShareResult'
@@ -542,6 +543,9 @@ export default function SimulatePage() {
 
                 {/* 3-5. 데이터 출처 정직 표시 (실시간/정적/추정 구분) */}
                 <DataSourcePanel result={result} />
+
+                {/* 3-6. 성장/생존 도구 7종 (실데이터 기반) */}
+                <GrowthToolsPanel result={result} />
 
                 {/* 4. 개원 실행 계획 (자금/인력/인허가/장비/일정/5년/세금/마케팅) */}
                 <OpeningExecutionPack result={result} />
