@@ -5,8 +5,7 @@ import {
   Megaphone, MapPin, Sparkles, TrendingUp, Users, Clock,
   Palette, ChevronDown, Loader2, AlertTriangle, CheckCircle2,
 } from 'lucide-react'
-import { SimulationResponse } from '@/lib/api/client'
-import apiClient from '@/lib/api/client'
+import { SimulationResponse, apiClient } from '@/lib/api/client'
 
 interface Props {
   result: SimulationResponse
