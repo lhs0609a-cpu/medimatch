@@ -137,12 +137,13 @@ class ExternalAPIService:
     """외부 API 연동 서비스"""
 
     def __init__(self):
-        self.hira_base_url = "http://apis.data.go.kr/B551182/hospInfoServicev2"
-        self.hira_pharmacy_url = "http://apis.data.go.kr/B551182/pharmacyInfoService"  # 약국 정보
-        self.hira_cost_url = "http://apis.data.go.kr/B551182/MadmDtlInfoService2"  # 진료비용 정보
-        self.hira_stats_url = "http://apis.data.go.kr/B551182/statInfoService"  # 통계 정보
-        self.building_base_url = "http://apis.data.go.kr/1613000/BldRgstService_v2"
-        self.commercial_base_url = "http://apis.data.go.kr/B553077/api/open/sdsc2"
+        self.hira_base_url = "https://apis.data.go.kr/B551182/hospInfoServicev2"
+        self.hira_pharmacy_url = "https://apis.data.go.kr/B551182/pharmacyInfoService"  # 약국 정보
+        self.hira_cost_url = "https://apis.data.go.kr/B551182/MadmDtlInfoService2.7"  # 의료기관별상세정보 v2.7
+        self.hira_fee_url = "https://apis.data.go.kr/B551182/mdfeeCrtrInfoService"  # 수가기준정보 (사용자 신청 완료)
+        self.hira_stats_url = "https://apis.data.go.kr/B551182/statInfoService"  # 통계 정보 (미신청 — 폴백 사용)
+        self.building_base_url = "https://apis.data.go.kr/1613000/BldRgstHubService"  # 건축HUB 통합 서비스
+        self.commercial_base_url = "https://apis.data.go.kr/B553077/api/open/sdsc2"
         self.kakao_base_url = "https://dapi.kakao.com/v2/local"
 
     @staticmethod
@@ -540,8 +541,99 @@ class ExternalAPIService:
                 continue
         return []
 
+    async def _get_mois_admm_unified(self, stdg_cd: str) -> Optional[Dict[str, Any]]:
+        """
+        행정안전부 행정동별(통반단위) 주민등록 인구 및 세대현황 통합 API.
+        End Point: https://apis.data.go.kr/1741000/admmPpltnHhStus
+        인구 + 세대 + 성/연령별 한 번에 조회.
+        """
+        api_key = _get_mois_key()
+        if not api_key:
+            return None
+
+        ym = _get_recent_ym()
+
+        # 운영 경로 후보 (포털 표기 vs OpenAPI 일반 패턴)
+        candidate_urls = [
+            "https://apis.data.go.kr/1741000/admmPpltnHhStus/selectAdmmPpltnHhStus",
+            "https://apis.data.go.kr/1741000/admmPpltnHhStus",
+        ]
+
+        params = {
+            "serviceKey": api_key,
+            "stdgCd": stdg_cd,
+            "srchFrYm": ym,
+            "srchToYm": ym,
+            "lv": "7",          # 단일 행정동
+            "regSeCd": "2",     # 주민등록자
+            "type": "JSON",
+            "numOfRows": "100",
+            "pageNo": "1",
+        }
+
+        for url in candidate_urls:
+            try:
+                async with httpx.AsyncClient() as client:
+                    response = await client.get(url, params=params, timeout=15.0)
+                    response.raise_for_status()
+                    data = response.json()
+
+                    items = self._extract_mois_items(data)
+                    if not items:
+                        logger.debug(f"admmPpltnHhStus no items at {url}")
+                        continue
+
+                    # 통/반 → 행정동 합산
+                    total_pop = 0
+                    male_pop = 0
+                    female_pop = 0
+                    total_hh = 0
+                    age_keys = (
+                        [f"male{a}AgeNmprCnt" for a in [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]]
+                        + [f"feml{a}AgeNmprCnt" for a in [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]]
+                    )
+                    age_groups: Dict[str, int] = {k: 0 for k in age_keys}
+
+                    for item in items:
+                        total_pop += int(item.get("totNmprCnt", 0) or 0)
+                        male_pop += int(item.get("maleNmprCnt", 0) or 0)
+                        female_pop += int(item.get("femlNmprCnt", 0) or 0)
+                        total_hh += int(item.get("hhCnt", 0) or 0)
+                        for key in age_keys:
+                            age_groups[key] += int(item.get(key, 0) or 0)
+
+                    if total_pop == 0:
+                        continue
+
+                    region_name = " ".join(filter(None, [
+                        items[0].get("ctpvNm", ""),
+                        items[0].get("sggNm", ""),
+                        items[0].get("admmNm", "") or items[0].get("stdgNm", ""),
+                    ]))
+
+                    pph = round(total_pop / total_hh, 2) if total_hh > 0 else 2.3
+                    logger.info(
+                        f"MOIS admmPpltnHhStus: {region_name} pop={total_pop} hh={total_hh}"
+                    )
+
+                    return {
+                        "total_population": total_pop,
+                        "male_population": male_pop,
+                        "female_population": female_pop,
+                        "household_count": total_hh,
+                        "persons_per_household": pph,
+                        "age_groups": age_groups,
+                        "stats_ym": ym,
+                        "region_name": region_name,
+                    }
+            except Exception as e:
+                logger.warning(f"admmPpltnHhStus URL {url} failed: {e}")
+                continue
+
+        return None
+
     async def _get_mois_age_population(self, stdg_cd: str) -> Optional[Dict[str, Any]]:
-        """행정안전부 법정동별 성/연령별 주민등록 인구수 API 호출"""
+        """행정안전부 법정동별 성/연령별 주민등록 인구수 API 호출 (구 endpoint, 폴백용)"""
         api_key = _get_mois_key()
         if not api_key:
             return None
@@ -784,7 +876,27 @@ class ExternalAPIService:
     ) -> Dict[str, Any]:
         """인구통계 데이터 — 행안부 실데이터 API 우선, 실패 시 좌표 추정 모델 폴백"""
 
-        # 1) 행안부 API (API 키 + 법정동코드가 있을 때)
+        # 1) 행안부 통합 API 우선 (admmPpltnHhStus — 인구+세대+연령 한 번에)
+        if _get_mois_key() and stdg_cd:
+            try:
+                unified = await self._get_mois_admm_unified(stdg_cd)
+                if unified and unified.get("total_population", 0) > 0:
+                    hh_inline = {
+                        "total_population": unified["total_population"],
+                        "household_count": unified["household_count"],
+                        "persons_per_household": unified["persons_per_household"],
+                    }
+                    logger.info(
+                        f"Demographics from MOIS admm API: {unified.get('region_name')} "
+                        f"pop={unified['total_population']}"
+                    )
+                    return self._build_demographics_from_mois(
+                        unified, hh_inline, latitude, longitude, radius_m
+                    )
+            except Exception as e:
+                logger.warning(f"MOIS admm API failed, trying legacy: {e}")
+
+        # 2) 구 API (stdgSexdAgePpltn + stdgPpltnHhStus) — 별도 활용신청 시
         if _get_mois_key() and stdg_cd:
             try:
                 age_result, hh_result = await asyncio.gather(
@@ -798,7 +910,7 @@ class ExternalAPIService:
 
                 if age_data and age_data.get("total_population", 0) > 0:
                     logger.info(
-                        f"Demographics from MOIS API: {age_data.get('region_name')} "
+                        f"Demographics from MOIS legacy API: {age_data.get('region_name')} "
                         f"pop={age_data['total_population']}"
                     )
                     return self._build_demographics_from_mois(
@@ -807,7 +919,7 @@ class ExternalAPIService:
                 else:
                     logger.warning("MOIS API returned 0 population, falling back to estimation")
             except Exception as e:
-                logger.warning(f"MOIS API failed, falling back to estimation: {e}")
+                logger.warning(f"MOIS legacy API failed, falling back to estimation: {e}")
 
         # 2) 폴백: 좌표 기반 추정 모델
         try:

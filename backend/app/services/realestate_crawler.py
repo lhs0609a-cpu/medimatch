@@ -28,8 +28,8 @@ class RealEstateCrawlerService:
 
     def __init__(self):
         self.realestate_base_url = "http://openapi.molit.go.kr"
-        self.building_base_url = "http://apis.data.go.kr/1613000/BldRgstService_v2"
-        self.commercial_base_url = "http://apis.data.go.kr/B553077/api/open/sdsc2"
+        self.building_base_url = "https://apis.data.go.kr/1613000/BldRgstHubService"
+        self.commercial_base_url = "https://apis.data.go.kr/B553077/api/open/sdsc2"
 
         # 시도 코드 (국토교통부 API용)
         self.sido_codes = {

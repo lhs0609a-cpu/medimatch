@@ -78,7 +78,7 @@ async def _crawl_hira_async():
     from sqlalchemy import select
 
     HIRA_API_KEY = os.getenv("HIRA_API_KEY", "")
-    BASE_URL = "http://apis.data.go.kr/B551182/hospInfoServicev2"
+    BASE_URL = "https://apis.data.go.kr/B551182/hospInfoServicev2"
 
     if not HIRA_API_KEY:
         logger.warning("HIRA_API_KEY not set, using mock data")
@@ -187,7 +187,7 @@ async def _check_closed_async():
     from app.tasks.notifications import send_new_prospect_alerts
 
     HIRA_API_KEY = os.getenv("HIRA_API_KEY", "")
-    BASE_URL = "http://apis.data.go.kr/B551182/hospInfoServicev2"
+    BASE_URL = "https://apis.data.go.kr/B551182/hospInfoServicev2"
 
     async with AsyncSessionLocal() as db:
         try:
@@ -377,7 +377,7 @@ async def _crawl_building_async():
     from app.tasks.notifications import send_new_prospect_alerts
 
     BUILDING_API_KEY = os.getenv("BUILDING_API_KEY", "")
-    BASE_URL = "http://apis.data.go.kr/1613000/BldRgstService_v2"
+    BASE_URL = "https://apis.data.go.kr/1613000/BldRgstHubService"
 
     if not BUILDING_API_KEY:
         logger.warning("BUILDING_API_KEY not set, using mock data")
@@ -521,7 +521,7 @@ async def _crawl_commercial_async():
     from app.models.hospital import CommercialData
 
     COMMERCIAL_API_KEY = os.getenv("COMMERCIAL_API_KEY", "")
-    BASE_URL = "http://apis.data.go.kr/B553077/api/open/sdsc"
+    BASE_URL = "https://apis.data.go.kr/B553077/api/open/sdsc2"
 
     if not COMMERCIAL_API_KEY:
         logger.warning("COMMERCIAL_API_KEY not set")

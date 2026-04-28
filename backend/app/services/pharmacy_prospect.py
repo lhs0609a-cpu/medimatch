@@ -76,7 +76,7 @@ class PharmacyProspectService:
     """약국 타겟팅 서비스"""
 
     def __init__(self):
-        self.hira_base_url = "http://apis.data.go.kr/B551182/pharmacyInfoService"
+        self.hira_base_url = "https://apis.data.go.kr/B551182/pharmacyInfoService"
 
         # 지역 코드 (시도)
         self.sido_codes = {
