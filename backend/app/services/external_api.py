@@ -241,7 +241,11 @@ class ExternalAPIService:
         clinic_type: Optional[str] = None,
         region_code: str = "",
     ) -> List[Dict[str, Any]]:
-        """주변 병원 정보 조회 — 지역코드 기반 조회 후 좌표 거리 필터"""
+        """주변 병원 정보 조회 — 지역코드 기반 조회 후 좌표 거리 필터.
+
+        HIRA는 dgsbjtCd 필터로 호출 시 응답에 dgsbjtCdNm을 포함하지 않음.
+        따라서 clinic_type 필터 사용 시 모든 결과를 해당 진료과로 표시.
+        """
         hospitals = await self._fetch_hira_hospitals(region_code, clinic_type)
 
         # 좌표 기반 거리 계산 및 반경 필터
@@ -253,6 +257,10 @@ class ExternalAPIService:
                 continue
             dist = self._haversine(latitude, longitude, h_lat, h_lng)
             h["distance"] = round(dist)
+            # HIRA가 dgsbjtCd로 필터해서 가져온 결과 = 해당 진료과 의원
+            # 응답에 dgsbjtCdNm이 없으므로 요청 진료과로 라벨링
+            if clinic_type and not h.get("clinic_type"):
+                h["clinic_type"] = clinic_type
             if dist <= radius_m:
                 nearby.append(h)
 
