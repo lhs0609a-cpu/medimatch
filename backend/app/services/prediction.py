@@ -152,8 +152,8 @@ class PredictionService:
             if clinic_type.lower() in h.get("clinic_type", "").lower()
         ])
 
-        # ─── 3) 입지 보정계수 ───
-        # 유동인구 + 지역 + 크기 종합
+        # ─── 3) 입지 보정계수 (VWORLD 건물 메타 + 카카오 + 네이버 트렌드) ───
+        # 유동인구 + 지역 + 크기 + 건물 + 검색트렌드 종합
         floating_pop = commercial_data.get("floating_population", 50000)
         floating_factor = min(1.4, max(0.7, floating_pop / 50000))
 
@@ -162,9 +162,23 @@ class PredictionService:
         size = size_pyeong or 30
         size_factor = min(1.25, max(0.85, size / 30))
 
-        location_factor = floating_factor * region_factor * size_factor / 1.0
-        # 정규화 (기준점 1.0)
-        location_factor = max(0.5, min(2.0, location_factor))
+        # VWORLD 빌딩 보정 (메디컬빌딩 +15%, 신축 +3%, 노후 -8%)
+        building_meta = demographics_data.get("building_meta") or {}
+        building_factor = building_meta.get("location_factor", 1.0)
+
+        # 네이버 검색 트렌드 보정 (모멘텀 ±15%)
+        search_trend = demographics_data.get("search_trend") or {}
+        if search_trend.get("momentum") is not None:
+            from .naver_datalab import NaverDatalabClient
+            trend_factor = NaverDatalabClient.momentum_to_revenue_factor(search_trend["momentum"])
+        else:
+            trend_factor = 1.0
+
+        location_factor = (
+            floating_factor * region_factor * size_factor * building_factor * trend_factor
+        )
+        # 정규화 (기준점 1.0, 폭주 방지)
+        location_factor = max(0.5, min(2.5, location_factor))
 
         # ─── 4) 1일 환자 수 (학계 공식) ───
         daily_patients = estimate_daily_patients(
@@ -174,15 +188,26 @@ class PredictionService:
             location_factor=location_factor,
         )
 
-        # ─── 5) 월 매출 (지역 단가 적용) ───
+        # ─── 5) 월 매출 (실시간 비급여 단가 우선, 정적 폴백) ───
         region_code = demographics_data.get("region_code", "") or ""
         working_days = 24
-        avg_monthly_revenue = estimate_monthly_revenue(
-            clinic_type=clinic_type,
-            daily_patients=daily_patients,
-            region_code=region_code,
-            work_days_per_month=working_days,
-        )
+
+        # HIRA 비급여 실시간 단가가 있으면 평균 활용
+        non_covered_fees = demographics_data.get("non_covered_fees") or []
+        if non_covered_fees:
+            valid_fees = [f["median_amount"] for f in non_covered_fees if f.get("median_amount", 0) > 0]
+            if valid_fees:
+                # 비급여 평균을 정적 단가에 가중 (50% 정적 + 50% 실시간)
+                static_price = get_regional_price(clinic_type, region_code)
+                live_avg = sum(valid_fees) / len(valid_fees)
+                # 비급여 평균은 보통 서비스 단가와 다르므로 비중으로 보정
+                weighted_price = int(static_price * 0.6 + live_avg * 0.4)
+            else:
+                weighted_price = get_regional_price(clinic_type, region_code)
+        else:
+            weighted_price = get_regional_price(clinic_type, region_code)
+
+        avg_monthly_revenue = int(daily_patients * working_days * weighted_price)
 
         # ─── 6) 보험/비급여 분리 ───
         breakdown = get_revenue_breakdown(clinic_type, avg_monthly_revenue)

@@ -562,6 +562,38 @@ export interface SimulationResponse {
     location_factor: number
     regional_price_won: number
   }
+  // 데이터 출처 정직 표시 (실시간/정적/추정 구분)
+  data_sources?: Record<string, {
+    source: string
+    is_realtime: boolean
+    is_estimated?: boolean
+    note?: string
+    [k: string]: any
+  }>
+  // 실시간 외부 API 호출 결과
+  realtime_data?: {
+    real_closure_data?: {
+      total: number
+      closed: number
+      open: number
+      closure_rate_percent: number
+      avg_lifespan_years: number
+      is_estimated: boolean
+    }
+    building_meta?: {
+      building_name: string
+      floors_above: number
+      built_year: number
+      is_medical_building: boolean
+      location_factor: number
+    }
+    non_covered_fees_count?: number
+    search_trend?: {
+      keyword: string
+      momentum: number
+      recent_avg: number
+    }
+  }
   // 결제/잠금 상태 (서버에서 관리)
   is_unlocked: boolean
   unlock_price: number

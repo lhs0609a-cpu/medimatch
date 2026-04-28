@@ -545,6 +545,10 @@ class SimulationResponse(BaseModel):
     proper_premium: Optional[Dict[str, Any]] = None
     # 학계 검증 매출 예측 변수 명시 (HIRA 단가 + 일본 진료권 공식)
     revenue_factors: Optional[Dict[str, Any]] = None
+    # 데이터 출처 정직 표시 (실시간/정적/추정 구분)
+    data_sources: Optional[Dict[str, Dict[str, Any]]] = None
+    # 실시간 외부 API 호출 결과 모음
+    realtime_data: Optional[Dict[str, Any]] = None
 
     confidence_score: int = Field(..., ge=0, le=100)
     recommendation: RecommendationType

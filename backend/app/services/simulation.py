@@ -112,6 +112,67 @@ class SimulationService:
         except Exception as e:
             logger.warning(f"카카오 키워드 검색 실패: {e}")
 
+        # 5-4. region_code를 demographics에 보존 (나중에 build_response에서 사용)
+        demographics_data["region_code"] = region_code
+
+        # 5-5. LOCALDATA — 시군구 의원 5년 폐업률 + 평균 영업기간 (실시간)
+        real_closure_data = None
+        try:
+            from .localdata_client import localdata_client
+            if region_code and len(region_code) >= 5:
+                real_closure_data = await localdata_client.calculate_closure_rate(
+                    sido_cd=region_code[:2],
+                    sggu_cd=region_code[2:5],
+                    years=3,
+                )
+                demographics_data["real_closure_data"] = real_closure_data
+                logger.info(f"LOCALDATA closure: {real_closure_data}")
+        except Exception as e:
+            logger.warning(f"LOCALDATA 폐업이력 호출 실패: {e}")
+
+        # 5-6. VWORLD — 건물 메타 (층수/용도/메디컬빌딩 여부) 실시간
+        building_meta = None
+        try:
+            from .vworld_client import vworld_client
+            building_meta = await vworld_client.get_building_info(latitude, longitude)
+            demographics_data["building_meta"] = building_meta
+            logger.info(f"VWORLD building: {building_meta}")
+        except Exception as e:
+            logger.warning(f"VWORLD 건물 호출 실패: {e}")
+
+        # 5-7. HIRA 비급여 진료비 — 시군구×진료과 평균 단가 (실시간)
+        non_covered_fees = None
+        try:
+            from ..data.hira_region_codes import haeng_to_hira_codes
+            hira_sido, hira_sggu = haeng_to_hira_codes(region_code)
+            if hira_sido:
+                non_covered_fees = await external_api_service.get_non_covered_fees(
+                    sido_cd=hira_sido,
+                    sggu_cd=hira_sggu,
+                    clinic_type=request.clinic_type,
+                )
+                demographics_data["non_covered_fees"] = non_covered_fees
+                if non_covered_fees:
+                    logger.info(f"비급여 항목 {len(non_covered_fees)}건 조회")
+        except Exception as e:
+            logger.warning(f"HIRA 비급여 호출 실패: {e}")
+
+        # 5-8. 네이버 데이터랩 — 진료과+지역 검색 트렌드 (실시간)
+        search_trend = None
+        try:
+            from .naver_datalab import naver_datalab_client
+            sido_name = (geo_data.get("sido_name", "") if geo_data else "").split()[0] if geo_data else ""
+            search_trend = await naver_datalab_client.get_search_trend(
+                clinic_type=request.clinic_type,
+                region_name=sido_name,
+                months=6,
+            )
+            if search_trend:
+                demographics_data["search_trend"] = search_trend
+                logger.info(f"네이버 트렌드 모멘텀: {search_trend['momentum']}")
+        except Exception as e:
+            logger.warning(f"네이버 데이터랩 호출 실패: {e}")
+
         # 5-3. 사용자 고급 입력 저장 (재조회 시에도 유지되도록)
         demographics_data["user_inputs"] = {
             "deposit_won": request.deposit_won,
@@ -1581,6 +1642,9 @@ class SimulationService:
             ),
             # 학계 모델 매출 변수 출처
             revenue_factors=(prediction or {}).get("factors") if isinstance(prediction, dict) else None,
+            # 데이터 출처 정직 표시
+            data_sources=self._build_data_sources(simulation.demographics_data or {}),
+            realtime_data=self._build_realtime_data(simulation.demographics_data or {}),
 
             confidence_score=simulation.confidence_score or 0,
             recommendation=simulation.recommendation or RecommendationType.NEUTRAL,
@@ -1640,6 +1704,137 @@ class SimulationService:
         except Exception as e:
             logger.warning(f"proper premium calc failed: {e}")
             return None
+
+    @staticmethod
+    def _build_data_sources(demographics_data: Dict[str, Any]) -> Dict[str, Dict[str, Any]]:
+        """각 데이터 항목별 출처 + 실시간 여부 정직 표시."""
+        sources = {}
+
+        # 인구통계 (MOIS — 현재 실패 → 폴백)
+        if demographics_data.get("data_source") == "estimation":
+            sources["population"] = {
+                "source": "추정 폴백 모델",
+                "is_realtime": False,
+                "is_estimated": True,
+                "note": "행안부 API 401/403/파라미터오류 — 좌표 기반 추정값",
+            }
+        else:
+            sources["population"] = {
+                "source": "행정안전부 admm API",
+                "is_realtime": True,
+                "is_estimated": False,
+            }
+
+        # 경쟁의원 (HIRA 실시간)
+        sources["competition"] = {
+            "source": "건강보험심사평가원 hospInfoServicev2",
+            "is_realtime": True,
+            "is_estimated": False,
+        }
+
+        # 폐업률 (LOCALDATA 실시간 + 학계 정적 폴백)
+        rcd = demographics_data.get("real_closure_data")
+        if rcd and not rcd.get("is_estimated", True):
+            sources["closure_rate"] = {
+                "source": f"LOCALDATA 인허가 ({rcd.get('total', 0)}건 분석)",
+                "is_realtime": True,
+                "is_estimated": False,
+                "value_percent": rcd.get("closure_rate_percent"),
+                "avg_lifespan_years": rcd.get("avg_lifespan_years"),
+            }
+        else:
+            sources["closure_rate"] = {
+                "source": "BMC 2025 + 의료정책연구원 학계 통계",
+                "is_realtime": False,
+                "is_estimated": False,
+                "note": "정적 학계 평균 — 분기 갱신",
+            }
+
+        # 건물 메타 (VWORLD 실시간)
+        bm = demographics_data.get("building_meta")
+        if bm and bm.get("data_source") == "VWORLD 건축물정보":
+            sources["building"] = {
+                "source": "VWORLD 건축물정보",
+                "is_realtime": True,
+                "is_estimated": False,
+                "is_medical_building": bm.get("is_medical_building"),
+                "built_year": bm.get("built_year"),
+            }
+        else:
+            sources["building"] = {
+                "source": "VWORLD 미응답",
+                "is_realtime": False,
+                "is_estimated": True,
+            }
+
+        # 비급여 단가 (HIRA 실시간)
+        ncf = demographics_data.get("non_covered_fees")
+        if ncf:
+            sources["non_covered_price"] = {
+                "source": f"HIRA 비급여진료비 ({len(ncf)}건)",
+                "is_realtime": True,
+                "is_estimated": False,
+            }
+        else:
+            sources["non_covered_price"] = {
+                "source": "정적 평균",
+                "is_realtime": False,
+                "is_estimated": False,
+                "note": "HIRA 비급여 미조회 — 정적 테이블 사용",
+            }
+
+        # 검색 트렌드 (네이버 데이터랩)
+        st = demographics_data.get("search_trend")
+        if st:
+            sources["search_trend"] = {
+                "source": "네이버 데이터랩",
+                "is_realtime": True,
+                "momentum": st.get("momentum"),
+            }
+        else:
+            sources["search_trend"] = {
+                "source": "미적용 (Naver client_id 미등록)",
+                "is_realtime": False,
+            }
+
+        # 진료과 단가/수료율 (정적)
+        sources["visit_price"] = {
+            "source": "HIRA 진료비통계지표 (2023)",
+            "is_realtime": False,
+            "is_estimated": False,
+            "note": "정적 — 분기 갱신 필요",
+        }
+        sources["utilization_rate"] = {
+            "source": "HIRA 진료비통계지표 (2023)",
+            "is_realtime": False,
+            "is_estimated": False,
+        }
+
+        # 상권 (소진공)
+        sources["commercial"] = {
+            "source": "소상공인진흥공단 sdsc2",
+            "is_realtime": True,
+            "is_estimated": False,
+        }
+
+        # 카카오
+        sources["nearby_facilities"] = {
+            "source": "카카오 Local API",
+            "is_realtime": True,
+            "is_estimated": False,
+        }
+
+        return sources
+
+    @staticmethod
+    def _build_realtime_data(demographics_data: Dict[str, Any]) -> Dict[str, Any]:
+        """실시간 호출 결과 묶음."""
+        return {
+            "real_closure_data": demographics_data.get("real_closure_data"),
+            "building_meta": demographics_data.get("building_meta"),
+            "non_covered_fees_count": len(demographics_data.get("non_covered_fees") or []),
+            "search_trend": demographics_data.get("search_trend"),
+        }
 
 
 simulation_service = SimulationService()
