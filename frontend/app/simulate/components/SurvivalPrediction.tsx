@@ -138,7 +138,7 @@ export default function SurvivalPrediction({ result }: Props) {
           <div>
             <div className="flex items-center gap-2 mb-3">
               <BarChart3 className="w-4 h-4 text-blue-600" />
-              <h4 className="font-semibold text-foreground">매출 예측 변수 (일본 진료권 공식)</h4>
+              <h4 className="font-semibold text-foreground">매출 예측 변수 (한국 진료권 모델)</h4>
             </div>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
               <div className="p-3 bg-blue-50 dark:bg-blue-950/30 rounded-lg">
@@ -167,7 +167,7 @@ export default function SurvivalPrediction({ result }: Props) {
               </div>
             </div>
             <div className="mt-2 p-2 bg-muted/30 rounded text-[11px] text-muted-foreground">
-              공식: 1일 환자 = 인구 × 수료율 ÷ 1000 ÷ 진료일 ÷ (경쟁+1) × 입지 / 월매출 = 환자×진료일×단가
+              공식: 1일 환자 = min(인구 × 수료율 ÷ 진료일 × 시장점유율 × 입지, 의사 처리한계) / 월매출 = 환자 × 진료일 × HIRA 평균단가 (지역보정)
             </div>
           </div>
         )}

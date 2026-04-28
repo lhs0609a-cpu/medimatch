@@ -363,19 +363,29 @@ class SimulationService:
         nearby_hospitals: List[Dict],
         clinic_type: str
     ) -> List[Dict]:
-        """경쟁 병원 분석"""
+        """경쟁 병원 분석. clinic_type + clCdNm 모두 매칭."""
         competitors = []
 
         # 진료과 매칭: "정형외과" → "정형외" 키워드로 유연 매칭
         keyword = clinic_type.replace("의원", "").replace("과", "").strip()
-        same_dept_hospitals = [
-            h for h in nearby_hospitals
-            if h.get("clinic_type", "").strip()  # 빈 문자열 제외
-            and (
-                keyword in h.get("clinic_type", "")
-                or clinic_type.lower() in h.get("clinic_type", "").lower()
-            )
-        ]
+
+        # 치과/한방은 cl_cd_nm으로도 매칭 (의료기관 종별 = 치과의원/한의원)
+        is_dental = clinic_type in ("치과",)
+        is_korean_med = clinic_type in ("한방과", "한의원")
+
+        same_dept_hospitals = []
+        for h in nearby_hospitals:
+            clt = (h.get("clinic_type") or "").strip()
+            cl_cd_nm = (h.get("cl_cd_nm") or "")
+            matched = False
+            if clt and (keyword in clt or clinic_type.lower() in clt.lower()):
+                matched = True
+            elif is_dental and "치과" in cl_cd_nm:
+                matched = True
+            elif is_korean_med and ("한의" in cl_cd_nm or "한방" in cl_cd_nm):
+                matched = True
+            if matched:
+                same_dept_hospitals.append(h)
 
         for hospital in same_dept_hospitals[:10]:  # Top 10
             # Estimate monthly revenue based on hospital size and location

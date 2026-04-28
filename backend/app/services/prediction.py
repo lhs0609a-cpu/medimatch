@@ -25,7 +25,7 @@ class PredictionService:
     """매출 및 처방전 예측 서비스 — 학계 검증 모델 기반.
 
     학술 근거:
-    - 일본 진료권조사 표준 공식 (Mapmarketing, 技研商事)
+    - 한국 진료권 모델 (HIRA 진료비통계지표 + 인구밀도 + 의사처리한계)
     - HIRA 진료비통계지표 2023
     - PMC11399738 (2024) — SVM AUC 0.762 폐업 예측
     - BMC Primary Care 2025 — Cox 회귀 진료과별 HR
@@ -131,7 +131,7 @@ class PredictionService:
         """
         학계 검증 매출 예측.
 
-        공식 (일본 진료권조사 + HIRA 단가):
+        공식 (한국 진료권 모델 + HIRA 단가):
             1일 환자수 = 진료권 인구 × 진료과별 수료율 ÷ 1000
                         ÷ 진료일 ÷ (경쟁의원수+1) × 입지보정
             월 매출 = 1일 환자수 × 월 진료일 × 시군구×진료과 단가
@@ -180,13 +180,39 @@ class PredictionService:
         # 정규화 (기준점 1.0, 폭주 방지)
         location_factor = max(0.5, min(2.5, location_factor))
 
-        # ─── 4) 1일 환자 수 (학계 공식) ───
-        daily_patients = estimate_daily_patients(
+        # ─── 4) 1일 환자 수 (학계 공식 + 현실성 cap) ───
+        # 시장 점유율 cap: 경쟁이 없어도 환자가 모두 한 곳으로 가지 않음.
+        # 학계 (BMC 2025): 단일 의원 시장점유율 평균 18-25%, 최대 35%
+        from ..data.growth_reference import get_doctor_capacity
+
+        MAX_MARKET_SHARE = 0.32   # 32% cap
+        MARKET_SHARE_FALLBACK_NO_COMP = 0.25  # 경쟁 0일 때 기본값
+
+        if same_dept_count == 0:
+            effective_market_share = MARKET_SHARE_FALLBACK_NO_COMP
+        else:
+            effective_market_share = min(1.0 / (same_dept_count + 1), MAX_MARKET_SHARE)
+
+        daily_patients_raw = estimate_daily_patients(
             clinic_type=clinic_type,
             target_population=target_population,
             competitor_count=same_dept_count,
             location_factor=location_factor,
         )
+        # 위 함수 결과를 점유율 cap 후 재계산
+        utilization = get_utilization_rate(clinic_type)
+        annual_visits = target_population * utilization / 1000.0
+        daily_market_total = annual_visits / 290.0
+        daily_patients_capped = (
+            daily_market_total * effective_market_share * location_factor
+        )
+
+        # 의사 1인 처리 한계 cap (치과 20명/일, 내과 60명/일 등)
+        # 의사 처리능력은 입지 무관 — location_factor 곱하지 않음
+        doctor_capacity = get_doctor_capacity(clinic_type)
+        daily_patients = min(daily_patients_capped, float(doctor_capacity))
+        # 너무 작으면 (최저 5명) 보정
+        daily_patients = max(daily_patients, 5.0)
 
         # ─── 5) 월 매출 (실시간 비급여 단가 우선, 정적 폴백) ───
         region_code = demographics_data.get("region_code", "") or ""
@@ -236,14 +262,16 @@ class PredictionService:
             "covered_revenue": breakdown["covered_revenue"],
             "non_covered_revenue": breakdown["non_covered_revenue"],
             "confidence_score": confidence_score,
-            "data_source": "HIRA 진료비통계지표 + 일본 진료권조사 공식",
+            "data_source": "HIRA 진료비통계지표 + 한국 진료권 모델 (의사 처리한계 + 시장점유율 32% cap)",
             "factors": {
                 "target_population": target_population,
                 "utilization_per_1000": get_utilization_rate(clinic_type),
                 "competitor_count": same_dept_count,
-                "market_share": round(1.0 / (same_dept_count + 1), 3),
+                "market_share": round(effective_market_share, 3),
                 "location_factor": round(location_factor, 2),
                 "regional_price_won": get_regional_price(clinic_type, region_code),
+                "doctor_capacity_per_day": doctor_capacity,
+                "is_capacity_limited": daily_patients_capped > doctor_capacity * location_factor,
             }
         }
 

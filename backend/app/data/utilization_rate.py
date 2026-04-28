@@ -124,7 +124,7 @@ def estimate_daily_patients(
     """
     1일 예상 환자 수 = 타겟인구 × 수료율 ÷ 1000 ÷ 진료일 ÷ (경쟁+1) × 입지보정
 
-    학계 검증: 일본 진료권조사 표준 공식 (Mapmarketing, 技研商事)
+    한국 진료권 모델: HIRA 진료비통계지표 + 의사 처리한계 + 시장점유율 cap
     """
     annual_rate = get_utilization_rate(clinic_type)
     annual_visits = target_population * annual_rate / 1000.0

@@ -1000,12 +1000,26 @@ class ExternalAPIService:
         return clinic_codes.get(clinic_type, "01")
 
     def _parse_hospital_data(self, item: Dict[str, Any]) -> Dict[str, Any]:
-        """병원 데이터 파싱"""
+        """병원 데이터 파싱.
+        clinic_type 추출 우선순위: dgsbjtCdNm (진료과목) → clCdNm (의료기관 종별).
+        치과의원/한의원은 dgsbjtCd가 비어 있어서 clCdNm으로 폴백.
+        """
+        dgsbjt = item.get("dgsbjtCdNm", "") or ""
+        cl_cd_nm = item.get("clCdNm", "") or ""
+        # 치과/한의원은 clCdNm으로 식별
+        clinic_type = dgsbjt
+        if not clinic_type:
+            if "치과" in cl_cd_nm:
+                clinic_type = "치과"
+            elif "한의" in cl_cd_nm or "한방" in cl_cd_nm:
+                clinic_type = "한방"
+
         return {
             "name": item.get("yadmNm", ""),
             "address": item.get("addr", ""),
             "phone": item.get("telno", ""),
-            "clinic_type": item.get("dgsbjtCdNm", ""),
+            "clinic_type": clinic_type,
+            "cl_cd_nm": cl_cd_nm,  # 의료기관 종별 (의원/치과의원/한의원/병원/종합병원)
             "latitude": float(item.get("YPos", 0)),
             "longitude": float(item.get("XPos", 0)),
             "beds": int(item.get("sickbedCnt", 0)),
