@@ -115,9 +115,35 @@ class PDFGeneratorService:
 
         html_content = self._build_html(simulation, response, has_modules)
 
-        pdf_bytes = HTML(string=html_content, base_url=".").write_pdf(
-            stylesheets=[CSS(string=self._get_pdf_styles())]
-        )
+        # WeasyPrint 60.x 호환성 — write_pdf의 stylesheets 인자가 PDF 내부 호출
+        # 시 TypeError 발생하는 경우가 있음. 안전을 위해 CSS를 HTML <style> 태그에
+        # 인라인 임베드하고 write_pdf를 인자 없이 호출.
+        css_text = self._get_pdf_styles()
+        if "<style>" not in html_content:
+            html_with_style = html_content.replace(
+                "</head>",
+                f"<style>{css_text}</style></head>",
+                1,
+            )
+            if html_with_style == html_content:
+                # </head> 없으면 <html> 다음에 삽입
+                html_with_style = (
+                    f"<style>{css_text}</style>\n{html_content}"
+                )
+        else:
+            html_with_style = html_content
+
+        try:
+            pdf_bytes = HTML(string=html_with_style, base_url=".").write_pdf()
+        except TypeError as e:
+            # 폴백: stylesheets 인자 시도 (구 API)
+            import logging
+            logging.getLogger(__name__).warning(
+                f"WeasyPrint write_pdf() failed: {e}, retrying with stylesheets arg"
+            )
+            pdf_bytes = HTML(string=html_content, base_url=".").write_pdf(
+                stylesheets=[CSS(string=css_text)]
+            )
         return pdf_bytes
 
     def _build_html(self, sim: Simulation, response: Any, has_modules: bool) -> str:
