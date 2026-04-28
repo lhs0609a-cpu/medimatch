@@ -539,6 +539,12 @@ class SimulationResponse(BaseModel):
     regional_income_info: Optional[Dict[str, Any]] = None
     # 진료과 신규개원/폐업/생존율 통계
     market_lifecycle: Optional[Dict[str, Any]] = None
+    # 학계 모델 기반 생존확률 + 폐업위험 (Cox + SVM AUC 0.76)
+    survival_prediction: Optional[Dict[str, Any]] = None
+    # 적정 권리금 계산 (월 순이익 × 10~36개월)
+    proper_premium: Optional[Dict[str, Any]] = None
+    # 학계 검증 매출 예측 변수 명시 (HIRA 단가 + 일본 진료권 공식)
+    revenue_factors: Optional[Dict[str, Any]] = None
 
     confidence_score: int = Field(..., ge=0, le=100)
     recommendation: RecommendationType

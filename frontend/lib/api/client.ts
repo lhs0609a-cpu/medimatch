@@ -533,6 +533,35 @@ export interface SimulationResponse {
   clinic_environment?: ClinicEnvironment
   regional_income_info?: RegionalIncomeInfo
   market_lifecycle?: MarketLifecycle
+  // 학계 검증 생존확률 (Cox + SVM AUC 0.76)
+  survival_prediction?: {
+    survival_1y: number
+    survival_3y: number
+    survival_5y: number
+    closure_risk_score: number
+    annual_closure_rate: number
+    base_rate: number
+    market_status?: { level: string; message: string }
+    risk_factors?: Record<string, any>
+    data_source?: string
+  }
+  // 적정 권리금
+  proper_premium?: {
+    premium_low: number
+    premium_high: number
+    multiplier_low: number
+    multiplier_high: number
+    formula: string
+  }
+  // 학계 매출 변수 (HIRA + 일본 진료권)
+  revenue_factors?: {
+    target_population: number
+    utilization_per_1000: number
+    competitor_count: number
+    market_share: number
+    location_factor: number
+    regional_price_won: number
+  }
   // 결제/잠금 상태 (서버에서 관리)
   is_unlocked: boolean
   unlock_price: number

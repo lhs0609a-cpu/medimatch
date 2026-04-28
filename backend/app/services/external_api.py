@@ -1329,5 +1329,59 @@ class ExternalAPIService:
             logger.error(f"Failed to get pharmacies by region: {e}")
             return []
 
+    # ─────────────────────────────────────────────────────────────────
+    # 비급여 진료비 (HIRA 비급여진료비정보조회 API)
+    # data.go.kr/15001700
+    # ─────────────────────────────────────────────────────────────────
+    async def get_non_covered_fees(
+        self,
+        ykiho: Optional[str] = None,
+        sido_cd: str = "",
+        sggu_cd: str = "",
+        clinic_type: Optional[str] = None,
+    ) -> List[Dict[str, Any]]:
+        """
+        비급여 진료비 평균 조회.
+        ykiho 있으면 해당 의원만, 없으면 시군구 평균.
+        Returns: [{itemNm, midAmt(중앙값), maxAmt, minAmt}, ...]
+        """
+        try:
+            async with httpx.AsyncClient() as client:
+                params: Dict[str, Any] = {
+                    "serviceKey": settings.HIRA_API_KEY,
+                    "_type": "json",
+                    "numOfRows": "30",
+                    "pageNo": "1",
+                }
+                if ykiho:
+                    params["ykiho"] = ykiho
+                if sido_cd:
+                    params["sidoCd"] = sido_cd
+                if sggu_cd:
+                    params["sgguCd"] = sggu_cd
+                if clinic_type:
+                    params["clCd"] = self._get_clinic_code(clinic_type)
+
+                response = await client.get(
+                    f"{self.hira_cost_url}/getNonPaymentItemHospList",
+                    params=params,
+                    timeout=15.0,
+                )
+                response.raise_for_status()
+                items = self._extract_items_safe(response.json())
+                return [
+                    {
+                        "item_name": it.get("itemNm", ""),
+                        "median_amount": int(it.get("midAmt", 0) or 0),
+                        "max_amount": int(it.get("maxAmt", 0) or 0),
+                        "min_amount": int(it.get("minAmt", 0) or 0),
+                        "item_code": it.get("npayKorNm", ""),
+                    }
+                    for it in items
+                ]
+        except Exception as e:
+            logger.warning(f"Non-covered fee API failed: {e}")
+            return []
+
 
 external_api_service = ExternalAPIService()

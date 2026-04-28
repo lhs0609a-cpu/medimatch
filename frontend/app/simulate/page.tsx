@@ -31,6 +31,7 @@ import NearbyFacilitiesReal from './components/NearbyFacilitiesReal'
 import ClinicEnvironment from './components/ClinicEnvironment'
 import MarketContext from './components/MarketContext'
 import OpeningExecutionPack from './components/OpeningExecutionPack'
+import SurvivalPrediction from './components/SurvivalPrediction'
 import TransitScore from './components/TransitScore'
 import BreakevenTimeline from './components/BreakevenTimeline'
 import ShareResult from './components/ShareResult'
@@ -496,6 +497,7 @@ export default function SimulatePage() {
                   <CostPreview result={DEMO_RESULT} />
                   <RentAnalysis result={DEMO_RESULT} />
                   <OverallRadar result={DEMO_RESULT} />
+                  <SurvivalPrediction result={DEMO_RESULT} />
                   <OpeningExecutionPack result={DEMO_RESULT} />
                 </div>
                 <PaywallCTA
@@ -533,6 +535,9 @@ export default function SimulatePage() {
 
                 {/* 3-3. 가구소득 + 진료과 시장 라이프사이클 */}
                 <MarketContext result={result} />
+
+                {/* 3-4. 학계 검증 모델 — 생존확률 + 권리금 + 매출변수 */}
+                <SurvivalPrediction result={result} />
 
                 {/* 4. 개원 실행 계획 (자금/인력/인허가/장비/일정/5년/세금/마케팅) */}
                 <OpeningExecutionPack result={result} />

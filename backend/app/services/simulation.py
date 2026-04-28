@@ -1558,12 +1558,88 @@ class SimulationService:
                 **clinic_lifecycle.assess_market_dynamics(clinic_type),
             },
 
+            # 학계 검증 생존확률 + 폐업위험 (Cox + SVM AUC 0.76)
+            survival_prediction=self._build_survival_prediction(
+                clinic_type=clinic_type,
+                same_dept_count=simulation.same_dept_count or len(competitors),
+                target_population=simulation.population_1km or 35000,
+                monthly_rent=simulation.est_cost_rent or 0,
+                monthly_revenue=revenue_avg,
+                elderly_ratio=(
+                    (simulation.demographics_data or {}).get("age_60_plus_ratio")
+                    if isinstance(simulation.demographics_data, dict) else None
+                ) or 0.18,
+            ),
+            # 적정 권리금 (월 순이익 × 10~36)
+            proper_premium=self._build_proper_premium(
+                monthly_profit=simulation.monthly_profit_avg or 0,
+                clinic_type=clinic_type,
+                location_code=(
+                    (simulation.demographics_data or {}).get("region_code", "")
+                    if isinstance(simulation.demographics_data, dict) else ""
+                ),
+            ),
+            # 학계 모델 매출 변수 출처
+            revenue_factors=(prediction or {}).get("factors") if isinstance(prediction, dict) else None,
+
             confidence_score=simulation.confidence_score or 0,
             recommendation=simulation.recommendation or RecommendationType.NEUTRAL,
             recommendation_reason=simulation.recommendation_reason or "",
             ai_analysis=simulation.ai_analysis,
             created_at=simulation.created_at
         )
+
+
+    def _build_survival_prediction(
+        self,
+        clinic_type: str,
+        same_dept_count: int,
+        target_population: int,
+        monthly_rent: int,
+        monthly_revenue: int,
+        elderly_ratio: float = 0.18,
+        has_subway_5min: bool = True,
+    ) -> Dict[str, Any]:
+        """학계 모델 생존확률 + 폐업위험 출력."""
+        try:
+            from ..data.closure_rates import (
+                calculate_survival_curve, get_clinic_type_market_status
+            )
+            survival = calculate_survival_curve(
+                clinic_type=clinic_type,
+                competitor_count=same_dept_count,
+                target_population=target_population,
+                monthly_rent=monthly_rent,
+                monthly_revenue=monthly_revenue,
+                has_subway_5min=has_subway_5min,
+                elderly_ratio=elderly_ratio,
+            )
+            return {
+                **survival,
+                "market_status": get_clinic_type_market_status(clinic_type),
+                "data_source": "Cox 회귀 (BMC 2025) + SVM AUC 0.762 (PMC11399738)",
+            }
+        except Exception as e:
+            logger.warning(f"survival prediction failed: {e}")
+            return None
+
+    def _build_proper_premium(
+        self,
+        monthly_profit: int,
+        clinic_type: str,
+        location_code: str = "",
+    ) -> Dict[str, Any]:
+        """적정 권리금 (월순이익 × 10~36)."""
+        try:
+            from ..data.closure_rates import estimate_proper_premium
+            return estimate_proper_premium(
+                monthly_profit=monthly_profit,
+                clinic_type=clinic_type,
+                location_code=location_code,
+            )
+        except Exception as e:
+            logger.warning(f"proper premium calc failed: {e}")
+            return None
 
 
 simulation_service = SimulationService()

@@ -1,11 +1,35 @@
 from typing import Optional, Dict, Any, List
 import logging
 
+from ..data.utilization_rate import (
+    estimate_daily_patients,
+    calculate_target_population,
+    get_utilization_rate,
+)
+from ..data.visit_price import (
+    estimate_monthly_revenue,
+    get_regional_price,
+    get_revenue_breakdown,
+    get_non_covered_ratio,
+)
+from ..data.closure_rates import (
+    calculate_survival_curve,
+    get_clinic_type_market_status,
+    estimate_proper_premium,
+)
+
 logger = logging.getLogger(__name__)
 
 
 class PredictionService:
-    """매출 및 처방전 예측 서비스"""
+    """매출 및 처방전 예측 서비스 — 학계 검증 모델 기반.
+
+    학술 근거:
+    - 일본 진료권조사 표준 공식 (Mapmarketing, 技研商事)
+    - HIRA 진료비통계지표 2023
+    - PMC11399738 (2024) — SVM AUC 0.762 폐업 예측
+    - BMC Primary Care 2025 — Cox 회귀 진료과별 HR
+    """
 
     # 진료과목별 평균 데이터 (실제로는 심평원 데이터 기반)
     CLINIC_BASE_DATA = {
@@ -105,72 +129,69 @@ class PredictionService:
         demographics_data: Dict
     ) -> Dict[str, Any]:
         """
-        매출 예측
+        학계 검증 매출 예측.
 
-        [입력 변수]
-        - 반경 1km 내 동일 진료과목 병원 수
-        - 해당 동네 진료과목별 평균 처방전 발행 건수
-        - 유동인구 × 연령대 가중치
-        - 기존 약국 포화도
-        - 대중교통 접근성 점수
+        공식 (일본 진료권조사 + HIRA 단가):
+            1일 환자수 = 진료권 인구 × 진료과별 수료율 ÷ 1000
+                        ÷ 진료일 ÷ (경쟁의원수+1) × 입지보정
+            월 매출 = 1일 환자수 × 월 진료일 × 시군구×진료과 단가
 
-        [산출 공식]
-        일일_환자수 = (지역_평균_환자수 / 경쟁_병원수) × 유동인구_가중치 × 접근성_계수
+        학계 R² 0.50~0.65 (변수 5개 SVM 기준).
         """
 
-        # 기본 데이터 가져오기
-        base_data = self.CLINIC_BASE_DATA.get(clinic_type, {
-            "avg_daily_patients": 30,
-            "avg_revenue_per_patient": 60000,
-            "prescription_rate": 0.5,
-        })
+        # ─── 1) 진료권 인구 (타겟 연령 가중치 적용) ───
+        total_pop = demographics_data.get("population_1km", 45000)
+        age_dist = self._extract_age_distribution(demographics_data)
+        target_population = calculate_target_population(
+            clinic_type, age_dist, total_pop
+        )
 
-        # 경쟁 병원 수 계산
+        # ─── 2) 경쟁의원 수 ───
         same_dept_count = len([
             h for h in nearby_hospitals
             if clinic_type.lower() in h.get("clinic_type", "").lower()
         ])
-        competition_factor = max(0.3, 1 / (same_dept_count + 1))
 
-        # 유동인구 가중치 (정규화된 값 사용)
+        # ─── 3) 입지 보정계수 ───
+        # 유동인구 + 지역 + 크기 종합
         floating_pop = commercial_data.get("floating_population", 50000)
-        population_factor = min(1.5, max(0.7, floating_pop / 50000))
+        floating_factor = min(1.4, max(0.7, floating_pop / 50000))
 
-        # 인구 구조 가중치 (40대 이상 비율이 높으면 유리)
-        age_40_plus = demographics_data.get("age_40_plus_ratio", 0.4)
-        age_factor = 1 + (age_40_plus - 0.35) * 0.5
-
-        # 지역 보정 계수
         region_factor = self._get_region_factor(latitude, longitude)
 
-        # 면적 보정 (큰 병원일수록 환자 수용 가능)
         size = size_pyeong or 30
-        size_factor = min(1.3, max(0.8, size / 30))
+        size_factor = min(1.25, max(0.85, size / 30))
 
-        # 일일 예상 환자 수 계산
-        base_patients = base_data["avg_daily_patients"]
-        estimated_daily_patients = int(
-            base_patients
-            * competition_factor
-            * population_factor
-            * age_factor
-            * region_factor
-            * size_factor
+        location_factor = floating_factor * region_factor * size_factor / 1.0
+        # 정규화 (기준점 1.0)
+        location_factor = max(0.5, min(2.0, location_factor))
+
+        # ─── 4) 1일 환자 수 (학계 공식) ───
+        daily_patients = estimate_daily_patients(
+            clinic_type=clinic_type,
+            target_population=target_population,
+            competitor_count=same_dept_count,
+            location_factor=location_factor,
         )
 
-        # 월 매출 계산 (영업일 25일 기준)
-        working_days = 25
-        revenue_per_patient = base_data["avg_revenue_per_patient"] * region_factor
-
-        avg_monthly_revenue = int(
-            estimated_daily_patients * revenue_per_patient * working_days
+        # ─── 5) 월 매출 (지역 단가 적용) ───
+        region_code = demographics_data.get("region_code", "") or ""
+        working_days = 24
+        avg_monthly_revenue = estimate_monthly_revenue(
+            clinic_type=clinic_type,
+            daily_patients=daily_patients,
+            region_code=region_code,
+            work_days_per_month=working_days,
         )
 
-        # 신뢰 구간 계산 (±20%)
-        min_revenue = int(avg_monthly_revenue * 0.75)
-        max_revenue = int(avg_monthly_revenue * 1.30)
+        # ─── 6) 보험/비급여 분리 ───
+        breakdown = get_revenue_breakdown(clinic_type, avg_monthly_revenue)
 
-        # 신뢰도 점수 계산
+        # ─── 7) 신뢰구간 ───
+        min_revenue = int(avg_monthly_revenue * 0.78)
+        max_revenue = int(avg_monthly_revenue * 1.25)
+
+        # ─── 8) 신뢰도 점수 ───
         confidence_score = self._calculate_confidence(
             same_dept_count,
             floating_pop,
@@ -182,15 +203,75 @@ class PredictionService:
             "min": min_revenue,
             "avg": avg_monthly_revenue,
             "max": max_revenue,
-            "daily_patients": estimated_daily_patients,
+            "daily_patients": int(round(daily_patients)),
+            "target_population": target_population,
+            "utilization_rate": get_utilization_rate(clinic_type),
+            "visit_price": get_regional_price(clinic_type, region_code),
+            "non_covered_ratio": breakdown["non_covered_ratio"],
+            "covered_revenue": breakdown["covered_revenue"],
+            "non_covered_revenue": breakdown["non_covered_revenue"],
             "confidence_score": confidence_score,
+            "data_source": "HIRA 진료비통계지표 + 일본 진료권조사 공식",
             "factors": {
-                "competition": round(competition_factor, 2),
-                "population": round(population_factor, 2),
-                "age": round(age_factor, 2),
-                "region": round(region_factor, 2),
-                "size": round(size_factor, 2),
+                "target_population": target_population,
+                "utilization_per_1000": get_utilization_rate(clinic_type),
+                "competitor_count": same_dept_count,
+                "market_share": round(1.0 / (same_dept_count + 1), 3),
+                "location_factor": round(location_factor, 2),
+                "regional_price_won": get_regional_price(clinic_type, region_code),
             }
+        }
+
+    @staticmethod
+    def _extract_age_distribution(demographics_data: Dict) -> Dict[str, int]:
+        """demographics_data에서 연령대별 인구 추출."""
+        age_dist = {}
+        total = demographics_data.get("population_1km", 0)
+        if total == 0:
+            return {}
+
+        # 비율 기반 계산
+        ratios = {
+            "age_0_9": demographics_data.get("age_0_9_ratio") or 0.08,
+            "age_10_19": demographics_data.get("age_10_19_ratio") or 0.10,
+            "age_20_29": demographics_data.get("age_20_29_ratio") or 0.13,
+            "age_30_39": demographics_data.get("age_30_39_ratio") or 0.15,
+            "age_40_49": demographics_data.get("age_40_49_ratio") or 0.17,
+            "age_50_59": demographics_data.get("age_50_59_ratio") or 0.18,
+            "age_60_plus": demographics_data.get("age_60_plus_ratio") or 0.19,
+        }
+        for key, ratio in ratios.items():
+            age_dist[key] = int(total * ratio)
+        return age_dist
+
+    def predict_survival(
+        self,
+        clinic_type: str,
+        same_dept_count: int,
+        target_population: int,
+        monthly_rent: int = 0,
+        monthly_revenue: int = 0,
+        elderly_ratio: float = 0.15,
+        has_subway_5min: bool = True,
+    ) -> Dict[str, Any]:
+        """
+        생존확률 예측 — Cox + SVM 학계 모델.
+        학계 AUC 0.76 (PMC11399738).
+        """
+        survival = calculate_survival_curve(
+            clinic_type=clinic_type,
+            competitor_count=same_dept_count,
+            target_population=target_population,
+            monthly_rent=monthly_rent,
+            monthly_revenue=monthly_revenue,
+            has_subway_5min=has_subway_5min,
+            elderly_ratio=elderly_ratio,
+        )
+        market_status = get_clinic_type_market_status(clinic_type)
+        return {
+            **survival,
+            "market_status": market_status,
+            "data_source": "Cox 회귀 (BMC 2025) + SVM AUC 0.762 (PMC11399738)",
         }
 
     async def predict_prescription(
