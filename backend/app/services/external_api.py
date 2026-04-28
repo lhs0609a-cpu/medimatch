@@ -182,22 +182,35 @@ class ExternalAPIService:
         self,
         region_code: str,
         clinic_type: Optional[str] = None,
-        num_of_rows: int = 200,
+        num_of_rows: int = 1000,
     ) -> List[Dict[str, Any]]:
-        """심평원 API로 지역 기반 병원 목록 조회 (sidoCd/sgguCd 사용)"""
-        if not region_code or len(region_code) < 5:
+        """
+        심평원 API로 지역 기반 병원 목록 조회.
+
+        행안부 코드(1114011000) → HIRA 코드(110000/110024)로 변환.
+        매핑 실패해도 sidoCd만 보내서 시도 전체 검색 → 거리 필터링.
+        """
+        from ..data.hira_region_codes import haeng_to_hira_codes
+
+        if not region_code or len(region_code) < 2:
             return []
-        sido_cd = region_code[:2]
-        sggu_cd = region_code[2:5]
+
+        sido_cd, sggu_cd = haeng_to_hira_codes(region_code)
+        if not sido_cd:
+            logger.warning(f"HIRA: unknown sido for region_code={region_code}")
+            return []
+
         try:
             async with httpx.AsyncClient() as client:
                 params: Dict[str, Any] = {
                     "serviceKey": settings.HIRA_API_KEY,
                     "sidoCd": sido_cd,
-                    "sgguCd": sggu_cd,
                     "numOfRows": num_of_rows,
                     "_type": "json",
                 }
+                # 시군구 매핑 성공 시만 sgguCd 적용 (안정성 우선)
+                if sggu_cd:
+                    params["sgguCd"] = sggu_cd
                 if clinic_type:
                     params["dgsbjtCd"] = self._get_clinic_code(clinic_type)
 
@@ -210,6 +223,10 @@ class ExternalAPIService:
                 data = response.json()
 
                 items = self._extract_items_safe(data)
+                logger.info(
+                    f"HIRA fetched {len(items)} hospitals "
+                    f"(sido={sido_cd}, sggu={sggu_cd or 'all'}, type={clinic_type})"
+                )
 
                 return [self._parse_hospital_data(item) for item in items]
         except Exception as e:
@@ -1056,15 +1073,18 @@ class ExternalAPIService:
             - avg_per_claim: 평균 건당 진료비
             - total_clinics: 해당 지역 총 병원 수
         """
+        from ..data.hira_region_codes import haeng_to_hira_codes
+        sido_cd_h, sggu_cd_h = haeng_to_hira_codes(region_code)
         try:
             async with httpx.AsyncClient() as client:
                 params = {
                     "serviceKey": settings.HIRA_API_KEY,
-                    "sidoCd": region_code[:2] if region_code else "",
-                    "sgguCd": region_code[2:5] if len(region_code) >= 5 else "",
+                    "sidoCd": sido_cd_h,
                     "dgsbjtCd": self._get_clinic_code(clinic_type),
                     "_type": "json"
                 }
+                if sggu_cd_h:
+                    params["sgguCd"] = sggu_cd_h
 
                 response = await client.get(
                     f"{self.hira_stats_url}/getStatsInfo",
