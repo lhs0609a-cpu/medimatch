@@ -95,7 +95,19 @@ class LocalDataClient:
                         timeout=20.0,
                     )
                     response.raise_for_status()
-                    data = response.json()
+                    # LOCALDATA는 JSON 또는 XML 반환 — content-type 체크
+                    text = response.text.strip()
+                    if not text:
+                        break
+                    if text.startswith("<"):
+                        # XML 응답 — JSON 응답을 강제하기 위해 resultType 다시 확인
+                        logger.debug(f"LOCALDATA returned XML, skipping (text[:80]={text[:80]})")
+                        break
+                    try:
+                        data = response.json()
+                    except ValueError as je:
+                        logger.warning(f"LOCALDATA JSON parse failed: {je}; body[:100]={text[:100]}")
+                        break
 
                     rows = (
                         data.get("result", {})

@@ -1382,8 +1382,9 @@ class ExternalAPIService:
                 if clinic_type:
                     params["clCd"] = self._get_clinic_code(clinic_type)
 
+                # HIRA 비급여 정확한 endpoint: nonPaymentDamtInfoService 별개 서비스
                 response = await client.get(
-                    f"{self.hira_cost_url}/getNonPaymentItemHospList",
+                    "https://apis.data.go.kr/B551182/nonPaymentDamtInfoService/getNonPaymentItemHospList",
                     params=params,
                     timeout=15.0,
                 )

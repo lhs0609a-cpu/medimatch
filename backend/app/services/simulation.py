@@ -161,7 +161,9 @@ class SimulationService:
         search_trend = None
         try:
             from .naver_datalab import naver_datalab_client
-            sido_name = (geo_data.get("sido_name", "") if geo_data else "").split()[0] if geo_data else ""
+            sido_name_raw = (geo_data.get("sido_name") or geo_data.get("region_1depth_name") or "") if geo_data else ""
+            sido_parts = sido_name_raw.split() if sido_name_raw else []
+            sido_name = sido_parts[0] if sido_parts else ""
             search_trend = await naver_datalab_client.get_search_trend(
                 clinic_type=request.clinic_type,
                 region_name=sido_name,

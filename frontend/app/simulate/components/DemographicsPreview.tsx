@@ -16,6 +16,10 @@ export default function DemographicsPreview({ result, isUnlocked }: Demographics
   const pop1km = result.demographics.population_1km
   const age40Plus = Math.round(result.demographics.age_40_plus_ratio * 100)
   const ageUnder40 = 100 - age40Plus
+  // 데이터 출처 정직 표시 — 실시간 vs 추정 구분
+  const popSource = result.data_sources?.population
+  const isRealtime = popSource?.is_realtime === true
+  const sourceLabel = isRealtime ? '행정안전부' : '추정값 (좌표 기반)'
 
   const donutData = [
     { name: '40대 이상', value: age40Plus },
@@ -61,7 +65,10 @@ export default function DemographicsPreview({ result, isUnlocked }: Demographics
           <div className="text-2xl font-bold text-foreground">
             {pop1km.toLocaleString()}명
           </div>
-          <div className="text-xs text-muted-foreground mb-2">반경 1km 추정 인구 (행정안전부)</div>
+          <div className="text-xs text-muted-foreground mb-2">
+            반경 1km 인구 ({sourceLabel})
+            {!isRealtime && <span className="ml-1 text-amber-600">⚠</span>}
+          </div>
           <div className="flex items-center gap-3 text-xs">
             <span className="flex items-center gap-1">
               <span className="w-2 h-2 rounded-full bg-blue-500" />
