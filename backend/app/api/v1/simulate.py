@@ -6,8 +6,22 @@ from typing import Optional
 from uuid import UUID
 from datetime import datetime, timedelta
 from io import BytesIO
+from urllib.parse import quote
 import hashlib
 import logging
+
+
+def _content_disposition(filename_kr: str) -> str:
+    """RFC 6266 Content-Disposition with proper UTF-8 percent-encoding.
+
+    한글 파일명을 그대로 헤더에 넣으면 starlette이 latin-1 인코딩에 실패해
+    응답이 500으로 떨어진다. ASCII fallback + filename* 둘 다 제공해야 한다.
+    """
+    ascii_fallback = "mediplaton_report.pdf"
+    return (
+        f"attachment; filename=\"{ascii_fallback}\"; "
+        f"filename*=UTF-8''{quote(filename_kr)}"
+    )
 
 from ...schemas.simulation import (
     SimulationRequest, SimulationResponse, SimulationListResponse,
@@ -537,7 +551,7 @@ async def download_report(
             BytesIO(pdf_bytes),
             media_type="application/pdf",
             headers={
-                "Content-Disposition": f"attachment; filename*=UTF-8''{filename}",
+                "Content-Disposition": _content_disposition(filename),
             },
         )
 
@@ -845,7 +859,7 @@ async def admin_download_simulation_pdf(
         BytesIO(pdf_bytes),
         media_type="application/pdf",
         headers={
-            "Content-Disposition": f"attachment; filename*=UTF-8''{filename}"
+            "Content-Disposition": _content_disposition(filename),
         },
     )
 
@@ -903,6 +917,6 @@ async def download_report_pdf(
         BytesIO(pdf_bytes),
         media_type="application/pdf",
         headers={
-            "Content-Disposition": f"attachment; filename*=UTF-8''{filename}"
+            "Content-Disposition": _content_disposition(filename),
         }
     )
