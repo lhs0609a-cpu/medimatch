@@ -41,6 +41,9 @@ python-dateutil==2.8.2
 # PDF Generation
 reportlab==4.0.8
 weasyprint==60.2
+# WeasyPrint 60.x는 pydyf<0.10과 호환. pin 안 하면 pip이 최신 pydyf 0.10+를 끌어와
+# pydyf.PDF()의 positional arg 시그니처가 깨지면서 PDF 생성 시 500 에러 발생.
+pydyf==0.8.0
 jinja2==3.1.2
 
 # Excel/CSV Export
