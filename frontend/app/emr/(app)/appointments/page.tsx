@@ -5,6 +5,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { Calendar, Plus, X, Clock, Phone, User, Check, Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
 import { appointmentService, Appointment } from '@/lib/api/emr'
+import PatientPicker from '@/components/emr/PatientPicker'
 
 function StatusBadge({ status }: { status: string }) {
   const map: Record<string, { color: string; label: string }> = {
@@ -150,6 +151,7 @@ export default function AppointmentsPage() {
 }
 
 function NewAppointmentModal({ onClose, onSuccess }: { onClose: () => void; onSuccess: () => void }) {
+  const [patient, setPatient] = useState<{ id: string; name: string; phone?: string } | null>(null)
   const [name, setName] = useState('')
   const [phone, setPhone] = useState('')
   const [start, setStart] = useState('')
@@ -170,13 +172,16 @@ function NewAppointmentModal({ onClose, onSuccess }: { onClose: () => void; onSu
   })
 
   const onSubmit = () => {
-    if (!name || !start) {
-      toast.error('환자명·예약시간 필수')
+    const finalName = patient?.name || name
+    const finalPhone = patient?.phone || phone
+    if (!finalName || !start) {
+      toast.error('환자·예약시간 필수')
       return
     }
     createMut.mutate({
-      patient_name: name,
-      patient_phone: phone || undefined,
+      patient_id: patient?.id,
+      patient_name: finalName,
+      patient_phone: finalPhone || undefined,
       start_time: new Date(start).toISOString(),
       duration_min: duration,
       appointment_type: type,
@@ -194,8 +199,13 @@ function NewAppointmentModal({ onClose, onSuccess }: { onClose: () => void; onSu
           <button onClick={onClose}><X className="w-5 h-5" /></button>
         </div>
         <div className="space-y-3">
-          <div><label className="label text-xs">환자명 *</label><input className="input" value={name} onChange={(e) => setName(e.target.value)} /></div>
-          <div><label className="label text-xs">전화번호</label><input className="input" value={phone} onChange={(e) => setPhone(e.target.value)} /></div>
+          <div>
+            <label className="label text-xs mb-1 block">기존 환자 선택</label>
+            <PatientPicker value={patient} onChange={setPatient} />
+          </div>
+          <div className="text-[11px] text-muted-foreground">또는 신규 환자 직접 입력 ↓</div>
+          <div><label className="label text-xs">환자명</label><input className="input" value={name} onChange={(e) => setName(e.target.value)} disabled={!!patient} /></div>
+          <div><label className="label text-xs">전화번호</label><input className="input" value={phone} onChange={(e) => setPhone(e.target.value)} disabled={!!patient} /></div>
           <div><label className="label text-xs">예약 시간 *</label><input type="datetime-local" className="input" value={start} onChange={(e) => setStart(e.target.value)} /></div>
           <div className="grid grid-cols-2 gap-2">
             <div><label className="label text-xs">소요 시간 (분)</label><input type="number" className="input" value={duration} onChange={(e) => setDuration(Number(e.target.value))} /></div>

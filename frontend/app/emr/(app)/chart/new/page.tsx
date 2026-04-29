@@ -7,11 +7,14 @@ import { Save, Plus, X, Stethoscope, ArrowLeft } from 'lucide-react'
 import { toast } from 'sonner'
 import Link from 'next/link'
 import { visitService, Diagnosis, Procedure } from '@/lib/api/emr'
+import PatientPicker from '@/components/emr/PatientPicker'
+import HiraCodePicker from '@/components/emr/HiraCodePicker'
 
 export default function NewChartPage() {
   const router = useRouter()
   const today = new Date().toISOString().slice(0, 10)
 
+  const [patient, setPatient] = useState<{ id: string; chart_no?: string; name: string } | null>(null)
   const [chartNo, setChartNo] = useState('')
   const [visitDate, setVisitDate] = useState(today)
   const [visitType, setVisitType] = useState('INITIAL')
@@ -77,7 +80,8 @@ export default function NewChartPage() {
     const validDiagnoses = diagnoses.filter((d) => d.code && d.name)
     const validProcedures = procedures.filter((p) => p.name)
     createMut.mutate({
-      chart_no: chartNo || undefined,
+      patient_id: patient?.id,
+      chart_no: chartNo || patient?.chart_no || undefined,
       visit_date: visitDate,
       visit_type: visitType,
       chief_complaint: chiefComplaint,
@@ -124,10 +128,14 @@ export default function NewChartPage() {
 
       <section className="card p-5 space-y-4">
         <h2 className="font-semibold">기본 정보</h2>
+        <div>
+          <label className="label text-xs mb-1 block">환자 (선택)</label>
+          <PatientPicker value={patient} onChange={setPatient} />
+        </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
-            <label className="label text-xs">차트번호</label>
-            <input className="input" value={chartNo} onChange={(e) => setChartNo(e.target.value)} placeholder="예: C-001234" />
+            <label className="label text-xs">차트번호 (수동)</label>
+            <input className="input" value={chartNo} onChange={(e) => setChartNo(e.target.value)} placeholder={patient?.chart_no || 'C-001234'} />
           </div>
           <div>
             <label className="label text-xs">진료일</label>
@@ -182,7 +190,15 @@ export default function NewChartPage() {
         {diagnoses.map((d, i) => (
           <div key={i} className="grid grid-cols-12 gap-2 items-start">
             <input className="input col-span-2" placeholder="코드 (R51)" value={d.code} onChange={(e) => updateDiagnosis(i, { code: e.target.value })} />
-            <input className="input col-span-5" placeholder="진단명" value={d.name} onChange={(e) => updateDiagnosis(i, { name: e.target.value })} />
+            <div className="col-span-5">
+              <HiraCodePicker
+                type="disease"
+                value={d.name}
+                onChange={(name) => updateDiagnosis(i, { name })}
+                onSelect={(item) => updateDiagnosis(i, { code: item.code, name: item.name })}
+                placeholder="진단명 또는 KCD 코드 검색"
+              />
+            </div>
             <input className="input col-span-3" placeholder="비고" value={d.note || ''} onChange={(e) => updateDiagnosis(i, { note: e.target.value })} />
             <label className="flex items-center gap-1 text-xs col-span-1 mt-2">
               <input type="checkbox" checked={d.is_primary} onChange={(e) => updateDiagnosis(i, { is_primary: e.target.checked })} /> 주
@@ -201,7 +217,18 @@ export default function NewChartPage() {
         {procedures.map((p, i) => (
           <div key={i} className="grid grid-cols-12 gap-2 items-start">
             <input className="input col-span-2" placeholder="수가코드" value={p.code} onChange={(e) => updateProcedure(i, { code: e.target.value })} />
-            <input className="input col-span-3" placeholder="명칭" value={p.name} onChange={(e) => updateProcedure(i, { name: e.target.value })} />
+            <div className="col-span-3">
+              <HiraCodePicker
+                type="fee"
+                value={p.name}
+                onChange={(name) => updateProcedure(i, { name })}
+                onSelect={(item) => updateProcedure(i, {
+                  code: item.code, name: item.name,
+                  unit_price: item.unit_price ?? p.unit_price,
+                })}
+                placeholder="명칭 검색"
+              />
+            </div>
             <select className="input col-span-1" value={p.category || '진찰'} onChange={(e) => updateProcedure(i, { category: e.target.value })}>
               <option value="진찰">진찰</option><option value="검사">검사</option><option value="시술">시술</option><option value="주사">주사</option><option value="처치">처치</option>
             </select>

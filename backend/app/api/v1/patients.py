@@ -6,7 +6,7 @@
 """
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, and_
+from sqlalchemy import select, and_, or_, func
 from pydantic import BaseModel
 from typing import Optional
 from datetime import date, datetime
@@ -145,11 +145,51 @@ async def list_patients(
     current_user: User = Depends(get_current_active_user),
     sub: ServiceSubscription = Depends(require_active_service(ServiceType.EMR)),
 ):
-    """환자 목록 (pagination, search, filter)"""
+    """환자 목록 (pagination, search, filter). DB 우선, 비어있으면 데모 폴백."""
+    # 실 DB 조회
+    q_db = select(Patient).where(Patient.user_id == current_user.id)
+    if search:
+        like = f"%{search}%"
+        q_db = q_db.where(or_(
+            Patient.name.ilike(like),
+            Patient.phone.ilike(like),
+            Patient.chart_no.ilike(like),
+        ))
+    if status:
+        q_db = q_db.where(Patient.inbound_status == status)
+    if manager:
+        q_db = q_db.where(Patient.manager_name == manager)
+    if inflow_path:
+        q_db = q_db.where(Patient.inflow_path == inflow_path)
+
+    total_db = (await db.execute(
+        select(func.count()).select_from(q_db.subquery())
+    )).scalar() or 0
+
+    if total_db > 0:
+        rows = (await db.execute(
+            q_db.order_by(Patient.created_at.desc())
+                .offset((page - 1) * size).limit(size)
+        )).scalars().all()
+        items = [{
+            "id": str(p.id),
+            "chart_no": p.chart_no,
+            "name": p.name,
+            "phone": p.phone,
+            "gender": p.gender,
+            "birth_date": p.birth_date.isoformat() if p.birth_date else None,
+            "inflow_path": p.inflow_path,
+            "inbound_status": p.inbound_status.value if p.inbound_status else None,
+            "manager_name": p.manager_name,
+            "appointment_date": p.appointment_date.isoformat() if p.appointment_date else None,
+        } for p in rows]
+        return {"items": items, "total": total_db, "page": page, "size": size, "is_demo": False}
+
+    # DB 비어있을 때만 데모 폴백
     patients = _build_demo_patients()
     if search:
-        q = search.lower()
-        patients = [p for p in patients if q in p["name"].lower() or q in (p["phone"] or "") or q in (p["chart_no"] or "").lower()]
+        ql = search.lower()
+        patients = [p for p in patients if ql in p["name"].lower() or ql in (p["phone"] or "") or ql in (p["chart_no"] or "").lower()]
     if status:
         patients = [p for p in patients if p["inbound_status"] == status]
     if manager:

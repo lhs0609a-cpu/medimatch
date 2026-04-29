@@ -77,7 +77,11 @@ export default function ChartListPage() {
               </thead>
               <tbody>
                 {visits?.map((v: VisitListItem) => (
-                  <tr key={v.id} className="border-b border-border/50 hover:bg-muted/30">
+                  <tr
+                    key={v.id}
+                    className="border-b border-border/50 hover:bg-muted/30 cursor-pointer"
+                    onClick={() => (window.location.href = `/emr/chart/${v.id}`)}
+                  >
                     <td className="py-2 px-2 flex items-center gap-1">
                       <Calendar className="w-3 h-3 text-muted-foreground" />
                       {v.visit_date}

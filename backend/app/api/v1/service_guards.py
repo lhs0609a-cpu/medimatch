@@ -8,7 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, and_
 
 from ..deps import get_db, get_current_active_user
-from ...models.user import User
+from ...models.user import User, UserRole
 from ...models.service_subscription import (
     ServiceSubscription, ServiceType, ServiceSubStatus
 )
@@ -29,6 +29,14 @@ def require_active_service(service_type: ServiceType):
         db: AsyncSession = Depends(get_db),
         current_user: User = Depends(get_current_active_user),
     ) -> ServiceSubscription:
+        # 관리자는 구독 없이 모든 서비스 사용 (운영·테스트용)
+        if current_user.role == UserRole.ADMIN:
+            return ServiceSubscription(
+                user_id=current_user.id,
+                service_type=service_type,
+                status=ServiceSubStatus.ACTIVE,
+            )
+
         result = await db.execute(
             select(ServiceSubscription).where(
                 and_(
