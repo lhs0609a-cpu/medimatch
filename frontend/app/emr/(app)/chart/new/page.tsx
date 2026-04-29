@@ -22,9 +22,13 @@ export default function NewChartPage() {
     if (p?.chart_no && !chartNo) setChartNo(p.chart_no)
   }
 
-  // ?patient_id=... 쿼리 파라미터로 환자 자동 로드
+  // 쿼리 파라미터: ?patient_id=... (환자 자동 로드) + ?cc=... (주소 자동 채움)
   const searchParams = useSearchParams()
   const queryPatientId = searchParams?.get('patient_id')
+  const queryCc = searchParams?.get('cc')
+  useEffect(() => {
+    if (queryCc && !chiefComplaint) setChiefComplaint(queryCc)
+  }, [queryCc])
   useEffect(() => {
     if (!queryPatientId || patient) return
     apiClient.get(`/emr/patients/${queryPatientId}`).then((r) => {

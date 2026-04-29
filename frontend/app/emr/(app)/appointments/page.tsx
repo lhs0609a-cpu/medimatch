@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { Calendar, Plus, X, Clock, Phone, User, Check, Loader2 } from 'lucide-react'
+import { Calendar, Plus, X, Clock, Phone, User, Check, Loader2, Stethoscope } from 'lucide-react'
 import { toast } from 'sonner'
 import { appointmentService, Appointment } from '@/lib/api/emr'
 import PatientPicker from '@/components/emr/PatientPicker'
@@ -126,7 +126,16 @@ export default function AppointmentsPage() {
                   </button>
                 )}
                 {(a.status === 'ARRIVED' || a.status === 'IN_PROGRESS') && (
-                  <button onClick={() => completeMut.mutate(a.id)} className="btn-secondary text-xs">
+                  <a
+                    href={`/emr/chart/new?${a.patient_id ? `patient_id=${a.patient_id}&` : ''}cc=${encodeURIComponent(a.chief_complaint || '')}`}
+                    className="btn-primary text-xs"
+                    title="진료 시작 — 미리 채워진 차트 작성"
+                  >
+                    <Stethoscope className="w-3 h-3" /> 진료 시작
+                  </a>
+                )}
+                {(a.status === 'ARRIVED' || a.status === 'IN_PROGRESS') && (
+                  <button onClick={() => completeMut.mutate(a.id)} className="btn-ghost text-xs">
                     <Check className="w-3 h-3" /> 완료
                   </button>
                 )}

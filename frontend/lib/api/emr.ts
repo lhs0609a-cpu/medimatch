@@ -212,6 +212,9 @@ export const visitService = {
     date_from?: string
     date_to?: string
     status?: string
+    visit_type?: string
+    diagnosis?: string
+    search?: string
     page?: number
     page_size?: number
   }): Promise<VisitListItem[]> => {

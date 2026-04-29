@@ -1,15 +1,36 @@
 'use client'
 
+import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import Link from 'next/link'
-import { Stethoscope, Plus, FileText, Calendar, Loader2 } from 'lucide-react'
+import { Stethoscope, Plus, FileText, Calendar, Loader2, Search, X } from 'lucide-react'
 import { visitService, VisitListItem } from '@/lib/api/emr'
 
 export default function ChartListPage() {
+  const [search, setSearch] = useState('')
+  const [diagnosis, setDiagnosis] = useState('')
+  const [dateFrom, setDateFrom] = useState('')
+  const [dateTo, setDateTo] = useState('')
+  const [visitType, setVisitType] = useState('')
+  const [statusFilter, setStatusFilter] = useState('')
+
   const { data: visits, isLoading } = useQuery({
-    queryKey: ['visits'],
-    queryFn: () => visitService.list({ page_size: 50 }),
+    queryKey: ['visits', search, diagnosis, dateFrom, dateTo, visitType, statusFilter],
+    queryFn: () => visitService.list({
+      page_size: 50,
+      search: search || undefined,
+      diagnosis: diagnosis || undefined,
+      date_from: dateFrom || undefined,
+      date_to: dateTo || undefined,
+      visit_type: visitType || undefined,
+      status: statusFilter || undefined,
+    }),
   })
+
+  const hasFilters = search || diagnosis || dateFrom || dateTo || visitType || statusFilter
+  const clearFilters = () => {
+    setSearch(''); setDiagnosis(''); setDateFrom(''); setDateTo(''); setVisitType(''); setStatusFilter('')
+  }
 
   const { data: stats } = useQuery({
     queryKey: ['visit-stats'],
@@ -47,7 +68,39 @@ export default function ChartListPage() {
       </div>
 
       <div className="card p-5">
-        <h2 className="font-semibold mb-4 flex items-center gap-2"><FileText className="w-5 h-5" /> 최근 진료 기록</h2>
+        <div className="flex items-center justify-between mb-3">
+          <h2 className="font-semibold flex items-center gap-2"><FileText className="w-5 h-5" /> 진료 기록</h2>
+          {hasFilters && (
+            <button onClick={clearFilters} className="btn-ghost text-xs">
+              <X className="w-3 h-3" /> 필터 초기화
+            </button>
+          )}
+        </div>
+        <div className="grid grid-cols-2 md:grid-cols-6 gap-2 mb-4">
+          <div className="md:col-span-2 relative">
+            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+            <input
+              className="input pl-9 text-sm"
+              placeholder="주소·차트번호 검색"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+          </div>
+          <input
+            className="input text-sm"
+            placeholder="진단명·KCD 코드"
+            value={diagnosis}
+            onChange={(e) => setDiagnosis(e.target.value)}
+          />
+          <input type="date" className="input text-sm" value={dateFrom} onChange={(e) => setDateFrom(e.target.value)} title="시작일" />
+          <input type="date" className="input text-sm" value={dateTo} onChange={(e) => setDateTo(e.target.value)} title="종료일" />
+          <select className="input text-sm" value={visitType} onChange={(e) => setVisitType(e.target.value)}>
+            <option value="">전체</option>
+            <option value="INITIAL">초진</option>
+            <option value="REVISIT">재진</option>
+            <option value="CHECKUP">검진</option>
+          </select>
+        </div>
         {isLoading && (
           <div className="flex items-center justify-center py-12 text-muted-foreground">
             <Loader2 className="w-5 h-5 animate-spin" />

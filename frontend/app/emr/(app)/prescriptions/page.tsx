@@ -2,7 +2,8 @@
 
 import { useState } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { Pill, Plus, AlertTriangle, Loader2, ShieldCheck, FileText } from 'lucide-react'
+import { Pill, Plus, AlertTriangle, Loader2, ShieldCheck, FileText, Printer } from 'lucide-react'
+import Link from 'next/link'
 import { prescriptionService, Prescription, PrescriptionItem } from '@/lib/api/emr'
 import NewPrescriptionModal from '@/components/emr/NewPrescriptionModal'
 
@@ -53,7 +54,17 @@ export default function PrescriptionsPage() {
                     </span>
                   )}
                 </div>
-                <span className="text-sm font-medium">{rx.total_amount.toLocaleString()}원</span>
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-medium">{rx.total_amount.toLocaleString()}원</span>
+                  <Link
+                    href={`/emr/prescriptions/${rx.id}/print`}
+                    target="_blank"
+                    className="btn-ghost text-xs"
+                    title="처방전 인쇄/PDF"
+                  >
+                    <Printer className="w-3 h-3" />
+                  </Link>
+                </div>
               </div>
               <div className="space-y-1 text-sm">
                 {rx.items.map((it: PrescriptionItem) => (

@@ -2,7 +2,8 @@
 
 import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { Receipt, Plus, X, CreditCard, Loader2, RotateCcw, CircleDollarSign } from 'lucide-react'
+import { Receipt, Plus, X, CreditCard, Loader2, RotateCcw, CircleDollarSign, Printer } from 'lucide-react'
+import Link from 'next/link'
 import { toast } from 'sonner'
 import { billService, Bill, BillItem } from '@/lib/api/emr'
 
@@ -93,11 +94,22 @@ export default function BillingPage() {
                   <td className="py-2 px-2 text-right text-amber-600 font-medium">{b.balance.toLocaleString()}원</td>
                   <td className="py-2 px-2 text-center"><StatusBadge status={b.status} /></td>
                   <td className="py-2 px-2 text-right">
-                    {b.balance > 0 && b.status !== 'CANCELLED' && (
-                      <button onClick={() => setPayTarget(b)} className="btn-secondary text-xs">
-                        <CreditCard className="w-3 h-3" /> 수납
-                      </button>
-                    )}
+                    <div className="flex items-center justify-end gap-1">
+                      {b.balance > 0 && b.status !== 'CANCELLED' && (
+                        <button onClick={(e) => { e.stopPropagation(); setPayTarget(b) }} className="btn-secondary text-xs">
+                          <CreditCard className="w-3 h-3" /> 수납
+                        </button>
+                      )}
+                      <Link
+                        href={`/emr/billing/${b.id}/receipt`}
+                        target="_blank"
+                        className="btn-ghost text-xs"
+                        title="영수증 인쇄/PDF"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <Printer className="w-3 h-3" />
+                      </Link>
+                    </div>
                   </td>
                 </tr>
               ))}

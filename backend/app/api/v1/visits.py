@@ -96,12 +96,16 @@ async def list_visits(
     date_from: Optional[date] = None,
     date_to: Optional[date] = None,
     status_filter: Optional[str] = Query(None, alias="status"),
+    visit_type: Optional[str] = None,
+    diagnosis: Optional[str] = None,
+    search: Optional[str] = None,
     page: int = Query(1, ge=1),
     page_size: int = Query(20, ge=1, le=100),
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_active_user),
 ):
-    """진료 기록 목록 (필터: 환자, 기간, 상태)."""
+    """진료 기록 목록 (필터: 환자/기간/상태/구분/진단/주소)."""
+    from sqlalchemy import or_
     q = (
         select(Visit)
         .where(Visit.user_id == current_user.id)
@@ -116,6 +120,22 @@ async def list_visits(
         q = q.where(Visit.visit_date <= date_to)
     if status_filter:
         q = q.where(Visit.status == status_filter)
+    if visit_type:
+        q = q.where(Visit.visit_type == visit_type)
+    if search:
+        like = f"%{search}%"
+        q = q.where(or_(
+            Visit.chief_complaint.ilike(like),
+            Visit.chart_no.ilike(like),
+            Visit.visit_no.ilike(like),
+        ))
+    if diagnosis:
+        like = f"%{diagnosis}%"
+        # 진단명·코드 매치는 join으로
+        q = q.join(VisitDiagnosis).where(or_(
+            VisitDiagnosis.name.ilike(like),
+            VisitDiagnosis.code.ilike(like),
+        )).distinct()
 
     q = q.offset((page - 1) * page_size).limit(page_size)
     result = await db.execute(q)
