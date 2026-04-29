@@ -1,7 +1,7 @@
 'use client'
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useState, useEffect } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { useMutation } from '@tanstack/react-query'
 import { Save, Plus, X, Stethoscope, ArrowLeft } from 'lucide-react'
 import { toast } from 'sonner'
@@ -9,12 +9,31 @@ import Link from 'next/link'
 import { visitService, Diagnosis, Procedure } from '@/lib/api/emr'
 import PatientPicker from '@/components/emr/PatientPicker'
 import HiraCodePicker from '@/components/emr/HiraCodePicker'
+import { apiClient } from '@/lib/api/client'
 
 export default function NewChartPage() {
   const router = useRouter()
   const today = new Date().toISOString().slice(0, 10)
 
   const [patient, setPatient] = useState<{ id: string; chart_no?: string; name: string } | null>(null)
+
+  const handlePatientChange = (p: { id: string; chart_no?: string; name: string } | null) => {
+    setPatient(p)
+    if (p?.chart_no && !chartNo) setChartNo(p.chart_no)
+  }
+
+  // ?patient_id=... 쿼리 파라미터로 환자 자동 로드
+  const searchParams = useSearchParams()
+  const queryPatientId = searchParams?.get('patient_id')
+  useEffect(() => {
+    if (!queryPatientId || patient) return
+    apiClient.get(`/emr/patients/${queryPatientId}`).then((r) => {
+      const p = r.data
+      if (p && p.id) {
+        handlePatientChange({ id: p.id, chart_no: p.chart_no, name: p.name })
+      }
+    }).catch(() => {})
+  }, [queryPatientId])
   const [chartNo, setChartNo] = useState('')
   const [visitDate, setVisitDate] = useState(today)
   const [visitType, setVisitType] = useState('INITIAL')
@@ -130,7 +149,7 @@ export default function NewChartPage() {
         <h2 className="font-semibold">기본 정보</h2>
         <div>
           <label className="label text-xs mb-1 block">환자 (선택)</label>
-          <PatientPicker value={patient} onChange={setPatient} />
+          <PatientPicker value={patient} onChange={handlePatientChange} />
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>

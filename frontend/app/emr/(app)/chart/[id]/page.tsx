@@ -4,9 +4,9 @@ import { useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import Link from 'next/link'
-import { ArrowLeft, Stethoscope, Loader2, Check, Trash2, Receipt, Pill } from 'lucide-react'
+import { ArrowLeft, Stethoscope, Loader2, Check, Trash2, Receipt, Pill, Edit3, AlertTriangle } from 'lucide-react'
 import { toast } from 'sonner'
-import { visitService } from '@/lib/api/emr'
+import { visitService, prescriptionService, billService } from '@/lib/api/emr'
 import NewPrescriptionModal from '@/components/emr/NewPrescriptionModal'
 
 export default function VisitDetailPage() {
@@ -19,6 +19,18 @@ export default function VisitDetailPage() {
   const { data: visit, isLoading } = useQuery({
     queryKey: ['visit', id],
     queryFn: () => visitService.get(id),
+    enabled: !!id,
+  })
+
+  const { data: prescriptions } = useQuery({
+    queryKey: ['visit-prescriptions', id],
+    queryFn: () => prescriptionService.list({ visit_id: id }),
+    enabled: !!id,
+  })
+
+  const { data: bills } = useQuery({
+    queryKey: ['visit-bills', id],
+    queryFn: () => billService.list().then((all) => all.filter((b: any) => b.visit_id === id)),
     enabled: !!id,
   })
 
@@ -80,6 +92,9 @@ export default function VisitDetailPage() {
           </span>
         </div>
         <div className="flex items-center gap-2">
+          <Link href={`/emr/chart/${id}/edit`} className="btn-ghost" title="수정">
+            <Edit3 className="w-4 h-4" />
+          </Link>
           <button
             onClick={() => setShowRxModal(true)}
             className="btn-secondary"
@@ -202,6 +217,58 @@ export default function VisitDetailPage() {
         <div className="card p-3 bg-blue-50/50 dark:bg-blue-950/20 text-sm">
           다음 진료 예정: <b>{visit.next_visit_date}</b>
         </div>
+      )}
+
+      {/* 이 진료의 처방전 */}
+      {prescriptions && prescriptions.length > 0 && (
+        <section className="card p-5">
+          <h2 className="font-semibold mb-3 flex items-center gap-2"><Pill className="w-4 h-4 text-purple-600" /> 이 진료의 처방전</h2>
+          <div className="space-y-2">
+            {prescriptions.map((rx) => (
+              <div key={rx.id} className="border border-border rounded p-3 text-sm">
+                <div className="flex items-center justify-between mb-1.5">
+                  <div className="flex items-center gap-2">
+                    <span className="font-mono text-xs text-muted-foreground">{rx.prescription_no.slice(-12)}</span>
+                    {rx.dur_warnings.length > 0 && (
+                      <span className="inline-flex items-center gap-1 text-[11px] text-rose-600">
+                        <AlertTriangle className="w-3 h-3" /> DUR {rx.dur_warnings.length}건
+                      </span>
+                    )}
+                  </div>
+                  <span className="font-medium">{rx.total_amount.toLocaleString()}원</span>
+                </div>
+                <div className="text-xs text-muted-foreground">
+                  {rx.items.map((it) => `${it.drug_name}(${it.dose_per_time}${it.dose_unit}×${it.frequency_per_day}회×${it.duration_days}일)`).join(' · ')}
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* 이 진료의 청구서 */}
+      {bills && bills.length > 0 && (
+        <section className="card p-5">
+          <h2 className="font-semibold mb-3 flex items-center gap-2"><Receipt className="w-4 h-4 text-emerald-600" /> 이 진료의 청구서</h2>
+          <div className="space-y-2">
+            {bills.map((b: any) => (
+              <Link key={b.id} href="/emr/billing" className="block border border-border rounded p-3 text-sm hover:bg-muted/30">
+                <div className="flex items-center justify-between">
+                  <span className="font-mono text-xs text-muted-foreground">{b.bill_no.slice(-12)}</span>
+                  <span className={`text-[11px] px-2 py-0.5 rounded-full ${
+                    b.status === 'PAID' ? 'bg-green-100 text-green-700' :
+                    b.status === 'PARTIAL' ? 'bg-blue-100 text-blue-700' :
+                    'bg-amber-100 text-amber-700'
+                  }`}>{b.status === 'PAID' ? '완납' : b.status === 'PARTIAL' ? '부분수납' : '발행'}</span>
+                </div>
+                <div className="flex items-center justify-between mt-1 text-xs">
+                  <span className="text-muted-foreground">총 {b.final_amount.toLocaleString()}원 / 수납 {b.paid_amount.toLocaleString()}원</span>
+                  {b.balance > 0 && <span className="text-amber-600 font-medium">잔액 {b.balance.toLocaleString()}원</span>}
+                </div>
+              </Link>
+            ))}
+          </div>
+        </section>
       )}
 
       {showRxModal && (

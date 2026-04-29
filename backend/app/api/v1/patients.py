@@ -358,7 +358,47 @@ async def get_patient(
     current_user: User = Depends(get_current_active_user),
     sub: ServiceSubscription = Depends(require_active_service(ServiceType.EMR)),
 ):
-    """환자 상세"""
+    """환자 상세 — DB 우선, 폴백으로 데모."""
+    # UUID 형식이면 DB 조회
+    try:
+        from uuid import UUID
+        pid = UUID(patient_id)
+        row = (await db.execute(
+            select(Patient).where(and_(
+                Patient.id == pid, Patient.user_id == current_user.id,
+            ))
+        )).scalar_one_or_none()
+        if row:
+            return {
+                "id": str(row.id),
+                "chart_no": row.chart_no,
+                "name": row.name,
+                "phone": row.phone,
+                "gender": row.gender,
+                "birth_date": row.birth_date.isoformat() if row.birth_date else None,
+                "region": row.region,
+                "inflow_date": row.inflow_date.isoformat() if row.inflow_date else None,
+                "inflow_path": row.inflow_path,
+                "search_keywords": row.search_keywords,
+                "symptoms": row.symptoms,
+                "diagnosis_name": row.diagnosis_name,
+                "consultation_summary": row.consultation_summary,
+                "db_quality": row.db_quality.value if row.db_quality else None,
+                "staff_assessment": row.staff_assessment,
+                "appointment_date": row.appointment_date.isoformat() if row.appointment_date else None,
+                "appointment_path": row.appointment_path,
+                "inbound_status": row.inbound_status.value if row.inbound_status else None,
+                "cancellation_reason": row.cancellation_reason,
+                "consultation_gap_analysis": row.consultation_gap_analysis,
+                "manager_name": row.manager_name,
+                "consent_examination": row.consent_examination.value if row.consent_examination else None,
+                "consent_treatment": row.consent_treatment.value if row.consent_treatment else None,
+                "is_demo": False,
+            }
+    except (ValueError, TypeError):
+        pass
+
+    # 폴백: 데모
     patients = _build_demo_patients()
     patient = next((p for p in patients if p["id"] == patient_id), None)
     if not patient:
