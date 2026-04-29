@@ -417,12 +417,17 @@ class SimulationService:
         for h in nearby_hospitals:
             clt = (h.get("clinic_type") or "").strip()
             cl_cd_nm = (h.get("cl_cd_nm") or "")
+            name = (h.get("name") or "")
             matched = False
             if clt and (keyword in clt or clinic_type.lower() in clt.lower()):
                 matched = True
             elif is_dental and "치과" in cl_cd_nm:
                 matched = True
             elif is_korean_med and ("한의" in cl_cd_nm or "한방" in cl_cd_nm):
+                matched = True
+            # 폴백: HIRA dgsbjtCd 필터 502로 무필터 응답을 받은 경우
+            # 의원명 키워드로 매칭 (한국 의원 명명 관습: "○○피부과의원")
+            elif keyword and keyword in name and "의원" in cl_cd_nm:
                 matched = True
             if matched:
                 same_dept_hospitals.append(h)

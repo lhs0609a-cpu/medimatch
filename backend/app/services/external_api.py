@@ -183,12 +183,14 @@ class ExternalAPIService:
         region_code: str,
         clinic_type: Optional[str] = None,
         num_of_rows: int = 1000,
+        _retry_without_dgsbjt: bool = False,
     ) -> List[Dict[str, Any]]:
         """
         심평원 API로 지역 기반 병원 목록 조회.
 
         행안부 코드(1114011000) → HIRA 코드(110000/110024)로 변환.
-        매핑 실패해도 sidoCd만 보내서 시도 전체 검색 → 거리 필터링.
+        HIRA가 dgsbjtCd 필터로 호출 시 502를 반환하는 경우가 있어,
+        실패 시 dgsbjtCd 없이 재시도하고 호출자가 이름·종별로 매칭한다.
         """
         from ..data.hira_region_codes import haeng_to_hira_codes
 
@@ -208,10 +210,9 @@ class ExternalAPIService:
                     "numOfRows": num_of_rows,
                     "_type": "json",
                 }
-                # 시군구 매핑 성공 시만 sgguCd 적용 (안정성 우선)
                 if sggu_cd:
                     params["sgguCd"] = sggu_cd
-                if clinic_type:
+                if clinic_type and not _retry_without_dgsbjt:
                     params["dgsbjtCd"] = self._get_clinic_code(clinic_type)
 
                 response = await client.get(
@@ -225,12 +226,25 @@ class ExternalAPIService:
                 items = self._extract_items_safe(data)
                 logger.info(
                     f"HIRA fetched {len(items)} hospitals "
-                    f"(sido={sido_cd}, sggu={sggu_cd or 'all'}, type={clinic_type})"
+                    f"(sido={sido_cd}, sggu={sggu_cd or 'all'}, type={clinic_type}, "
+                    f"retry={_retry_without_dgsbjt})"
                 )
 
-                return [self._parse_hospital_data(item) for item in items]
+                parsed = [self._parse_hospital_data(item) for item in items]
+                # 진료과 필터로 가져왔는지 표시 (폴백이면 False — 이름 매칭으로 처리)
+                was_filtered = bool(clinic_type) and not _retry_without_dgsbjt
+                for h in parsed:
+                    h["_dgsbjt_filtered"] = was_filtered
+                return parsed
         except Exception as e:
-            logger.error(f"Failed to fetch HIRA hospitals (region={region_code}, type={clinic_type}): {e}")
+            logger.error(f"Failed to fetch HIRA hospitals (region={region_code}, type={clinic_type}, retry={_retry_without_dgsbjt}): {e}")
+            # 진료과 필터에서만 실패한 경우 dgsbjtCd 빼고 재시도
+            if clinic_type and not _retry_without_dgsbjt:
+                logger.info(f"HIRA dgsbjtCd 호출 실패 → 무필터로 재시도 (이름·종별 매칭으로 폴백)")
+                return await self._fetch_hira_hospitals(
+                    region_code, clinic_type, num_of_rows,
+                    _retry_without_dgsbjt=True,
+                )
             return []
 
     async def get_nearby_hospitals(
@@ -257,9 +271,9 @@ class ExternalAPIService:
                 continue
             dist = self._haversine(latitude, longitude, h_lat, h_lng)
             h["distance"] = round(dist)
-            # HIRA가 dgsbjtCd로 필터해서 가져온 결과 = 해당 진료과 의원
-            # 응답에 dgsbjtCdNm이 없으므로 요청 진료과로 라벨링
-            if clinic_type and not h.get("clinic_type"):
+            # HIRA가 dgsbjtCd 필터로 정상 응답한 경우만 = 해당 진료과 의원으로 라벨링
+            # 폴백 경로(_dgsbjt_filtered=False)는 전체 의원이라 이름 매칭으로 처리
+            if clinic_type and not h.get("clinic_type") and h.get("_dgsbjt_filtered"):
                 h["clinic_type"] = clinic_type
             if dist <= radius_m:
                 nearby.append(h)
