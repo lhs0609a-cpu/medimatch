@@ -50,6 +50,8 @@ class CompetitorInfo(BaseModel):
     specialty_detail: Optional[str] = None  # 세부 전문 분야
     rating: Optional[float] = None  # 평점
     review_count: Optional[int] = None  # 리뷰 수
+    latitude: Optional[float] = None
+    longitude: Optional[float] = None
 
 
 class EstimatedRevenue(BaseModel):
@@ -490,6 +492,17 @@ class MarketingPlan(BaseModel):
     clinic_type_tips: List[str]            # 진료과별 마케팅 팁
 
 
+class CompetitorRevenueStats(BaseModel):
+    """동일과 의원 매출 통계 (anchor 비교용)"""
+    avg: int  # 평균 월매출 (원)
+    median: int  # 중앙값 월매출 (원)
+    min: int
+    max: int
+    sample_size: int  # 추정 샘플 수
+    new_clinic_floor: int  # 신규 개원 매출 하한 (평균의 55%)
+    note: str = "HIRA 진료비통계지표 표준 매출 × 의사수 × 입지·연차 보정"
+
+
 class SimulationResponse(BaseModel):
     """시뮬레이션 결과 응답 - 확장된 버전"""
     simulation_id: UUID
@@ -497,6 +510,9 @@ class SimulationResponse(BaseModel):
     clinic_type: str
     size_pyeong: Optional[float] = None
     budget_million: Optional[int] = None
+    latitude: Optional[float] = None
+    longitude: Optional[float] = None
+    competitor_revenue_stats: Optional[CompetitorRevenueStats] = None
 
     # 기본 정보
     estimated_monthly_revenue: EstimatedRevenue

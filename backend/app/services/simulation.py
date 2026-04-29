@@ -10,6 +10,7 @@ from datetime import datetime
 from ..models.simulation import Simulation, SimulationReport, RecommendationType
 from ..schemas.simulation import (
     SimulationRequest, SimulationResponse, CompetitorInfo,
+    CompetitorRevenueStats,
     EstimatedRevenue, EstimatedCost, Profitability, Competition, Demographics,
     RevenueDetail, CostDetail, ProfitabilityDetail, CompetitionDetail,
     DemographicsDetail, LocationAnalysis, GrowthProjection, RiskAnalysis,
@@ -197,8 +198,31 @@ class SimulationService:
             demographics_data=demographics_data
         )
 
-        # 6. 경쟁 분석
-        competitors = self._analyze_competitors(nearby_hospitals, request.clinic_type)
+        # 6. 경쟁 분석 (입지 보정 반영해 동일과 의원 매출 추정)
+        loc_factor = (prediction.get("factors") or {}).get("location_factor", 1.0)
+        competitors = self._analyze_competitors(
+            nearby_hospitals, request.clinic_type, location_factor=loc_factor
+        )
+
+        # 6-1. 동일과 평균 매출 anchor — 신규 개원 매출이 동일과 평균 대비
+        # 너무 낮으면(< 평균의 55%) 평균의 55%를 floor로 적용한다.
+        # 근거: 동일 입지에서 같은 진료과를 운영하는 의원의 평균 매출은
+        # 신규 개원의 1~2년차 도달 가능 매출의 강력한 anchor (BMC 2025).
+        comp_revenues = [c.get("est_monthly_revenue", 0) for c in competitors if c.get("est_monthly_revenue", 0) > 0]
+        competitor_avg_revenue = int(sum(comp_revenues) / len(comp_revenues)) if comp_revenues else 0
+        competitor_median_revenue = 0
+        if comp_revenues:
+            sorted_rev = sorted(comp_revenues)
+            mid = len(sorted_rev) // 2
+            competitor_median_revenue = sorted_rev[mid] if len(sorted_rev) % 2 == 1 else (sorted_rev[mid - 1] + sorted_rev[mid]) // 2
+        if competitor_avg_revenue > 0:
+            floor_revenue = int(competitor_avg_revenue * 0.55)
+            if prediction["avg"] < floor_revenue:
+                ratio = floor_revenue / max(prediction["avg"], 1)
+                prediction["avg"] = floor_revenue
+                prediction["min"] = int(prediction["min"] * ratio)
+                prediction["max"] = int(prediction["max"] * ratio)
+                prediction["anchored_to_competitor_avg"] = True
 
         # 7. 비용 추정 — 사용자 입력값 우선
         estimated_cost = self._estimate_costs(
@@ -361,7 +385,8 @@ class SimulationService:
     def _analyze_competitors(
         self,
         nearby_hospitals: List[Dict],
-        clinic_type: str
+        clinic_type: str,
+        location_factor: float = 1.0,
     ) -> List[Dict]:
         """경쟁 병원 분석. clinic_type + clCdNm 모두 매칭."""
         competitors = []
@@ -389,8 +414,12 @@ class SimulationService:
 
         for hospital in same_dept_hospitals[:10]:  # Top 10
             # Estimate monthly revenue based on hospital size and location
-            est_revenue = self._estimate_competitor_revenue(hospital)
+            est_revenue = self._estimate_competitor_revenue(
+                hospital, clinic_type=clinic_type, location_factor=location_factor
+            )
 
+            lat_v = hospital.get("latitude") or hospital.get("lat")
+            lng_v = hospital.get("longitude") or hospital.get("lng")
             competitors.append({
                 "name": hospital.get("name", ""),
                 "distance_m": int(hospital.get("distance", 0)),
@@ -400,7 +429,9 @@ class SimulationService:
                 "address": hospital.get("address", ""),
                 "specialty_detail": hospital.get("specialty_detail", ""),
                 "rating": hospital.get("rating", round(random.uniform(3.5, 4.8), 1)),
-                "review_count": hospital.get("review_count", random.randint(10, 500))
+                "review_count": hospital.get("review_count", random.randint(10, 500)),
+                "latitude": float(lat_v) if lat_v else None,
+                "longitude": float(lng_v) if lng_v else None,
             })
 
         return competitors
@@ -546,17 +577,47 @@ class SimulationService:
             "score": score
         }
 
-    def _estimate_competitor_revenue(self, hospital: Dict) -> int:
-        """경쟁 병원 매출 추정"""
-        doctors = hospital.get("doctors", 1)
-        beds = hospital.get("beds", 0)
+    def _estimate_competitor_revenue(
+        self,
+        hospital: Dict,
+        clinic_type: str = "",
+        location_factor: float = 1.0,
+    ) -> int:
+        """경쟁 병원 매출 추정 — 진료과 표준 매출 × 의사수 × 입지 × 연차 보정.
 
-        # Basic estimation
-        base_revenue = 50000000  # 5천만원 기본
-        doctor_revenue = doctors * 20000000  # 의사 1인당 2천만원
-        bed_revenue = beds * 5000000  # 병상 1개당 500만원
+        근거: clinic_profiles.REVENUE.monthly_revenue_typical (HIRA 진료비통계지표 2023).
+        """
+        from ..data.clinic_profiles import get_revenue_profile
 
-        return base_revenue + doctor_revenue + bed_revenue
+        ct = clinic_type or hospital.get("clinic_type", "내과")
+        profile = get_revenue_profile(ct)
+        base = int(profile.get("monthly_revenue_typical", 35_000_000))
+
+        doctors = max(int(hospital.get("doctors", 1) or 1), 1)
+        # 의사 2인 이상 의원 — 두 번째부터 0.7배 가산 (방·기기 공유로 효율 떨어짐)
+        doctor_factor = 1.0 + 0.7 * (doctors - 1)
+
+        # 개원 연차 보정 — 3~10년차가 피크, 1년차 0.6배, 10년+ 0.95배
+        years = self._calculate_years_open(hospital.get("established", "") or "")
+        if years <= 0:
+            year_factor = 0.7
+        elif years == 1:
+            year_factor = 0.6
+        elif years == 2:
+            year_factor = 0.85
+        elif years <= 10:
+            year_factor = 1.0
+        else:
+            year_factor = 0.95
+
+        # 입지 보정 (도심·강남 등 가산)
+        loc = max(0.6, min(2.0, location_factor))
+
+        # 병상 보유 의원(요양·재활) 가산
+        beds = int(hospital.get("beds", 0) or 0)
+        bed_bonus = beds * 3_000_000
+
+        return int(base * doctor_factor * year_factor * loc + bed_bonus)
 
     def _calculate_years_open(self, established: str) -> int:
         """개원 연차 계산"""
@@ -1542,12 +1603,32 @@ class SimulationService:
             "max": simulation.est_revenue_max or 0
         }
 
+        # 동일과 평균 매출 통계 (anchor 표시)
+        comp_revs = [c.get("est_monthly_revenue", 0) for c in competitors if c.get("est_monthly_revenue", 0) > 0]
+        comp_stats = None
+        if comp_revs:
+            sorted_revs = sorted(comp_revs)
+            mid = len(sorted_revs) // 2
+            median_v = sorted_revs[mid] if len(sorted_revs) % 2 == 1 else (sorted_revs[mid - 1] + sorted_revs[mid]) // 2
+            avg_v = sum(comp_revs) // len(comp_revs)
+            comp_stats = CompetitorRevenueStats(
+                avg=avg_v,
+                median=median_v,
+                min=sorted_revs[0],
+                max=sorted_revs[-1],
+                sample_size=len(comp_revs),
+                new_clinic_floor=int(avg_v * 0.55),
+            )
+
         return SimulationResponse(
             simulation_id=simulation.id,
             address=simulation.address,
             clinic_type=simulation.clinic_type,
             size_pyeong=simulation.size_pyeong,
             budget_million=simulation.budget_million,
+            latitude=lat,
+            longitude=lng,
+            competitor_revenue_stats=comp_stats,
 
             # 기본 정보
             estimated_monthly_revenue=EstimatedRevenue(

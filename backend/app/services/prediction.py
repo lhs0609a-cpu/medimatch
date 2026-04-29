@@ -146,6 +146,17 @@ class PredictionService:
             clinic_type, age_dist, total_pop
         )
 
+        # CBD/상업·업무 지구 보정: 거주 인구는 적지만 직장·유동 인구가 압도적인
+        # 도심(중구·종로·강남 핵심상권 등)에서는 거주 인구만으로 계산하면
+        # 환자 풀이 비현실적으로 작아진다. 유동인구 대비 거주인구가 3배 이상이면
+        # 직장 환자 풀(유동의 35%)을 합산해 진료권 인구를 보정한다.
+        floating_pop_for_cbd = commercial_data.get("floating_population", 0)
+        if total_pop > 0 and floating_pop_for_cbd > total_pop * 3:
+            # 비미용 진료과(이비인후과/내과/가정의학과 등)는 직장인 점심·퇴근 환자 비중 큼
+            commute_visit_share = 0.35 if clinic_type not in {"성형외과", "산부인과", "소아청소년과"} else 0.15
+            cbd_target = int(floating_pop_for_cbd * commute_visit_share)
+            target_population = max(target_population, cbd_target)
+
         # ─── 2) 경쟁의원 수 ───
         same_dept_count = len([
             h for h in nearby_hospitals

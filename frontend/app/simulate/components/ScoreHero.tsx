@@ -134,6 +134,45 @@ export default function ScoreHero({ result }: ScoreHeroProps) {
         </div>
       </div>
 
+      {/* 동일과 평균 매출 비교 (anchor) */}
+      {result.competitor_revenue_stats && result.competitor_revenue_stats.sample_size > 0 && (
+        <div className="mt-5 p-3 md:p-4 bg-muted/40 dark:bg-muted/20 rounded-xl border border-border">
+          <div className="flex items-center justify-between mb-2">
+            <div className="text-xs font-semibold text-foreground">
+              주변 동일과 의원 평균 매출 (샘플 {result.competitor_revenue_stats.sample_size}개)
+            </div>
+            <div className="text-[10px] text-muted-foreground">HIRA 표준×입지 보정</div>
+          </div>
+          <div className="grid grid-cols-3 gap-2 text-center">
+            <div>
+              <div className="text-[10px] text-muted-foreground">최소</div>
+              <div className="text-sm font-bold text-foreground">
+                {formatMoney(result.competitor_revenue_stats.min)}원
+              </div>
+            </div>
+            <div className="border-x border-border">
+              <div className="text-[10px] text-muted-foreground">평균</div>
+              <div className="text-base font-bold text-blue-600 dark:text-blue-400">
+                {formatMoney(result.competitor_revenue_stats.avg)}원
+              </div>
+              <div className="text-[10px] text-muted-foreground">중앙값 {formatMoney(result.competitor_revenue_stats.median)}</div>
+            </div>
+            <div>
+              <div className="text-[10px] text-muted-foreground">최대</div>
+              <div className="text-sm font-bold text-foreground">
+                {formatMoney(result.competitor_revenue_stats.max)}원
+              </div>
+            </div>
+          </div>
+          <div className="mt-2 text-[11px] text-muted-foreground leading-relaxed">
+            본 시뮬레이션 예상 매출 <b className="text-foreground">{formatMoney(revenue)}원</b>은
+            동일과 평균의 <b className="text-foreground">{Math.round((revenue / Math.max(result.competitor_revenue_stats.avg, 1)) * 100)}%</b> 수준 ·
+            신규 개원 1~2년차 도달 가능 매출 anchor: 평균의 55%
+            (<b>{formatMoney(result.competitor_revenue_stats.new_clinic_floor)}원</b>) 이상
+          </div>
+        </div>
+      )}
+
       {/* Revenue Range Visualization */}
       {revenueMin > 0 && revenueMax > 0 && (
         <div className="mt-5">

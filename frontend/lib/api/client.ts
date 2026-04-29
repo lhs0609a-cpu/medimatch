@@ -452,12 +452,25 @@ export interface MarketingPlan {
   clinic_type_tips: string[]
 }
 
+export interface CompetitorRevenueStats {
+  avg: number
+  median: number
+  min: number
+  max: number
+  sample_size: number
+  new_clinic_floor: number
+  note?: string
+}
+
 export interface SimulationResponse {
   simulation_id: string
   address: string
   clinic_type: string
   size_pyeong?: number
   budget_million?: number
+  latitude?: number
+  longitude?: number
+  competitor_revenue_stats?: CompetitorRevenueStats
   estimated_monthly_revenue: {
     min: number
     avg: number
@@ -491,6 +504,8 @@ export interface SimulationResponse {
     specialty_detail?: string
     rating?: number
     review_count?: number
+    latitude?: number
+    longitude?: number
   }>
   demographics: {
     population_1km: number
