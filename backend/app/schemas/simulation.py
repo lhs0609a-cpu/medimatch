@@ -37,6 +37,7 @@ class SimulationRequest(BaseModel):
     own_capital_ratio: Optional[float] = Field(None, ge=0.0, le=1.0, description="자기자본 비율 (0.0~1.0)")
     loan_interest_rate: Optional[float] = Field(None, ge=0.0, le=0.20, description="대출 연이자율 (0.055=5.5%)")
     monthly_payroll_won: Optional[int] = Field(None, ge=0, description="실제 월 인건비 (원, 원장 제외)")
+    monthly_marketing_won: Optional[int] = Field(None, ge=0, description="월 마케팅 예산 (원) — 매출 uplift + 비용에 반영")
 
 
 class CompetitorInfo(BaseModel):
@@ -503,6 +504,13 @@ class CompetitorRevenueStats(BaseModel):
     note: str = "HIRA 진료비통계지표 표준 매출 × 의사수 × 입지·연차 보정"
 
 
+class MarketingImpact(BaseModel):
+    """마케팅 예산이 매출에 미치는 영향 (입력 시)"""
+    monthly_spend_won: int  # 사용자가 입력한 월 마케팅 예산 (원)
+    uplift_won: int  # 그로 인한 월 매출 증가분 (원)
+    effective_roas: float  # 감쇠 곡선 적용 후 실효 ROAS
+
+
 class SimulationResponse(BaseModel):
     """시뮬레이션 결과 응답 - 확장된 버전"""
     simulation_id: UUID
@@ -513,6 +521,7 @@ class SimulationResponse(BaseModel):
     latitude: Optional[float] = None
     longitude: Optional[float] = None
     competitor_revenue_stats: Optional[CompetitorRevenueStats] = None
+    marketing_impact: Optional[MarketingImpact] = None
 
     # 기본 정보
     estimated_monthly_revenue: EstimatedRevenue

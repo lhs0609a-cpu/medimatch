@@ -134,6 +134,23 @@ export default function ScoreHero({ result }: ScoreHeroProps) {
         </div>
       </div>
 
+      {/* 마케팅 uplift 표시 (입력 시) */}
+      {result.marketing_impact && result.marketing_impact.monthly_spend_won > 0 && (
+        <div className="mt-5 p-3 md:p-4 bg-purple-50 dark:bg-purple-950/30 rounded-xl border border-purple-200 dark:border-purple-900">
+          <div className="flex items-center justify-between mb-1.5">
+            <div className="text-xs font-semibold text-foreground">마케팅 영향</div>
+            <div className="text-[10px] text-muted-foreground">
+              실효 ROAS {result.marketing_impact.effective_roas.toFixed(2)}× (감쇠곡선 적용)
+            </div>
+          </div>
+          <div className="text-[12px] text-muted-foreground leading-relaxed">
+            월 마케팅 <b className="text-foreground">{formatMoney(result.marketing_impact.monthly_spend_won)}원</b> 투입 시
+            매출 <b className="text-purple-600 dark:text-purple-400">+{formatMoney(result.marketing_impact.uplift_won)}원</b> 증가 ·
+            매출과 비용에 동시 반영됨
+          </div>
+        </div>
+      )}
+
       {/* 동일과 평균 매출 비교 (anchor) */}
       {result.competitor_revenue_stats && result.competitor_revenue_stats.sample_size > 0 && (
         <div className="mt-5 p-3 md:p-4 bg-muted/40 dark:bg-muted/20 rounded-xl border border-border">

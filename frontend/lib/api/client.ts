@@ -93,6 +93,7 @@ export interface SimulationRequest {
   own_capital_ratio?: number
   loan_interest_rate?: number
   monthly_payroll_won?: number
+  monthly_marketing_won?: number
 }
 
 // 상세 매출 분석
@@ -462,6 +463,12 @@ export interface CompetitorRevenueStats {
   note?: string
 }
 
+export interface MarketingImpact {
+  monthly_spend_won: number
+  uplift_won: number
+  effective_roas: number
+}
+
 export interface SimulationResponse {
   simulation_id: string
   address: string
@@ -471,6 +478,7 @@ export interface SimulationResponse {
   latitude?: number
   longitude?: number
   competitor_revenue_stats?: CompetitorRevenueStats
+  marketing_impact?: MarketingImpact
   estimated_monthly_revenue: {
     min: number
     avg: number

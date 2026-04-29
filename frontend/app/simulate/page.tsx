@@ -55,6 +55,7 @@ const simulationSchema = z.object({
   own_capital_ratio: z.number().min(0).max(1).optional(),
   loan_interest_rate: z.number().min(0).max(0.20).optional(),
   monthly_payroll_won: z.number().optional(),
+  monthly_marketing_won: z.number().optional(),
 })
 
 type SimulationForm = z.infer<typeof simulationSchema>
@@ -394,6 +395,18 @@ export default function SimulatePage() {
                           {...register('monthly_payroll_won', { setValueAs: (v) => v === '' ? undefined : Number(v) })}
                           type="number"
                           placeholder="예: 10000000"
+                          className="input text-sm"
+                        />
+                      </div>
+                      <div className="md:col-span-2">
+                        <label className="label text-xs mb-1 block">
+                          월 마케팅 예산 (원)
+                          <span className="ml-2 text-[10px] text-muted-foreground">매출 uplift + 비용에 동시 반영</span>
+                        </label>
+                        <input
+                          {...register('monthly_marketing_won', { setValueAs: (v) => v === '' ? undefined : Number(v) })}
+                          type="number"
+                          placeholder="예: 3000000 (월 300만원, 매출 5% 수준이 ROAS 최적)"
                           className="input text-sm"
                         />
                       </div>

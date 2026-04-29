@@ -10,7 +10,7 @@ from datetime import datetime
 from ..models.simulation import Simulation, SimulationReport, RecommendationType
 from ..schemas.simulation import (
     SimulationRequest, SimulationResponse, CompetitorInfo,
-    CompetitorRevenueStats,
+    CompetitorRevenueStats, MarketingImpact,
     EstimatedRevenue, EstimatedCost, Profitability, Competition, Demographics,
     RevenueDetail, CostDetail, ProfitabilityDetail, CompetitionDetail,
     DemographicsDetail, LocationAnalysis, GrowthProjection, RiskAnalysis,
@@ -185,6 +185,7 @@ class SimulationService:
             "own_capital_ratio": request.own_capital_ratio,
             "loan_interest_rate": request.loan_interest_rate,
             "monthly_payroll_won": request.monthly_payroll_won,
+            "monthly_marketing_won": request.monthly_marketing_won,
         }
 
         # 5. 예측 모델 실행
@@ -195,7 +196,8 @@ class SimulationService:
             size_pyeong=request.size_pyeong,
             nearby_hospitals=nearby_hospitals,
             commercial_data=commercial_data,
-            demographics_data=demographics_data
+            demographics_data=demographics_data,
+            monthly_marketing_won=request.monthly_marketing_won,
         )
 
         # 6. 경쟁 분석 (입지 보정 반영해 동일과 의원 매출 추정)
@@ -234,6 +236,18 @@ class SimulationService:
             user_monthly_payroll=request.monthly_payroll_won,
         )
 
+        # 7-1. 마케팅 비용을 'other'에 가산 (매출 uplift와 동기화)
+        if request.monthly_marketing_won and request.monthly_marketing_won > 0:
+            estimated_cost["other"] = (estimated_cost.get("other", 0) or 0) + request.monthly_marketing_won
+            estimated_cost["marketing"] = request.monthly_marketing_won
+            estimated_cost["total"] = (
+                estimated_cost.get("rent", 0)
+                + estimated_cost.get("labor", 0)
+                + estimated_cost.get("utilities", 0)
+                + estimated_cost.get("supplies", 0)
+                + estimated_cost.get("other", 0)
+            )
+
         # 사용자 입력 추적 — 어떤 게 본인 데이터인지 응답에 보존
         user_inputs = {
             "deposit_won": request.deposit_won,
@@ -243,6 +257,7 @@ class SimulationService:
             "own_capital_ratio": request.own_capital_ratio,
             "loan_interest_rate": request.loan_interest_rate,
             "monthly_payroll_won": request.monthly_payroll_won,
+            "monthly_marketing_won": request.monthly_marketing_won,
         }
 
         # 8. 수익성 분석
@@ -1629,6 +1644,15 @@ class SimulationService:
             latitude=lat,
             longitude=lng,
             competitor_revenue_stats=comp_stats,
+            marketing_impact=(
+                MarketingImpact(
+                    monthly_spend_won=int((prediction or {}).get("marketing", {}).get("monthly_spend_won") or 0),
+                    uplift_won=int((prediction or {}).get("marketing", {}).get("uplift_won") or 0),
+                    effective_roas=float((prediction or {}).get("marketing", {}).get("effective_roas") or 0.0),
+                )
+                if isinstance(prediction, dict) and prediction.get("marketing", {}).get("monthly_spend_won")
+                else None
+            ),
 
             # 기본 정보
             estimated_monthly_revenue=EstimatedRevenue(

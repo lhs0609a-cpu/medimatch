@@ -126,7 +126,8 @@ class PredictionService:
         size_pyeong: Optional[float],
         nearby_hospitals: List[Dict],
         commercial_data: Dict,
-        demographics_data: Dict
+        demographics_data: Dict,
+        monthly_marketing_won: Optional[int] = None,
     ) -> Dict[str, Any]:
         """
         학계 검증 매출 예측.
@@ -246,6 +247,37 @@ class PredictionService:
 
         avg_monthly_revenue = int(daily_patients * working_days * weighted_price)
 
+        # ─── 5-1) 마케팅 uplift (입력 시) ───
+        # 진료과별 ROAS 벤치마크 (의료광고 업계 표준 + 강남언니/굿닥/네이버 평균)
+        # 도수치료·미용·고단가 비급여는 ROAS 높음, 보험 위주 진료과는 낮음.
+        ROAS_BY_CLINIC = {
+            "성형외과": 5.0, "피부과": 4.5, "치과": 3.8, "안과": 3.5,
+            "정형외과": 3.2, "산부인과": 2.8, "비뇨의학과": 2.6,
+            "정신건강의학과": 2.5, "재활의학과": 3.0, "신경외과": 2.8,
+            "내과": 2.2, "이비인후과": 2.0, "소아청소년과": 1.8,
+            "가정의학과": 2.0, "한방과": 2.5,
+        }
+        marketing_uplift = 0
+        marketing_roas_effective = 0.0
+        if monthly_marketing_won and monthly_marketing_won > 0:
+            base_roas = ROAS_BY_CLINIC.get(clinic_type, 2.5)
+            # 체감 수익 곡선: 매출 5% 수준이 최적, 그 이상은 ROAS 감소 (sqrt 곡선)
+            optimal_spend = max(int(avg_monthly_revenue * 0.05), 1_500_000)
+            ratio = monthly_marketing_won / optimal_spend
+            if ratio <= 1.0:
+                effective_roas = base_roas
+            else:
+                # ratio>1이면 sqrt로 감쇠. ratio=4면 ROAS×0.5, ratio=9면 ×0.33
+                import math
+                effective_roas = base_roas / math.sqrt(ratio)
+            # 의사 처리능력으로 capping — 환자 한계 넘는 마케팅은 무의미
+            capacity_revenue = doctor_capacity * working_days * weighted_price
+            uplift_raw = int(monthly_marketing_won * effective_roas)
+            headroom = max(0, capacity_revenue - avg_monthly_revenue)
+            marketing_uplift = min(uplift_raw, int(headroom * 0.85))
+            marketing_roas_effective = round(effective_roas, 2)
+            avg_monthly_revenue += marketing_uplift
+
         # ─── 6) 보험/비급여 분리 ───
         breakdown = get_revenue_breakdown(clinic_type, avg_monthly_revenue)
 
@@ -283,7 +315,12 @@ class PredictionService:
                 "regional_price_won": get_regional_price(clinic_type, region_code),
                 "doctor_capacity_per_day": doctor_capacity,
                 "is_capacity_limited": daily_patients_capped > doctor_capacity * location_factor,
-            }
+            },
+            "marketing": {
+                "monthly_spend_won": monthly_marketing_won or 0,
+                "uplift_won": marketing_uplift,
+                "effective_roas": marketing_roas_effective,
+            },
         }
 
     @staticmethod
