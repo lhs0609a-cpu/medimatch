@@ -128,6 +128,11 @@ from .maintenance import (
     MaintenanceContract, MaintenanceRequest, MaintenanceComment, MaintenancePlanPreset,
     MaintenanceStatus, MaintenanceServiceType, RequestCategory, RequestStatus, RequestPriority,
 )
+# EMR 핵심 (전자차트/예약/처방전/수납)
+from .visit import Visit, VisitDiagnosis, VisitProcedure, VisitStatus
+from .appointment import Appointment, AppointmentStatus
+from .prescription import Prescription, PrescriptionItem, PrescriptionStatus
+from .bill import Bill, BillItem, EmrPayment, BillStatus, PaymentMethod as BillPaymentMethod
 
 __all__ = [
     "User",
@@ -347,4 +352,19 @@ __all__ = [
     "RequestCategory",
     "RequestStatus",
     "RequestPriority",
+    # EMR 핵심
+    "Visit",
+    "VisitDiagnosis",
+    "VisitProcedure",
+    "VisitStatus",
+    "Appointment",
+    "AppointmentStatus",
+    "Prescription",
+    "PrescriptionItem",
+    "PrescriptionStatus",
+    "Bill",
+    "BillItem",
+    "EmrPayment",
+    "BillStatus",
+    "BillPaymentMethod",
 ]

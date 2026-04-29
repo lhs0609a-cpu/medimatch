@@ -51,6 +51,10 @@ from .admin_contacts import router as admin_contacts_router
 from .community import router as community_router
 from .maintenance import router as maintenance_router
 from .growth_tools import router as growth_tools_router
+from .visits import router as visits_router
+from .appointments import router as appointments_router
+from .prescriptions import router as prescriptions_router
+from .bills import router as bills_router
 
 api_router = APIRouter()
 
@@ -107,3 +111,7 @@ api_router.include_router(admin_contacts_router, prefix="/admin", tags=["Admin C
 api_router.include_router(community_router, prefix="/community", tags=["Community - 커뮤니티"])
 api_router.include_router(maintenance_router, prefix="/maintenance", tags=["Maintenance - 관리유지비"])
 api_router.include_router(growth_tools_router, tags=["Growth Tools - 성장/생존 도구 7종"])
+api_router.include_router(visits_router, prefix="/emr/visits", tags=["EMR Visits - 전자차트"])
+api_router.include_router(appointments_router, prefix="/emr/appointments", tags=["EMR Appointments - 예약"])
+api_router.include_router(prescriptions_router, prefix="/emr/prescriptions", tags=["EMR Prescriptions - 처방전"])
+api_router.include_router(bills_router, prefix="/emr/bills", tags=["EMR Bills - 수납"])
