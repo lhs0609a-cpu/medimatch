@@ -220,7 +220,9 @@ def _disease_sql_value(code, name, chapter, is_chronic):
     name_esc = name.replace("'", "''")
     return (
         f"('{code}', '{name_esc}', '{chapter}', "
-        f"{'TRUE' if is_chronic else 'FALSE'}, TRUE, NOW(), NOW())"
+        f"{'TRUE' if is_chronic else 'FALSE'}, FALSE, "  # is_rare
+        f"'{{}}', '{{}}', "  # common_procedures, common_medications
+        f"TRUE, NOW(), NOW())"
     )
 
 
@@ -252,7 +254,9 @@ def build_sql():
         values = ",\n".join(_disease_sql_value(*d) for d in DISEASE_CODES)
         parts.append(
             "INSERT INTO hira_disease_codes "
-            "(code, name_kr, chapter, is_chronic, is_active, created_at, updated_at) "
+            "(code, name_kr, chapter, is_chronic, is_rare, "
+            "common_procedures, common_medications, "
+            "is_active, created_at, updated_at) "
             f"VALUES {values} "
             "ON CONFLICT (code) DO NOTHING;"
         )
