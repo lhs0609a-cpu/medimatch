@@ -43,7 +43,15 @@ export default function HiraCodePicker({
       const r = await apiClient.get(`/hira-codes/${type}`, {
         params: { q: debounced, limit: 12 },
       })
-      return r.data?.data || []
+      const raw = r.data?.data || []
+      // 백엔드 응답 정규화 (drug는 product_name/insurance_price, disease는 name_kr)
+      return raw.map((it: any) => ({
+        code: it.code,
+        name: it.name || it.product_name || it.name_kr || '',
+        unit_price: it.unit_price ?? it.insurance_price ?? 0,
+        category: it.category,
+        insurance_type: it.insurance_type,
+      }))
     },
     enabled: open && debounced.length >= 1,
   })

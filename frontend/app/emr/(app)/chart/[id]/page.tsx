@@ -1,17 +1,20 @@
 'use client'
 
+import { useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import Link from 'next/link'
-import { ArrowLeft, Stethoscope, Loader2, Check, Trash2, Edit3 } from 'lucide-react'
+import { ArrowLeft, Stethoscope, Loader2, Check, Trash2, Receipt, Pill } from 'lucide-react'
 import { toast } from 'sonner'
 import { visitService } from '@/lib/api/emr'
+import NewPrescriptionModal from '@/components/emr/NewPrescriptionModal'
 
 export default function VisitDetailPage() {
   const params = useParams()
   const router = useRouter()
   const qc = useQueryClient()
   const id = params.id as string
+  const [showRxModal, setShowRxModal] = useState(false)
 
   const { data: visit, isLoading } = useQuery({
     queryKey: ['visit', id],
@@ -33,6 +36,17 @@ export default function VisitDetailPage() {
     onSuccess: () => {
       toast.success('삭제 완료')
       router.push('/emr/chart')
+    },
+  })
+
+  const billMut = useMutation({
+    mutationFn: () => visitService.createBill(id),
+    onSuccess: (bill) => {
+      toast.success(`청구서 발행 완료 (${bill.bill_no.slice(-12)})`)
+      router.push('/emr/billing')
+    },
+    onError: (e: any) => {
+      toast.error(e.response?.data?.detail || '청구서 발행 실패')
     },
   })
 
@@ -66,6 +80,22 @@ export default function VisitDetailPage() {
           </span>
         </div>
         <div className="flex items-center gap-2">
+          <button
+            onClick={() => setShowRxModal(true)}
+            className="btn-secondary"
+            title="이 진료에 처방전 발행"
+          >
+            <Pill className="w-4 h-4" /> 처방전
+          </button>
+          <button
+            onClick={() => billMut.mutate()}
+            disabled={billMut.isPending}
+            className="btn-secondary"
+            title="이 진료의 시술 항목으로 청구서 자동 발행"
+          >
+            <Receipt className="w-4 h-4" />
+            {billMut.isPending ? '발행 중...' : '청구서 발행'}
+          </button>
           {visit.status !== 'COMPLETED' && (
             <button onClick={() => completeMut.mutate()} disabled={completeMut.isPending} className="btn-secondary">
               <Check className="w-4 h-4" /> 진료 완료
@@ -172,6 +202,14 @@ export default function VisitDetailPage() {
         <div className="card p-3 bg-blue-50/50 dark:bg-blue-950/20 text-sm">
           다음 진료 예정: <b>{visit.next_visit_date}</b>
         </div>
+      )}
+
+      {showRxModal && (
+        <NewPrescriptionModal
+          visitId={visit.id}
+          patientId={visit.patient_id || undefined}
+          onClose={() => setShowRxModal(false)}
+        />
       )}
     </div>
   )

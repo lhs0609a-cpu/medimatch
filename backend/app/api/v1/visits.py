@@ -12,8 +12,9 @@ from sqlalchemy.orm import selectinload
 from ..deps import get_db, get_current_active_user
 from ...models.user import User
 from ...models.visit import Visit, VisitDiagnosis, VisitProcedure, VisitStatus
+from ...models.bill import Bill, BillItem, BillStatus
 from ...schemas.emr_core import (
-    VisitCreate, VisitUpdate, VisitOut, VisitListItem,
+    VisitCreate, VisitUpdate, VisitOut, VisitListItem, BillOut,
 )
 
 logger = logging.getLogger(__name__)
@@ -244,6 +245,119 @@ async def delete_visit(
         raise HTTPException(status_code=404, detail="Visit not found")
     await db.delete(visit)
     await db.commit()
+
+
+@router.post("/{visit_id}/create-bill", response_model=BillOut)
+async def create_bill_from_visit(
+    visit_id: UUID,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_active_user),
+):
+    """진료 기록의 시술 항목을 바탕으로 청구서 자동 생성.
+
+    진찰료(BASIC_001) 기본 추가 + 시술/검사/주사/처치는 그대로 항목화.
+    급여 항목은 본인부담률 30% 기본, 비급여는 100%.
+    """
+    q = (
+        select(Visit)
+        .where(and_(Visit.id == visit_id, Visit.user_id == current_user.id))
+        .options(selectinload(Visit.procedures))
+    )
+    visit = (await db.execute(q)).scalar_one_or_none()
+    if not visit:
+        raise HTTPException(status_code=404, detail="Visit not found")
+
+    # 이미 이 진료에 발행된 청구서가 있으면 거부
+    existing = (await db.execute(
+        select(Bill).where(and_(Bill.visit_id == visit_id, Bill.status != BillStatus.CANCELLED))
+    )).scalar_one_or_none()
+    if existing:
+        raise HTTPException(
+            status_code=400,
+            detail=f"이미 청구서가 발행되었습니다 ({existing.bill_no})",
+        )
+
+    # 청구 항목 = 진찰료 + 시술 항목들
+    items_to_create = []
+    # 진찰료 — 초진/재진/검진별 표준 단가 (HIRA 2024 의원급)
+    consultation_fee = (
+        17_700 if visit.visit_type == "INITIAL" else 11_540  # REVISIT/CHECKUP
+    )
+    items_to_create.append({
+        "item_type": "CONSULTATION",
+        "code": "AA100" if visit.visit_type == "INITIAL" else "AA200",
+        "name": "초진 진찰료" if visit.visit_type == "INITIAL" else "재진 진찰료",
+        "quantity": 1,
+        "unit_price": consultation_fee,
+        "total_price": consultation_fee,
+        "insurance_covered": True,
+        "copay_rate": 0.30,
+    })
+    # 시술 항목
+    for p in visit.procedures:
+        item_type = {
+            "진찰": "CONSULTATION", "검사": "EXAM", "시술": "PROCEDURE",
+            "주사": "PROCEDURE", "처치": "PROCEDURE",
+        }.get(p.category or "시술", "PROCEDURE")
+        items_to_create.append({
+            "item_type": item_type,
+            "code": p.code,
+            "name": p.name,
+            "quantity": p.quantity,
+            "unit_price": p.unit_price,
+            "total_price": p.total_price,
+            "insurance_covered": p.insurance_covered,
+            "copay_rate": 0.30 if p.insurance_covered else 1.0,
+        })
+
+    # 금액 계산 (보험·본인·비급여 분리)
+    subtotal = 0
+    insurance = 0
+    patient_amount = 0
+    non_covered = 0
+    for it in items_to_create:
+        total = it["total_price"]
+        subtotal += total
+        if it["insurance_covered"]:
+            copay = int(total * it["copay_rate"])
+            patient_amount += copay
+            insurance += total - copay
+        else:
+            non_covered += total
+            patient_amount += total
+
+    final = patient_amount + non_covered
+
+    # bill 번호 (V- 대신 B-)
+    today = datetime.utcnow().strftime("%Y%m%d")
+    suffix = str(current_user.id)[:6].upper()
+    micro = datetime.utcnow().strftime("%H%M%S%f")[:9]
+    bill_no = f"B-{today}-{suffix}-{micro}"
+
+    bill = Bill(
+        user_id=current_user.id,
+        visit_id=visit.id,
+        patient_id=visit.patient_id,
+        bill_no=bill_no,
+        bill_date=visit.visit_date,
+        subtotal=subtotal,
+        insurance_amount=insurance,
+        patient_amount=patient_amount,
+        non_covered_amount=non_covered,
+        discount_amount=0,
+        final_amount=final,
+        balance=final,
+        status=BillStatus.ISSUED,
+        issued_at=datetime.utcnow(),
+        memo=f"진료기록 {visit.visit_no} 자동 생성",
+    )
+    db.add(bill)
+    await db.flush()
+    for it in items_to_create:
+        db.add(BillItem(bill_id=bill.id, **it))
+    await db.commit()
+    await db.refresh(bill, ["items", "payments"])
+    return bill
 
 
 @router.get("/stats/summary")

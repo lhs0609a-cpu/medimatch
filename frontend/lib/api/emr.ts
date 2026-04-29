@@ -241,6 +241,10 @@ export const visitService = {
     const r = await apiClient.get('/emr/visits/stats/summary')
     return r.data
   },
+  createBill: async (id: string): Promise<Bill> => {
+    const r = await apiClient.post(`/emr/visits/${id}/create-bill`)
+    return r.data
+  },
 }
 
 // ────────────────────────────────────────
