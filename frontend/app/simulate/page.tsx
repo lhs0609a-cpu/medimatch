@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -131,8 +131,58 @@ export default function SimulatePage() {
   const [result, setResult] = useState<SimulationResponse | null>(null)
   const [isAuthRequired, setIsAuthRequired] = useState(false)
   const [isUnlocked, setIsUnlocked] = useState(false)
+  const [isPdfGenerating, setIsPdfGenerating] = useState(false)
+  const reportRef = useRef<HTMLDivElement>(null)
   const { user } = useAuth()
   const isAdmin = user?.role === 'ADMIN'
+
+  const handleDownloadPdf = async () => {
+    if (!reportRef.current || !result) return
+    setIsPdfGenerating(true)
+    try {
+      const [{ default: html2canvas }, { default: jsPDF }] = await Promise.all([
+        import('html2canvas'),
+        import('jspdf'),
+      ])
+      const node = reportRef.current
+      // 페이지 캡처 — 폭 기준, 흰 배경
+      const canvas = await html2canvas(node, {
+        scale: 1.5,
+        backgroundColor: '#ffffff',
+        useCORS: true,
+        logging: false,
+        windowWidth: node.scrollWidth,
+        windowHeight: node.scrollHeight,
+      })
+      const imgData = canvas.toDataURL('image/jpeg', 0.92)
+      // A4 세로 (210×297mm), 여백 10mm
+      const pdf = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait' })
+      const pageW = 210
+      const pageH = 297
+      const margin = 10
+      const usableW = pageW - margin * 2
+      const imgH = (canvas.height * usableW) / canvas.width
+      let heightLeft = imgH
+      let position = margin
+      pdf.addImage(imgData, 'JPEG', margin, position, usableW, imgH, undefined, 'FAST')
+      heightLeft -= pageH - margin * 2
+      while (heightLeft > 0) {
+        pdf.addPage()
+        position = margin - (imgH - heightLeft)
+        pdf.addImage(imgData, 'JPEG', margin, position, usableW, imgH, undefined, 'FAST')
+        heightLeft -= pageH - margin * 2
+      }
+      const today = new Date().toISOString().slice(0, 10).replace(/-/g, '')
+      const filename = `mediplaton_report_${result.clinic_type || 'sim'}_${today}.pdf`
+      pdf.save(filename)
+      toast.success('PDF 다운로드를 시작합니다.')
+    } catch (e) {
+      console.error('PDF 생성 실패:', e)
+      toast.error('PDF 생성에 실패했습니다. 다시 시도해주세요.')
+    } finally {
+      setIsPdfGenerating(false)
+    }
+  }
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -439,14 +489,27 @@ export default function SimulatePage() {
           </div>
         ) : (
           /* ─── Results Section ─── */
-          <div className="space-y-6">
+          <div className="space-y-6" ref={reportRef}>
             {/* Header */}
             <div className="flex items-center justify-between">
               <div>
                 <h1 className="text-2xl font-semibold text-foreground">시뮬레이션 결과</h1>
                 <p className="text-muted-foreground">{result.address} · {result.clinic_type}</p>
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 print:hidden" data-html2canvas-ignore="true">
+                {isUnlocked && (
+                  <button
+                    onClick={handleDownloadPdf}
+                    disabled={isPdfGenerating}
+                    className="btn-secondary"
+                    title="전체 분석 PDF 다운로드"
+                  >
+                    <Download className="w-4 h-4" />
+                    <span className="hidden sm:inline">
+                      {isPdfGenerating ? 'PDF 생성 중...' : 'PDF 다운로드'}
+                    </span>
+                  </button>
+                )}
                 <ShareResult result={result} />
                 <button
                   onClick={() => { setResult(null); setIsUnlocked(false) }}
