@@ -139,46 +139,63 @@ export default function SimulatePage() {
   const handleDownloadPdf = async () => {
     if (!reportRef.current || !result) return
     setIsPdfGenerating(true)
+    const node = reportRef.current
     try {
       const [{ default: html2canvas }, { default: jsPDF }] = await Promise.all([
         import('html2canvas'),
         import('jspdf'),
       ])
-      const node = reportRef.current
-      // 페이지 캡처 — 폭 기준, 흰 배경
       const canvas = await html2canvas(node, {
-        scale: 1.5,
+        scale: 1.4,
         backgroundColor: '#ffffff',
         useCORS: true,
+        allowTaint: false,  // tainted면 toDataURL 실패 — 차라리 빠지게
         logging: false,
+        imageTimeout: 8000,
         windowWidth: node.scrollWidth,
         windowHeight: node.scrollHeight,
+        onclone: (doc) => {
+          // 캔버스 안에서 카카오맵·이미지 등 cross-origin 요소를 추가로 숨김
+          doc.querySelectorAll('[data-html2canvas-ignore="true"]').forEach((el) => {
+            (el as HTMLElement).style.display = 'none'
+          })
+        },
       })
-      const imgData = canvas.toDataURL('image/jpeg', 0.92)
-      // A4 세로 (210×297mm), 여백 10mm
+      let imgData: string
+      try {
+        imgData = canvas.toDataURL('image/jpeg', 0.9)
+      } catch (taintErr) {
+        // tainted canvas — 폴백
+        throw new Error('TAINTED_CANVAS')
+      }
       const pdf = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait' })
       const pageW = 210
       const pageH = 297
       const margin = 10
       const usableW = pageW - margin * 2
+      const usableH = pageH - margin * 2
       const imgH = (canvas.height * usableW) / canvas.width
       let heightLeft = imgH
       let position = margin
       pdf.addImage(imgData, 'JPEG', margin, position, usableW, imgH, undefined, 'FAST')
-      heightLeft -= pageH - margin * 2
+      heightLeft -= usableH
       while (heightLeft > 0) {
         pdf.addPage()
         position = margin - (imgH - heightLeft)
         pdf.addImage(imgData, 'JPEG', margin, position, usableW, imgH, undefined, 'FAST')
-        heightLeft -= pageH - margin * 2
+        heightLeft -= usableH
       }
       const today = new Date().toISOString().slice(0, 10).replace(/-/g, '')
       const filename = `mediplaton_report_${result.clinic_type || 'sim'}_${today}.pdf`
       pdf.save(filename)
       toast.success('PDF 다운로드를 시작합니다.')
-    } catch (e) {
+    } catch (e: any) {
       console.error('PDF 생성 실패:', e)
-      toast.error('PDF 생성에 실패했습니다. 다시 시도해주세요.')
+      // 폴백 — 브라우저 인쇄 다이얼로그 ("PDF로 저장")
+      toast.message('이미지 PDF 생성에 실패해 인쇄 다이얼로그로 전환합니다.', {
+        description: '"대상"에서 "PDF로 저장"을 선택하세요.',
+      })
+      setTimeout(() => window.print(), 400)
     } finally {
       setIsPdfGenerating(false)
     }

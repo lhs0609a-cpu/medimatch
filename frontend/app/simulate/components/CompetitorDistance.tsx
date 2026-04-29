@@ -147,8 +147,15 @@ export default function CompetitorDistance({ result }: CompetitorDistanceProps) 
         </span>
       </div>
 
+      {/* PDF 캡처용 placeholder (인쇄 시에만 보임, 캔버스에서는 보임) */}
+      <div className="hidden print:block mb-3 p-4 bg-muted/40 rounded-lg border border-border text-center text-xs text-muted-foreground">
+        경쟁 의원 위치는 웹에서 카카오맵으로 확인 — 본 PDF에는 거리 리스트로 대체 표시됩니다.
+      </div>
       {canRenderMap ? (
-        <div className="relative w-full h-[360px] rounded-lg overflow-hidden border border-border mb-5 bg-muted/30">
+        <div
+          className="relative w-full h-[360px] rounded-lg overflow-hidden border border-border mb-5 bg-muted/30 print:hidden"
+          data-html2canvas-ignore="true"
+        >
           <div ref={mapRef} className="w-full h-full" />
           {!isLoaded && !loadError && (
             <div className="absolute inset-0 flex items-center justify-center bg-muted/50">
