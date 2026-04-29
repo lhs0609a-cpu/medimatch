@@ -244,6 +244,16 @@ export const visitService = {
     const r = await apiClient.get('/emr/visits/stats/summary')
     return r.data
   },
+  dashboard: async (months: number = 6): Promise<{
+    months: number
+    start: string
+    monthly: { month: string; visits: number; patients: number; revenue: number }[]
+    by_visit_type: Record<string, number>
+    top_diagnoses: { code: string; name: string; count: number }[]
+  }> => {
+    const r = await apiClient.get('/emr/visits/stats/dashboard', { params: { months } })
+    return r.data
+  },
   createBill: async (id: string): Promise<Bill> => {
     const r = await apiClient.post(`/emr/visits/${id}/create-bill`)
     return r.data

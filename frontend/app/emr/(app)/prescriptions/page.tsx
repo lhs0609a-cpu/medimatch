@@ -6,6 +6,7 @@ import { Pill, Plus, AlertTriangle, Loader2, ShieldCheck, FileText, Printer } fr
 import Link from 'next/link'
 import { prescriptionService, Prescription, PrescriptionItem } from '@/lib/api/emr'
 import NewPrescriptionModal from '@/components/emr/NewPrescriptionModal'
+import ExportButton from '@/components/emr/ExportButton'
 
 export default function PrescriptionsPage() {
   const qc = useQueryClient()
@@ -26,9 +27,12 @@ export default function PrescriptionsPage() {
             <p className="text-sm text-muted-foreground">DUR 자동 안전 체크 — 임신·연령·병용금기·중복 처방</p>
           </div>
         </div>
-        <button onClick={() => setShowForm(true)} className="btn-primary">
-          <Plus className="w-4 h-4" /> 신규 처방
-        </button>
+        <div className="flex items-center gap-2">
+          <ExportButton endpoint="prescriptions" label="CSV 내보내기" className="btn-secondary text-sm" />
+          <button onClick={() => setShowForm(true)} className="btn-primary">
+            <Plus className="w-4 h-4" /> 신규 처방
+          </button>
+        </div>
       </div>
 
       <div className="card p-5">

@@ -5,6 +5,8 @@ import { useQuery } from '@tanstack/react-query'
 import Link from 'next/link'
 import { Stethoscope, Plus, FileText, Calendar, Loader2, Search, X } from 'lucide-react'
 import { visitService, VisitListItem } from '@/lib/api/emr'
+import EmrStatsPanel from '@/components/emr/EmrStatsPanel'
+import ExportButton from '@/components/emr/ExportButton'
 
 export default function ChartListPage() {
   const [search, setSearch] = useState('')
@@ -47,25 +49,15 @@ export default function ChartListPage() {
             <p className="text-sm text-muted-foreground">진료 기록 — SOAP · 활력징후 · 진단 · 시술</p>
           </div>
         </div>
-        <Link href="/emr/chart/new" className="btn-primary">
-          <Plus className="w-4 h-4" /> 신규 진료
-        </Link>
+        <div className="flex items-center gap-2">
+          <ExportButton endpoint="visits" label="CSV 내보내기" className="btn-secondary text-sm" />
+          <Link href="/emr/chart/new" className="btn-primary">
+            <Plus className="w-4 h-4" /> 신규 진료
+          </Link>
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="card p-5">
-          <div className="text-xs text-muted-foreground">오늘 진료</div>
-          <div className="text-3xl font-bold mt-1">{stats?.today_visits ?? '-'}건</div>
-        </div>
-        <div className="card p-5">
-          <div className="text-xs text-muted-foreground">이번 달 진료</div>
-          <div className="text-3xl font-bold mt-1">{stats?.month_visits ?? '-'}건</div>
-        </div>
-        <div className="card p-5">
-          <div className="text-xs text-muted-foreground">전체 기록</div>
-          <div className="text-3xl font-bold mt-1">{visits?.length ?? '-'}건</div>
-        </div>
-      </div>
+      <EmrStatsPanel />
 
       <div className="card p-5">
         <div className="flex items-center justify-between mb-3">

@@ -22,7 +22,7 @@ export default function NewPrescriptionModal({ visitId, patientId, onClose, onSu
   const [items, setItems] = useState<Omit<PrescriptionItem, 'id' | 'warning'>[]>([
     { drug_code: '', drug_name: '', ingredient: '', dose_per_time: 1, dose_unit: '정', frequency_per_day: 3, duration_days: 3, total_quantity: 9, unit_price: 0, total_price: 0, usage_note: '식후 30분' },
   ])
-  const [durResult, setDurResult] = useState<{ warnings: any[]; item_warnings: Record<number, string> } | null>(null)
+  const [durResult, setDurResult] = useState<{ warnings: any[]; item_warnings: Record<number, string>; cross_checked_active_meds?: number } | null>(null)
 
   const durMut = useMutation({
     mutationFn: () => prescriptionService.durCheck({
@@ -138,13 +138,25 @@ export default function NewPrescriptionModal({ visitId, patientId, onClose, onSu
           </div>
         </div>
 
-        {durResult && durResult.warnings.length > 0 && (
-          <div className="bg-rose-50 dark:bg-rose-950/30 border border-rose-200 rounded-lg p-3 text-xs space-y-1">
-            <div className="font-semibold text-rose-700 flex items-center gap-1"><AlertTriangle className="w-3 h-3" /> DUR 경고</div>
-            {durResult.warnings.map((w, i) => (
-              <div key={i} className="text-rose-600">· {w.message}</div>
-            ))}
-          </div>
+        {durResult && (
+          <>
+            {durResult.cross_checked_active_meds !== undefined && durResult.cross_checked_active_meds > 0 && (
+              <div className="bg-blue-50 dark:bg-blue-950/30 border border-blue-200 rounded-lg p-2 text-xs text-blue-700">
+                환자의 최근 90일 복용약 <b>{durResult.cross_checked_active_meds}건</b>과 함께 cross-check 완료
+              </div>
+            )}
+            {durResult.warnings.length > 0 && (
+              <div className="bg-rose-50 dark:bg-rose-950/30 border border-rose-200 rounded-lg p-3 text-xs space-y-1">
+                <div className="font-semibold text-rose-700 flex items-center gap-1"><AlertTriangle className="w-3 h-3" /> DUR 경고</div>
+                {durResult.warnings.map((w, i) => {
+                  const sevColor = w.severity === 'HIGH' ? 'text-rose-700 font-semibold' : w.severity === 'MEDIUM' ? 'text-rose-600' : 'text-amber-600'
+                  return (
+                    <div key={i} className={sevColor}>· {w.message}</div>
+                  )
+                })}
+              </div>
+            )}
+          </>
         )}
 
         <textarea className="input" placeholder="환자 안내 메모" value={patientNote} onChange={(e) => setPatientNote(e.target.value)} />

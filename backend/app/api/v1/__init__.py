@@ -55,6 +55,7 @@ from .visits import router as visits_router
 from .appointments import router as appointments_router
 from .prescriptions import router as prescriptions_router
 from .bills import router as bills_router
+from .emr_export import router as emr_export_router
 
 api_router = APIRouter()
 
@@ -115,3 +116,4 @@ api_router.include_router(visits_router, prefix="/emr/visits", tags=["EMR Visits
 api_router.include_router(appointments_router, prefix="/emr/appointments", tags=["EMR Appointments - 예약"])
 api_router.include_router(prescriptions_router, prefix="/emr/prescriptions", tags=["EMR Prescriptions - 처방전"])
 api_router.include_router(bills_router, prefix="/emr/bills", tags=["EMR Bills - 수납"])
+api_router.include_router(emr_export_router, prefix="/emr/export", tags=["EMR Export - CSV 내보내기"])

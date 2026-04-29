@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import Link from 'next/link'
 import {
@@ -8,6 +9,7 @@ import {
 } from 'lucide-react'
 import { toast } from 'sonner'
 import { apiClient } from '@/lib/api/client'
+import ExportButton from '@/components/emr/ExportButton'
 
 interface PatientItem {
   id: string
@@ -56,9 +58,12 @@ export default function PatientsPage() {
             <p className="text-sm text-muted-foreground">유입 · 상담 · 예약 · 동의 파이프라인</p>
           </div>
         </div>
-        <button onClick={() => setShowForm(true)} className="btn-primary">
-          <UserPlus className="w-4 h-4" /> 신규 환자
-        </button>
+        <div className="flex items-center gap-2">
+          <ExportButton endpoint="patients" label="CSV 내보내기" className="btn-secondary text-sm" />
+          <button onClick={() => setShowForm(true)} className="btn-primary">
+            <UserPlus className="w-4 h-4" /> 신규 환자
+          </button>
+        </div>
       </div>
 
       {data?.is_demo && (
@@ -155,6 +160,7 @@ export default function PatientsPage() {
 }
 
 function NewPatientModal({ onClose, onSuccess }: { onClose: () => void; onSuccess: () => void }) {
+  const router = useRouter()
   const [name, setName] = useState('')
   const [chartNo, setChartNo] = useState('')
   const [phone, setPhone] = useState('')
@@ -180,9 +186,13 @@ function NewPatientModal({ onClose, onSuccess }: { onClose: () => void; onSucces
       })
       return r.data
     },
-    onSuccess: () => {
-      toast.success('환자 등록 완료')
+    onSuccess: (data) => {
+      toast.success('환자 등록 완료 — 예약 화면으로 이동')
       onSuccess()
+      // 등록 직후 자동으로 예약 화면으로 (모달 자동 오픈)
+      if (data?.id) {
+        router.push(`/emr/appointments?new_patient_id=${data.id}&patient_name=${encodeURIComponent(name)}&patient_phone=${encodeURIComponent(phone || '')}`)
+      }
     },
     onError: (e: any) => toast.error(e.response?.data?.detail || '등록 실패'),
   })

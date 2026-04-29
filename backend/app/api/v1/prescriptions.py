@@ -133,17 +133,65 @@ def _dur_check(items: List) -> tuple[List[dict], dict]:
     return warnings, final_item_warnings
 
 
+async def _fetch_patient_active_meds(
+    db: AsyncSession,
+    user_id: UUID,
+    patient_id: UUID,
+    days: int = 90,
+) -> List:
+    """환자의 최근 N일 처방 약품 (현재 복용 추정)."""
+    from datetime import timedelta
+    cutoff = date.today() - timedelta(days=days)
+    q = (
+        select(Prescription)
+        .where(and_(
+            Prescription.user_id == user_id,
+            Prescription.patient_id == patient_id,
+            Prescription.prescribed_date >= cutoff,
+            Prescription.status != PrescriptionStatus.CANCELLED,
+        ))
+        .options(selectinload(Prescription.items))
+        .order_by(desc(Prescription.prescribed_date))
+        .limit(20)
+    )
+    rxs = (await db.execute(q)).scalars().all()
+    items = []
+    for rx in rxs:
+        items.extend(rx.items)
+    return items
+
+
 @router.post("/dur-check")
 async def dur_check_only(
     payload: PrescriptionCreate,
+    db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_active_user),
 ):
-    """처방전 저장 전 DUR 안전 체크만 수행."""
-    warnings, item_warnings = _dur_check(payload.items)
+    """처방전 저장 전 DUR 안전 체크 — 신규 처방 + 환자의 최근 90일 처방 cross-check."""
+    items_to_check = list(payload.items)
+
+    # 환자 최근 처방을 합쳐서 검사 (cross-check)
+    cross_check_count = 0
+    if payload.patient_id:
+        active_meds = await _fetch_patient_active_meds(db, current_user.id, payload.patient_id)
+        cross_check_count = len(active_meds)
+        # PrescriptionItem 모델 객체를 PrescriptionItemIn-호환 형태로 wrap
+        class _Adapter:
+            def __init__(self, m):
+                self.drug_name = m.drug_name
+                self.ingredient = m.ingredient
+        items_to_check = list(payload.items) + [_Adapter(m) for m in active_meds]
+
+    warnings, item_warnings = _dur_check(items_to_check)
+    # 신규 처방 인덱스만 item_warnings로 반환 (기존 복용약은 정보용)
+    new_count = len(payload.items)
+    new_item_warnings = {i: w for i, w in item_warnings.items() if i < new_count}
+
     return {
         "ok": len(warnings) == 0,
         "warnings": warnings,
-        "item_warnings": item_warnings,
+        "item_warnings": new_item_warnings,
+        "cross_checked_active_meds": cross_check_count,
     }
 
 
@@ -153,8 +201,20 @@ async def create_prescription(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_active_user),
 ):
-    """처방전 발행 — DUR 자동 체크 + 총액 계산."""
-    warnings, item_warnings = _dur_check(payload.items)
+    """처방전 발행 — DUR 자동 체크 (환자 복용약 cross-check 포함) + 총액 계산."""
+    # 환자 최근 처방을 합쳐 cross-check
+    items_to_check = list(payload.items)
+    if payload.patient_id:
+        active_meds = await _fetch_patient_active_meds(db, current_user.id, payload.patient_id)
+        class _Adapter:
+            def __init__(self, m):
+                self.drug_name = m.drug_name
+                self.ingredient = m.ingredient
+        items_to_check = list(payload.items) + [_Adapter(m) for m in active_meds]
+    warnings, item_warnings = _dur_check(items_to_check)
+    # 신규 처방 인덱스만 item_warnings 유지 (기존 복용약은 모델에 저장 안 함)
+    new_count = len(payload.items)
+    item_warnings = {i: w for i, w in item_warnings.items() if i < new_count}
 
     rx = Prescription(
         user_id=current_user.id,

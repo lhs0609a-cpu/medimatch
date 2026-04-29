@@ -1,6 +1,7 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { Calendar, Plus, X, Clock, Phone, User, Check, Loader2, Stethoscope } from 'lucide-react'
 import { toast } from 'sonner'
@@ -26,6 +27,14 @@ export default function AppointmentsPage() {
   const today = new Date().toISOString().slice(0, 10)
   const [selectedDate, setSelectedDate] = useState(today)
   const [showForm, setShowForm] = useState(false)
+  const searchParams = useSearchParams()
+  const newPatientId = searchParams?.get('new_patient_id')
+  const newPatientName = searchParams?.get('patient_name')
+  const newPatientPhone = searchParams?.get('patient_phone')
+
+  useEffect(() => {
+    if (newPatientId && !showForm) setShowForm(true)
+  }, [newPatientId])
 
   const dateFrom = `${selectedDate}T00:00:00`
   const dateTo = `${selectedDate}T23:59:59`
@@ -150,19 +159,37 @@ export default function AppointmentsPage() {
         </div>
       </div>
 
-      {showForm && <NewAppointmentModal onClose={() => setShowForm(false)} onSuccess={() => {
-        setShowForm(false)
-        qc.invalidateQueries({ queryKey: ['appointments'] })
-        qc.invalidateQueries({ queryKey: ['appointment-stats'] })
-      }} />}
+      {showForm && (
+        <NewAppointmentModal
+          prefillPatientId={newPatientId || undefined}
+          prefillPatientName={newPatientName || undefined}
+          prefillPatientPhone={newPatientPhone || undefined}
+          onClose={() => setShowForm(false)}
+          onSuccess={() => {
+            setShowForm(false)
+            qc.invalidateQueries({ queryKey: ['appointments'] })
+            qc.invalidateQueries({ queryKey: ['appointment-stats'] })
+          }}
+        />
+      )}
     </div>
   )
 }
 
-function NewAppointmentModal({ onClose, onSuccess }: { onClose: () => void; onSuccess: () => void }) {
-  const [patient, setPatient] = useState<{ id: string; name: string; phone?: string } | null>(null)
-  const [name, setName] = useState('')
-  const [phone, setPhone] = useState('')
+interface NewAppointmentModalProps {
+  onClose: () => void
+  onSuccess: () => void
+  prefillPatientId?: string
+  prefillPatientName?: string
+  prefillPatientPhone?: string
+}
+
+function NewAppointmentModal({ onClose, onSuccess, prefillPatientId, prefillPatientName, prefillPatientPhone }: NewAppointmentModalProps) {
+  const [patient, setPatient] = useState<{ id: string; name: string; phone?: string } | null>(
+    prefillPatientId && prefillPatientName ? { id: prefillPatientId, name: prefillPatientName, phone: prefillPatientPhone } : null
+  )
+  const [name, setName] = useState(prefillPatientName || '')
+  const [phone, setPhone] = useState(prefillPatientPhone || '')
   const [start, setStart] = useState('')
   const [duration, setDuration] = useState(15)
   const [type, setType] = useState('INITIAL')

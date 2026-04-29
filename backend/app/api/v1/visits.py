@@ -408,3 +408,85 @@ async def visit_stats(
         "month_visits": month_count,
         "as_of": datetime.utcnow().isoformat(),
     }
+
+
+@router.get("/stats/dashboard")
+async def dashboard_stats(
+    months: int = Query(6, ge=1, le=24),
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_active_user),
+):
+    """월별 진료수·매출·환자수 + 진료과 분포 + 진단 TOP 10."""
+    from datetime import timedelta
+    from dateutil.relativedelta import relativedelta as _rd
+    today = date.today()
+    start = (today - _rd(months=months - 1)).replace(day=1)
+
+    # 월별 진료 수
+    rows = (await db.execute(
+        select(
+            func.to_char(Visit.visit_date, 'YYYY-MM').label('month'),
+            func.count(Visit.id).label('count'),
+            func.count(func.distinct(Visit.patient_id)).label('unique_patients'),
+        )
+        .where(and_(
+            Visit.user_id == current_user.id,
+            Visit.visit_date >= start,
+        ))
+        .group_by('month')
+        .order_by('month')
+    )).all()
+    monthly = [
+        {"month": r[0], "visits": r[1], "patients": r[2]}
+        for r in rows
+    ]
+
+    # 월별 매출 (Bill 기반)
+    rev_rows = (await db.execute(
+        select(
+            func.to_char(Bill.bill_date, 'YYYY-MM').label('month'),
+            func.coalesce(func.sum(Bill.paid_amount), 0).label('revenue'),
+        )
+        .where(and_(
+            Bill.user_id == current_user.id,
+            Bill.bill_date >= start,
+        ))
+        .group_by('month')
+        .order_by('month')
+    )).all()
+    rev_map = {r[0]: int(r[1]) for r in rev_rows}
+    for m in monthly:
+        m["revenue"] = rev_map.get(m["month"], 0)
+
+    # 진료 구분 분포
+    type_rows = (await db.execute(
+        select(Visit.visit_type, func.count(Visit.id))
+        .where(and_(
+            Visit.user_id == current_user.id,
+            Visit.visit_date >= start,
+        ))
+        .group_by(Visit.visit_type)
+    )).all()
+    by_type = {r[0]: r[1] for r in type_rows}
+
+    # 진단 TOP 10
+    dx_rows = (await db.execute(
+        select(VisitDiagnosis.code, VisitDiagnosis.name, func.count(VisitDiagnosis.id).label('n'))
+        .join(Visit, Visit.id == VisitDiagnosis.visit_id)
+        .where(and_(
+            Visit.user_id == current_user.id,
+            Visit.visit_date >= start,
+        ))
+        .group_by(VisitDiagnosis.code, VisitDiagnosis.name)
+        .order_by(desc('n'))
+        .limit(10)
+    )).all()
+    top_dx = [{"code": r[0], "name": r[1], "count": r[2]} for r in dx_rows]
+
+    return {
+        "months": months,
+        "start": start.isoformat(),
+        "monthly": monthly,
+        "by_visit_type": by_type,
+        "top_diagnoses": top_dx,
+    }

@@ -6,6 +6,7 @@ import { Receipt, Plus, X, CreditCard, Loader2, RotateCcw, CircleDollarSign, Pri
 import Link from 'next/link'
 import { toast } from 'sonner'
 import { billService, Bill, BillItem } from '@/lib/api/emr'
+import ExportButton from '@/components/emr/ExportButton'
 
 function StatusBadge({ status }: { status: string }) {
   const map: Record<string, { color: string; label: string }> = {
@@ -45,9 +46,12 @@ export default function BillingPage() {
             <p className="text-sm text-muted-foreground">청구서 발행 · 부분 결제 · 환불 · 미수금 추적</p>
           </div>
         </div>
-        <button onClick={() => setShowForm(true)} className="btn-primary">
-          <Plus className="w-4 h-4" /> 청구서 발행
-        </button>
+        <div className="flex items-center gap-2">
+          <ExportButton endpoint="bills" label="CSV 내보내기" className="btn-secondary text-sm" />
+          <button onClick={() => setShowForm(true)} className="btn-primary">
+            <Plus className="w-4 h-4" /> 청구서 발행
+          </button>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
