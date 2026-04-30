@@ -145,53 +145,113 @@ export default function SimulatePage() {
         import('html2canvas'),
         import('jspdf'),
       ])
-      const canvas = await html2canvas(node, {
-        scale: 1.4,
-        backgroundColor: '#ffffff',
-        useCORS: true,
-        allowTaint: false,  // tainted면 toDataURL 실패 — 차라리 빠지게
-        logging: false,
-        imageTimeout: 8000,
-        windowWidth: node.scrollWidth,
-        windowHeight: node.scrollHeight,
-        onclone: (doc) => {
-          // 캔버스 안에서 카카오맵·이미지 등 cross-origin 요소를 추가로 숨김
-          doc.querySelectorAll('[data-html2canvas-ignore="true"]').forEach((el) => {
-            (el as HTMLElement).style.display = 'none'
-          })
-        },
-      })
-      let imgData: string
-      try {
-        imgData = canvas.toDataURL('image/jpeg', 0.9)
-      } catch (taintErr) {
-        // tainted canvas — 폴백
-        throw new Error('TAINTED_CANVAS')
-      }
+
       const pdf = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait' })
       const pageW = 210
       const pageH = 297
       const margin = 10
       const usableW = pageW - margin * 2
       const usableH = pageH - margin * 2
-      const imgH = (canvas.height * usableW) / canvas.width
-      let heightLeft = imgH
-      let position = margin
-      pdf.addImage(imgData, 'JPEG', margin, position, usableW, imgH, undefined, 'FAST')
-      heightLeft -= usableH
-      while (heightLeft > 0) {
-        pdf.addPage()
-        position = margin - (imgH - heightLeft)
-        pdf.addImage(imgData, 'JPEG', margin, position, usableW, imgH, undefined, 'FAST')
-        heightLeft -= usableH
+      const blockGap = 3
+      const MAX_RECURSE_DEPTH = 2
+
+      const captureBlock = async (el: HTMLElement) => {
+        return html2canvas(el, {
+          scale: 1.6,
+          backgroundColor: '#ffffff',
+          useCORS: true,
+          allowTaint: false,
+          logging: false,
+          imageTimeout: 8000,
+          windowWidth: el.scrollWidth,
+          onclone: (doc) => {
+            // 캡처 불가 영역(카카오맵 iframe 등) 숨김
+            doc.querySelectorAll('[data-html2canvas-ignore="true"]').forEach((ig) => {
+              (ig as HTMLElement).style.display = 'none'
+            })
+            // print 전용으로 숨겨둔 PDF 플레이스홀더(예: 지도 대체 텍스트)를 캡처에서도 보이게
+            doc.querySelectorAll('[class*="print:block"]').forEach((el) => {
+              (el as HTMLElement).style.display = 'block'
+            })
+          },
+        })
       }
+
+      let cursorY = margin
+
+      const placeImage = (imgData: string, h: number) => {
+        if (cursorY + h > pageH - margin) {
+          pdf.addPage()
+          cursorY = margin
+        }
+        pdf.addImage(imgData, 'JPEG', margin, cursorY, usableW, h, undefined, 'FAST')
+        cursorY += h + blockGap
+      }
+
+      const sliceTallImage = (imgData: string, totalH: number) => {
+        if (cursorY > margin) {
+          pdf.addPage()
+          cursorY = margin
+        }
+        let heightLeft = totalH
+        let position = margin
+        pdf.addImage(imgData, 'JPEG', margin, position, usableW, totalH, undefined, 'FAST')
+        heightLeft -= usableH
+        while (heightLeft > 0) {
+          pdf.addPage()
+          position = margin - (totalH - heightLeft)
+          pdf.addImage(imgData, 'JPEG', margin, position, usableW, totalH, undefined, 'FAST')
+          heightLeft -= usableH
+        }
+        cursorY = pageH // 다음 블록은 새 페이지에서
+      }
+
+      const visibleChildren = (el: HTMLElement): HTMLElement[] => {
+        return Array.from(el.children).filter((c) => {
+          const h = c as HTMLElement
+          if (h.getAttribute('data-html2canvas-ignore') === 'true') return false
+          const r = h.getBoundingClientRect()
+          return r.width > 0 && r.height > 0
+        }) as HTMLElement[]
+      }
+
+      // 재귀: 한 블록을 배치. 페이지보다 크면 자식으로 내려가서 분할 시도.
+      const placeBlock = async (el: HTMLElement, depth: number): Promise<void> => {
+        const canvas = await captureBlock(el)
+        const imgData = canvas.toDataURL('image/jpeg', 0.92)
+        const blockH = (canvas.height * usableW) / canvas.width
+
+        if (blockH <= usableH) {
+          placeImage(imgData, blockH)
+          return
+        }
+
+        // 페이지보다 크면 자식 단위로 분할 (최대 MAX_RECURSE_DEPTH 단계)
+        if (depth < MAX_RECURSE_DEPTH) {
+          const children = visibleChildren(el)
+          if (children.length >= 2) {
+            for (const child of children) {
+              await placeBlock(child, depth + 1)
+            }
+            return
+          }
+        }
+
+        // 더 이상 쪼갤 수 없으면 픽셀 단위 슬라이스 (마지막 수단)
+        sliceTallImage(imgData, blockH)
+      }
+
+      const topBlocks = visibleChildren(node)
+      for (const el of topBlocks) {
+        await placeBlock(el, 0)
+      }
+
       const today = new Date().toISOString().slice(0, 10).replace(/-/g, '')
       const filename = `mediplaton_report_${result.clinic_type || 'sim'}_${today}.pdf`
       pdf.save(filename)
       toast.success('PDF 다운로드를 시작합니다.')
     } catch (e: any) {
       console.error('PDF 생성 실패:', e)
-      // 폴백 — 브라우저 인쇄 다이얼로그 ("PDF로 저장")
       toast.message('이미지 PDF 생성에 실패해 인쇄 다이얼로그로 전환합니다.', {
         description: '"대상"에서 "PDF로 저장"을 선택하세요.',
       })

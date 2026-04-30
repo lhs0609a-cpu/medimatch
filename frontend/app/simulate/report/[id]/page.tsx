@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useParams, useRouter, useSearchParams } from 'next/navigation'
 import { useQuery, useMutation } from '@tanstack/react-query'
 import Link from 'next/link'
@@ -21,6 +21,7 @@ export default function ReportPage() {
 
   const [isPurchased, setIsPurchased] = useState(false)
   const [isPaymentProcessing, setIsPaymentProcessing] = useState(false)
+  const reportRef = useRef<HTMLDivElement>(null)
   const { user } = useAuth()
   const isAdmin = user?.role === 'ADMIN'
 
@@ -107,42 +108,113 @@ export default function ReportPage() {
     },
   })
 
-  // Download PDF mutation
+  // 클라이언트 PDF 생성 (백엔드 의존 X — CORS/503 영향 없음)
+  const generateClientPdf = async () => {
+    if (!reportRef.current) throw new Error('리포트 미준비')
+    const node = reportRef.current
+
+    const [{ default: html2canvas }, { default: jsPDF }] = await Promise.all([
+      import('html2canvas'),
+      import('jspdf'),
+    ])
+
+    const pdf = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait' })
+    const pageW = 210, pageH = 297, margin = 10
+    const usableW = pageW - margin * 2
+    const usableH = pageH - margin * 2
+    const blockGap = 3
+    const MAX_RECURSE_DEPTH = 2
+
+    const captureBlock = (el: HTMLElement) => html2canvas(el, {
+      scale: 1.6,
+      backgroundColor: '#ffffff',
+      useCORS: true,
+      allowTaint: false,
+      logging: false,
+      imageTimeout: 8000,
+      windowWidth: el.scrollWidth,
+      onclone: (doc) => {
+        doc.querySelectorAll('[data-html2canvas-ignore="true"]').forEach((ig) => {
+          (ig as HTMLElement).style.display = 'none'
+        })
+        doc.querySelectorAll('[class*="print:block"]').forEach((el) => {
+          (el as HTMLElement).style.display = 'block'
+        })
+      },
+    })
+
+    let cursorY = margin
+
+    const placeImage = (imgData: string, h: number) => {
+      if (cursorY + h > pageH - margin) {
+        pdf.addPage()
+        cursorY = margin
+      }
+      pdf.addImage(imgData, 'JPEG', margin, cursorY, usableW, h, undefined, 'FAST')
+      cursorY += h + blockGap
+    }
+
+    const sliceTallImage = (imgData: string, totalH: number) => {
+      if (cursorY > margin) { pdf.addPage(); cursorY = margin }
+      let heightLeft = totalH, position = margin
+      pdf.addImage(imgData, 'JPEG', margin, position, usableW, totalH, undefined, 'FAST')
+      heightLeft -= usableH
+      while (heightLeft > 0) {
+        pdf.addPage()
+        position = margin - (totalH - heightLeft)
+        pdf.addImage(imgData, 'JPEG', margin, position, usableW, totalH, undefined, 'FAST')
+        heightLeft -= usableH
+      }
+      cursorY = pageH
+    }
+
+    const visibleChildren = (el: HTMLElement): HTMLElement[] => {
+      return Array.from(el.children).filter((c) => {
+        const h = c as HTMLElement
+        if (h.getAttribute('data-html2canvas-ignore') === 'true') return false
+        const r = h.getBoundingClientRect()
+        return r.width > 0 && r.height > 0
+      }) as HTMLElement[]
+    }
+
+    const placeBlock = async (el: HTMLElement, depth: number): Promise<void> => {
+      const canvas = await captureBlock(el)
+      const imgData = canvas.toDataURL('image/jpeg', 0.92)
+      const blockH = (canvas.height * usableW) / canvas.width
+
+      if (blockH <= usableH) { placeImage(imgData, blockH); return }
+
+      if (depth < MAX_RECURSE_DEPTH) {
+        const children = visibleChildren(el)
+        if (children.length >= 2) {
+          for (const child of children) await placeBlock(child, depth + 1)
+          return
+        }
+      }
+      sliceTallImage(imgData, blockH)
+    }
+
+    for (const el of visibleChildren(node)) {
+      await placeBlock(el, 0)
+    }
+
+    const today = new Date().toISOString().slice(0, 10).replace(/-/g, '')
+    const filename = `메디플라톤_상권분석_${simulation?.clinic_type || 'report'}_${today}.pdf`
+    pdf.save(filename)
+  }
+
   const downloadMutation = useMutation({
     mutationFn: async () => {
-      if (isAdmin) {
-        // Admin direct PDF stream — bypass purchase/report record
-        const API_BASE = process.env.NEXT_PUBLIC_API_URL || '/api/v1'
-        const token = localStorage.getItem('access_token')
-        const res = await fetch(`${API_BASE}/simulate/reports/${simulationId}/admin-pdf`, {
-          headers: { Authorization: `Bearer ${token}` },
-        })
-        if (!res.ok) throw new Error('관리자 다운로드 실패')
-        const blob = await res.blob()
-        const url = URL.createObjectURL(blob)
-        const a = document.createElement('a')
-        a.href = url
-        a.download = `메디플라톤_상권분석_${simulation?.clinic_type || ''}_${new Date().toISOString().slice(0, 10).replace(/-/g, '')}.pdf`
-        document.body.appendChild(a)
-        a.click()
-        a.remove()
-        URL.revokeObjectURL(url)
-        return { download_url: '' }
-      }
-      return simulationService.downloadReport(simulationId)
+      await generateClientPdf()
+      return { download_url: '' }
     },
-    onSuccess: (data) => {
-      if (isAdmin) {
-        toast.success('관리자 권한으로 PDF가 다운로드되었습니다.')
-        return
-      }
-      if (data.download_url) {
-        window.open(data.download_url, '_blank')
-        toast.success('PDF 다운로드가 시작됩니다.')
-      }
+    onSuccess: () => {
+      toast.success('PDF 다운로드를 시작합니다.')
     },
     onError: (error: any) => {
-      toast.error('다운로드에 실패했습니다.')
+      console.error('PDF 생성 실패:', error)
+      toast.error('PDF 생성에 실패했습니다. 인쇄 다이얼로그를 사용해주세요.')
+      setTimeout(() => window.print(), 400)
     },
   })
 
@@ -295,12 +367,14 @@ export default function ReportPage() {
         )}
 
         {/* Report Preview */}
-        <ReportPreview
-          simulation={simulation}
-          isPurchased={isPurchased}
-          onPurchase={handlePurchase}
-          isLoading={purchaseMutation.isPending || isPaymentProcessing}
-        />
+        <div ref={reportRef}>
+          <ReportPreview
+            simulation={simulation}
+            isPurchased={isPurchased}
+            onPurchase={handlePurchase}
+            isLoading={purchaseMutation.isPending || isPaymentProcessing}
+          />
+        </div>
 
         {/* Bottom CTA for non-purchased */}
         {!isPurchased && (

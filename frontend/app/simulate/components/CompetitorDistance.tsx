@@ -147,10 +147,20 @@ export default function CompetitorDistance({ result }: CompetitorDistanceProps) 
         </span>
       </div>
 
-      {/* PDF 캡처용 placeholder (인쇄 시에만 보임, 캔버스에서는 보임) */}
-      <div className="hidden print:block mb-3 p-4 bg-muted/40 rounded-lg border border-border text-center text-xs text-muted-foreground">
-        경쟁 의원 위치는 웹에서 카카오맵으로 확인 — 본 PDF에는 거리 리스트로 대체 표시됩니다.
-      </div>
+      {/* PDF/인쇄 전용 도식 지도 (좌표 기반 SVG, API 키 불필요) */}
+      {canRenderMap && (
+        <div className="hidden print:block mb-3">
+          <SchematicMap
+            centerLat={centerLat!}
+            centerLng={centerLng!}
+            radius={radius}
+            competitors={competitorsWithCoords.slice(0, 10)}
+          />
+          <p className="mt-1 text-center text-[10px] text-muted-foreground">
+            반경 {radius}m · 좌표 기반 도식 지도 (실제 지도는 웹에서 확인)
+          </p>
+        </div>
+      )}
       {canRenderMap ? (
         <div
           className="relative w-full h-[360px] rounded-lg overflow-hidden border border-border mb-5 bg-muted/30 print:hidden"
@@ -217,5 +227,95 @@ export default function CompetitorDistance({ result }: CompetitorDistanceProps) 
         </span>
       </div>
     </div>
+  )
+}
+
+interface SchematicMapProps {
+  centerLat: number
+  centerLng: number
+  radius: number
+  competitors: Array<{
+    name: string
+    latitude?: number | null
+    longitude?: number | null
+    distance_m: number
+  }>
+}
+
+function SchematicMap({ centerLat, centerLng, radius, competitors }: SchematicMapProps) {
+  const W = 600
+  const H = 360
+  const viewMeters = radius * 2.4 // 반경 원이 80% 차도록
+  const scale = Math.min(W, H) / viewMeters
+  const cx = W / 2
+  const cy = H / 2
+  const mPerDegLat = 111320
+  const mPerDegLng = 111320 * Math.cos((centerLat * Math.PI) / 180)
+
+  const markers = competitors
+    .map((c, i) => {
+      if (typeof c.latitude !== 'number' || typeof c.longitude !== 'number') return null
+      const dxM = (c.longitude - centerLng) * mPerDegLng
+      const dyM = (c.latitude - centerLat) * mPerDegLat
+      const x = cx + dxM * scale
+      const y = cy - dyM * scale // SVG y는 아래로 증가
+      // 뷰포트 안쪽에 들어오는 마커만 표시 (가장자리 8px 안전영역)
+      if (x < 8 || x > W - 8 || y < 8 || y > H - 8) return null
+      return {
+        x,
+        y,
+        label: String.fromCharCode(65 + i),
+        name: c.name,
+        isClose: c.distance_m <= 300,
+      }
+    })
+    .filter((m): m is NonNullable<typeof m> => m !== null)
+
+  return (
+    <svg
+      viewBox={`0 0 ${W} ${H}`}
+      width="100%"
+      style={{ aspectRatio: `${W} / ${H}`, background: '#f8fafc', borderRadius: 8, border: '1px solid #e2e8f0' }}
+    >
+      {/* 격자 (html2canvas 호환을 위해 명시적 라인) */}
+      <rect width={W} height={H} fill="#f8fafc" />
+      {Array.from({ length: Math.floor(W / 40) }, (_, i) => (
+        <line key={`v${i}`} x1={(i + 1) * 40} y1={0} x2={(i + 1) * 40} y2={H} stroke="#e2e8f0" strokeWidth="0.5" />
+      ))}
+      {Array.from({ length: Math.floor(H / 40) }, (_, i) => (
+        <line key={`h${i}`} x1={0} y1={(i + 1) * 40} x2={W} y2={(i + 1) * 40} stroke="#e2e8f0" strokeWidth="0.5" />
+      ))}
+
+      {/* 반경 원 */}
+      <circle cx={cx} cy={cy} r={radius * scale} fill="#3b82f6" fillOpacity="0.06" stroke="#3b82f6" strokeWidth="1.5" strokeDasharray="6 4" />
+
+      {/* 반경 라벨 */}
+      <text x={cx} y={cy - radius * scale - 6} textAnchor="middle" fontSize="11" fill="#3b82f6" fontWeight="600">
+        반경 {radius >= 1000 ? `${(radius / 1000).toFixed(1)}km` : `${radius}m`}
+      </text>
+
+      {/* 내 위치 */}
+      <circle cx={cx} cy={cy} r="11" fill="#2563eb" stroke="white" strokeWidth="2.5" />
+      <text x={cx} y={cy + 3.5} textAnchor="middle" fontSize="10" fill="white" fontWeight="700">
+        나
+      </text>
+
+      {/* 경쟁 의원 마커 */}
+      {markers.map((m, i) => (
+        <g key={i}>
+          <circle cx={m.x} cy={m.y} r="10" fill={m.isClose ? '#ef4444' : '#f59e0b'} stroke="white" strokeWidth="2" />
+          <text x={m.x} y={m.y + 3.5} textAnchor="middle" fontSize="10" fill="white" fontWeight="700">
+            {m.label}
+          </text>
+        </g>
+      ))}
+
+      {/* 북쪽 표시 */}
+      <g transform={`translate(${W - 30}, 30)`}>
+        <circle r="14" fill="white" stroke="#cbd5e1" strokeWidth="1" />
+        <text textAnchor="middle" y="-2" fontSize="9" fill="#64748b" fontWeight="600">N</text>
+        <path d="M 0 -8 L -3 4 L 0 1 L 3 4 Z" fill="#ef4444" />
+      </g>
+    </svg>
   )
 }
