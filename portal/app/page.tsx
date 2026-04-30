@@ -5,10 +5,10 @@ import { useState } from 'react'
 const services = [
   {
     id: 'hospital',
-    title: '병원개원',
+    title: '개원컨설팅',
     subtitle: 'OPENING',
     tagline: 'Establishment',
-    description: '입지 분석부터 인테리어까지\n원스톱 개원 솔루션',
+    description: '입지 분석부터 인테리어까지\n원스톱 개원 컨설팅',
     features: ['입지 분석', '인테리어', '인허가'],
     url: 'https://medi.brandplaton.com',
     image: 'https://medi.brandplaton.com/images/listings/building-01.jpg',
@@ -27,11 +27,11 @@ const services = [
   },
   {
     id: 'marketing',
-    title: '플라톤마케팅',
-    subtitle: 'MARKETING',
+    title: '브랜딩',
+    subtitle: 'BRANDING',
     tagline: 'Brand',
-    description: '데이터 기반 마케팅 전략으로\n병원의 가치를 극대화합니다',
-    features: ['브랜드 전략', '온라인 마케팅', '콘텐츠 제작'],
+    description: '데이터 기반 브랜드 전략으로\n가치를 극대화합니다',
+    features: ['브랜드 전략', '디지털 마케팅', '콘텐츠 제작'],
     url: 'https://www.brandplaton.com/',
     image: '/images/platon-marketing.jpg',
     number: '03',
