@@ -118,6 +118,21 @@ export default function ReportPage() {
       import('jspdf'),
     ])
 
+    // 외부 이미지 (OSM 타일 등) 로딩 대기
+    const imgs = Array.from(node.querySelectorAll('img'))
+    await Promise.all(
+      imgs.map((img) =>
+        img.complete && img.naturalWidth > 0
+          ? Promise.resolve()
+          : new Promise<void>((resolve) => {
+              const done = () => resolve()
+              img.addEventListener('load', done, { once: true })
+              img.addEventListener('error', done, { once: true })
+              setTimeout(done, 6000)
+            })
+      )
+    )
+
     const pdf = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait' })
     const pageW = 210, pageH = 297, margin = 10
     const usableW = pageW - margin * 2

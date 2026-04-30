@@ -147,18 +147,15 @@ export default function CompetitorDistance({ result }: CompetitorDistanceProps) 
         </span>
       </div>
 
-      {/* PDF/인쇄 전용 도식 지도 (좌표 기반 SVG, API 키 불필요) */}
+      {/* PDF/인쇄 전용 OSM 타일 지도 (실제 지도 + 마커) */}
       {canRenderMap && (
         <div className="hidden print:block mb-3">
-          <SchematicMap
+          <TileMap
             centerLat={centerLat!}
             centerLng={centerLng!}
             radius={radius}
-            competitors={competitorsWithCoords.slice(0, 10)}
+            competitors={competitors.slice(0, 10)}
           />
-          <p className="mt-1 text-center text-[10px] text-muted-foreground">
-            반경 {radius}m · 좌표 기반 도식 지도 (실제 지도는 웹에서 확인)
-          </p>
         </div>
       )}
       {canRenderMap ? (
@@ -230,7 +227,7 @@ export default function CompetitorDistance({ result }: CompetitorDistanceProps) 
   )
 }
 
-interface SchematicMapProps {
+interface TileMapProps {
   centerLat: number
   centerLng: number
   radius: number
@@ -242,80 +239,202 @@ interface SchematicMapProps {
   }>
 }
 
-function SchematicMap({ centerLat, centerLng, radius, competitors }: SchematicMapProps) {
+// Web Mercator 변환
+const lngToTileX = (lng: number, z: number) => ((lng + 180) / 360) * Math.pow(2, z)
+const latToTileY = (lat: number, z: number) => {
+  const rad = (lat * Math.PI) / 180
+  return ((1 - Math.log(Math.tan(rad) + 1 / Math.cos(rad)) / Math.PI) / 2) * Math.pow(2, z)
+}
+const metersPerPixel = (lat: number, z: number) =>
+  (156543.03392 * Math.cos((lat * Math.PI) / 180)) / Math.pow(2, z)
+
+function TileMap({ centerLat, centerLng, radius, competitors }: TileMapProps) {
   const W = 600
   const H = 360
-  const viewMeters = radius * 2.4 // 반경 원이 80% 차도록
-  const scale = Math.min(W, H) / viewMeters
-  const cx = W / 2
-  const cy = H / 2
-  const mPerDegLat = 111320
-  const mPerDegLng = 111320 * Math.cos((centerLat * Math.PI) / 180)
 
-  const markers = competitors
-    .map((c, i) => {
-      if (typeof c.latitude !== 'number' || typeof c.longitude !== 'number') return null
-      const dxM = (c.longitude - centerLng) * mPerDegLng
-      const dyM = (c.latitude - centerLat) * mPerDegLat
-      const x = cx + dxM * scale
-      const y = cy - dyM * scale // SVG y는 아래로 증가
-      // 뷰포트 안쪽에 들어오는 마커만 표시 (가장자리 8px 안전영역)
-      if (x < 8 || x > W - 8 || y < 8 || y > H - 8) return null
-      return {
-        x,
-        y,
-        label: String.fromCharCode(65 + i),
-        name: c.name,
-        isClose: c.distance_m <= 300,
+  // 좌표를 가진 경쟁자 + 거리 계산용 중심까지 거리
+  const withCoords = competitors
+    .map((c, i) => ({ c, originalIndex: i }))
+    .filter(({ c }) => typeof c.latitude === 'number' && typeof c.longitude === 'number')
+
+  // 가장 먼 경쟁자까지 거리 (마커가 모두 보이도록)
+  const maxCompDist = withCoords.reduce((m, { c }) => Math.max(m, c.distance_m), 0)
+
+  // 줌 레벨 자동 선택: 마커 클러스터가 뷰포트 60% 차도록
+  const targetDiameter = Math.max(maxCompDist * 2.5, 300) // 최소 300m
+  const pickZoom = () => {
+    for (let z = 19; z >= 10; z--) {
+      const mpp = metersPerPixel(centerLat, z)
+      const viewportM = Math.min(W, H) * mpp
+      if (viewportM >= targetDiameter) return z
+    }
+    return 10
+  }
+  const z = pickZoom()
+  const mpp = metersPerPixel(centerLat, z)
+
+  // 중심 픽셀 좌표 (월드 그리드)
+  const cxWorld = lngToTileX(centerLng, z) * 256
+  const cyWorld = latToTileY(centerLat, z) * 256
+  const minX = cxWorld - W / 2
+  const minY = cyWorld - H / 2
+
+  // 필요한 타일 범위
+  const tileMinX = Math.floor(minX / 256)
+  const tileMaxX = Math.floor((minX + W) / 256)
+  const tileMinY = Math.floor(minY / 256)
+  const tileMaxY = Math.floor((minY + H) / 256)
+
+  const tiles: Array<{ x: number; y: number; drawX: number; drawY: number; url: string }> = []
+  for (let tx = tileMinX; tx <= tileMaxX; tx++) {
+    for (let ty = tileMinY; ty <= tileMaxY; ty++) {
+      tiles.push({
+        x: tx,
+        y: ty,
+        drawX: tx * 256 - minX,
+        drawY: ty * 256 - minY,
+        url: `https://tile.openstreetmap.org/${z}/${tx}/${ty}.png`,
+      })
+    }
+  }
+
+  // 좌표 → 픽셀
+  const project = (lat: number, lng: number) => {
+    const px = lngToTileX(lng, z) * 256
+    const py = latToTileY(lat, z) * 256
+    return { x: px - minX, y: py - minY }
+  }
+
+  const radiusPx = radius / mpp
+  const center = { x: W / 2, y: H / 2 }
+
+  // 마커 (충돌 분산: 24px 이내면 약간 옆으로 밀어서 안 겹치게)
+  const placed: Array<{ x: number; y: number }> = []
+  const markers = withCoords.map(({ c, originalIndex }) => {
+    let { x, y } = project(c.latitude!, c.longitude!)
+    const MIN_GAP = 22
+    for (const p of placed) {
+      const dx = x - p.x, dy = y - p.y
+      const d = Math.sqrt(dx * dx + dy * dy)
+      if (d < MIN_GAP) {
+        const angle = d > 0.1 ? Math.atan2(dy, dx) : (originalIndex * Math.PI) / 3
+        const push = MIN_GAP - d + 1
+        x += Math.cos(angle) * push
+        y += Math.sin(angle) * push
       }
-    })
-    .filter((m): m is NonNullable<typeof m> => m !== null)
+    }
+    placed.push({ x, y })
+    return {
+      x,
+      y,
+      label: String.fromCharCode(65 + originalIndex),
+      isClose: c.distance_m <= 300,
+    }
+  })
 
   return (
-    <svg
-      viewBox={`0 0 ${W} ${H}`}
-      width="100%"
-      style={{ aspectRatio: `${W} / ${H}`, background: '#f8fafc', borderRadius: 8, border: '1px solid #e2e8f0' }}
+    <div
+      style={{
+        position: 'relative',
+        width: '100%',
+        aspectRatio: `${W} / ${H}`,
+        maxWidth: W,
+        margin: '0 auto',
+        borderRadius: 8,
+        overflow: 'hidden',
+        border: '1px solid #e2e8f0',
+        background: '#e8eef3',
+      }}
     >
-      {/* 격자 (html2canvas 호환을 위해 명시적 라인) */}
-      <rect width={W} height={H} fill="#f8fafc" />
-      {Array.from({ length: Math.floor(W / 40) }, (_, i) => (
-        <line key={`v${i}`} x1={(i + 1) * 40} y1={0} x2={(i + 1) * 40} y2={H} stroke="#e2e8f0" strokeWidth="0.5" />
-      ))}
-      {Array.from({ length: Math.floor(H / 40) }, (_, i) => (
-        <line key={`h${i}`} x1={0} y1={(i + 1) * 40} x2={W} y2={(i + 1) * 40} stroke="#e2e8f0" strokeWidth="0.5" />
-      ))}
+      <div style={{ position: 'relative', width: W, height: H, transformOrigin: 'top left' }}>
+        {/* OSM 타일 — CORS 지원, html2canvas 캡처 가능 */}
+        {tiles.map((t) => (
+          <img
+            key={`${t.x}-${t.y}`}
+            src={t.url}
+            crossOrigin="anonymous"
+            alt=""
+            style={{
+              position: 'absolute',
+              left: t.drawX,
+              top: t.drawY,
+              width: 256,
+              height: 256,
+              pointerEvents: 'none',
+              userSelect: 'none',
+            }}
+          />
+        ))}
 
-      {/* 반경 원 */}
-      <circle cx={cx} cy={cy} r={radius * scale} fill="#3b82f6" fillOpacity="0.06" stroke="#3b82f6" strokeWidth="1.5" strokeDasharray="6 4" />
+        {/* SVG 오버레이: 반경, 내 위치, 경쟁 마커 */}
+        <svg
+          viewBox={`0 0 ${W} ${H}`}
+          width={W}
+          height={H}
+          style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}
+        >
+          {/* 반경 원 */}
+          <circle
+            cx={center.x}
+            cy={center.y}
+            r={radiusPx}
+            fill="#3b82f6"
+            fillOpacity="0.08"
+            stroke="#3b82f6"
+            strokeWidth="2"
+            strokeDasharray="6 4"
+          />
 
-      {/* 반경 라벨 */}
-      <text x={cx} y={cy - radius * scale - 6} textAnchor="middle" fontSize="11" fill="#3b82f6" fontWeight="600">
-        반경 {radius >= 1000 ? `${(radius / 1000).toFixed(1)}km` : `${radius}m`}
-      </text>
-
-      {/* 내 위치 */}
-      <circle cx={cx} cy={cy} r="11" fill="#2563eb" stroke="white" strokeWidth="2.5" />
-      <text x={cx} y={cy + 3.5} textAnchor="middle" fontSize="10" fill="white" fontWeight="700">
-        나
-      </text>
-
-      {/* 경쟁 의원 마커 */}
-      {markers.map((m, i) => (
-        <g key={i}>
-          <circle cx={m.x} cy={m.y} r="10" fill={m.isClose ? '#ef4444' : '#f59e0b'} stroke="white" strokeWidth="2" />
-          <text x={m.x} y={m.y + 3.5} textAnchor="middle" fontSize="10" fill="white" fontWeight="700">
-            {m.label}
+          {/* 내 위치 */}
+          <circle cx={center.x} cy={center.y} r="11" fill="#2563eb" stroke="white" strokeWidth="2.5" />
+          <text x={center.x} y={center.y + 3.5} textAnchor="middle" fontSize="10" fill="white" fontWeight="700">
+            나
           </text>
-        </g>
-      ))}
 
-      {/* 북쪽 표시 */}
-      <g transform={`translate(${W - 30}, 30)`}>
-        <circle r="14" fill="white" stroke="#cbd5e1" strokeWidth="1" />
-        <text textAnchor="middle" y="-2" fontSize="9" fill="#64748b" fontWeight="600">N</text>
-        <path d="M 0 -8 L -3 4 L 0 1 L 3 4 Z" fill="#ef4444" />
-      </g>
-    </svg>
+          {/* 경쟁 의원 마커 */}
+          {markers.map((m, i) => (
+            <g key={i}>
+              <circle cx={m.x} cy={m.y} r="10" fill={m.isClose ? '#ef4444' : '#f59e0b'} stroke="white" strokeWidth="2" />
+              <text x={m.x} y={m.y + 3.5} textAnchor="middle" fontSize="10" fill="white" fontWeight="700">
+                {m.label}
+              </text>
+            </g>
+          ))}
+        </svg>
+
+        {/* 반경 라벨 */}
+        <div
+          style={{
+            position: 'absolute',
+            top: 8,
+            left: 8,
+            fontSize: 11,
+            fontWeight: 600,
+            color: '#1e40af',
+            background: 'rgba(255,255,255,0.85)',
+            padding: '2px 8px',
+            borderRadius: 4,
+          }}
+        >
+          반경 {radius >= 1000 ? `${(radius / 1000).toFixed(1)}km` : `${radius}m`}
+        </div>
+
+        {/* OSM 저작자 표시 (필수) */}
+        <div
+          style={{
+            position: 'absolute',
+            bottom: 2,
+            right: 4,
+            fontSize: 9,
+            color: '#475569',
+            background: 'rgba(255,255,255,0.8)',
+            padding: '1px 4px',
+            borderRadius: 2,
+          }}
+        >
+          © OpenStreetMap contributors
+        </div>
+      </div>
+    </div>
   )
 }
