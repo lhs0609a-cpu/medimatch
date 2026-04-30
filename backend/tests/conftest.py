@@ -55,7 +55,14 @@ async def db_session() -> AsyncGenerator[AsyncSession, None]:
     Create a fresh database session for each test.
     Tables are created and dropped for each test.
     """
+    is_postgres = TEST_DATABASE_URL.startswith("postgresql")
+
     async with test_engine.begin() as conn:
+        # PostgreSQL인 경우 trigram 검색 인덱스(gin_trgm_ops)에 필요한
+        # pg_trgm 익스텐션을 켠다. CI 기본 postgres 이미지엔 없음.
+        if is_postgres:
+            from sqlalchemy import text
+            await conn.execute(text("CREATE EXTENSION IF NOT EXISTS pg_trgm"))
         await conn.run_sync(Base.metadata.create_all)
 
     async with TestSessionLocal() as session:
