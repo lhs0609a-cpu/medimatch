@@ -1,6 +1,7 @@
 """
 Pytest configuration and fixtures for 메디플라톤 tests
 """
+import os
 import pytest
 import asyncio
 from typing import AsyncGenerator, Generator
@@ -15,8 +16,12 @@ from app.core.security import create_access_token, get_password_hash
 from app.models.user import User, UserRole
 
 
-# Test database URL (use SQLite for testing or a separate PostgreSQL DB)
-TEST_DATABASE_URL = "sqlite+aiosqlite:///:memory:"
+# Test DB: CI는 PostgreSQL(DATABASE_URL 환경변수), 로컬 폴백은 SQLite.
+# SQLite는 UUID 컬럼 타입을 지원 안 해서 운영 모델(UUID PK)과 호환되지 않음.
+TEST_DATABASE_URL = os.getenv(
+    "DATABASE_URL",
+    "sqlite+aiosqlite:///:memory:",
+)
 
 
 # Create test engine
