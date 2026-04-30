@@ -201,10 +201,33 @@ class SimulationService:
         )
 
         # 6. 경쟁 분석 (입지 보정 반영해 동일과 의원 매출 추정)
+        # all_nearby (무필터 호출)도 같이 넘겨서 ykiho 교집합으로 보강.
         loc_factor = (prediction.get("factors") or {}).get("location_factor", 1.0)
         competitors = self._analyze_competitors(
-            nearby_hospitals, request.clinic_type, location_factor=loc_factor
+            nearby_hospitals, request.clinic_type,
+            location_factor=loc_factor,
+            all_hospitals=all_nearby,
         )
+
+        # 6-0. 100% 안전망: HIRA 결과가 0건이면 카카오 키워드 검색을 독립 폴백으로 사용.
+        # HIRA 전체 장애·sido 매핑 누락·필터 완전 실패 등 어떤 경우에도 동일과를 잡는다.
+        if not competitors:
+            try:
+                logger.warning(
+                    f"HIRA 동일과 0건 ({request.clinic_type}) → 카카오 키워드 폴백 실행"
+                )
+                kakao_clinics = await external_api_service.get_nearby_clinics_by_specialty_kakao(
+                    latitude, longitude, request.clinic_type, radius_m
+                )
+                if kakao_clinics:
+                    competitors = self._analyze_competitors(
+                        kakao_clinics, request.clinic_type,
+                        location_factor=loc_factor,
+                        all_hospitals=kakao_clinics,
+                    )
+                    logger.info(f"카카오 폴백으로 동일과 {len(competitors)}건 확보")
+            except Exception as e:
+                logger.error(f"카카오 폴백 실패: {e}")
 
         # 6-1. 동일과 평균 매출 anchor — 신규 개원 매출이 동일과 평균 대비
         # 너무 낮으면(< 평균의 55%) 평균의 55%를 floor로 적용한다.
@@ -402,8 +425,13 @@ class SimulationService:
         nearby_hospitals: List[Dict],
         clinic_type: str,
         location_factor: float = 1.0,
+        all_hospitals: Optional[List[Dict]] = None,
     ) -> List[Dict]:
-        """경쟁 병원 분석. clinic_type + clCdNm 모두 매칭."""
+        """경쟁 병원 분석. clinic_type + clCdNm 모두 매칭.
+
+        nearby_hospitals: HIRA dgsbjtCd 필터 호출 결과 (ykiho 신뢰)
+        all_hospitals: HIRA 무필터 호출 결과 (풀 메타 + 이름 매칭 폴백용)
+        """
         competitors = []
 
         # 진료과 매칭: "정형외과" → "정형외" 키워드로 유연 매칭
@@ -413,8 +441,42 @@ class SimulationService:
         is_dental = clinic_type in ("치과",)
         is_korean_med = clinic_type in ("한방과", "한의원")
 
+        # HIRA 필터가 정상 동작 → 그 ykiho 셋이 진짜 "동일과"
+        # (관습 명명 안 따르는 "사랑의원"=내과 등도 여기서 잡힘)
+        filtered_ykihos = {
+            h.get("ykiho") for h in nearby_hospitals
+            if h.get("_dgsbjt_filtered") and h.get("ykiho")
+        }
+
+        # 풀 메타 인덱스 — all_hospitals(무필터)가 우선, 없으면 nearby로 폴백
+        meta_pool = all_hospitals if all_hospitals else nearby_hospitals
+        by_ykiho = {h.get("ykiho"): h for h in meta_pool if h.get("ykiho")}
+
+        # 후보 풀: all_hospitals가 있으면 그걸 베이스로(더 풍부),
+        # 없으면 nearby_hospitals.
+        # 필터가 성공한 ykiho는 풀 메타와 nearby의 billing/distance를 머지해서 추가.
+        candidates = meta_pool
+
         same_dept_hospitals = []
-        for h in nearby_hospitals:
+        seen_ykiho = set()
+
+        # 1단계: HIRA 필터가 잡아준 ykiho는 무조건 동일과로 인정
+        if filtered_ykihos:
+            for h in nearby_hospitals:
+                yk = h.get("ykiho")
+                if yk and yk in filtered_ykihos and yk not in seen_ykiho:
+                    # 무필터 호출에 더 풍부한 메타가 있으면 머지 (clCdNm 등)
+                    full = by_ykiho.get(yk, {})
+                    merged = {**full, **h}  # h의 billing/distance 우선
+                    same_dept_hospitals.append(merged)
+                    seen_ykiho.add(yk)
+
+        # 2단계: 풀 메타 리스트에서 이름/종별 매칭으로 추가 캐치
+        # (HIRA 필터가 빠뜨린 의원, 또는 필터가 0건일 때 폴백)
+        for h in candidates:
+            yk = h.get("ykiho")
+            if yk and yk in seen_ykiho:
+                continue
             clt = (h.get("clinic_type") or "").strip()
             cl_cd_nm = (h.get("cl_cd_nm") or "")
             name = (h.get("name") or "")
@@ -425,12 +487,14 @@ class SimulationService:
                 matched = True
             elif is_korean_med and ("한의" in cl_cd_nm or "한방" in cl_cd_nm):
                 matched = True
-            # 폴백: HIRA dgsbjtCd 필터 502로 무필터 응답을 받은 경우
-            # 의원명 키워드로 매칭 (한국 의원 명명 관습: "○○피부과의원")
-            elif keyword and keyword in name and "의원" in cl_cd_nm:
+            # 풀 진료과명("내과"/"피부과"/"정형외과")으로 의원명 매칭.
+            # keyword(짧음)로 매칭하면 "내과"→"내"가 "내일의원" 오탐하므로 풀 이름 사용.
+            elif clinic_type and clinic_type in name and "의원" in cl_cd_nm:
                 matched = True
             if matched:
                 same_dept_hospitals.append(h)
+                if yk:
+                    seen_ykiho.add(yk)
 
         for hospital in same_dept_hospitals[:10]:  # Top 10
             # Estimate monthly revenue based on hospital size and location

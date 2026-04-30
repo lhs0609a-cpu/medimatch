@@ -202,12 +202,16 @@ class ExternalAPIService:
             logger.warning(f"HIRA: unknown sido for region_code={region_code}")
             return []
 
+        # sgguCd 매핑이 없으면 sido 전체에서 가져와서 좌표 거리 필터로 잡아야 하므로
+        # numOfRows를 크게 가져간다 (HIRA 최대 10000). 매핑이 있으면 작게 유지.
+        effective_rows = num_of_rows if sggu_cd else max(num_of_rows, 10000)
+
         try:
             async with httpx.AsyncClient() as client:
                 params: Dict[str, Any] = {
                     "serviceKey": settings.HIRA_API_KEY,
                     "sidoCd": sido_cd,
-                    "numOfRows": num_of_rows,
+                    "numOfRows": effective_rows,
                     "_type": "json",
                 }
                 if sggu_cd:
@@ -229,6 +233,18 @@ class ExternalAPIService:
                     f"(sido={sido_cd}, sggu={sggu_cd or 'all'}, type={clinic_type}, "
                     f"retry={_retry_without_dgsbjt})"
                 )
+
+                # dgsbjtCd 필터가 200 OK + 0건 반환하는 경우도 폴백.
+                # 같은 sggu에 의원은 있는데 진료과 필터만 0건이면 HIRA 필터 버그.
+                # (502 예외가 나는 케이스는 아래 except로 처리)
+                if not items and clinic_type and not _retry_without_dgsbjt:
+                    logger.info(
+                        f"HIRA dgsbjtCd 필터 0건 응답 → 무필터로 재시도 (이름·종별 매칭으로 폴백)"
+                    )
+                    return await self._fetch_hira_hospitals(
+                        region_code, clinic_type, num_of_rows,
+                        _retry_without_dgsbjt=True,
+                    )
 
                 parsed = [self._parse_hospital_data(item) for item in items]
                 # 진료과 필터로 가져왔는지 표시 (폴백이면 False — 이름 매칭으로 처리)
@@ -454,6 +470,96 @@ class ExternalAPIService:
         except Exception as e:
             logger.warning(f"카카오 키워드 검색 실패 ({keyword}): {e}")
             return []
+
+    async def get_nearby_clinics_by_specialty_kakao(
+        self,
+        latitude: float,
+        longitude: float,
+        clinic_type: str,
+        radius_m: int = 1000,
+    ) -> List[Dict[str, Any]]:
+        """카카오 키워드 검색으로 동일과 의원 조회 (HIRA 100% 폴백).
+
+        HIRA가 완전히 다운되거나 sido 매핑 누락 시 독립 데이터원으로 사용.
+        반환 포맷은 HIRA 호환(_parse_hospital_data 결과와 동일 키).
+        """
+        # 진료과별 검색 키워드 — 카카오 카테고리·이름에서 매칭되는 형태로
+        if clinic_type == "치과":
+            queries = ["치과 의원", "치과"]
+        elif clinic_type in ("한의원", "한방과"):
+            queries = ["한의원"]
+        else:
+            # "내과", "정형외과" 등 → "○○ 의원"으로 의원만 좁힘
+            queries = [f"{clinic_type} 의원", clinic_type]
+
+        results: List[Dict[str, Any]] = []
+        seen_ids = set()
+
+        async with httpx.AsyncClient() as client:
+            headers = {"Authorization": f"KakaoAK {settings.KAKAO_MAP_API_KEY}"}
+            for query in queries:
+                for page in range(1, 4):  # 최대 45건 (3페이지 × 15)
+                    try:
+                        params = {
+                            "query": query,
+                            "x": str(longitude),
+                            "y": str(latitude),
+                            "radius": str(min(radius_m, 20000)),
+                            "size": "15",
+                            "page": str(page),
+                            "category_group_code": "HP8",  # 병원 카테고리
+                            "sort": "distance",
+                        }
+                        resp = await client.get(
+                            f"{self.kakao_base_url}/search/keyword.json",
+                            headers=headers,
+                            params=params,
+                            timeout=8.0,
+                        )
+                        resp.raise_for_status()
+                        data = resp.json()
+                        docs = data.get("documents", [])
+                        if not docs:
+                            break
+                        for d in docs:
+                            place_id = d.get("id") or f"{d.get('place_name')}|{d.get('x')}|{d.get('y')}"
+                            if place_id in seen_ids:
+                                continue
+                            name = d.get("place_name", "")
+                            category = d.get("category_name", "")
+                            # 진료과명이 이름 또는 카테고리에 들어있을 때만 채택
+                            # (HP8 카테고리는 모든 병원이라 다른 과 섞임 방지)
+                            if clinic_type not in name and clinic_type not in category:
+                                continue
+                            seen_ids.add(place_id)
+                            results.append({
+                                "ykiho": "",  # 카카오엔 ykiho 없음
+                                "name": name,
+                                "address": d.get("road_address_name") or d.get("address_name", ""),
+                                "phone": d.get("phone", ""),
+                                "latitude": float(d.get("y", 0)),
+                                "longitude": float(d.get("x", 0)),
+                                "distance": int(d.get("distance", "0") or 0),
+                                "clinic_type": clinic_type,
+                                "cl_cd_nm": "의원",  # 카카오는 종별 없음 — 의원 가정
+                                "doctors": 1,
+                                "beds": 0,
+                                "established": "",
+                                "specialty_detail": category,
+                                "_dgsbjt_filtered": True,
+                                "_source": "kakao",
+                            })
+                        if data.get("meta", {}).get("is_end", True):
+                            break
+                    except Exception as e:
+                        logger.warning(f"Kakao clinic search failed ({query}, page {page}): {e}")
+                        break
+
+        results.sort(key=lambda x: x.get("distance", 99999))
+        logger.info(
+            f"Kakao 동일과 검색: {clinic_type} 반경 {radius_m}m → {len(results)}건"
+        )
+        return results
 
     async def get_clinic_environment_data(
         self,
