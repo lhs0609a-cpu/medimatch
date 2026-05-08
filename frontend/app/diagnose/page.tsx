@@ -10,6 +10,7 @@ import {
   ShieldCheck,
 } from 'lucide-react';
 import { HomeHeader, HomeFooter } from '@/components/home';
+import { setGuestToken, rememberPhoneTail } from '@/lib/auth/guestToken';
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1';
 
@@ -123,7 +124,17 @@ export default function DiagnosePage() {
         body: JSON.stringify({ ...data, utm_source, utm_campaign }),
       });
       if (res.ok) {
-        setResult(await res.json());
+        const r: DiagnosisResult = await res.json();
+        // 토큰 자동 저장 — 무로그인 식별 핵심
+        if (r.roadmap_url) {
+          try {
+            const u = new URL(r.roadmap_url);
+            const t = u.searchParams.get('token');
+            if (t) setGuestToken(t);
+          } catch { /* relative url 무시 */ }
+        }
+        rememberPhoneTail(data.phone);
+        setResult(r);
       } else {
         const e = await res.json();
         setError(e.detail || '제출 실패');

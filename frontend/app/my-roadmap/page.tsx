@@ -10,6 +10,7 @@ import {
   Star, FileText, Award, ShieldCheck,
 } from 'lucide-react';
 import { HomeHeader, HomeFooter } from '@/components/home';
+import { resolveGuestToken, clearGuestToken } from '@/lib/auth/guestToken';
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1';
 
@@ -94,13 +95,20 @@ function RoadmapLoading() {
 
 function RoadmapInner() {
   const params = useSearchParams();
-  const token = params?.get('token') || '';
+  // URL token 우선, 없으면 localStorage. URL에 있으면 자동으로 localStorage에 저장됨.
+  const [token, setToken] = useState<string>('');
+  useEffect(() => {
+    const urlToken = params?.get('token') || '';
+    const resolved = urlToken || resolveGuestToken() || '';
+    setToken(resolved);
+  }, [params]);
+
   const [data, setData] = useState<Roadmap | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
   const fetchData = useCallback(async () => {
-    if (!token) { setError('링크가 올바르지 않습니다.'); setLoading(false); return; }
+    if (!token) { setError('NO_TOKEN'); setLoading(false); return; }
     setLoading(true);
     try {
       const res = await fetch(`${apiUrl}/roadmap/me?token=${encodeURIComponent(token)}`);
@@ -108,6 +116,8 @@ function RoadmapInner() {
         setData(await res.json());
       } else {
         const e = await res.json().catch(() => ({}));
+        // 410(만료) 또는 404(존재 안 함) → 저장된 토큰 폐기
+        if (res.status === 410 || res.status === 404) clearGuestToken();
         setError(e.detail || '불러오지 못했습니다.');
       }
     } catch {
@@ -131,19 +141,39 @@ function RoadmapInner() {
   if (loading) return <RoadmapLoading />;
 
   if (error || !data) {
+    const noToken = error === 'NO_TOKEN';
     return (
       <>
         <HomeHeader />
-        <main className="min-h-screen flex items-center justify-center px-4">
+        <main className="min-h-screen flex items-center justify-center px-4 pt-24 pb-16">
           <div className="text-center max-w-md">
-            <AlertTriangle className="w-12 h-12 text-red-500 mx-auto mb-4" />
-            <h1 className="text-xl font-bold mb-2">{error || '링크 만료'}</h1>
-            <p className="text-sm text-muted-foreground mb-6">
-              상담사에게 새 링크를 요청해주세요.
-            </p>
-            <Link href="/diagnose" className="inline-flex items-center gap-1 px-5 py-2.5 text-sm font-semibold bg-foreground text-background rounded-xl">
-              다시 진단받기 <ChevronRight className="w-4 h-4" />
-            </Link>
+            {noToken ? (
+              <>
+                <Sparkles className="w-12 h-12 text-[#3182f6] mx-auto mb-4" />
+                <h1 className="text-2xl font-bold mb-2">아직 진단을 안 하셨어요</h1>
+                <p className="text-sm text-muted-foreground mb-8 leading-relaxed">
+                  메디플라톤은 가입·로그인 없이 1분 진단으로 시작합니다.
+                  <br />
+                  진단하시면 본인 미션맵이 자동 생성돼요.
+                </p>
+              </>
+            ) : (
+              <>
+                <AlertTriangle className="w-12 h-12 text-amber-500 mx-auto mb-4" />
+                <h1 className="text-xl font-bold mb-2">링크가 만료됐거나 유효하지 않아요</h1>
+                <p className="text-sm text-muted-foreground mb-8">
+                  카톡으로 새 링크를 받으시거나 다시 진단해주세요.
+                </p>
+              </>
+            )}
+            <div className="flex flex-col sm:flex-row gap-2 justify-center">
+              <Link href="/diagnose" className="inline-flex items-center justify-center gap-1 px-5 py-3 text-sm font-bold bg-foreground text-background rounded-xl">
+                {noToken ? '1분 진단으로 시작' : '다시 진단받기'} <ChevronRight className="w-4 h-4" />
+              </Link>
+              <Link href="/recover" className="inline-flex items-center justify-center gap-1 px-5 py-3 text-sm font-semibold border border-foreground/15 rounded-xl hover:bg-muted/40">
+                카톡으로 링크 받기
+              </Link>
+            </div>
           </div>
         </main>
         <HomeFooter />

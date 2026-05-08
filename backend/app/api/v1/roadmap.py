@@ -7,6 +7,7 @@
 3. GET /roadmap/me?token=... → 본인 진행도/체크리스트/매칭/타임라인 (정제된 뷰)
 4. PATCH /roadmap/me/checklist → 의사가 직접 체크 가능
 5. POST /roadmap/me/extend → 토큰 90일 연장
+6. POST /roadmap/recover → 휴대폰으로 토큰 재발급 + 카톡 발송 (분실 대응)
 
 노출하지 않는 것:
 - 우리팀 내부 메모(notes), 통화 transcript, 상담사 user_id, lead_score
@@ -15,16 +16,18 @@
 
 Rate limit은 추후 (게이트웨이/리버스프록시 단).
 """
+import secrets
 from datetime import datetime, timedelta
 from typing import Optional, List
 
 from fastapi import APIRouter, Depends, HTTPException, Query
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from app.api.deps import get_db
+from app.core.config import settings
 from app.core.lead_checklist import (
     CATEGORY_LABELS, STAGE_LABELS, STAGE_ORDER,
     calc_readiness_score, missing_categories,
@@ -32,6 +35,7 @@ from app.core.lead_checklist import (
 from app.models.doctor_lead import (
     DoctorLead, LeadPartnerMatch, LeadMilestone,
 )
+from app.services.kakao_alimtalk import send_diagnosis_alimtalk
 
 
 router = APIRouter()
@@ -243,3 +247,81 @@ async def extend_roadmap_token(
         "expires_at": lead.roadmap_token_expires_at.isoformat(),
         "extended_days": 90,
     }
+
+
+# ============================================================
+# Recover — 휴대폰으로 토큰 재발급 + 카톡 발송
+# ============================================================
+
+class RoadmapRecoverRequest(BaseModel):
+    phone: str = Field(..., min_length=8, max_length=30)
+
+
+def _normalize_phone(p: str) -> str:
+    return "".join(c for c in (p or "") if c.isdigit())
+
+
+@router.post("/recover")
+async def recover_roadmap_link(
+    payload: RoadmapRecoverRequest,
+    db: AsyncSession = Depends(get_db),
+):
+    """분실 시 휴대폰으로 미션맵 링크 재발송.
+
+    보안:
+    - 가입/존재 여부 누설 방지 — phone 매칭 안 돼도 동일 응답.
+    - 알림톡 발사 결과는 ok 필드로만 노출 (전화번호·이름 echo 안 함).
+    - 매칭 시 새 토큰 발급(기존 무효화) → 90일 유효.
+    """
+    phone_norm = _normalize_phone(payload.phone)
+    # 동일 응답 (존재 여부 누설 방지)
+    generic_response = {
+        "ok": True,
+        "message": "등록된 정보가 있다면 카카오톡으로 미션맵 링크를 보내드렸어요.",
+    }
+
+    if len(phone_norm) < 8:
+        # 명백한 잘못된 입력은 400으로 즉시 반환
+        raise HTTPException(status_code=400, detail="유효한 전화번호를 입력해주세요")
+
+    # 다양한 형식으로 매칭 시도 (010-1234-5678, 01012345678 등)
+    candidates = {phone_norm, payload.phone}
+    if len(phone_norm) == 11:  # 010xxxxxxxx
+        formatted = f"{phone_norm[:3]}-{phone_norm[3:7]}-{phone_norm[7:]}"
+        candidates.add(formatted)
+
+    lead = (await db.execute(
+        select(DoctorLead).where(DoctorLead.phone.in_(list(candidates))).limit(1)
+    )).scalar_one_or_none()
+
+    if not lead:
+        return generic_response
+
+    # 새 토큰 발급 (기존 무효화)
+    lead.roadmap_token = secrets.token_urlsafe(32)
+    lead.roadmap_token_expires_at = datetime.utcnow() + timedelta(days=90)
+    await db.flush()
+
+    # 알림톡 발송
+    base = (settings.FRONTEND_URL or "").rstrip("/") or "https://medi.brandplaton.com"
+    roadmap_url = f"{base}/my-roadmap?token={lead.roadmap_token}"
+
+    stage = lead.opening_stage.value if lead.opening_stage else "PLANNING"
+    recs = missing_categories(lead.checklist, stage)
+    rec_label = CATEGORY_LABELS.get(recs[0], recs[0]) if recs else "맞춤 협력사 안내"
+
+    try:
+        await send_diagnosis_alimtalk(
+            phone=lead.phone or phone_norm,
+            name=lead.name,
+            readiness_score=lead.readiness_score or 0,
+            stage_label=STAGE_LABELS.get(stage, stage),
+            rec_label=rec_label,
+            next_action="아래 버튼으로 본인 미션맵을 다시 확인하실 수 있어요.",
+            roadmap_url=roadmap_url,
+        )
+    except Exception as e:
+        print(f"[recover] alimtalk error: {e}")
+        # 알림톡 실패해도 응답은 동일
+
+    return generic_response

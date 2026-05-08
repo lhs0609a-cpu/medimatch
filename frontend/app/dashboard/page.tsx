@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { apiClient } from '@/lib/api/client';
+import { resolveGuestToken } from '@/lib/auth/guestToken';
 import {
   BarChart3,
   TrendingUp,
@@ -60,9 +61,17 @@ export default function DashboardPage() {
 
   const fetchDashboardData = async () => {
     try {
+      // 무로그인 식별 우선 — guest 토큰이 있으면 의사용 미션맵으로 이동
+      const guestToken = resolveGuestToken();
+      if (guestToken) {
+        window.location.replace('/my-roadmap');
+        return;
+      }
+      // 그 다음 JWT 로그인 (admin/sales_rep/legacy member)
       const token = localStorage.getItem('access_token');
       if (!token) {
-        window.location.href = '/login';
+        // 로그인도 토큰도 없으면 → 진단으로 시작
+        window.location.replace('/diagnose');
         return;
       }
 
@@ -116,7 +125,8 @@ export default function DashboardPage() {
       if (err?.response?.status === 401) {
         localStorage.removeItem('access_token');
         localStorage.removeItem('refresh_token');
-        window.location.href = '/login';
+        // 무로그인 플랫폼으로 회귀
+        window.location.href = '/diagnose';
         return;
       }
       setStats({

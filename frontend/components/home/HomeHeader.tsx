@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import {
   ArrowRight,
   BarChart3,
@@ -20,12 +20,18 @@ import {
   Wrench,
   X,
   Globe,
+  Target,
 } from 'lucide-react'
 import { TossIcon } from '@/components/ui/TossIcon'
+import { hasGuestToken } from '@/lib/auth/guestToken'
 
 export function HomeHeader() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [servicesOpen, setServicesOpen] = useState(false)
+  const [hasToken, setHasToken] = useState(false)
+
+  // 토큰 인식 — SSR mismatch 피하려고 mount 후 1회 체크
+  useEffect(() => { setHasToken(hasGuestToken()) }, [])
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 glass" role="banner">
@@ -157,15 +163,25 @@ export function HomeHeader() {
           </nav>
 
           <div className="hidden lg:flex items-center gap-3">
-            <Link href="/dashboard" className="nav-link flex items-center gap-2">
-              <LayoutDashboard className="w-4 h-4" />
-              대시보드
-            </Link>
-            <Link href="/login" className="btn-ghost">로그인</Link>
-            <Link href="/register" className="btn-primary">
-              무료 시작
-              <ArrowRight className="w-4 h-4" />
-            </Link>
+            {hasToken ? (
+              <>
+                <Link href="/recover" className="nav-link text-sm">링크 분실?</Link>
+                <Link href="/my-roadmap" className="btn-primary">
+                  <Target className="w-4 h-4" />
+                  내 미션맵
+                  <ArrowRight className="w-4 h-4" />
+                </Link>
+              </>
+            ) : (
+              <>
+                <Link href="/recover" className="nav-link text-sm">링크 분실?</Link>
+                <Link href="/diagnose" className="btn-primary">
+                  <Sparkles className="w-4 h-4" />
+                  1분 진단으로 시작
+                  <ArrowRight className="w-4 h-4" />
+                </Link>
+              </>
+            )}
           </div>
 
           <button
@@ -223,12 +239,20 @@ export function HomeHeader() {
               <span className="px-1.5 py-0.5 text-[10px] font-bold bg-[#3182f6]/10 text-[#3182f6] rounded">NEW</span>
             </Link>
             <div className="pt-4 border-t border-border space-y-2">
-              <Link href="/login" className="block w-full text-center py-3 text-foreground hover:bg-accent rounded-xl" onClick={() => setMobileMenuOpen(false)}>
-                로그인
+              <Link href="/recover" className="block w-full text-center py-3 text-muted-foreground hover:bg-accent rounded-xl text-sm" onClick={() => setMobileMenuOpen(false)}>
+                링크 분실 시 복구
               </Link>
-              <Link href="/register" className="btn-primary w-full justify-center" onClick={() => setMobileMenuOpen(false)}>
-                무료로 시작하기
-              </Link>
+              {hasToken ? (
+                <Link href="/my-roadmap" className="btn-primary w-full justify-center" onClick={() => setMobileMenuOpen(false)}>
+                  <Target className="w-4 h-4" />
+                  내 미션맵 보기
+                </Link>
+              ) : (
+                <Link href="/diagnose" className="btn-primary w-full justify-center" onClick={() => setMobileMenuOpen(false)}>
+                  <Sparkles className="w-4 h-4" />
+                  1분 진단으로 시작
+                </Link>
+              )}
             </div>
           </div>
         </nav>
