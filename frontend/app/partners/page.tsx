@@ -33,13 +33,32 @@ import {
   Receipt,
   UserCog,
 } from 'lucide-react'
-import {
-  getAllPartners,
-  getPartnersByCategory,
-  partnerCategories,
-  partnerStats,
-  Partner,
-} from '@/lib/data/seedPartners'
+// 파트너 카테고리 (UI 필터용 — 실제 등록된 파트너는 백엔드 연동 후 노출)
+interface PartnerCategory { code: string; name: string; description: string }
+interface Partner {
+  id: string; name: string; category: string; subcategory?: string;
+  description: string; region: string; rating: number; reviewCount: number;
+  isPremium: boolean; isVerified: boolean; specialties: string[];
+  experience: string; projectCount: number; thumbnailIndex: number;
+}
+const partnerCategories: PartnerCategory[] = [
+  { code: 'realestate', name: '부동산중개법인', description: '상가·의료시설 전문 중개' },
+  { code: 'legal', name: '법무법인/변호사', description: '의료법·임대차·동업 계약' },
+  { code: 'accounting', name: '회계법인', description: '재무자문·기장·감사' },
+  { code: 'tax', name: '세무법인', description: '개원신고·종합소득세·경정청구' },
+  { code: 'labor', name: '노무법인', description: '근로계약·4대보험·인사' },
+  { code: 'consulting', name: '개원컨설팅', description: '입지·자금·운영 종합' },
+  { code: 'finance', name: '금융/대출', description: '의료인 대출·리스·보험' },
+  { code: 'interior', name: '인테리어', description: '병원/약국 전문 시공' },
+  { code: 'equipment', name: '의료기기', description: '신품·리스·중고 비교' },
+  { code: 'emr', name: 'EMR/의료IT', description: 'EMR·예약·청구 시스템' },
+  { code: 'signage', name: '간판/사이니지', description: '외부간판·내부사인' },
+  { code: 'marketing', name: '마케팅', description: '환자 유입 부스팅' },
+  { code: 'pharma', name: '약품도매', description: '의약품 유통' },
+]
+// 백엔드 연동 전까지 빈 배열
+const getAllPartners = (): Partner[] => []
+const getPartnersByCategory = (_code: string): Partner[] => []
 
 const categoryIcons: Record<string, any> = {
   realestate: Building,
@@ -162,29 +181,18 @@ export default function PartnersPage() {
           <div className="max-w-3xl mx-auto text-center">
             <h1 className="text-4xl font-bold mb-4">개원의 모든 것, 파트너와 함께</h1>
             <p className="text-xl text-primary-foreground/80 mb-8">
-              검증된 인테리어, 의료장비, 회계/세무, 법무 파트너를 만나보세요.
+              인테리어·의료장비·회계/세무·법무·금융까지,
               <br />
-              메디플라톤이 엄선한 <span className="font-bold">{partnerStats.totalPartners}개</span> 전문 업체와 함께
-              성공적인 개원을 시작하세요.
+              메디플라톤이 직접 검증한 협력사만 모십니다.
             </p>
 
-            {/* Stats */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-2xl mx-auto mb-8">
-              <div className="bg-white/10 backdrop-blur rounded-xl p-4">
-                <div className="text-2xl font-bold">{partnerStats.totalPartners}</div>
-                <div className="text-sm text-primary-foreground/70">검증된 파트너</div>
-              </div>
-              <div className="bg-white/10 backdrop-blur rounded-xl p-4">
-                <div className="text-2xl font-bold">{partnerStats.totalCategories}</div>
-                <div className="text-sm text-primary-foreground/70">전문 분야</div>
-              </div>
-              <div className="bg-white/10 backdrop-blur rounded-xl p-4">
-                <div className="text-2xl font-bold">{partnerStats.averageRating}</div>
-                <div className="text-sm text-primary-foreground/70">평균 평점</div>
-              </div>
-              <div className="bg-white/10 backdrop-blur rounded-xl p-4">
-                <div className="text-2xl font-bold">{(partnerStats.totalReviews / 1000).toFixed(1)}K</div>
-                <div className="text-sm text-primary-foreground/70">누적 리뷰</div>
+            {/* 모집 중 안내 */}
+            <div className="max-w-2xl mx-auto mb-8 p-5 bg-white/10 backdrop-blur rounded-2xl">
+              <div className="text-base font-semibold mb-1">현재 1차 협력사를 직접 검증·모집 중입니다</div>
+              <div className="text-sm text-primary-foreground/80">
+                검증을 통과한 협력사만 노출하기 위해 공개를 잠시 보류하고 있어요.
+                <br />
+                매칭이 필요한 개원의는 아래 카카오톡으로 문의주시면 1:1로 연결해드립니다.
               </div>
             </div>
 
@@ -223,11 +231,10 @@ export default function PartnersPage() {
                   : 'bg-secondary text-secondary-foreground hover:bg-accent'
               }`}
             >
-              전체 ({allPartners.length})
+              전체
             </button>
             {partnerCategories.map((category) => {
               const Icon = getCategoryIcon(category.code)
-              const count = getPartnersByCategory(category.code).length
               return (
                 <button
                   key={category.code}
@@ -239,7 +246,7 @@ export default function PartnersPage() {
                   }`}
                 >
                   <Icon className="w-4 h-4" />
-                  {category.name} ({count})
+                  {category.name}
                 </button>
               )
             })}
@@ -250,23 +257,25 @@ export default function PartnersPage() {
       {/* Results */}
       <section className="py-8">
         <div className="container mx-auto px-4">
-          {/* Toolbar */}
-          <div className="flex items-center justify-between mb-6">
-            <p className="text-muted-foreground">
-              총 <span className="font-semibold text-foreground">{filteredPartners.length}</span>개의 파트너
-            </p>
-            <div className="flex items-center gap-3">
-              <select
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value)}
-                className="px-4 py-2 border border-border rounded-lg text-sm bg-card focus:outline-none focus:ring-2 focus:ring-primary"
-              >
-                <option value="rating">평점순</option>
-                <option value="review_count">리뷰순</option>
-                <option value="project_count">시공건수순</option>
-              </select>
+          {/* Toolbar — 등록된 협력사 노출 시 사용. 모집 중에는 숨김 */}
+          {filteredPartners.length > 0 && (
+            <div className="flex items-center justify-between mb-6">
+              <p className="text-muted-foreground">
+                총 <span className="font-semibold text-foreground">{filteredPartners.length}</span>개의 파트너
+              </p>
+              <div className="flex items-center gap-3">
+                <select
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value)}
+                  className="px-4 py-2 border border-border rounded-lg text-sm bg-card focus:outline-none focus:ring-2 focus:ring-primary"
+                >
+                  <option value="rating">평점순</option>
+                  <option value="review_count">리뷰순</option>
+                  <option value="project_count">시공건수순</option>
+                </select>
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Partner Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -364,14 +373,47 @@ export default function PartnersPage() {
             })}
           </div>
 
-          {/* Empty State */}
+          {/* Empty State — 모집 중 상태에서는 매칭 안내 카드로 */}
           {filteredPartners.length === 0 && (
-            <div className="text-center py-16">
-              <div className="w-20 h-20 bg-secondary rounded-full flex items-center justify-center mx-auto mb-4">
-                <Search className="w-10 h-10 text-muted-foreground" />
+            <div className="max-w-3xl mx-auto py-12">
+              <div className="bg-card border border-border rounded-3xl p-8 text-center">
+                <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary/10 mb-5">
+                  <BadgeCheck className="w-8 h-8 text-primary" />
+                </div>
+                <h3 className="text-2xl font-bold text-foreground mb-3">
+                  검증된 협력사 라인업을 준비 중입니다
+                </h3>
+                <p className="text-muted-foreground mb-6 leading-relaxed">
+                  메디플라톤은 무작정 등록을 받지 않습니다.
+                  <br />
+                  실적·계약 사례·평판을 직접 확인한 협력사만 노출하기 위해 1차 라인업을 정비하고 있어요.
+                  <br />
+                  매칭이 필요하신 분은 카카오톡으로 1:1 상담 받으실 수 있습니다.
+                </p>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
+                  <a
+                    href="https://open.kakao.com/o/sMLX4Zei"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-center gap-2 px-5 py-3 bg-[#FEE500] text-[#181600] rounded-xl font-semibold hover:opacity-90"
+                  >
+                    <MessageCircle className="w-4 h-4" />
+                    카카오톡 1:1 매칭 상담
+                  </a>
+                  <Link
+                    href="/diagnose"
+                    className="flex items-center justify-center gap-2 px-5 py-3 bg-foreground text-background rounded-xl font-semibold hover:opacity-90"
+                  >
+                    <Sparkles className="w-4 h-4" />
+                    1분 진단받고 매칭
+                  </Link>
+                </div>
+
+                <div className="text-xs text-muted-foreground">
+                  현재 진행 중인 검증 카테고리: 부동산·법무·회계·세무·노무·인테리어·의료기기·EMR·금융·마케팅
+                </div>
               </div>
-              <h3 className="text-xl font-bold text-foreground mb-2">파트너를 찾을 수 없습니다</h3>
-              <p className="text-muted-foreground">다른 검색어나 카테고리를 선택해보세요.</p>
             </div>
           )}
         </div>
