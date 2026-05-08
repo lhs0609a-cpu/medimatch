@@ -58,6 +58,7 @@ from .bills import router as bills_router
 from .emr_export import router as emr_export_router
 from .doctor_lead import router as doctor_lead_router
 from .diagnosis import router as diagnosis_router
+from .roadmap import router as roadmap_router
 
 api_router = APIRouter()
 
@@ -121,3 +122,4 @@ api_router.include_router(bills_router, prefix="/emr/bills", tags=["EMR Bills - 
 api_router.include_router(emr_export_router, prefix="/emr/export", tags=["EMR Export - CSV 내보내기"])
 api_router.include_router(doctor_lead_router, prefix="/crm", tags=["CRM - 개원의 Lead 관리"])
 api_router.include_router(diagnosis_router, tags=["Diagnosis - 개원 진단 1분 테스트"])
+api_router.include_router(roadmap_router, prefix="/roadmap", tags=["Roadmap - 의사용 미션맵"])

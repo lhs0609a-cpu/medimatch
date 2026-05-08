@@ -5,8 +5,9 @@
 - 단계별 체크리스트, 통화 로그, 파트너 매칭
 - 우리 팀(ADMIN/SALES_REP) 전용
 """
+import secrets
 import uuid
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Optional, List
 
 from fastapi import APIRouter, Depends, HTTPException, Query
@@ -16,6 +17,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from app.api.deps import get_db, get_current_active_user
+from app.core.config import settings
 from app.core.lead_checklist import (
     CHECKLIST_TEMPLATES, STAGE_ORDER, STAGE_LABELS, CATEGORY_LABELS,
     build_default_checklist, calc_readiness_score, calc_lead_score,
@@ -1158,6 +1160,149 @@ async def seed_milestones(
         .order_by(LeadMilestone.due_at.asc().nullslast())
     )).scalars().all()
     return {"seeded_stages": targets, "milestones": [serialize_milestone(m) for m in rows]}
+
+
+# ============================================================
+# Today's Queue — 오늘 콜할 TOP N (priority_score = lead_score × 시기긴급도 × 미응답일수)
+# ============================================================
+
+def _urgency_multiplier(target_open_date: Optional[datetime]) -> float:
+    """개원 시기 긴급도 — 임박할수록 ↑"""
+    if not target_open_date:
+        return 1.0
+    days = (target_open_date - datetime.utcnow()).days
+    if days < 0:    return 1.4   # 이미 지남 — 운영 안정화 영업
+    if days < 30:   return 2.5
+    if days < 90:   return 2.0
+    if days < 180:  return 1.5
+    if days < 365:  return 1.2
+    return 1.0
+
+
+def _silence_multiplier(last_contacted_at: Optional[datetime], created_at: Optional[datetime]) -> float:
+    """무응답 일수 — 너무 오래 안 누적되도록 sqrt 곡선"""
+    base = last_contacted_at or created_at
+    if not base:
+        return 1.5
+    days = max(0, (datetime.utcnow() - base).days)
+    if days == 0:
+        return 0.6   # 오늘 이미 컨택 — 큐 후순위
+    if days >= 30:
+        return 2.0
+    # 1~29일: 1.0 ~ 2.0 사이 부드럽게
+    return 1.0 + (days / 30) ** 0.5
+
+
+def _overdue_multiplier(next_followup_at: Optional[datetime]) -> float:
+    """예정 후속이 지났으면 큐 최상단으로"""
+    if not next_followup_at:
+        return 1.0
+    if next_followup_at <= datetime.utcnow():
+        return 2.5
+    return 1.0
+
+
+@router.get("/queue/today")
+async def todays_call_queue(
+    limit: int = Query(10, ge=1, le=50),
+    owner_user_id: Optional[str] = Query(None, description="None=전체, 'me'=본인, UUID=특정 담당자"),
+    db: AsyncSession = Depends(get_db),
+    user: User = Depends(require_crm_user),
+):
+    """우선순위 정렬된 콜 큐.
+
+    priority_score = lead_score × 시기긴급도 × 무응답일수 × 후속지연
+    """
+    # 종료된 lead 제외
+    filters = [
+        DoctorLead.funnel_stage.notin_([
+            LeadFunnelStage.CONVERTED, LeadFunnelStage.LOST, LeadFunnelStage.DORMANT,
+        ]),
+        DoctorLead.priority != LeadPriority.DEAD,
+    ]
+    if owner_user_id == "me":
+        filters.append(DoctorLead.owner_user_id == user.id)
+    elif owner_user_id and owner_user_id != "all":
+        try:
+            filters.append(DoctorLead.owner_user_id == uuid.UUID(owner_user_id))
+        except ValueError:
+            pass
+
+    rows = (await db.execute(
+        select(DoctorLead).where(*filters).limit(500)
+    )).scalars().all()
+
+    scored = []
+    for l in rows:
+        urgency = _urgency_multiplier(l.target_open_date)
+        silence = _silence_multiplier(l.last_contacted_at, l.created_at)
+        overdue = _overdue_multiplier(l.next_followup_at)
+        priority_score = round((l.lead_score or 50) * urgency * silence * overdue, 1)
+
+        scored.append({
+            "id": str(l.id),
+            "name": l.name,
+            "phone": l.phone,
+            "specialty": l.specialty,
+            "target_region_sido": l.target_region_sido,
+            "target_region_sigungu": l.target_region_sigungu,
+            "opening_stage": l.opening_stage.value if l.opening_stage else None,
+            "opening_stage_label": STAGE_LABELS.get(l.opening_stage.value, "") if l.opening_stage else "",
+            "funnel_stage": l.funnel_stage.value if l.funnel_stage else None,
+            "priority": l.priority.value if l.priority else None,
+            "lead_score": l.lead_score or 0,
+            "readiness_score": l.readiness_score or 0,
+            "priority_score": priority_score,
+            "urgency_x": round(urgency, 2),
+            "silence_x": round(silence, 2),
+            "overdue_x": round(overdue, 2),
+            "last_contacted_at": l.last_contacted_at.isoformat() if l.last_contacted_at else None,
+            "next_action": l.next_action,
+            "next_followup_at": l.next_followup_at.isoformat() if l.next_followup_at else None,
+            "target_open_date": l.target_open_date.isoformat() if l.target_open_date else None,
+            "is_overdue_followup": bool(l.next_followup_at and l.next_followup_at <= datetime.utcnow()),
+        })
+
+    scored.sort(key=lambda x: x["priority_score"], reverse=True)
+
+    return {
+        "items": scored[:limit],
+        "total_pool": len(scored),
+        "limit": limit,
+        "scope": owner_user_id or "all",
+    }
+
+
+# ============================================================
+# 의사 매직링크 — 재발급
+# ============================================================
+
+@router.post("/leads/{lead_id}/roadmap-token")
+async def issue_roadmap_token(
+    lead_id: uuid.UUID,
+    db: AsyncSession = Depends(get_db),
+    _: User = Depends(require_crm_user),
+):
+    """의사 본인 미션맵 매직링크 토큰 (재)발급.
+
+    카톡/문자 재발송 시 호출. 기존 토큰은 무효화됨.
+    """
+    lead = (await db.execute(
+        select(DoctorLead).where(DoctorLead.id == lead_id)
+    )).scalar_one_or_none()
+    if not lead:
+        raise HTTPException(status_code=404, detail="Lead 없음")
+
+    lead.roadmap_token = secrets.token_urlsafe(32)
+    lead.roadmap_token_expires_at = datetime.utcnow() + timedelta(days=90)
+    await db.flush()
+
+    base = (settings.FRONTEND_URL or "").rstrip("/") or "https://medi.brandplaton.com"
+    return {
+        "token": lead.roadmap_token,
+        "expires_at": lead.roadmap_token_expires_at.isoformat(),
+        "url": f"{base}/my-roadmap?token={lead.roadmap_token}",
+    }
 
 
 # ============================================================

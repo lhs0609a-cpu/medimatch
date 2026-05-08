@@ -48,6 +48,8 @@ interface DiagnosisResult {
   pain_categories: { key: string; label: string }[];
   missing_count: number;
   next_action_message: string;
+  roadmap_url?: string;
+  alimtalk_sent?: boolean;
 }
 
 const SIDO_OPTIONS = [
@@ -566,6 +568,32 @@ function ResultCard({ result }: { result: DiagnosisResult }) {
         <ShieldCheck className="w-3.5 h-3.5" />
         진단 정보는 1회성 상담 외 외부 공유되지 않습니다
       </div>
+
+      {result.roadmap_url && (
+        <div className="bg-emerald-50 border border-emerald-200 rounded-3xl p-5">
+          <div className="flex items-start gap-3">
+            <div className="w-10 h-10 rounded-xl bg-emerald-600 flex items-center justify-center flex-shrink-0">
+              <Check className="w-5 h-5 text-white" />
+            </div>
+            <div className="flex-1">
+              <h3 className="text-sm font-bold text-emerald-900 mb-1">
+                {result.alimtalk_sent
+                  ? '카톡으로 결과를 발송했어요'
+                  : '본인 미션맵 링크가 발급되었어요'}
+              </h3>
+              <p className="text-xs text-emerald-700 leading-relaxed mb-3">
+                미션맵에서 단계별 체크리스트, 매칭된 협력사, 견적 비교를 본인이 직접 확인하고 관리할 수 있어요.
+              </p>
+              <a
+                href={result.roadmap_url}
+                className="inline-flex items-center gap-1 px-5 py-2.5 text-sm font-bold bg-emerald-600 text-white rounded-xl hover:bg-emerald-700"
+              >
+                내 미션맵 바로 보기 <ArrowRight className="w-4 h-4" />
+              </a>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="flex flex-col sm:flex-row gap-3">
         <Link href="/partners" className="flex-1 px-6 py-3 text-sm font-semibold text-center bg-foreground text-background rounded-2xl hover:opacity-90">

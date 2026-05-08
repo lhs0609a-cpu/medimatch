@@ -176,6 +176,12 @@ class DoctorLead(Base):
     converted_project_id = Column(UUID(as_uuid=True), ForeignKey("opening_projects.id"), nullable=True)
     converted_at = Column(DateTime, nullable=True)
 
+    # 의사 본인용 매직링크 (/my-roadmap?token=...)
+    roadmap_token = Column(String(64), nullable=True, unique=True, index=True)
+    roadmap_token_expires_at = Column(DateTime, nullable=True)
+    roadmap_last_viewed_at = Column(DateTime, nullable=True)
+    roadmap_view_count = Column(Integer, default=0)
+
     # 메타
     created_at = Column(DateTime, default=datetime.utcnow, index=True)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)

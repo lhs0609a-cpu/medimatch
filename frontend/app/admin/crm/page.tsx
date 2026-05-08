@@ -5,7 +5,7 @@ import Link from 'next/link';
 import {
   Search, RefreshCw, ChevronLeft, ChevronRight, Plus,
   Phone, Calendar, AlertTriangle, Flame, Snowflake, Users,
-  TrendingUp, Target, X,
+  TrendingUp, Target, X, Zap, BookOpen, Headphones,
 } from 'lucide-react';
 
 interface Lead {
@@ -38,6 +38,30 @@ interface Stats {
   by_funnel: Record<string, number>;
   contracted_revenue: number;
   commission_revenue: number;
+}
+
+interface QueueItem {
+  id: string;
+  name: string;
+  phone?: string;
+  specialty?: string;
+  target_region_sido?: string;
+  target_region_sigungu?: string;
+  opening_stage?: string;
+  opening_stage_label: string;
+  funnel_stage?: string;
+  priority?: string;
+  lead_score: number;
+  readiness_score: number;
+  priority_score: number;
+  urgency_x: number;
+  silence_x: number;
+  overdue_x: number;
+  last_contacted_at?: string;
+  next_action?: string;
+  next_followup_at?: string;
+  target_open_date?: string;
+  is_overdue_followup: boolean;
 }
 
 const FUNNEL_LABELS: Record<string, string> = {
@@ -86,6 +110,9 @@ export default function CRMListPage() {
   const [stageFilter, setStageFilter] = useState('');
   const [needsFollowup, setNeedsFollowup] = useState(false);
   const [showCreate, setShowCreate] = useState(false);
+  const [queue, setQueue] = useState<QueueItem[]>([]);
+  const [queueScope, setQueueScope] = useState<'all' | 'me'>('all');
+  const [queueOpen, setQueueOpen] = useState(true);
   const pageSize = 20;
   const totalPages = Math.max(1, Math.ceil(total / pageSize));
 
@@ -124,8 +151,23 @@ export default function CRMListPage() {
     } catch {}
   }, []);
 
+  const fetchQueue = useCallback(async () => {
+    try {
+      const params = new URLSearchParams({ limit: '10' });
+      if (queueScope === 'me') params.set('owner_user_id', 'me');
+      const res = await fetch(`${apiUrl}/crm/queue/today?${params}`, {
+        headers: { Authorization: `Bearer ${getToken()}` },
+      });
+      if (res.ok) {
+        const d = await res.json();
+        setQueue(d.items || []);
+      }
+    } catch {}
+  }, [queueScope]);
+
   useEffect(() => { fetchData(); }, [fetchData]);
   useEffect(() => { fetchStats(); }, [fetchStats]);
+  useEffect(() => { fetchQueue(); }, [fetchQueue]);
 
   return (
     <div className="p-6 space-y-6">
@@ -138,8 +180,14 @@ export default function CRMListPage() {
           </p>
         </div>
         <div className="flex gap-2">
+          <Link
+            href="/admin/crm/onboarding"
+            className="flex items-center gap-2 px-4 py-2 text-sm border border-violet-200 text-violet-700 rounded-xl hover:bg-violet-50"
+          >
+            <BookOpen className="w-4 h-4" />교육 가이드
+          </Link>
           <button
-            onClick={() => { fetchData(); fetchStats(); }}
+            onClick={() => { fetchData(); fetchStats(); fetchQueue(); }}
             className="flex items-center gap-2 px-4 py-2 text-sm border border-gray-200 rounded-xl hover:bg-gray-50"
           >
             <RefreshCw className="w-4 h-4" />새로고침
@@ -151,6 +199,119 @@ export default function CRMListPage() {
             <Plus className="w-4 h-4" />Lead 추가
           </button>
         </div>
+      </div>
+
+      {/* 오늘 콜할 TOP 10 */}
+      <div className="bg-gradient-to-br from-amber-50 to-orange-50 border border-amber-200 rounded-2xl overflow-hidden">
+        <div className="flex items-center justify-between px-5 py-4">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center">
+              <Zap className="w-5 h-5 text-white" />
+            </div>
+            <div>
+              <div className="font-bold text-amber-900">오늘 콜할 TOP {queue.length}</div>
+              <div className="text-xs text-amber-700">
+                위에서부터 순서대로 콜만 돌리세요. 매시간 자동 갱신.
+              </div>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="flex bg-white rounded-lg p-0.5 border border-amber-200">
+              <button
+                onClick={() => setQueueScope('all')}
+                className={`px-3 py-1 text-xs rounded-md ${queueScope === 'all' ? 'bg-amber-500 text-white' : 'text-amber-700'}`}
+              >전체</button>
+              <button
+                onClick={() => setQueueScope('me')}
+                className={`px-3 py-1 text-xs rounded-md ${queueScope === 'me' ? 'bg-amber-500 text-white' : 'text-amber-700'}`}
+              >내 담당</button>
+            </div>
+            <button
+              onClick={() => setQueueOpen(o => !o)}
+              className="text-xs text-amber-700 px-2 py-1 hover:bg-amber-100 rounded-md"
+            >
+              {queueOpen ? '접기' : '펼치기'}
+            </button>
+          </div>
+        </div>
+        {queueOpen && (
+          <div className="bg-white border-t border-amber-200">
+            {queue.length === 0 ? (
+              <div className="px-5 py-6 text-sm text-gray-400 text-center">
+                지금은 우선 콜 대상이 없어요. lead가 늘어나면 자동으로 채워집니다.
+              </div>
+            ) : (
+              <div className="divide-y divide-gray-50">
+                {queue.map((q, i) => {
+                  const stale = q.last_contacted_at
+                    ? Math.floor((Date.now() - new Date(q.last_contacted_at).getTime()) / 86_400_000)
+                    : null;
+                  return (
+                    <div key={q.id} className="flex items-center gap-3 px-5 py-3 hover:bg-amber-50/50">
+                      <div className={`w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold flex-shrink-0 ${
+                        i === 0 ? 'bg-red-500 text-white'
+                          : i < 3 ? 'bg-orange-500 text-white'
+                            : 'bg-amber-100 text-amber-800'
+                      }`}>{i + 1}</div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-baseline gap-2">
+                          <Link href={`/admin/crm/${q.id}`} className="font-semibold text-gray-900 hover:text-blue-600 truncate">
+                            {q.name}
+                          </Link>
+                          {q.specialty && <span className="text-xs text-gray-500">{q.specialty}</span>}
+                          {q.priority === 'HOT' && (
+                            <span className="text-[10px] bg-red-100 text-red-700 px-1.5 py-0.5 rounded-full font-bold">
+                              HOT
+                            </span>
+                          )}
+                          {q.is_overdue_followup && (
+                            <span className="text-[10px] bg-red-100 text-red-700 px-1.5 py-0.5 rounded-full">
+                              후속 지연
+                            </span>
+                          )}
+                        </div>
+                        <div className="text-xs text-gray-500 mt-0.5 flex items-center gap-2 truncate">
+                          {q.opening_stage_label && <span>{q.opening_stage_label}</span>}
+                          {q.target_region_sido && <span>· {q.target_region_sido} {q.target_region_sigungu || ''}</span>}
+                          {stale !== null && (
+                            <span>· {stale === 0 ? '오늘 컨택' : `${stale}일 무응답`}</span>
+                          )}
+                        </div>
+                      </div>
+                      <div className="hidden md:flex items-center gap-1.5 text-[10px] text-gray-500">
+                        <span title="긴급도">⚡{q.urgency_x}</span>
+                        <span title="무응답">💤{q.silence_x}</span>
+                        <span title="후속 지연">⏰{q.overdue_x}</span>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-lg font-bold text-amber-700">{Math.round(q.priority_score)}</div>
+                        <div className="text-[10px] text-gray-500">우선도</div>
+                      </div>
+                      <div className="flex gap-1">
+                        {q.phone && (
+                          <a
+                            href={`tel:${q.phone}`}
+                            className="p-2 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600"
+                            title={`전화 ${q.phone}`}
+                          >
+                            <Phone className="w-4 h-4" />
+                          </a>
+                        )}
+                        <Link
+                          href={`/admin/crm/${q.id}/call`}
+                          className="p-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                          title="콜 콘솔 열기"
+                        >
+                          <Headphones className="w-4 h-4" />
+                        </Link>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       {/* KPI */}

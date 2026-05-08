@@ -2,10 +2,12 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
+import Link from 'next/link';
 import {
   ArrowLeft, Phone, Mail, MapPin, User, Briefcase, Calendar,
   CheckCircle, Circle, Sparkles, MessageCircle, Plus, X, Save,
   Building2, Wallet, AlertTriangle, ChevronRight, Loader2, FileText,
+  Headphones,
 } from 'lucide-react';
 import { QuoteMatrix } from '@/components/crm/QuoteMatrix';
 import { Timeline } from '@/components/crm/Timeline';
@@ -192,6 +194,12 @@ export default function CRMDetailPage() {
           </div>
         </div>
         <div className="flex gap-2">
+          <Link
+            href={`/admin/crm/${leadId}/call`}
+            className="flex items-center gap-2 px-4 py-2 text-sm bg-emerald-600 text-white rounded-xl hover:bg-emerald-700 shadow-md shadow-emerald-500/20"
+          >
+            <Headphones className="w-4 h-4" />콜 콘솔 열기
+          </Link>
           <button onClick={() => setShowScript(true)}
                   className="flex items-center gap-2 px-4 py-2 text-sm bg-violet-600 text-white rounded-xl hover:bg-violet-700">
             <Sparkles className="w-4 h-4" />상담 스크립트

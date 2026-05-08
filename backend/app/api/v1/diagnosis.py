@@ -14,7 +14,8 @@
 
 인증 없음 (public). Rate limit는 추후.
 """
-from datetime import datetime
+import secrets
+from datetime import datetime, timedelta
 from typing import Optional, List
 
 from fastapi import APIRouter, Depends, HTTPException, Request
@@ -23,6 +24,7 @@ from sqlalchemy import select, or_
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.deps import get_db
+from app.core.config import settings
 from app.core.lead_checklist import (
     CATEGORY_LABELS, STAGE_LABELS, build_default_checklist,
     calc_readiness_score, calc_lead_score, missing_categories,
@@ -31,8 +33,17 @@ from app.models.doctor_lead import (
     DoctorLead, LeadPartnerMatch,
     LeadFunnelStage, LeadOpeningStage, LeadPriority, LeadPartnerMatchStatus,
 )
+from app.services.kakao_alimtalk import send_diagnosis_alimtalk
 
 router = APIRouter()
+
+
+ROADMAP_TOKEN_TTL_DAYS = 90
+
+
+def _issue_roadmap_token() -> tuple[str, datetime]:
+    """매직링크용 토큰 + 만료시각"""
+    return secrets.token_urlsafe(32), datetime.utcnow() + timedelta(days=ROADMAP_TOKEN_TTL_DAYS)
 
 
 # ============================================================
@@ -77,6 +88,8 @@ class DiagnosisResult(BaseModel):
     pain_categories: List[dict]
     missing_count: int
     next_action_message: str
+    roadmap_url: Optional[str] = None
+    alimtalk_sent: bool = False
 
 
 # ============================================================
@@ -218,6 +231,15 @@ async def submit_diagnosis(
     lead.readiness_score = calc_readiness_score(lead.checklist)
     lead.lead_score = calc_lead_score(lead)
 
+    # 의사용 매직링크 — 만료 임박이거나 미발급 시 재발급
+    needs_new_token = (
+        not lead.roadmap_token
+        or not lead.roadmap_token_expires_at
+        or lead.roadmap_token_expires_at < datetime.utcnow() + timedelta(days=7)
+    )
+    if needs_new_token:
+        lead.roadmap_token, lead.roadmap_token_expires_at = _issue_roadmap_token()
+
     # 막막한 영역 → partner_match SUGGESTED 자동 생성 (중복 방지)
     if payload.pain_categories:
         existing_matches = (await db.execute(
@@ -271,6 +293,28 @@ async def submit_diagnosis(
     else:
         msg = "여유롭게 준비하시는 중이군요. 전담 상담사가 연락드려 장기 로드맵을 함께 짜드릴게요."
 
+    # 미션맵 URL + 카카오 알림톡 발송 (실패해도 진단 결과는 정상 반환)
+    roadmap_url = None
+    alimtalk_sent = False
+    if lead.roadmap_token:
+        base = (settings.FRONTEND_URL or "").rstrip("/") or "https://medi.brandplaton.com"
+        roadmap_url = f"{base}/my-roadmap?token={lead.roadmap_token}"
+
+    if payload.consent_marketing and lead.phone and roadmap_url:
+        try:
+            result = await send_diagnosis_alimtalk(
+                phone=lead.phone,
+                name=lead.name,
+                readiness_score=lead.readiness_score or 0,
+                stage_label=STAGE_LABELS.get(opening_stage.value, opening_stage.value),
+                rec_label=rec_cards[0]["label"] if rec_cards else None,
+                next_action=msg,
+                roadmap_url=roadmap_url,
+            )
+            alimtalk_sent = bool(result.get("ok"))
+        except Exception as e:
+            print(f"[diagnosis] alimtalk send error: {e}")
+
     return DiagnosisResult(
         lead_id=str(lead.id),
         name=lead.name,
@@ -282,6 +326,8 @@ async def submit_diagnosis(
         pain_categories=pain_cards,
         missing_count=missing_count,
         next_action_message=msg,
+        roadmap_url=roadmap_url,
+        alimtalk_sent=alimtalk_sent,
     )
 
 
