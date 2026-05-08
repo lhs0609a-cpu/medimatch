@@ -168,7 +168,7 @@ export default function SimulatePage() {
       const usableW = pageW - margin * 2
       const usableH = pageH - margin * 2
       const blockGap = 3
-      const MAX_RECURSE_DEPTH = 2
+      const MAX_RECURSE_DEPTH = 5
 
       const captureBlock = async (el: HTMLElement) => {
         return html2canvas(el, {
@@ -180,13 +180,60 @@ export default function SimulatePage() {
           imageTimeout: 8000,
           windowWidth: el.scrollWidth,
           onclone: (doc) => {
-            // 캡처 불가 영역(카카오맵 iframe 등) 숨김
+            // 캡처 불가 영역(카카오맵 iframe, PDF용으로 숨길 CTA 등) 제거
             doc.querySelectorAll('[data-html2canvas-ignore="true"]').forEach((ig) => {
               (ig as HTMLElement).style.display = 'none'
             })
-            // print 전용으로 숨겨둔 PDF 플레이스홀더(예: 지도 대체 텍스트)를 캡처에서도 보이게
+            // print 전용 플레이스홀더(예: 지도 대체 텍스트)를 캡처에서도 보이게
             doc.querySelectorAll('[class*="print:block"]').forEach((el) => {
               (el as HTMLElement).style.display = 'block'
+            })
+
+            // Recharts hover/툴팁 잔재 제거 (호버 시 남는 라벨 중복 방지)
+            doc.querySelectorAll(
+              '.recharts-tooltip-wrapper, .recharts-active-dot, .recharts-tooltip-cursor'
+            ).forEach((el) => {
+              (el as HTMLElement).style.display = 'none'
+            })
+
+            // 인터랙티브 컨트롤(슬라이더/input/select)을 정적 값 텍스트로 치환
+            doc.querySelectorAll('input[type="range"]').forEach((el) => {
+              const input = el as HTMLInputElement
+              const span = doc.createElement('span')
+              span.textContent = input.value
+              span.style.cssText =
+                'display:inline-block;padding:2px 8px;background:#f3f4f6;' +
+                'border:1px solid #e5e7eb;border-radius:6px;font-size:12px;color:#111827'
+              input.parentNode?.replaceChild(span, input)
+            })
+            doc.querySelectorAll('input:not([type="hidden"])').forEach((el) => {
+              const input = el as HTMLInputElement
+              if (input.type === 'range') return
+              const span = doc.createElement('span')
+              span.textContent = input.value || input.placeholder || '—'
+              span.style.cssText =
+                'display:inline-block;min-width:40px;padding:4px 8px;background:#fff;' +
+                'border:1px solid #e5e7eb;border-radius:6px;font-size:13px;color:#111827;' +
+                'text-align:right'
+              input.parentNode?.replaceChild(span, input)
+            })
+            doc.querySelectorAll('select').forEach((el) => {
+              const sel = el as HTMLSelectElement
+              const span = doc.createElement('span')
+              const opt = sel.options[sel.selectedIndex]
+              span.textContent = opt?.textContent || sel.value || '—'
+              span.style.cssText =
+                'display:inline-block;padding:4px 8px;background:#fff;' +
+                'border:1px solid #e5e7eb;border-radius:6px;font-size:13px;color:#111827'
+              sel.parentNode?.replaceChild(span, sel)
+            })
+            doc.querySelectorAll('button').forEach((el) => {
+              const btn = el as HTMLButtonElement
+              // 모든 버튼이 다 빠지면 안 되니, "다운로드"/"공유"/"잠금해제" 류만 제거
+              const txt = btn.textContent || ''
+              if (/PDF|다운로드|공유|잠금해제|결제|새로운 시뮬레이션/.test(txt)) {
+                btn.style.display = 'none'
+              }
             })
           },
         })
@@ -203,20 +250,33 @@ export default function SimulatePage() {
         cursorY += h + blockGap
       }
 
-      const sliceTallImage = (imgData: string, totalH: number) => {
+      // 캔버스 단위로 실제 슬라이스해서 페이지마다 정확히 한 조각씩만 그림 (뷰어 클리핑 의존 X)
+      const sliceTallImage = (canvas: HTMLCanvasElement) => {
         if (cursorY > margin) {
           pdf.addPage()
           cursorY = margin
         }
-        let heightLeft = totalH
-        let position = margin
-        pdf.addImage(imgData, 'JPEG', margin, position, usableW, totalH, undefined, 'FAST')
-        heightLeft -= usableH
-        while (heightLeft > 0) {
-          pdf.addPage()
-          position = margin - (totalH - heightLeft)
-          pdf.addImage(imgData, 'JPEG', margin, position, usableW, totalH, undefined, 'FAST')
-          heightLeft -= usableH
+        // 1mm당 픽셀
+        const pxPerMm = canvas.width / usableW
+        const sliceHeightPx = Math.floor(usableH * pxPerMm)
+        let yPx = 0
+        let firstSlice = true
+        while (yPx < canvas.height) {
+          const remainPx = canvas.height - yPx
+          const thisSlicePx = Math.min(sliceHeightPx, remainPx)
+          const sliceCanvas = document.createElement('canvas')
+          sliceCanvas.width = canvas.width
+          sliceCanvas.height = thisSlicePx
+          const ctx = sliceCanvas.getContext('2d')!
+          ctx.drawImage(canvas, 0, yPx, canvas.width, thisSlicePx, 0, 0, canvas.width, thisSlicePx)
+          const sliceData = sliceCanvas.toDataURL('image/jpeg', 0.92)
+          const sliceMmH = thisSlicePx / pxPerMm
+          if (!firstSlice) {
+            pdf.addPage()
+          }
+          pdf.addImage(sliceData, 'JPEG', margin, margin, usableW, sliceMmH, undefined, 'FAST')
+          yPx += thisSlicePx
+          firstSlice = false
         }
         cursorY = pageH // 다음 블록은 새 페이지에서
       }
@@ -232,19 +292,19 @@ export default function SimulatePage() {
 
       // 재귀: 한 블록을 배치. 페이지보다 크면 자식으로 내려가서 분할 시도.
       const placeBlock = async (el: HTMLElement, depth: number): Promise<void> => {
-        const canvas = await captureBlock(el)
-        const imgData = canvas.toDataURL('image/jpeg', 0.92)
-        const blockH = (canvas.height * usableW) / canvas.width
-
-        if (blockH <= usableH) {
-          placeImage(imgData, blockH)
-          return
-        }
-
-        // 페이지보다 크면 자식 단위로 분할 (최대 MAX_RECURSE_DEPTH 단계)
+        // 먼저 자식이 충분히 있고 깊이 여유가 있으면 부모 캡처 비용을 아끼고 바로 분할
         if (depth < MAX_RECURSE_DEPTH) {
           const children = visibleChildren(el)
+          // 자식이 1개뿐이면 파드 캡처와 동일하므로 바로 캡처로 진행
           if (children.length >= 2) {
+            // 부모 단위로 일단 캡처 → 한 페이지에 들어가면 그대로 한 장으로 처리 (이미지 절약)
+            const parentCanvas = await captureBlock(el)
+            const parentH = (parentCanvas.height * usableW) / parentCanvas.width
+            if (parentH <= usableH) {
+              placeImage(parentCanvas.toDataURL('image/jpeg', 0.92), parentH)
+              return
+            }
+            // 페이지보다 크면 자식 단위로 분할
             for (const child of children) {
               await placeBlock(child, depth + 1)
             }
@@ -252,8 +312,17 @@ export default function SimulatePage() {
           }
         }
 
-        // 더 이상 쪼갤 수 없으면 픽셀 단위 슬라이스 (마지막 수단)
-        sliceTallImage(imgData, blockH)
+        // leaf 또는 자식 1개: 캡처 후 페이지 분할
+        const canvas = await captureBlock(el)
+        const blockH = (canvas.height * usableW) / canvas.width
+
+        if (blockH <= usableH) {
+          placeImage(canvas.toDataURL('image/jpeg', 0.92), blockH)
+          return
+        }
+
+        // 진짜 leaf인데 페이지보다 큰 경우만 픽셀 단위 슬라이스 (최후의 수단)
+        sliceTallImage(canvas)
       }
 
       const topBlocks = visibleChildren(node)
@@ -722,7 +791,7 @@ export default function SimulatePage() {
 
             {/* ── 하단 CTA ── */}
             {isUnlocked ? (
-              <div className="card p-6 flex flex-col md:flex-row items-center justify-between gap-4">
+              <div className="card p-6 flex flex-col md:flex-row items-center justify-between gap-4 print:hidden" data-html2canvas-ignore="true">
                 <div>
                   <h3 className="font-semibold text-foreground">PDF 리포트 다운로드</h3>
                   <p className="text-muted-foreground">AI 분석이 포함된 PDF 리포트를 받아보세요</p>
@@ -733,7 +802,7 @@ export default function SimulatePage() {
                 </Link>
               </div>
             ) : (
-              <div className="card p-6 bg-gradient-to-r from-blue-50 to-blue-50 dark:from-blue-950/30 dark:to-blue-950/30 border-blue-200 dark:border-blue-800">
+              <div className="card p-6 bg-gradient-to-r from-blue-50 to-blue-50 dark:from-blue-950/30 dark:to-blue-950/30 border-blue-200 dark:border-blue-800 print:hidden" data-html2canvas-ignore="true">
                 <div className="flex flex-col md:flex-row items-center justify-between gap-4">
                   <div>
                     <h3 className="font-semibold text-foreground">전체 분석 결과 확인하기</h3>

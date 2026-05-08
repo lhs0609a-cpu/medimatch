@@ -96,8 +96,8 @@ export default function BreakevenTimeline({ result }: Props) {
             <XAxis
               dataKey="month"
               tick={{ fontSize: 10 }}
-              tickFormatter={(v) => `${Math.ceil(v / 12)}년`}
-              ticks={[6, 12, 18, 24, 30, 36, 42, 48, 54, 60]}
+              tickFormatter={(v) => `${v / 12}년`}
+              ticks={[12, 24, 36, 48, 60]}
             />
             <YAxis tick={{ fontSize: 10 }} tickFormatter={(v) => won(v)} />
             <Tooltip
