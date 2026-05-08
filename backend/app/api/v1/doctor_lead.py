@@ -1274,6 +1274,293 @@ async def todays_call_queue(
 
 
 # ============================================================
+# Quick-Diagnose — 콜 콘솔에서 1-클릭 자가진단 (상담사용)
+# ============================================================
+
+class QuickDiagnoseUpdate(BaseModel):
+    """콜 콘솔에서 의사 답변을 칩 클릭만으로 누적 반영.
+
+    각 필드 None 이면 변경 안 함. 부분 업데이트 안전.
+    """
+    specialty: Optional[str] = None
+    timeline: Optional[str] = None  # '지금'/'1~3개월'/...
+    opening_stage: Optional[str] = None
+    budget_max_만: Optional[int] = None  # None=정해지지 않음
+    has_partner: Optional[bool] = None
+    needs_loan: Optional[bool] = None
+    pain_categories: Optional[List[str]] = None  # 누적 추가, 기존 매칭은 유지
+
+
+_TIMELINE_TABLE = {
+    "지금":      ("HOT",  0),
+    "1~3개월":   ("HOT",  60),
+    "3~6개월":   ("WARM", 135),
+    "6~12개월":  ("WARM", 270),
+    "1년 이후":  ("COLD", 400),
+    "결정 안됨": (None,   None),
+}
+
+
+@router.patch("/leads/{lead_id}/quick-diagnose")
+async def quick_diagnose(
+    lead_id: uuid.UUID,
+    payload: QuickDiagnoseUpdate,
+    db: AsyncSession = Depends(get_db),
+    user: User = Depends(require_crm_user),
+):
+    """상담사가 통화 중 칩 클릭으로 채우는 batch 진단.
+
+    - 입력된 필드만 업데이트
+    - opening_stage 변경 시 이전 단계 항목 자동 완료 처리
+    - pain_categories 추가 시 SUGGESTED 매칭 자동 생성 (중복 방지)
+    - lead_score / readiness_score 재계산
+    """
+    lead = (await db.execute(
+        select(DoctorLead).where(DoctorLead.id == lead_id)
+    )).scalar_one_or_none()
+    if not lead:
+        raise HTTPException(status_code=404, detail="Lead 없음")
+
+    data = payload.model_dump(exclude_unset=True)
+
+    if "specialty" in data and data["specialty"]:
+        lead.specialty = data["specialty"]
+
+    if "timeline" in data and data["timeline"]:
+        prio, days = _TIMELINE_TABLE.get(data["timeline"], (None, None))
+        if prio:
+            lead.priority = LeadPriority(prio)
+        if days is not None:
+            lead.target_open_date = datetime.utcnow() + timedelta(days=days)
+
+    if "budget_max_만" in data:
+        v = data["budget_max_만"]
+        lead.budget_total = (int(v) * 10_000) if v else None
+
+    if "has_partner" in data and data["has_partner"] is not None:
+        lead.has_partner = bool(data["has_partner"])
+
+    if "needs_loan" in data and data["needs_loan"] is not None:
+        lead.needs_loan = bool(data["needs_loan"])
+
+    # 단계 변경 — 이전 단계 자동 완료
+    if "opening_stage" in data and data["opening_stage"]:
+        try:
+            new_stage = LeadOpeningStage(data["opening_stage"])
+        except ValueError:
+            raise HTTPException(status_code=400, detail=f"잘못된 단계: {data['opening_stage']}")
+        lead.opening_stage = new_stage
+
+        checklist = dict(lead.checklist or build_default_checklist())
+        if new_stage.value in STAGE_ORDER:
+            idx = STAGE_ORDER.index(new_stage.value)
+            now_iso = datetime.utcnow().isoformat()
+            for prev in STAGE_ORDER[:idx]:
+                items = list(checklist.get(prev, []))
+                for it in items:
+                    if not it.get("done"):
+                        it["done"] = True
+                        it["completed_at"] = now_iso
+                        it["note"] = it.get("note") or "통화 중 자가진단"
+                checklist[prev] = items
+        lead.checklist = checklist
+        from sqlalchemy.orm.attributes import flag_modified
+        flag_modified(lead, "checklist")
+
+        # 새 단계 자동 마일스톤 시드 (멱등)
+        await _seed_milestones_for_stage(db, lead, new_stage.value)
+
+    # pain_categories — SUGGESTED 매칭 자동 생성
+    added_pain = []
+    if "pain_categories" in data and data["pain_categories"]:
+        existing = (await db.execute(
+            select(LeadPartnerMatch.category).where(LeadPartnerMatch.lead_id == lead.id)
+        )).scalars().all()
+        existing_set = set(existing)
+        for cat in data["pain_categories"]:
+            if cat not in CATEGORY_LABELS or cat in existing_set:
+                continue
+            db.add(LeadPartnerMatch(
+                lead_id=lead.id,
+                partner_id=None,
+                category=cat,
+                match_reason="통화 자가진단에서 막막하다고 응답",
+                status=LeadPartnerMatchStatus.SUGGESTED,
+                matched_by_user_id=user.id,
+            ))
+            existing_set.add(cat)
+            added_pain.append(cat)
+
+        # source_meta에도 누적
+        meta = dict(lead.source_meta or {})
+        prev_pain = list(meta.get("pain_categories", []) or [])
+        for c in data["pain_categories"]:
+            if c not in prev_pain:
+                prev_pain.append(c)
+        meta["pain_categories"] = prev_pain
+        lead.source_meta = meta
+        from sqlalchemy.orm.attributes import flag_modified
+        flag_modified(lead, "source_meta")
+
+    # 점수 재계산
+    lead.readiness_score = calc_readiness_score(lead.checklist)
+    lead.lead_score = calc_lead_score(lead)
+
+    await db.flush()
+
+    # 추천 카테고리 즉시 반환 (프런트가 우측 패널 갱신용)
+    recs = missing_categories(
+        lead.checklist,
+        lead.opening_stage.value if lead.opening_stage else None,
+    )
+
+    return {
+        "lead": serialize_lead(lead, full=True),
+        "added_pain_categories": added_pain,
+        "recommended_categories": [
+            {"key": c, "label": CATEGORY_LABELS.get(c, c)} for c in recs
+        ],
+    }
+
+
+# ============================================================
+# Bundle Action — TOP-N 자동매칭 + 알림톡 + 통화 + 후속 일정 한 번에
+# ============================================================
+
+class BundleActionRequest(BaseModel):
+    top_n: int = Field(3, ge=1, le=6)
+    follow_up_days: int = Field(3, ge=0, le=30)
+    summary: Optional[str] = None
+    send_alimtalk: bool = True
+    issue_new_token: bool = True  # 미션맵 링크 새로 발급해서 카톡 발송
+
+
+@router.post("/leads/{lead_id}/bundle-action")
+async def bundle_action(
+    lead_id: uuid.UUID,
+    payload: BundleActionRequest,
+    db: AsyncSession = Depends(get_db),
+    user: User = Depends(require_crm_user),
+):
+    """원클릭 묶음:
+    1. 추천 카테고리 TOP-N 자동 매칭 (이미 매칭된 카테고리는 skip)
+    2. PROPOSAL_SENT outcome 통화 기록 자동 추가
+    3. 미션맵 토큰 (재)발급
+    4. 알림톡 발송 (실패 시 결과만 반환, 트랜잭션은 유지)
+    5. 후속 일정 등록
+    """
+    q = (
+        select(DoctorLead).where(DoctorLead.id == lead_id)
+        .options(selectinload(DoctorLead.partner_matches))
+    )
+    lead = (await db.execute(q)).scalar_one_or_none()
+    if not lead:
+        raise HTTPException(status_code=404, detail="Lead 없음")
+
+    stage = lead.opening_stage.value if lead.opening_stage else "PLANNING"
+    recs = missing_categories(lead.checklist, stage)
+
+    existing_cats = {m.category for m in lead.partner_matches}
+    new_recs = [c for c in recs if c not in existing_cats][:payload.top_n]
+
+    # 1. TOP-N 매칭 생성 + 카테고리별 best partner 자동 선택
+    created_matches = []
+    for cat in new_recs:
+        # 같은 시도 + premium + rating 기준 best partner
+        pq = select(Partner).where(
+            Partner.category == cat,
+            Partner.status == PartnerStatus.ACTIVE,
+        )
+        if lead.target_region_sido:
+            pq = pq.order_by(
+                (Partner.sido == lead.target_region_sido).desc(),
+                Partner.is_premium.desc(),
+                Partner.rating.desc().nullslast(),
+            )
+        else:
+            pq = pq.order_by(Partner.is_premium.desc(), Partner.rating.desc().nullslast())
+        best = (await db.execute(pq.limit(1))).scalar_one_or_none()
+
+        match = LeadPartnerMatch(
+            lead_id=lead.id,
+            partner_id=best.id if best else None,
+            category=cat,
+            match_reason="원클릭 묶음 — 단계 추천 TOP-N",
+            status=LeadPartnerMatchStatus.SUGGESTED,
+            matched_by_user_id=user.id,
+        )
+        db.add(match)
+        created_matches.append({"category": cat, "partner_name": best.name if best else None})
+
+    # 2. PROPOSAL_SENT 통화 기록
+    next_followup_at = (
+        datetime.utcnow() + timedelta(days=payload.follow_up_days)
+        if payload.follow_up_days > 0 else None
+    )
+    summary = payload.summary or (
+        f"[원클릭 묶음] 추천 {len(created_matches)}개 매칭 + 미션맵 카톡 발송"
+    )
+    consultation = LeadConsultation(
+        lead_id=lead.id,
+        user_id=user.id,
+        contact_method=ContactMethod.PHONE,
+        direction="OUTBOUND",
+        summary=summary,
+        outcome=ConsultationOutcome.PROPOSAL_SENT,
+        next_action=f"제안한 {len(created_matches)}곳 응답 확인",
+        next_followup_at=next_followup_at,
+    )
+    db.add(consultation)
+
+    lead.last_contacted_at = datetime.utcnow()
+    lead.next_action = consultation.next_action
+    lead.next_followup_at = next_followup_at
+    if lead.funnel_stage in (LeadFunnelStage.NEW, LeadFunnelStage.CONTACTED, LeadFunnelStage.ENGAGED):
+        lead.funnel_stage = LeadFunnelStage.PROPOSING
+
+    # 3. 미션맵 토큰 발급
+    roadmap_url = None
+    if payload.issue_new_token or not lead.roadmap_token:
+        lead.roadmap_token = secrets.token_urlsafe(32)
+        lead.roadmap_token_expires_at = datetime.utcnow() + timedelta(days=90)
+
+    if lead.roadmap_token:
+        base = (settings.FRONTEND_URL or "").rstrip("/") or "https://medi.brandplaton.com"
+        roadmap_url = f"{base}/my-roadmap?token={lead.roadmap_token}"
+
+    await db.flush()
+
+    # 4. 알림톡 발송 (트랜잭션 외)
+    alimtalk_result = {"ok": False, "status": "skipped"}
+    if payload.send_alimtalk and lead.phone and roadmap_url:
+        from app.services.kakao_alimtalk import send_diagnosis_alimtalk
+        first_label = CATEGORY_LABELS.get(new_recs[0], new_recs[0]) if new_recs else "맞춤 협력사"
+        try:
+            alimtalk_result = await send_diagnosis_alimtalk(
+                phone=lead.phone,
+                name=lead.name,
+                readiness_score=lead.readiness_score or 0,
+                stage_label=STAGE_LABELS.get(stage, stage),
+                rec_label=f"{first_label} 외 {len(new_recs)-1}개" if len(new_recs) > 1 else first_label,
+                next_action=f"제안 검토하시고 답주세요. {payload.follow_up_days}일 뒤 다시 연락드리겠습니다.",
+                roadmap_url=roadmap_url,
+            )
+        except Exception as e:
+            print(f"[bundle] alimtalk error: {e}")
+            alimtalk_result = {"ok": False, "status": "exception", "message": str(e)}
+
+    return {
+        "matched_count": len(created_matches),
+        "created_matches": created_matches,
+        "consultation_id": str(consultation.id),
+        "next_followup_at": next_followup_at.isoformat() if next_followup_at else None,
+        "roadmap_url": roadmap_url,
+        "alimtalk": alimtalk_result,
+        "funnel_stage": lead.funnel_stage.value if lead.funnel_stage else None,
+    }
+
+
+# ============================================================
 # 의사 매직링크 — 재발급
 # ============================================================
 

@@ -15,7 +15,61 @@ import {
   X, Phone, PhoneOff, Sparkles, CheckCircle, Circle, ChevronRight,
   Loader2, Send, Plus, MapPin, Calendar, Wallet, Building2, Briefcase,
   AlertTriangle, Mic, FileText, MessageSquare, Target, Link2, Copy,
+  Stethoscope, Clock, Layers, Zap, Rocket,
 } from 'lucide-react';
+
+// 인라인 진단 — 칩 옵션 (의사가 답변하는 즉시 클릭)
+const SPECIALTIES = [
+  '내과', '외과', '정형외과', '신경외과', '이비인후과', '안과',
+  '피부과', '성형외과', '산부인과', '소아과', '정신건강의학과',
+  '재활의학과', '마취통증의학과', '치과', '한의원', '가정의학과',
+  '비뇨기과', '영상의학과', '기타',
+];
+const TIMELINES = ['지금', '1~3개월', '3~6개월', '6~12개월', '1년 이후', '결정 안됨'];
+const STAGES_FOR_DIAG = [
+  { key: 'PLANNING', label: '01 사업계획' },
+  { key: 'LOCATION_REVIEW', label: '02 입지검토' },
+  { key: 'CONTRACT', label: '03 임대계약' },
+  { key: 'LICENSING', label: '04 인허가' },
+  { key: 'CONSTRUCTION', label: '05 인테리어' },
+  { key: 'EQUIPMENT', label: '06 의료기기' },
+  { key: 'HIRING', label: '07 인력채용' },
+  { key: 'OPENING', label: '08 개원준비' },
+  { key: 'OPERATING', label: '09 운영안정' },
+];
+const PAIN_CATEGORIES = [
+  { key: 'realestate', label: '부동산' },
+  { key: 'legal', label: '법무' },
+  { key: 'accounting', label: '회계' },
+  { key: 'tax', label: '세무' },
+  { key: 'labor', label: '노무' },
+  { key: 'consulting', label: '종합컨설팅' },
+  { key: 'finance', label: '금융·대출' },
+  { key: 'interior', label: '인테리어' },
+  { key: 'equipment', label: '의료기기' },
+  { key: 'pharma', label: '의약품·소모품' },
+  { key: 'signage', label: '간판·사이니지' },
+  { key: 'emr', label: 'EMR·청구' },
+  { key: 'marketing', label: '마케팅' },
+];
+const BUDGETS = [
+  { label: '5천만↓', max: 5000 },
+  { label: '5천~1억', max: 10000 },
+  { label: '1~3억', max: 30000 },
+  { label: '3~5억', max: 50000 },
+  { label: '5~10억', max: 100000 },
+  { label: '10억↑', max: 200000 },
+  { label: '미정', max: null },
+];
+
+// 분기형 응답 옵션 (스크립트 카드 아래)
+type Branch = { label: string; goto: 'next' | 'objections' | 'closing' | 'end_save'; cls: string };
+const RESPONSE_BRANCHES: Branch[] = [
+  { label: '👍 관심 있음',  goto: 'next',       cls: 'bg-emerald-600 hover:bg-emerald-700 text-white' },
+  { label: '🤔 거절·반론',  goto: 'objections', cls: 'bg-amber-600 hover:bg-amber-700 text-white' },
+  { label: '⏳ 다른 질문',  goto: 'next',       cls: 'bg-blue-600 hover:bg-blue-700 text-white' },
+  { label: '📵 부재·종료', goto: 'end_save',   cls: 'bg-gray-600 hover:bg-gray-700 text-white' },
+];
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1';
 const getToken = () => (typeof window !== 'undefined' ? localStorage.getItem('access_token') || '' : '');
@@ -110,6 +164,14 @@ export default function CallConsolePage() {
   const [linkUrl, setLinkUrl] = useState<string | null>(null);
   const [linkCopied, setLinkCopied] = useState(false);
 
+  // 인라인 진단
+  const [diagOpen, setDiagOpen] = useState(true);
+  const [diagPainSelected, setDiagPainSelected] = useState<string[]>([]);
+
+  // 묶음 발사 결과
+  const [bundleResult, setBundleResult] = useState<any>(null);
+  const [bundleSending, setBundleSending] = useState(false);
+
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   // ============ 데이터 로딩 ============
@@ -196,6 +258,80 @@ export default function CallConsolePage() {
       body: JSON.stringify({ category, partner_id, match_reason: '콜 콘솔에서 즉시 매칭' }),
     });
     if (res.ok) fetchLead();
+  };
+
+  // ============ 인라인 진단 — 칩 클릭 batch update ============
+  const quickDiag = async (patch: Record<string, any>) => {
+    const res = await fetch(`${apiUrl}/crm/leads/${leadId}/quick-diagnose`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${getToken()}` },
+      body: JSON.stringify(patch),
+    });
+    if (res.ok) {
+      fetchLead();
+      fetchSuggestions();
+      fetchScript(true);
+    }
+  };
+
+  const togglePainCat = (cat: string) => {
+    const next = diagPainSelected.includes(cat)
+      ? diagPainSelected.filter(c => c !== cat)
+      : [...diagPainSelected, cat];
+    setDiagPainSelected(next);
+  };
+
+  const submitPainSelection = async () => {
+    if (diagPainSelected.length === 0) return;
+    await quickDiag({ pain_categories: diagPainSelected });
+    setDiagPainSelected([]);
+  };
+
+  // ============ 분기형 응답 — 다음 카드로 점프 ============
+  const handleBranch = (branch: Branch) => {
+    if (!script) return;
+    if (branch.goto === 'next') {
+      setScriptCardIdx(i => Math.min(cards.length - 1, i + 1));
+    } else if (branch.goto === 'objections') {
+      const objIdx = cards.findIndex(c => c.type === 'objection');
+      if (objIdx >= 0) setScriptCardIdx(objIdx);
+    } else if (branch.goto === 'closing') {
+      const closeIdx = cards.findIndex(c => c.type === 'closing');
+      if (closeIdx >= 0) setScriptCardIdx(closeIdx);
+    } else if (branch.goto === 'end_save') {
+      setOutcome('NO_ANSWER');
+      saveConsultation();
+    }
+  };
+
+  // ============ 원클릭 묶음 발사 ============
+  const fireBundle = async () => {
+    if (!confirm('추천 TOP3을 자동 매칭하고 의사에게 카톡(미션맵)을 발송합니다. 계속할까요?')) return;
+    setBundleSending(true);
+    setBundleResult(null);
+    try {
+      const res = await fetch(`${apiUrl}/crm/leads/${leadId}/bundle-action`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${getToken()}` },
+        body: JSON.stringify({
+          top_n: 3,
+          follow_up_days: 3,
+          summary: summary || undefined,
+          send_alimtalk: true,
+          issue_new_token: true,
+        }),
+      });
+      if (res.ok) {
+        const d = await res.json();
+        setBundleResult(d);
+        if (d.roadmap_url) setLinkUrl(d.roadmap_url);
+        setOutcome('PROPOSAL_SENT');
+        if (!nextAction) setNextAction(`제안한 ${d.matched_count}곳 응답 확인`);
+        setNextFollowupDays(3);
+        fetchLead();
+        fetchSuggestions();
+      }
+    } finally { setBundleSending(false); }
   };
 
   // ============ 미션맵 링크 발급/복사 ============
@@ -362,9 +498,25 @@ export default function CallConsolePage() {
                 <div className="text-xs text-gray-500 mb-2">
                   {scriptCardIdx + 1} / {cards.length} · {currentCard.title}
                 </div>
-                <div className="bg-gradient-to-br from-violet-900/40 to-violet-800/30 border border-violet-700/40 rounded-2xl p-5 mb-4 min-h-[260px]">
+                <div className="bg-gradient-to-br from-violet-900/40 to-violet-800/30 border border-violet-700/40 rounded-2xl p-5 mb-4 min-h-[220px]">
                   <div className="text-base leading-relaxed whitespace-pre-wrap text-gray-100">
                     {currentCard.body}
+                  </div>
+                </div>
+
+                {/* 분기형 응답 버튼 — 의사 반응에 따라 다음 카드 자동 점프 */}
+                <div className="mb-3">
+                  <div className="text-[10px] uppercase tracking-wider text-gray-500 mb-2">
+                    의사 반응 → 클릭만 하세요
+                  </div>
+                  <div className="grid grid-cols-2 gap-1.5">
+                    {RESPONSE_BRANCHES.map((b, i) => (
+                      <button
+                        key={i}
+                        onClick={() => handleBranch(b)}
+                        className={`px-3 py-2 text-xs rounded-lg font-semibold transition-all ${b.cls}`}
+                      >{b.label}</button>
+                    ))}
                   </div>
                 </div>
 
@@ -402,7 +554,93 @@ export default function CallConsolePage() {
         </div>
 
         {/* 중 — 핵심정보 + 다음액션 */}
-        <div className="col-span-4 flex flex-col gap-4 overflow-hidden">
+        <div className="col-span-4 flex flex-col gap-4 overflow-y-auto">
+          {/* 인라인 진단 패널 — 칩만 클릭 */}
+          <div className="bg-gradient-to-br from-blue-900/40 to-cyan-900/30 border border-blue-700/40 rounded-2xl flex-shrink-0">
+            <button
+              onClick={() => setDiagOpen(o => !o)}
+              className="w-full flex items-center justify-between px-4 py-3 text-sm font-semibold text-blue-100"
+            >
+              <span className="flex items-center gap-2">
+                <Stethoscope className="w-4 h-4 text-cyan-300" />
+                1-클릭 자가진단 패널
+              </span>
+              <span className="text-xs text-blue-300">{diagOpen ? '접기' : '펼치기'}</span>
+            </button>
+
+            {diagOpen && (
+              <div className="px-4 pb-4 space-y-3 border-t border-blue-700/40 pt-3">
+                {/* 진료과 */}
+                <DiagSection title="진료과" icon={Stethoscope}>
+                  <ChipGrid
+                    options={SPECIALTIES.map(s => ({ key: s, label: s }))}
+                    active={lead.specialty ? [lead.specialty] : []}
+                    onClick={(k) => quickDiag({ specialty: k })}
+                  />
+                </DiagSection>
+
+                {/* 시기 */}
+                <DiagSection title="개원 시기" icon={Clock}>
+                  <ChipGrid
+                    options={TIMELINES.map(t => ({ key: t, label: t }))}
+                    active={[]} // 시기 자체는 lead에 직접 저장 안 함 (priority/target_open_date로 변환)
+                    onClick={(k) => quickDiag({ timeline: k })}
+                  />
+                </DiagSection>
+
+                {/* 단계 */}
+                <DiagSection title="현재 단계" icon={Layers}>
+                  <ChipGrid
+                    options={STAGES_FOR_DIAG}
+                    active={[lead.opening_stage]}
+                    onClick={(k) => quickDiag({ opening_stage: k })}
+                  />
+                </DiagSection>
+
+                {/* 막막한 영역 (다중 선택) */}
+                <DiagSection title="막막한 영역 (여러 개 가능)" icon={AlertTriangle}>
+                  <ChipGrid
+                    options={PAIN_CATEGORIES}
+                    active={diagPainSelected}
+                    onClick={togglePainCat}
+                  />
+                  {diagPainSelected.length > 0 && (
+                    <button
+                      onClick={submitPainSelection}
+                      className="mt-2 w-full px-3 py-2 text-xs font-bold bg-cyan-500 hover:bg-cyan-600 text-white rounded-lg flex items-center justify-center gap-1"
+                    >
+                      <Plus className="w-3 h-3" />
+                      선택한 {diagPainSelected.length}개 매칭에 추가
+                    </button>
+                  )}
+                </DiagSection>
+
+                {/* 예산 */}
+                <DiagSection title="예산" icon={Wallet}>
+                  <ChipGrid
+                    options={BUDGETS.map(b => ({ key: String(b.max), label: b.label }))}
+                    active={[lead.budget_total ? String(Math.round(lead.budget_total / 10_000)) : '']}
+                    onClick={(k) => quickDiag({ budget_max_만: k === 'null' ? null : Number(k) })}
+                  />
+                  <div className="grid grid-cols-2 gap-1.5 mt-2">
+                    <button
+                      onClick={() => quickDiag({ has_partner: !lead.has_partner })}
+                      className={`px-2 py-1.5 text-xs rounded-lg ${
+                        lead.has_partner ? 'bg-cyan-500 text-white' : 'bg-gray-800 text-gray-400 border border-gray-700'
+                      }`}
+                    >동업 {lead.has_partner ? '✓' : ''}</button>
+                    <button
+                      onClick={() => quickDiag({ needs_loan: !lead.needs_loan })}
+                      className={`px-2 py-1.5 text-xs rounded-lg ${
+                        lead.needs_loan ? 'bg-cyan-500 text-white' : 'bg-gray-800 text-gray-400 border border-gray-700'
+                      }`}
+                    >대출 필요 {lead.needs_loan ? '✓' : ''}</button>
+                  </div>
+                </DiagSection>
+              </div>
+            )}
+          </div>
+
           {/* 의사 핵심 3줄 */}
           <div className="bg-gray-800 rounded-2xl p-5 flex-shrink-0">
             <div className="text-xs text-gray-500 mb-3">한눈에 보는 의사</div>
@@ -450,6 +688,35 @@ export default function CallConsolePage() {
                 후속 일정: {nextFollowupDays === 0 ? '오늘'
                   : nextFollowupDays === 1 ? '내일'
                     : `${nextFollowupDays}일 뒤`} 자동 등록 예정
+              </div>
+            )}
+          </div>
+
+          {/* 원클릭 묶음 발사 — 추천 TOP3 매칭 + 카톡 + outcome + 후속 */}
+          <div className="bg-gradient-to-br from-emerald-600/30 to-green-700/30 border border-emerald-500/50 rounded-2xl p-5 flex-shrink-0">
+            <div className="flex items-center gap-2 mb-2">
+              <Rocket className="w-4 h-4 text-emerald-300" />
+              <span className="text-xs font-semibold text-emerald-300 uppercase tracking-wider">원클릭 묶음 발사</span>
+            </div>
+            <p className="text-xs text-emerald-100/80 mb-3 leading-relaxed">
+              추천 TOP3 자동 매칭 + 미션맵 카톡 발송 + 통화기록 PROPOSAL_SENT + 3일 후속 등록까지 한 번에.
+            </p>
+            <button
+              onClick={fireBundle}
+              disabled={bundleSending}
+              className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-emerald-500 hover:bg-emerald-600 disabled:opacity-50 text-white font-bold rounded-xl"
+            >
+              {bundleSending ? (
+                <><Loader2 className="w-4 h-4 animate-spin" />발사 중…</>
+              ) : (
+                <><Zap className="w-4 h-4" />묶음 발사</>
+              )}
+            </button>
+            {bundleResult && (
+              <div className="mt-3 text-xs text-emerald-100 bg-emerald-950/40 rounded-lg p-2 space-y-0.5">
+                <div>✓ 매칭 {bundleResult.matched_count}개 생성</div>
+                <div>{bundleResult.alimtalk?.ok ? '✓ 카톡 발송 완료' : `· 카톡: ${bundleResult.alimtalk?.status || 'skip'}`}</div>
+                <div>✓ 후속 {bundleResult.next_followup_at ? new Date(bundleResult.next_followup_at).toLocaleDateString('ko-KR') : '-'} 등록</div>
               </div>
             )}
           </div>
@@ -681,6 +948,44 @@ function CoreFact({ icon: Icon, label, value }: { icon: any; label: string; valu
         <Icon className="w-3 h-3" />{label}
       </div>
       <div className="text-sm text-gray-100 font-medium truncate">{value}</div>
+    </div>
+  );
+}
+
+function DiagSection({ title, icon: Icon, children }: {
+  title: string; icon: any; children: React.ReactNode;
+}) {
+  return (
+    <div>
+      <div className="flex items-center gap-1.5 text-[11px] uppercase tracking-wider text-blue-300 mb-1.5">
+        <Icon className="w-3 h-3" />{title}
+      </div>
+      {children}
+    </div>
+  );
+}
+
+function ChipGrid({ options, active, onClick }: {
+  options: { key: string; label: string }[];
+  active: string[];
+  onClick: (k: string) => void;
+}) {
+  return (
+    <div className="flex flex-wrap gap-1">
+      {options.map(o => {
+        const isActive = active.includes(o.key);
+        return (
+          <button
+            key={o.key}
+            onClick={() => onClick(o.key)}
+            className={`px-2 py-1 text-[11px] rounded-md transition-all ${
+              isActive
+                ? 'bg-cyan-400 text-blue-950 font-bold ring-1 ring-cyan-200'
+                : 'bg-gray-800/80 text-gray-300 border border-gray-700 hover:border-cyan-500'
+            }`}
+          >{o.label}</button>
+        );
+      })}
     </div>
   );
 }
