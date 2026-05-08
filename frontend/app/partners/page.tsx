@@ -30,6 +30,8 @@ import {
   Calculator,
   Lock,
   CheckCircle,
+  Receipt,
+  UserCog,
 } from 'lucide-react'
 import {
   getAllPartners,
@@ -40,16 +42,20 @@ import {
 } from '@/lib/data/seedPartners'
 
 const categoryIcons: Record<string, any> = {
+  realestate: Building,
+  legal: Scale,
+  accounting: Calculator,
+  tax: Receipt,
+  labor: UserCog,
+  consulting: Briefcase,
+  finance: Landmark,
   interior: Paintbrush,
   equipment: Stethoscope,
-  consulting: Briefcase,
-  finance: Calculator,
-  pharma: Pill,
+  emr: Monitor,
+  it: Monitor, // legacy alias
   signage: PenTool,
-  it: Monitor,
   marketing: Megaphone,
-  legal: Scale,
-  realestate: Building,
+  pharma: Pill,
 }
 
 export default function PartnersPage() {

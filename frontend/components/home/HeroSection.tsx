@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import dynamic from 'next/dynamic'
 import { motion } from 'framer-motion'
-import { ArrowRight } from 'lucide-react'
+import { ArrowRight, Stethoscope, HeartHandshake, MessageCircle } from 'lucide-react'
 
 const KakaoMap = dynamic(() => import('@/components/map/KakaoMap'), {
   ssr: false,
@@ -11,9 +11,9 @@ const KakaoMap = dynamic(() => import('@/components/map/KakaoMap'), {
 })
 
 const stats = [
-  { value: '470+', label: '매물' },
-  { value: '150+', label: '성공 사례' },
-  { value: '8년', label: '경험' },
+  { value: '13', label: '전문 분야' },
+  { value: '470+', label: '매물·솔루션' },
+  { value: '150+', label: '개원 성공' },
 ]
 
 interface HeroSectionProps {
@@ -51,29 +51,48 @@ export function HeroSection({ markers = [] }: HeroSectionProps) {
           transition={{ duration: 0.7, ease: 'easeOut' }}
           className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black tracking-tight leading-[1.1] mb-6"
         >
-          <span className="text-foreground">의료 개원의 모든 것,</span>
+          <span className="text-foreground">개원의 모든 길,</span>
           <br />
-          <span className="text-[#3182f6]">메디플라톤</span>
+          <span className="text-[#3182f6]">한 곳에서 만납니다</span>
         </motion.h1>
 
         <motion.p
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.15, ease: 'easeOut' }}
-          className="text-lg md:text-xl text-muted-foreground mb-10 max-w-2xl mx-auto leading-relaxed"
+          className="text-lg md:text-xl text-muted-foreground mb-12 max-w-2xl mx-auto leading-relaxed"
         >
-          개원 준비부터 운영까지, 데이터 기반으로 성공을 설계합니다
+          부동산·법무·회계·세무·노무·인테리어·의료기기·마케팅까지<br className="hidden md:block" />
+          개원에 필요한 모든 협력사를 한 플랫폼에서
         </motion.p>
 
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.3, ease: 'easeOut' }}
-          className="mb-14"
+          className="mb-14 flex flex-col sm:flex-row items-center justify-center gap-3"
         >
-          <Link href="/opening-package" className="btn-primary btn-lg group text-lg px-10 inline-flex">
-            무료 개원 진단 시작하기
-            <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+          <Link
+            href="/diagnose"
+            className="btn-primary btn-lg group text-base px-8 inline-flex w-full sm:w-auto"
+          >
+            <Stethoscope className="w-5 h-5" />
+            1분 개원 진단 시작
+            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+          </Link>
+          <Link
+            href="/contact"
+            className="inline-flex items-center justify-center gap-2 px-8 py-3 text-base font-semibold rounded-2xl border border-foreground/15 bg-background/60 backdrop-blur-sm hover:bg-background hover:border-foreground/30 transition-all w-full sm:w-auto"
+          >
+            <MessageCircle className="w-5 h-5 text-[#3182f6]" />
+            무료 상담 신청
+          </Link>
+          <Link
+            href="/partners"
+            className="inline-flex items-center justify-center gap-2 px-8 py-3 text-base font-semibold rounded-2xl border border-foreground/15 bg-background/60 backdrop-blur-sm hover:bg-background hover:border-foreground/30 transition-all w-full sm:w-auto"
+          >
+            <HeartHandshake className="w-5 h-5 text-[#3182f6]" />
+            협력사 입점
           </Link>
         </motion.div>
 

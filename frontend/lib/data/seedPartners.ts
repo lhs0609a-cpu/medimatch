@@ -28,18 +28,21 @@ export interface PartnerCategory {
   partnerCount: number
 }
 
-// 파트너 카테고리
+// 파트너 카테고리 — 백엔드 partner_categories 마스터와 동기화
 export const partnerCategories: PartnerCategory[] = [
-  { code: 'interior', name: '인테리어', description: '병원/약국 전문 인테리어', icon: 'Paintbrush', partnerCount: 12 },
-  { code: 'equipment', name: '의료장비', description: '의료기기 판매/렌탈', icon: 'Stethoscope', partnerCount: 8 },
-  { code: 'consulting', name: '개원컨설팅', description: '입지분석, 사업계획', icon: 'Briefcase', partnerCount: 7 },
-  { code: 'finance', name: '회계/세무', description: '세무사, 회계사', icon: 'Calculator', partnerCount: 10 },
-  { code: 'legal', name: '법무/법률', description: '법무사, 변호사', icon: 'Scale', partnerCount: 8 },
-  { code: 'it', name: '의료IT', description: 'EMR, 예약시스템', icon: 'Monitor', partnerCount: 6 },
-  { code: 'signage', name: '간판/사인물', description: '외부간판, 내부사인', icon: 'PenTool', partnerCount: 7 },
-  { code: 'marketing', name: '마케팅', description: '온라인마케팅, 홍보', icon: 'Megaphone', partnerCount: 9 },
+  { code: 'realestate', name: '부동산중개법인', description: '상가·의료시설 전문 중개', icon: 'Building', partnerCount: 8 },
+  { code: 'legal', name: '법무법인/변호사', description: '의료법·임대차·동업 계약', icon: 'Scale', partnerCount: 6 },
+  { code: 'accounting', name: '회계법인', description: '재무자문·기장·감사', icon: 'Calculator', partnerCount: 9 },
+  { code: 'tax', name: '세무법인', description: '개원신고·종합소득세·경정청구', icon: 'Receipt', partnerCount: 11 },
+  { code: 'labor', name: '노무법인', description: '근로계약·4대보험·인사', icon: 'UserCog', partnerCount: 5 },
+  { code: 'consulting', name: '개원컨설팅', description: '입지·자금·운영 종합', icon: 'Briefcase', partnerCount: 7 },
+  { code: 'finance', name: '금융/대출', description: '의료인 대출·리스·보험', icon: 'Landmark', partnerCount: 10 },
+  { code: 'interior', name: '인테리어', description: '병원/약국 전문 시공', icon: 'Paintbrush', partnerCount: 12 },
+  { code: 'equipment', name: '의료기기', description: '신품·리스·중고 비교', icon: 'Stethoscope', partnerCount: 8 },
+  { code: 'emr', name: 'EMR/의료IT', description: 'EMR·예약·청구 시스템', icon: 'Monitor', partnerCount: 6 },
+  { code: 'signage', name: '간판/사이니지', description: '외부간판·내부사인', icon: 'PenTool', partnerCount: 7 },
+  { code: 'marketing', name: '마케팅', description: '환자 유입 부스팅', icon: 'Megaphone', partnerCount: 9 },
   { code: 'pharma', name: '약품도매', description: '의약품 유통', icon: 'Pill', partnerCount: 6 },
-  { code: 'realestate', name: '부동산', description: '상가/건물 중개', icon: 'Building', partnerCount: 8 },
 ]
 
 // 지역 목록

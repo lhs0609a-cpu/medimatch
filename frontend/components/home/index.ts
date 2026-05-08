@@ -1,5 +1,8 @@
 export { HomeHeader } from './HomeHeader'
 export { HeroSection } from './HeroSection'
+export { StageInfographic } from './StageInfographic'
+export { PartnerCategoryGrid } from './PartnerCategoryGrid'
+export { PartnerOnboardingCTA } from './PartnerOnboardingCTA'
 export { ServiceCards } from './ServiceCards'
 export { InteractiveDemo } from './InteractiveDemo'
 export { SocialProof } from './SocialProof'

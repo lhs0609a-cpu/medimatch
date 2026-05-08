@@ -119,6 +119,13 @@ from .patient import Patient, InboundStatus, ConsentStatus, DBQuality
 from .opening_project import OpeningProject, OpeningProjectTask, ProjectStatus
 # 문의/상담
 from .contact_inquiry import ContactInquiry, ContactStatus
+# 개원의 Lead CRM
+from .doctor_lead import (
+    DoctorLead, LeadConsultation, LeadPartnerMatch, LeadMilestone,
+    LeadFunnelStage, LeadOpeningStage, LeadPriority,
+    ConsultationOutcome, ContactMethod, LeadPartnerMatchStatus,
+    MilestoneStatus, MilestoneSource,
+)
 # 커뮤니티
 from .community import CommunityPost, CommunityComment, CommunityLike, CommunityCategory, PostStatus
 # 캠페인
@@ -332,6 +339,19 @@ __all__ = [
     # 문의/상담
     "ContactInquiry",
     "ContactStatus",
+    # 개원의 Lead CRM
+    "DoctorLead",
+    "LeadConsultation",
+    "LeadPartnerMatch",
+    "LeadMilestone",
+    "LeadFunnelStage",
+    "LeadOpeningStage",
+    "LeadPriority",
+    "ConsultationOutcome",
+    "ContactMethod",
+    "LeadPartnerMatchStatus",
+    "MilestoneStatus",
+    "MilestoneSource",
     # 커뮤니티
     "CommunityPost",
     "CommunityComment",

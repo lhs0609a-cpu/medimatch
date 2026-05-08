@@ -57,6 +57,7 @@ const sidebarGroups: SidebarGroup[] = [
   {
     title: '고객 관리',
     items: [
+      { href: '/admin/crm', label: '개원의 CRM', icon: Target },
       { href: '/admin/consultations', label: '상담 신청', icon: Stethoscope },
       { href: '/admin/inquiries', label: '문의 관리', icon: MessageCircle },
       { href: '/admin/users', label: '회원 관리', icon: Users },

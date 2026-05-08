@@ -6,6 +6,9 @@ import { generateBuildingListings, generatePharmacyListings } from '@/lib/data/s
 import {
   HomeHeader,
   HeroSection,
+  StageInfographic,
+  PartnerCategoryGrid,
+  PartnerOnboardingCTA,
   ServiceCards,
   InteractiveDemo,
   SocialProof,
@@ -54,10 +57,13 @@ export default function HomePage() {
 
         <main id="main-content" role="main">
           <HeroSection markers={mapMarkers} />
+          <StageInfographic />
+          <PartnerCategoryGrid />
           <ServiceCards />
           <InteractiveDemo />
           <SocialProof />
           <ConsultingSection />
+          <PartnerOnboardingCTA />
           <MapPreview markers={mapMarkers} />
           <FinalCTA />
         </main>
