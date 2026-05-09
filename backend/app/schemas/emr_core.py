@@ -180,6 +180,14 @@ class PrescriptionOut(BaseModel):
     dur_warnings: List[Dict[str, Any]] = []
     patient_note: Optional[str]
     items: List[PrescriptionItemOut] = []
+    # 약국 픽업
+    pickup_code: Optional[str] = None
+    pickup_token: Optional[str] = None
+    pickup_expires_at: Optional[datetime] = None
+    pickup_dispensed_at: Optional[datetime] = None
+    pickup_pharmacy_name: Optional[str] = None
+    patient_phone: Optional[str] = None
+    patient_name: Optional[str] = None
     created_at: datetime
     model_config = ConfigDict(from_attributes=True)
 

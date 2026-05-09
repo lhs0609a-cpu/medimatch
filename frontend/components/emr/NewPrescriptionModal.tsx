@@ -2,9 +2,9 @@
 
 import { useState } from 'react'
 import { useMutation } from '@tanstack/react-query'
-import { Plus, X, AlertTriangle, ShieldCheck } from 'lucide-react'
+import { Plus, X, AlertTriangle, ShieldCheck, KeyRound, Copy, MessageSquareText } from 'lucide-react'
 import { toast } from 'sonner'
-import { prescriptionService, PrescriptionItem } from '@/lib/api/emr'
+import { prescriptionService, PrescriptionItem, Prescription } from '@/lib/api/emr'
 import HiraCodePicker from './HiraCodePicker'
 
 interface Props {
@@ -23,6 +23,7 @@ export default function NewPrescriptionModal({ visitId, patientId, onClose, onSu
     { drug_code: '', drug_name: '', ingredient: '', dose_per_time: 1, dose_unit: '정', frequency_per_day: 3, duration_days: 3, total_quantity: 9, unit_price: 0, total_price: 0, usage_note: '식후 30분' },
   ])
   const [durResult, setDurResult] = useState<{ warnings: any[]; item_warnings: Record<number, string>; cross_checked_active_meds?: number } | null>(null)
+  const [issued, setIssued] = useState<Prescription | null>(null)
 
   const durMut = useMutation({
     mutationFn: () => prescriptionService.durCheck({
@@ -60,10 +61,11 @@ export default function NewPrescriptionModal({ visitId, patientId, onClose, onSu
         }
       }),
     }),
-    onSuccess: () => {
+    onSuccess: (rx) => {
       toast.success('처방전 발행 완료')
+      setIssued(rx)
       onSuccess?.()
-      onClose()
+      // 픽업 코드를 한 번 보여주고 사용자가 닫게 함 (자동 close X)
     },
     onError: (e: any) => toast.error(e.response?.data?.detail || '발행 실패'),
   })
@@ -72,6 +74,11 @@ export default function NewPrescriptionModal({ visitId, patientId, onClose, onSu
     setItems(items.map((it, idx) => (idx === i ? { ...it, ...p } : it)))
   const add = () => setItems([...items, { drug_code: '', drug_name: '', ingredient: '', dose_per_time: 1, dose_unit: '정', frequency_per_day: 3, duration_days: 3, total_quantity: 9, unit_price: 0, total_price: 0, usage_note: '식후 30분' }])
   const remove = (i: number) => setItems(items.filter((_, idx) => idx !== i))
+
+  // 처방 발행 직후 — 픽업코드 화면 (대체 뷰)
+  if (issued) {
+    return <PickupResultView issued={issued} onClose={onClose} />
+  }
 
   return (
     <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 overflow-y-auto">
@@ -167,6 +174,103 @@ export default function NewPrescriptionModal({ visitId, patientId, onClose, onSu
           className="btn-primary w-full"
         >
           {createMut.isPending ? '발행 중...' : '처방전 발행'}
+        </button>
+      </div>
+    </div>
+  )
+}
+
+
+function PickupResultView({ issued, onClose }: { issued: Prescription; onClose: () => void }) {
+  const code = issued.pickup_code || ''
+  const phoneLast4 = (issued.patient_phone || '').replace(/\D/g, '').slice(-4)
+  const expires = issued.pickup_expires_at
+    ? new Date(issued.pickup_expires_at).toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' })
+    : '7일 후'
+  const url = typeof window !== 'undefined' && issued.pickup_token
+    ? `${window.location.origin}/pharmacy-pickup?token=${issued.pickup_token}`
+    : ''
+  const qrSrc = code
+    ? `https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=${encodeURIComponent(`${code}|${phoneLast4}`)}`
+    : ''
+
+  const copy = (text: string, label: string) => {
+    navigator.clipboard?.writeText(text).then(
+      () => toast.success(`${label} 복사됨`),
+      () => toast.error('복사 실패'),
+    )
+  }
+
+  return (
+    <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 overflow-y-auto">
+      <div className="bg-background rounded-xl max-w-md w-full p-6 space-y-4 my-8">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <ShieldCheck className="w-5 h-5 text-emerald-600" />
+            <h2 className="font-semibold">처방전 발행 완료</h2>
+          </div>
+          <button onClick={onClose} aria-label="닫기"><X className="w-5 h-5" /></button>
+        </div>
+
+        <div className="text-sm text-slate-600 leading-relaxed">
+          환자에게 아래 <b>픽업 코드</b>를 알려주세요. 약국에서 코드만 입력하면 바로 조제할 수 있어요.
+        </div>
+
+        <div className="rounded-2xl border-2 border-blue-200 bg-blue-50/50 p-5 text-center">
+          <div className="text-xs text-blue-700 mb-1 flex items-center justify-center gap-1">
+            <KeyRound className="w-3.5 h-3.5" /> 약국 픽업 코드
+          </div>
+          <div className="text-5xl font-bold tracking-widest font-mono text-blue-900 my-2 select-all">
+            {code || '—'}
+          </div>
+          {phoneLast4 && (
+            <div className="text-xs text-blue-700">
+              검증: 환자 폰 끝 <b>{phoneLast4}</b>
+            </div>
+          )}
+          <div className="text-[10px] text-blue-500 mt-1">{expires}까지 유효</div>
+        </div>
+
+        {qrSrc && (
+          <div className="bg-slate-50 rounded-xl p-4 flex justify-center">
+            <img src={qrSrc} alt="픽업 코드 QR" className="w-44 h-44" />
+          </div>
+        )}
+
+        <div className="flex flex-wrap gap-2">
+          <button
+            type="button"
+            onClick={() => copy(code, '코드')}
+            className="btn-secondary text-xs flex-1"
+          >
+            <Copy className="w-3 h-3" /> 코드 복사
+          </button>
+          {url && (
+            <button
+              type="button"
+              onClick={() => copy(url, '링크')}
+              className="btn-secondary text-xs flex-1"
+            >
+              <Copy className="w-3 h-3" /> 링크 복사
+            </button>
+          )}
+          {issued.patient_phone && (
+            <button
+              type="button"
+              onClick={() => {
+                const msg = `[처방 발행] 약국에서 코드 입력 시 바로 조제됩니다.\n픽업 코드: ${code}\n유효: ${expires}까지`
+                const sms = `sms:${issued.patient_phone}?body=${encodeURIComponent(msg)}`
+                window.location.href = sms
+              }}
+              className="btn-primary text-xs flex-1"
+            >
+              <MessageSquareText className="w-3 h-3" /> 환자에게 SMS
+            </button>
+          )}
+        </div>
+
+        <button onClick={onClose} className="btn-ghost w-full text-sm">
+          닫기
         </button>
       </div>
     </div>

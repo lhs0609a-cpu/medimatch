@@ -1,5 +1,8 @@
+import os
+from pathlib import Path
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.responses import Response
 from contextlib import asynccontextmanager
@@ -134,6 +137,11 @@ app.include_router(api_router, prefix=settings.API_V1_PREFIX)
 
 # Include WebSocket router
 app.include_router(websocket_router, tags=["WebSocket"])
+
+# 차트 첨부 파일 정적 서빙 — UPLOAD_DIR/uploads 노출
+_upload_dir = Path(os.getenv("UPLOAD_DIR", "./uploads")).resolve()
+_upload_dir.mkdir(parents=True, exist_ok=True)
+app.mount("/uploads", StaticFiles(directory=str(_upload_dir)), name="uploads")
 
 
 @app.get("/")

@@ -41,12 +41,15 @@ import {
   ShoppingCart,
   TrendingUp,
   Rocket,
+  HeartPulse,
 } from 'lucide-react'
 
 const sidebarLinks = [
   { href: '/emr/dashboard', label: '대시보드', icon: LayoutDashboard },
   { href: '/opening-project', label: '개원 준비', icon: Rocket, badge: '진행중' },
   { href: '/emr/appointments', label: '예약/접수', icon: CalendarCheck },
+  { href: '/emr/inbox', label: '예약 인박스', icon: MessageSquare },
+  { href: '/emr/chronic-care', label: '만성질환관리', icon: HeartPulse },
   { href: '/emr/patients', label: '환자 관리', icon: Users },
   { href: '/emr/chart', label: '전자차트', icon: Mic, accent: true },
   { href: '/emr/prescriptions', label: '처방전', icon: Pill },
@@ -68,6 +71,7 @@ const sidebarLinks = [
   { href: '/emr/crm', label: '환자 리콜/CRM', icon: MessageSquare },
   { href: '/emr/multi-branch', label: '멀티 지점', icon: Building2 },
   { href: '/emr/staff', label: '직원/권한', icon: UserCog },
+  { href: '/emr/seats', label: '직원 ID/요금', icon: CreditCard },
   { href: '/emr/integrations', label: '연동/API', icon: Building2 },
   { href: '/emr/settings', label: '설정', icon: Settings },
 ]

@@ -7,6 +7,7 @@ import { Calendar, Plus, X, Clock, Phone, User, Check, Loader2, Stethoscope } fr
 import { toast } from 'sonner'
 import { appointmentService, Appointment } from '@/lib/api/emr'
 import PatientPicker from '@/components/emr/PatientPicker'
+import QuestionnaireSendButton from '@/components/emr/QuestionnaireSendButton'
 
 function StatusBadge({ status }: { status: string }) {
   const map: Record<string, { color: string; label: string }> = {
@@ -129,6 +130,15 @@ export default function AppointmentsPage() {
                 </div>
               </div>
               <div className="flex items-center gap-1">
+                {(a.status === 'SCHEDULED' || a.status === 'CONFIRMED') && a.patient_phone && (
+                  <QuestionnaireSendButton
+                    appointmentId={a.id}
+                    patientId={a.patient_id}
+                    patientPhone={a.patient_phone}
+                    patientName={a.patient_name}
+                    compact
+                  />
+                )}
                 {a.status === 'SCHEDULED' && (
                   <button onClick={() => checkInMut.mutate(a.id)} className="btn-secondary text-xs">
                     <User className="w-3 h-3" /> 체크인
