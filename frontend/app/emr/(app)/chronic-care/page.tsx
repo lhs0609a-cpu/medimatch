@@ -18,6 +18,7 @@ import {
   chronicCareService, ChronicCondition, ChronicProgram,
   conditionIcon, conditionDefaults,
 } from '@/lib/api/chronicCare'
+import ModuleHeader from '@/components/emr/ModuleHeader'
 
 const ALL: 'ALL' = 'ALL'
 
@@ -42,27 +43,27 @@ export default function ChronicCarePage() {
   })
 
   return (
-    <div className="max-w-6xl mx-auto p-6 space-y-6">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <HeartPulse className="w-7 h-7 text-rose-600" />
-          <div>
-            <h1 className="text-2xl font-semibold">만성질환관리</h1>
-            <p className="text-sm text-muted-foreground">
-              고혈압·당뇨·이상지질혈증 환자의 회차를 자동 추적. 누수 환자는 콜큐로.
-            </p>
-          </div>
-        </div>
-        <div className="flex gap-2">
-          <button onClick={() => refetch()} className="btn-ghost text-sm" disabled={isFetching}>
-            {isFetching ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
-          </button>
-          <button onClick={() => setShowCreate(true)} className="btn-primary text-sm">
-            <Plus className="w-4 h-4" /> 환자 등록
-          </button>
-        </div>
-      </div>
-
+    <div>
+      <ModuleHeader
+        moduleKey="chronic-care"
+        maxWidthClass="max-w-6xl"
+        meta={
+          stats && stats.overdue_count > 0 ? (
+            <span className="font-medium text-rose-600">누수 {stats.overdue_count}명</span>
+          ) : null
+        }
+        actions={
+          <>
+            <button onClick={() => refetch()} className="btn-ghost text-sm" disabled={isFetching}>
+              {isFetching ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
+            </button>
+            <button onClick={() => setShowCreate(true)} className="btn-primary text-sm">
+              <Plus className="w-4 h-4" /> 환자 등록
+            </button>
+          </>
+        }
+      />
+      <div className="max-w-6xl mx-auto p-6 space-y-6">
       {/* 통계 */}
       {stats && (
         <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
@@ -144,6 +145,7 @@ export default function ChronicCarePage() {
           }}
         />
       )}
+      </div>
     </div>
   )
 }

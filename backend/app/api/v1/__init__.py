@@ -46,6 +46,7 @@ from .fixed_cost import router as fixed_cost_router
 from .supply_price import router as supply_price_router
 from .marketing_roi import router as marketing_roi_router
 from .patients import router as patients_router
+from .patient_recall import router as patient_recall_router
 from .opening_project import router as opening_project_router
 from .admin_contacts import router as admin_contacts_router
 from .community import router as community_router
@@ -119,6 +120,7 @@ api_router.include_router(fixed_cost_router, prefix="/emr/fixed-cost", tags=["EM
 api_router.include_router(supply_price_router, prefix="/emr/supply-price", tags=["EMR Supply Price - 소모품/약가 비교"])
 api_router.include_router(marketing_roi_router, prefix="/emr/marketing-roi", tags=["EMR Marketing ROI - 마케팅 ROI"])
 api_router.include_router(patients_router, prefix="/emr/patients", tags=["EMR Patients - 환자 관리"])
+api_router.include_router(patient_recall_router, prefix="/emr/crm", tags=["EMR CRM - 환자 리콜/캠페인"])
 api_router.include_router(opening_project_router, prefix="/opening-projects", tags=["Opening Project - 개원 프로젝트"])
 api_router.include_router(admin_contacts_router, prefix="/admin", tags=["Admin Contacts - 상담/문의 관리"])
 api_router.include_router(community_router, prefix="/community", tags=["Community - 커뮤니티"])

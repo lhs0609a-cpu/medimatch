@@ -17,6 +17,7 @@ import {
   extApptService, ExternalAppointment, ExtChannel, ExtStatus,
   channelLabel, channelBadgeClass,
 } from '@/lib/api/externalAppointments'
+import ModuleHeader from '@/components/emr/ModuleHeader'
 
 export default function InboxPage() {
   const qc = useQueryClient()
@@ -68,23 +69,23 @@ export default function InboxPage() {
   })
 
   return (
-    <div className="max-w-6xl mx-auto p-6 space-y-6">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <Inbox className="w-7 h-7 text-purple-600" />
-          <div>
-            <h1 className="text-2xl font-semibold">예약 인박스</h1>
-            <p className="text-sm text-muted-foreground">
-              똑닥·굿닥·네이버 예약을 한 화면에서. 시간 충돌은 자동 표시.
-            </p>
-          </div>
-        </div>
-        <button onClick={() => refetch()} className="btn-ghost text-sm" disabled={isFetching}>
-          {isFetching ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
-          새로고침
-        </button>
-      </div>
-
+    <div>
+      <ModuleHeader
+        moduleKey="inbox"
+        maxWidthClass="max-w-6xl"
+        meta={
+          stats && stats.total_pending > 0 ? (
+            <span className="font-medium text-violet-700">대기 {stats.total_pending}건</span>
+          ) : null
+        }
+        actions={
+          <button onClick={() => refetch()} className="btn-ghost text-sm" disabled={isFetching}>
+            {isFetching ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
+            새로고침
+          </button>
+        }
+      />
+      <div className="max-w-6xl mx-auto p-6 space-y-6">
       {/* 채널별 카드 */}
       {stats && (
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
@@ -159,6 +160,7 @@ export default function InboxPage() {
             ))}
           </div>
         )}
+      </div>
       </div>
     </div>
   )

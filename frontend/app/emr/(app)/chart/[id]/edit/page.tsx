@@ -12,6 +12,7 @@ import HiraCodePicker from '@/components/emr/HiraCodePicker'
 import CdssPanel from '@/components/emr/CdssPanel'
 import SoapVoiceCapture from '@/components/emr/SoapVoiceCapture'
 import AttachmentGallery from '@/components/emr/AttachmentGallery'
+import ModuleHeader from '@/components/emr/ModuleHeader'
 
 export default function EditVisitPage() {
   const params = useParams()
@@ -122,21 +123,24 @@ export default function EditVisitPage() {
   if (!visit) return <div className="p-6 text-center text-muted-foreground">진료 기록을 찾을 수 없습니다.</div>
 
   return (
-    <div className="max-w-7xl mx-auto p-6">
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-3">
-          <Link href={`/emr/chart/${id}`} className="text-muted-foreground hover:text-foreground"><ArrowLeft className="w-5 h-5" /></Link>
-          <Stethoscope className="w-6 h-6 text-blue-600" />
-          <div>
-            <h1 className="text-2xl font-semibold">진료 기록 수정</h1>
-            <p className="text-xs text-muted-foreground font-mono">{visit.visit_no}</p>
-          </div>
-        </div>
-        <button onClick={() => updateMut.mutate()} disabled={updateMut.isPending} className="btn-primary">
-          <Save className="w-4 h-4" /> {updateMut.isPending ? '저장 중...' : '저장'}
-        </button>
-      </div>
-
+    <div>
+      <ModuleHeader
+        moduleKey="chart"
+        title="진료 기록 수정"
+        subtitle={`#${visit.visit_no}`}
+        maxWidthClass="max-w-7xl"
+        breadcrumbs={[
+          { label: '전자차트', href: '/emr/chart' },
+          { label: visit.visit_no, href: `/emr/chart/${id}` },
+          { label: '수정' },
+        ]}
+        actions={
+          <button onClick={() => updateMut.mutate()} disabled={updateMut.isPending} className="btn-primary">
+            <Save className="w-4 h-4" /> {updateMut.isPending ? '저장 중...' : '저장'}
+          </button>
+        }
+      />
+      <div className="max-w-7xl mx-auto p-6">
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-6 items-start">
         <div className="space-y-6">
           <section className="card p-5 space-y-4">
@@ -248,6 +252,7 @@ export default function EditVisitPage() {
             visitType={visit.visit_type}
           />
         </div>
+      </div>
       </div>
     </div>
   )

@@ -12,6 +12,7 @@ import HiraCodePicker from '@/components/emr/HiraCodePicker'
 import CdssPanel from '@/components/emr/CdssPanel'
 import QuestionnairePrefillBanner from '@/components/emr/QuestionnairePrefillBanner'
 import SoapVoiceCapture from '@/components/emr/SoapVoiceCapture'
+import ModuleHeader from '@/components/emr/ModuleHeader'
 import { apiClient } from '@/lib/api/client'
 
 export default function NewChartPage() {
@@ -133,25 +134,25 @@ export default function NewChartPage() {
   }
 
   return (
-    <div className="max-w-7xl mx-auto p-6">
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-3">
-          <Link href="/emr/chart" className="text-muted-foreground hover:text-foreground">
-            <ArrowLeft className="w-5 h-5" />
-          </Link>
-          <Stethoscope className="w-6 h-6 text-blue-600" />
-          <h1 className="text-2xl font-semibold">신규 진료 기록</h1>
-        </div>
-        <button
-          onClick={onSubmit}
-          disabled={createMut.isPending}
-          className="btn-primary"
-        >
-          <Save className="w-4 h-4" />
-          {createMut.isPending ? '저장 중...' : '저장'}
-        </button>
-      </div>
-
+    <div>
+      <ModuleHeader
+        moduleKey="chart"
+        title="신규 진료 기록"
+        subtitle={patient ? `${patient.name} · ${visitType === 'INITIAL' ? '초진' : visitType === 'REVISIT' ? '재진' : '검진'}` : '환자를 선택하고 SOAP을 입력하세요'}
+        maxWidthClass="max-w-7xl"
+        breadcrumbs={[{ label: '전자차트', href: '/emr/chart' }, { label: '신규 작성' }]}
+        actions={
+          <button
+            onClick={onSubmit}
+            disabled={createMut.isPending}
+            className="btn-primary"
+          >
+            <Save className="w-4 h-4" />
+            {createMut.isPending ? '저장 중...' : '저장'}
+          </button>
+        }
+      />
+      <div className="max-w-7xl mx-auto p-6">
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-6 items-start">
         <div className="space-y-6">
           {patient?.id && (
@@ -327,6 +328,7 @@ export default function NewChartPage() {
             visitType={visitType}
           />
         </div>
+      </div>
       </div>
     </div>
   )

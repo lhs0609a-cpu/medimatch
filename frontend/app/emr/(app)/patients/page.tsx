@@ -10,6 +10,7 @@ import {
 import { toast } from 'sonner'
 import { apiClient } from '@/lib/api/client'
 import ExportButton from '@/components/emr/ExportButton'
+import ModuleHeader from '@/components/emr/ModuleHeader'
 
 interface PatientItem {
   id: string
@@ -49,23 +50,20 @@ export default function PatientsPage() {
   })
 
   return (
-    <div className="max-w-6xl mx-auto p-6 space-y-6">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <Users className="w-7 h-7 text-blue-600" />
-          <div>
-            <h1 className="text-2xl font-semibold">환자 관리</h1>
-            <p className="text-sm text-muted-foreground">유입 · 상담 · 예약 · 동의 파이프라인</p>
-          </div>
-        </div>
-        <div className="flex items-center gap-2">
-          <ExportButton endpoint="patients" label="CSV 내보내기" className="btn-secondary text-sm" />
-          <button onClick={() => setShowForm(true)} className="btn-primary">
-            <UserPlus className="w-4 h-4" /> 신규 환자
-          </button>
-        </div>
-      </div>
-
+    <div>
+      <ModuleHeader
+        moduleKey="patients"
+        maxWidthClass="max-w-6xl"
+        actions={
+          <>
+            <ExportButton endpoint="patients" label="CSV 내보내기" className="btn-secondary text-sm" />
+            <button onClick={() => setShowForm(true)} className="btn-primary">
+              <UserPlus className="w-4 h-4" /> 신규 환자
+            </button>
+          </>
+        }
+      />
+      <div className="max-w-6xl mx-auto p-6 space-y-6">
       {data?.is_demo && (
         <div className="bg-amber-50 dark:bg-amber-950/30 border border-amber-200 rounded-lg p-3 text-xs text-amber-700">
           데모 데이터 표시 중 — 실제 환자를 등록하면 자동으로 DB 데이터가 표시됩니다.
@@ -155,6 +153,7 @@ export default function PatientsPage() {
         setShowForm(false)
         qc.invalidateQueries({ queryKey: ['patients-list'] })
       }} />}
+      </div>
     </div>
   )
 }

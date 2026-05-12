@@ -93,7 +93,14 @@ class Patient(Base):
     non_consent_reason = Column(Text)
     non_consent_root_cause = Column(Text)
 
+    # 알림톡 수신 동의 (정통망법 / PIPA — 광고성 분류 시 필수)
+    consent_alimtalk = Column(
+        Enum(ConsentStatus, name="consentstatus", create_type=False),
+        default=ConsentStatus.NOT_ASKED, nullable=False,
+    )
+
     is_demo = Column(Boolean, default=False, nullable=False)
+    deleted_at = Column(DateTime)  # soft delete (의료법 5년 보존)
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 

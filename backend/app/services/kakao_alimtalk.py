@@ -39,6 +39,27 @@ BIZM_BASE = "https://alimtalk-api.bizmsg.kr/v2"
 BIZM_PROFILE_KEY = os.getenv("BIZM_PROFILE_KEY", "")
 BIZM_USER_ID = os.getenv("BIZM_USER_ID", "")
 
+# 전역 httpx 클라이언트 — TLS 핸드셰이크 / connection 재사용 (대량 발송 성능)
+_http_client: Optional[httpx.AsyncClient] = None
+
+
+def _get_client() -> httpx.AsyncClient:
+    global _http_client
+    if _http_client is None or _http_client.is_closed:
+        _http_client = httpx.AsyncClient(
+            timeout=TIMEOUT,
+            limits=httpx.Limits(max_connections=100, max_keepalive_connections=30),
+        )
+    return _http_client
+
+
+async def close_client() -> None:
+    """앱 shutdown 시 호출. 누락해도 GC가 정리하지만 graceful 종료 권장."""
+    global _http_client
+    if _http_client is not None and not _http_client.is_closed:
+        await _http_client.aclose()
+        _http_client = None
+
 
 def _normalize_phone(p: str) -> str:
     """01012345678 형태로 정규화"""
@@ -60,7 +81,7 @@ async def send_alimtalk(
     message: str,
     button_url: Optional[str] = None,
     button_name: str = "자세히 보기",
-    fallback_sms: bool = True,
+    fallback_sms: bool = False,  # 기본 OFF — SMS 폴백은 의사 명시 활성화 필요 (비용/책임)
 ) -> dict:
     """알림톡 1건 발송. dict {ok, provider, status, message} 반환.
 
@@ -106,16 +127,16 @@ async def _send_aligo(phone, template_code, message, button_url, button_name, fa
         payload["fmessage_1"] = message[:80]
 
     try:
-        async with httpx.AsyncClient(timeout=TIMEOUT) as client:
-            res = await client.post(f"{ALIGO_BASE}/alimtalk/send/", data=payload)
+        client = _get_client()
+        res = await client.post(f"{ALIGO_BASE}/alimtalk/send/", data=payload)
         data = res.json() if res.headers.get("content-type", "").startswith("application/json") else {"raw": res.text}
         ok = res.status_code == 200 and (str(data.get("code", "")) == "0" or data.get("result_code") == "1")
         if not ok:
-            print(f"[ALIMTALK] aligo fail status={res.status_code} body={data}")
+            print(f"[ALIMTALK] aligo fail status={res.status_code} code={data.get('code')}")
         return {"ok": ok, "provider": "aligo", "status": str(data.get("code", "?")), "message": data.get("message")}
     except Exception as e:
-        print(f"[ALIMTALK] aligo error: {e}")
-        return {"ok": False, "provider": "aligo", "status": "exception", "message": str(e)}
+        print(f"[ALIMTALK] aligo error: {type(e).__name__}")
+        return {"ok": False, "provider": "aligo", "status": "exception", "message": str(e)[:200]}
 
 
 async def _send_bizm(phone, template_code, message, button_url, button_name, fallback_sms):
@@ -135,21 +156,21 @@ async def _send_bizm(phone, template_code, message, button_url, button_name, fal
         }, ensure_ascii=False)
 
     try:
-        async with httpx.AsyncClient(timeout=TIMEOUT) as client:
-            res = await client.post(
-                f"{BIZM_BASE}/sender/send",
-                headers={"userid": BIZM_USER_ID, "Content-Type": "application/json"},
-                json=body,
-            )
+        client = _get_client()
+        res = await client.post(
+            f"{BIZM_BASE}/sender/send",
+            headers={"userid": BIZM_USER_ID, "Content-Type": "application/json"},
+            json=body,
+        )
         data = res.json() if res.headers.get("content-type", "").startswith("application/json") else {"raw": res.text}
         item = data[0] if isinstance(data, list) and data else {}
         ok = res.status_code == 200 and item.get("code") in ("success", "0000")
         if not ok:
-            print(f"[ALIMTALK] bizm fail status={res.status_code} body={data}")
+            print(f"[ALIMTALK] bizm fail status={res.status_code} code={item.get('code')}")
         return {"ok": ok, "provider": "bizm", "status": item.get("code", "?"), "message": item.get("message")}
     except Exception as e:
-        print(f"[ALIMTALK] bizm error: {e}")
-        return {"ok": False, "provider": "bizm", "status": "exception", "message": str(e)}
+        print(f"[ALIMTALK] bizm error: {type(e).__name__}")
+        return {"ok": False, "provider": "bizm", "status": "exception", "message": str(e)[:200]}
 
 
 # ============================================================

@@ -8,6 +8,7 @@ import { toast } from 'sonner'
 import { appointmentService, Appointment } from '@/lib/api/emr'
 import PatientPicker from '@/components/emr/PatientPicker'
 import QuestionnaireSendButton from '@/components/emr/QuestionnaireSendButton'
+import ModuleHeader from '@/components/emr/ModuleHeader'
 
 function StatusBadge({ status }: { status: string }) {
   const map: Record<string, { color: string; label: string }> = {
@@ -77,20 +78,19 @@ export default function AppointmentsPage() {
   })
 
   return (
-    <div className="max-w-6xl mx-auto p-6 space-y-6">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <Calendar className="w-7 h-7 text-blue-600" />
-          <div>
-            <h1 className="text-2xl font-semibold">예약 관리</h1>
-            <p className="text-sm text-muted-foreground">시간대 충돌 자동 검증 + 체크인 + 노쇼 추적</p>
-          </div>
-        </div>
-        <button onClick={() => setShowForm(true)} className="btn-primary">
-          <Plus className="w-4 h-4" /> 신규 예약
-        </button>
-      </div>
-
+    <div>
+      <ModuleHeader
+        moduleKey="appointments"
+        title="예약 관리"
+        subtitle="시간대 충돌 자동 검증 · 체크인 · 노쇼 추적"
+        maxWidthClass="max-w-6xl"
+        actions={
+          <button onClick={() => setShowForm(true)} className="btn-primary">
+            <Plus className="w-4 h-4" /> 신규 예약
+          </button>
+        }
+      />
+      <div className="max-w-6xl mx-auto p-6 space-y-6">
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         <div className="card p-4"><div className="text-xs text-muted-foreground">오늘 총 예약</div><div className="text-2xl font-bold">{stats?.total ?? '-'}</div></div>
         <div className="card p-4"><div className="text-xs text-muted-foreground">대기</div><div className="text-2xl font-bold">{stats?.scheduled ?? '-'}</div></div>
@@ -182,6 +182,7 @@ export default function AppointmentsPage() {
           }}
         />
       )}
+      </div>
     </div>
   )
 }

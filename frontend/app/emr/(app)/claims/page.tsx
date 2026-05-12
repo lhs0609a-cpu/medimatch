@@ -33,6 +33,7 @@ import {
   Loader2,
 } from 'lucide-react'
 import { TossIcon } from '@/components/ui/TossIcon'
+import ModuleHeader from '@/components/emr/ModuleHeader'
 
 /* ─── 타입 ─── */
 type ClaimStatus = 'DRAFT' | 'READY' | 'AI_REVIEWING' | 'SUBMITTED' | 'EDI_RECEIVED' | 'UNDER_REVIEW' | 'ACCEPTED' | 'REJECTED' | 'PARTIAL' | 'APPEALING' | 'APPEAL_ACCEPTED' | 'APPEAL_REJECTED'
@@ -210,7 +211,27 @@ export default function ClaimsPage() {
   const rejectionRate = stats ? stats.rejection_rate.toFixed(1) : '0'
 
   return (
-    <div className="max-w-[1400px] mx-auto space-y-6">
+    <div>
+      <ModuleHeader
+        moduleKey="claims"
+        title="보험청구 관리"
+        subtitle="AI가 삭감 위험을 미리 잡아드립니다"
+        maxWidthClass="max-w-[1400px]"
+        actions={
+          <>
+            <Link href="/emr/claims/new" className="btn-primary btn-sm">
+              <FileText className="w-3.5 h-3.5" /> 새 청구
+            </Link>
+            {selectedClaims.length > 0 && (
+              <button onClick={handleBatchSubmit} disabled={submitting} className="btn-primary btn-sm">
+                {submitting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Send className="w-3.5 h-3.5" />}
+                {selectedClaims.length}건 심평원 전송
+              </button>
+            )}
+          </>
+        }
+      />
+    <div className="max-w-[1400px] mx-auto space-y-6 p-6">
       {/* 데모 배너 */}
       {isDemo && (
         <div className="flex items-center gap-2 p-3 rounded-xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800">
@@ -246,30 +267,9 @@ export default function ClaimsPage() {
         ))}
       </div>
 
-      {/* ───── 헤더 ───── */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold">보험청구 관리</h1>
-          <p className="text-sm text-muted-foreground mt-1">
-            AI가 삭감 위험을 미리 잡아드립니다
-          </p>
-        </div>
-
-        <div className="flex items-center gap-2 flex-wrap">
-          <Link href="/emr/claims/new" className="btn-primary btn-sm">
-            <FileText className="w-3.5 h-3.5" />
-            새 청구
-          </Link>
-          <button className="btn-outline btn-sm">
-            <Download className="w-3.5 h-3.5" />
-            내보내기
-          </button>
-          {selectedClaims.length > 0 && (
-            <button onClick={handleBatchSubmit} disabled={submitting} className="btn-primary btn-sm">
-              {submitting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Send className="w-3.5 h-3.5" />}
-              {selectedClaims.length}건 심평원 전송
-            </button>
-          )}
+      {/* ───── 일괄 액션 ───── */}
+      {((selectedClaims.length === 0 && readyClaims.length > 0) || selectedClaims.length > 0) && (
+        <div className="flex justify-end">
           {selectedClaims.length === 0 && readyClaims.length > 0 && (
             <button onClick={handleBatchSubmit} disabled={submitting} className="btn-primary btn-sm">
               {submitting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Send className="w-3.5 h-3.5" />}
@@ -277,7 +277,7 @@ export default function ClaimsPage() {
             </button>
           )}
         </div>
-      </div>
+      )}
 
       {/* ───── 통계 카드 ───── */}
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
@@ -576,6 +576,7 @@ export default function ClaimsPage() {
           </div>
         )}
       </div>
+    </div>
     </div>
   )
 }

@@ -42,6 +42,7 @@ import {
   TrendingUp,
   Rocket,
   HeartPulse,
+  Send,
 } from 'lucide-react'
 
 const sidebarLinks = [
@@ -68,7 +69,7 @@ const sidebarLinks = [
   { href: '/emr/ai-consulting', label: 'AI 경영컨설팅', icon: Brain },
   { href: '/emr/reviews', label: '만족도/리뷰', icon: Star },
   { href: '/emr/billing', label: '수납/결제', icon: CreditCard },
-  { href: '/emr/crm', label: '환자 리콜/CRM', icon: MessageSquare },
+  { href: '/emr/crm', label: '환자 리콜/CRM', icon: Send, badge: 'NEW' },
   { href: '/emr/multi-branch', label: '멀티 지점', icon: Building2 },
   { href: '/emr/staff', label: '직원/권한', icon: UserCog },
   { href: '/emr/seats', label: '직원 ID/요금', icon: CreditCard },

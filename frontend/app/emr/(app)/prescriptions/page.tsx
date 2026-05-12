@@ -7,6 +7,7 @@ import Link from 'next/link'
 import { prescriptionService, Prescription, PrescriptionItem } from '@/lib/api/emr'
 import NewPrescriptionModal from '@/components/emr/NewPrescriptionModal'
 import ExportButton from '@/components/emr/ExportButton'
+import ModuleHeader from '@/components/emr/ModuleHeader'
 
 export default function PrescriptionsPage() {
   const qc = useQueryClient()
@@ -18,23 +19,20 @@ export default function PrescriptionsPage() {
   })
 
   return (
-    <div className="max-w-6xl mx-auto p-6 space-y-6">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <Pill className="w-7 h-7 text-purple-600" />
-          <div>
-            <h1 className="text-2xl font-semibold">처방전</h1>
-            <p className="text-sm text-muted-foreground">DUR 자동 안전 체크 — 임신·연령·병용금기·중복 처방</p>
-          </div>
-        </div>
-        <div className="flex items-center gap-2">
-          <ExportButton endpoint="prescriptions" label="CSV 내보내기" className="btn-secondary text-sm" />
-          <button onClick={() => setShowForm(true)} className="btn-primary">
-            <Plus className="w-4 h-4" /> 신규 처방
-          </button>
-        </div>
-      </div>
-
+    <div>
+      <ModuleHeader
+        moduleKey="prescriptions"
+        maxWidthClass="max-w-6xl"
+        actions={
+          <>
+            <ExportButton endpoint="prescriptions" label="CSV 내보내기" className="btn-secondary text-sm" />
+            <button onClick={() => setShowForm(true)} className="btn-primary">
+              <Plus className="w-4 h-4" /> 신규 처방
+            </button>
+          </>
+        }
+      />
+      <div className="max-w-6xl mx-auto p-6 space-y-6">
       <div className="card p-5">
         <h2 className="font-semibold mb-4 flex items-center gap-2"><FileText className="w-5 h-5" /> 처방 이력</h2>
         {isLoading && <div className="flex justify-center py-8"><Loader2 className="w-5 h-5 animate-spin" /></div>}
@@ -91,6 +89,7 @@ export default function PrescriptionsPage() {
       {showForm && <NewPrescriptionModal onClose={() => setShowForm(false)} onSuccess={() => {
         qc.invalidateQueries({ queryKey: ['prescriptions'] })
       }} />}
+      </div>
     </div>
   )
 }

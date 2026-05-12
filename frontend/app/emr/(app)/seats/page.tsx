@@ -17,6 +17,7 @@ import {
   staffSeatService, StaffSeat, StaffRole,
   ROLE_OPTIONS, roleIcon,
 } from '@/lib/api/staffSeats'
+import ModuleHeader from '@/components/emr/ModuleHeader'
 
 export default function SeatsPage() {
   const qc = useQueryClient()
@@ -50,22 +51,25 @@ export default function SeatsPage() {
   })
 
   return (
-    <div className="max-w-6xl mx-auto p-6 space-y-6">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <Users className="w-7 h-7 text-blue-600" />
-          <div>
-            <h1 className="text-2xl font-semibold">직원 ID</h1>
-            <p className="text-sm text-muted-foreground">
-              PC가 아닌 사용자 ID당 과금 — 페이닥·이중원장·다인 진료실에 유리
-            </p>
-          </div>
-        </div>
-        <button onClick={() => setShowAdd(true)} className="btn-primary">
-          <UserPlus className="w-4 h-4" /> 직원 추가
-        </button>
-      </div>
-
+    <div>
+      <ModuleHeader
+        moduleKey="seats"
+        maxWidthClass="max-w-6xl"
+        meta={
+          data?.billing ? (
+            <span>
+              월 청구 <b className="text-emerald-700 tabular-nums">{data.billing.monthly_total.toLocaleString()}원</b>
+              <span className="text-muted-foreground"> · ID {data.billing.billable_seats}</span>
+            </span>
+          ) : null
+        }
+        actions={
+          <button onClick={() => setShowAdd(true)} className="btn-primary">
+            <UserPlus className="w-4 h-4" /> 직원 추가
+          </button>
+        }
+      />
+      <div className="max-w-6xl mx-auto p-6 space-y-6">
       {/* 청구 카드 */}
       {data?.billing && <BillingCard billing={data.billing} />}
 
@@ -130,6 +134,7 @@ export default function SeatsPage() {
           }}
         />
       )}
+      </div>
     </div>
   )
 }
