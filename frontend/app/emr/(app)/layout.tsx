@@ -76,6 +76,7 @@ export default function EMRAppLayout({
   const [mobileOpen, setMobileOpen] = useState(false)
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false)
   const [paletteOpen, setPaletteOpen] = useState(false)
+  const [authReady, setAuthReady] = useState(false)
 
   // ⌘K / Ctrl+K — 어디서든 명령 팔레트 열기
   useEffect(() => {
@@ -87,6 +88,33 @@ export default function EMRAppLayout({
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
+  }, [])
+
+  // EMR 진입 가드 — 토큰 없으면 데모 의사 자동 발급
+  useEffect(() => {
+    const ensureAuth = async () => {
+      const jwt = localStorage.getItem('access_token')
+      const magic = localStorage.getItem('medi_token')
+      if (jwt || magic) {
+        setAuthReady(true)
+        return
+      }
+      try {
+        const base = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1'
+        const r = await fetch(`${base}/auth/demo-doctor`, { method: 'POST' })
+        if (r.ok) {
+          const data = await r.json()
+          if (data.token) {
+            localStorage.setItem('medi_token', data.token)
+          }
+        }
+      } catch (e) {
+        console.warn('demo-doctor 발급 실패 — EMR API 호출이 401될 수 있음', e)
+      } finally {
+        setAuthReady(true)
+      }
+    }
+    ensureAuth()
   }, [])
 
   return (
@@ -274,9 +302,16 @@ export default function EMRAppLayout({
           </div>
         </header>
 
-        {/* 콘텐츠 */}
+        {/* 콘텐츠 — 인증 준비 후 렌더 (신규 사용자만 200~500ms 대기) */}
         <main className="flex-1 p-4 sm:p-6 overflow-y-auto">
-          {children}
+          {authReady ? children : (
+            <div className="flex items-center justify-center h-[60vh]">
+              <div className="text-center text-muted-foreground">
+                <div className="inline-block w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin mb-3" />
+                <p className="text-sm">EMR 준비 중...</p>
+              </div>
+            </div>
+          )}
         </main>
       </div>
 
