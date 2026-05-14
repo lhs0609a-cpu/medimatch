@@ -67,85 +67,83 @@ export function HeroSection({ markers = [] }: HeroSectionProps) {
           transition={{ duration: 0.6, delay: 0.15, ease: 'easeOut' }}
           className="text-lg md:text-xl text-muted-foreground mb-4 max-w-2xl mx-auto leading-relaxed"
         >
-          가입·로그인 없이 1분 진단으로 시작하세요.<br className="hidden md:block" />
-          부동산·법무·회계·인테리어·기기까지 전 단계 협력사를 한 곳에서.
+          환자 리콜·예약·문진·청구까지 — 가입 없이 지금 바로 사용하세요.<br className="hidden md:block" />
+          기존 EMR 환자도 CSV/엑셀 한 번에 이관됩니다.
         </motion.p>
         <motion.p
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.2, ease: 'easeOut' }}
-          className="text-sm text-muted-foreground/80 mb-12"
+          className="text-sm text-muted-foreground/80 mb-10"
         >
           ✓ 회원가입 불필요 &nbsp;·&nbsp; ✓ 비밀번호 없음 &nbsp;·&nbsp; ✓ 의사 평생 무료
         </motion.p>
 
+        {/* 메인 CTA — CRM·EMR 바로 시작 (2-col, 동등 강조) */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.3, ease: 'easeOut' }}
-          className="mb-14 flex flex-col sm:flex-row items-center justify-center gap-3"
+          className="mb-4 flex flex-col sm:flex-row items-stretch justify-center gap-3 max-w-2xl mx-auto"
         >
-          {hasToken ? (
-            <Link
-              href="/my-roadmap"
-              className="btn-primary btn-lg group text-base px-10 inline-flex w-full sm:w-auto"
-            >
-              <Target className="w-5 h-5" />
-              내 미션맵 보기
-              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-            </Link>
-          ) : (
-            <Link
-              href="/diagnose"
-              className="btn-primary btn-lg group text-base px-10 inline-flex w-full sm:w-auto"
-            >
-              <Stethoscope className="w-5 h-5" />
-              1분 진단으로 시작
-              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-            </Link>
-          )}
           <Link
-            href="/recover"
-            className="inline-flex items-center justify-center gap-2 px-6 py-3 text-sm font-medium rounded-2xl border border-foreground/10 bg-background/40 backdrop-blur-sm hover:bg-background hover:border-foreground/30 transition-all w-full sm:w-auto text-muted-foreground"
+            href="/emr/crm"
+            className="btn-primary btn-lg group text-base px-8 py-4 inline-flex flex-1 justify-center"
           >
-            <MessageCircle className="w-4 h-4" />
-            이전에 진단했어요 — 카톡으로 링크 받기
+            <Send className="w-5 h-5" />
+            CRM 바로 시작
+            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+          </Link>
+          <Link
+            href="/emr"
+            className="inline-flex flex-1 items-center justify-center gap-2 px-8 py-4 text-base font-semibold rounded-2xl bg-[#3182f6]/10 hover:bg-[#3182f6]/20 text-[#3182f6] border-2 border-[#3182f6]/30 transition-all"
+          >
+            <Monitor className="w-5 h-5" />
+            EMR 바로 시작
+            <ArrowRight className="w-4 h-4" />
           </Link>
         </motion.div>
 
-        {/* 프로그램 직링크 — 이미 개원한 의사 / CRM 둘러보기 */}
+        {/* 보조 동선 — 환자 이관 / 진단 / 카톡 복원 / 미션맵 */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.4, ease: 'easeOut' }}
-          className="mb-12 flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-3"
+          className="mb-12 flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-sm"
         >
-          <span className="text-sm text-muted-foreground/80">이미 개원하셨나요?</span>
-          <div className="flex flex-wrap items-center justify-center gap-2">
+          <Link
+            href="/emr/patients/import"
+            className="inline-flex items-center gap-1.5 text-muted-foreground hover:text-[#3182f6] transition-colors"
+          >
+            <ArrowRight className="w-3.5 h-3.5" />
+            기존 EMR에서 환자 옮기기
+          </Link>
+          <span className="text-muted-foreground/30">·</span>
+          {hasToken ? (
             <Link
-              href="/emr"
-              className="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-full bg-[#3182f6]/10 hover:bg-[#3182f6]/20 text-[#3182f6] border border-[#3182f6]/30 transition-all"
+              href="/my-roadmap"
+              className="inline-flex items-center gap-1.5 text-muted-foreground hover:text-[#3182f6] transition-colors"
             >
-              <Monitor className="w-4 h-4" />
-              EMR 바로 쓰기
-              <ArrowRight className="w-3.5 h-3.5" />
+              <Target className="w-3.5 h-3.5" />
+              내 개원 미션맵
             </Link>
+          ) : (
             <Link
-              href="/emr/crm"
-              className="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-full bg-[#3182f6]/10 hover:bg-[#3182f6]/20 text-[#3182f6] border border-[#3182f6]/30 transition-all"
+              href="/diagnose"
+              className="inline-flex items-center gap-1.5 text-muted-foreground hover:text-[#3182f6] transition-colors"
             >
-              <Send className="w-4 h-4" />
-              CRM · 환자 리콜
-              <ArrowRight className="w-3.5 h-3.5" />
+              <Stethoscope className="w-3.5 h-3.5" />
+              개원 준비 중 — 1분 진단
             </Link>
-            <Link
-              href="/emr/patients/import"
-              className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-full hover:bg-foreground/5 text-muted-foreground border border-transparent transition-all"
-            >
-              기존 EMR에서 환자 옮기기
-              <ArrowRight className="w-3.5 h-3.5" />
-            </Link>
-          </div>
+          )}
+          <span className="text-muted-foreground/30">·</span>
+          <Link
+            href="/recover"
+            className="inline-flex items-center gap-1.5 text-muted-foreground hover:text-[#3182f6] transition-colors"
+          >
+            <MessageCircle className="w-3.5 h-3.5" />
+            카톡으로 링크 받기
+          </Link>
         </motion.div>
 
         {/* Stat pills */}
