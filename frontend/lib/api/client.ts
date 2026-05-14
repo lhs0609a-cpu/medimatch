@@ -1,6 +1,12 @@
 import axios from 'axios'
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1'
+// 브라우저: 상대 경로 `/api/v1` 사용 — next.config.js rewrites가 백엔드(fly.dev)로 프록시.
+//          같은 origin이라 CORS preflight 불필요, 브라우저 확장/회사 방화벽/DNS 차단 우회.
+// SSR/Node: 절대 URL 필수이므로 환경변수 또는 localhost fallback.
+const API_BASE_URL =
+  typeof window === 'undefined'
+    ? (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1')
+    : '/api/v1'
 
 export const apiClient = axios.create({
   baseURL: API_BASE_URL,

@@ -100,8 +100,8 @@ export default function EMRAppLayout({
         return
       }
       try {
-        const base = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1'
-        const r = await fetch(`${base}/auth/demo-doctor`, { method: 'POST' })
+        // 상대 경로 — next.config.js rewrites가 백엔드로 프록시 (같은 origin, CORS 우회)
+        const r = await fetch('/api/v1/auth/demo-doctor', { method: 'POST' })
         if (r.ok) {
           const data = await r.json()
           if (data.token) {
