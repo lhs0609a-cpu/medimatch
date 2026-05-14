@@ -457,69 +457,60 @@ export default function EMRLandingPage() {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[
               {
-                emoji: '🎙️',
-                gradient: 'from-rose-100 to-red-200 dark:from-rose-900/40 dark:to-red-800/40',
-                ring: 'ring-rose-200/60 dark:ring-rose-700/40',
+                icon: Mic,
+                color: 'from-rose-500 to-red-600',
                 title: 'AI 음성 자동 차트',
                 desc: '진료 대화만 하세요. CC, PI, PMH를 AI가 자동 분류하고, ICD-10 진단코드와 처방까지 추천합니다.',
                 badge: '업계 최초',
               },
               {
-                emoji: '🛡️',
-                gradient: 'from-emerald-100 to-teal-200 dark:from-emerald-900/40 dark:to-teal-800/40',
-                ring: 'ring-emerald-200/60 dark:ring-emerald-700/40',
+                icon: Shield,
+                color: 'from-emerald-500 to-teal-600',
                 title: '삭감 방어 AI',
                 desc: '과거 삭감 패턴을 학습해 위험 청구를 실시간 경고. 최적 코드 조합을 추천하여 삭감률을 30% 줄여드립니다.',
                 badge: 'AI 분석',
               },
               {
-                emoji: '💊',
-                gradient: 'from-sky-100 to-blue-200 dark:from-sky-900/40 dark:to-blue-800/40',
-                ring: 'ring-sky-200/60 dark:ring-sky-700/40',
+                icon: Pill,
+                color: 'from-sky-500 to-blue-600',
                 title: '의원-약국 실시간 브릿지',
                 desc: '처방전 3초 전송, DUR 자동 체크, 조제 완료 알림. 환자 대기시간을 70% 줄이는 실시간 연결.',
                 badge: '업계 최초',
               },
               {
-                emoji: '🗓️',
-                gradient: 'from-blue-100 to-indigo-200 dark:from-blue-900/40 dark:to-indigo-800/40',
-                ring: 'ring-blue-200/60 dark:ring-blue-700/40',
+                icon: CalendarCheck,
+                color: 'from-blue-500 to-indigo-600',
                 title: '스마트 예약/접수',
                 desc: 'QR 체크인, 태블릿 문진, 카톡 대기 알림. 환자가 집에서 미리 문진을 작성하면 도착 즉시 진료.',
               },
               {
-                emoji: '🧾',
-                gradient: 'from-amber-100 to-orange-200 dark:from-amber-900/40 dark:to-orange-800/40',
-                ring: 'ring-amber-200/60 dark:ring-amber-700/40',
+                icon: Receipt,
+                color: 'from-amber-500 to-orange-600',
                 title: '1클릭 보험청구',
                 desc: 'AI가 청구 코드를 자동 매핑. 삭감 위험도를 색상으로 표시하고, 1클릭으로 심평원에 전송합니다.',
               },
               {
-                emoji: '📊',
-                gradient: 'from-violet-100 to-purple-200 dark:from-violet-900/40 dark:to-purple-800/40',
-                ring: 'ring-violet-200/60 dark:ring-violet-700/40',
+                icon: BarChart3,
+                color: 'from-violet-500 to-purple-600',
                 title: '경영 대시보드',
                 desc: '매출, 환자수, 삭감률을 한눈에. AI가 공백 시간대, 미방문 환자, 재고 이슈를 자동 분석합니다.',
                 link: '/emr-dashboard',
               },
               {
-                emoji: '🔔',
-                gradient: 'from-yellow-100 to-amber-200 dark:from-yellow-900/40 dark:to-amber-800/40',
-                ring: 'ring-yellow-200/60 dark:ring-yellow-700/40',
+                icon: Bell,
+                color: 'from-yellow-500 to-amber-600',
                 title: '환자 리콜 자동화',
                 desc: '3개월 미방문 환자 자동 감지. 카톡/문자로 리마인드 발송. 재방문율을 25% 높여드립니다.',
               },
               {
-                emoji: '📱',
-                gradient: 'from-cyan-100 to-sky-200 dark:from-cyan-900/40 dark:to-sky-800/40',
-                ring: 'ring-cyan-200/60 dark:ring-cyan-700/40',
+                icon: Smartphone,
+                color: 'from-cyan-500 to-sky-600',
                 title: '환자 앱 연동',
                 desc: '예약 확인, 복약 알림, 검사결과 조회를 환자가 직접. 문의 전화 50% 감소, 만족도 상승.',
               },
               {
-                emoji: '🔐',
-                gradient: 'from-slate-100 to-gray-200 dark:from-slate-900/40 dark:to-gray-800/40',
-                ring: 'ring-slate-200/60 dark:ring-slate-700/40',
+                icon: Lock,
+                color: 'from-slate-500 to-gray-600',
                 title: '데이터 주권 보장',
                 desc: '원장님 데이터는 원장님 것. 언제든 전체 Export 무료, 타사 전환 시 무료 마이그레이션 지원.',
               },
@@ -529,19 +520,8 @@ export default function EMRLandingPage() {
               return (
                 <Wrapper key={i} {...wrapperProps as any} className={`feature-card group ${f.link ? 'cursor-pointer' : ''}`}>
                   <div className="flex items-start justify-between mb-5">
-                    <div
-                      className={`relative w-16 h-16 rounded-2xl bg-gradient-to-br ${f.gradient} ring-1 ${f.ring} shadow-lg flex items-center justify-center transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-3`}
-                      aria-hidden="true"
-                    >
-                      <span
-                        className="text-3xl select-none"
-                        style={{
-                          filter: 'drop-shadow(0 2px 3px rgba(0,0,0,0.18)) drop-shadow(0 4px 8px rgba(0,0,0,0.12))',
-                        }}
-                      >
-                        {f.emoji}
-                      </span>
-                      <span className="absolute inset-x-2 top-1.5 h-3 rounded-full bg-white/40 dark:bg-white/10 blur-sm pointer-events-none" />
+                    <div className="transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-3">
+                      <TossIcon icon={f.icon} color={f.color} size="xl" />
                     </div>
                     {f.badge && (
                       <span className="badge-primary text-2xs">{f.badge}</span>
