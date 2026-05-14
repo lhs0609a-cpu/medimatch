@@ -264,6 +264,13 @@ export const MODULES: Record<string, ModuleMeta> = {
     icon: TrendingUp,
     color: 'rose',
   },
+  discover: {
+    key: 'discover',
+    label: '발견',
+    desc: 'EMR 사용 중 자연스럽게 — 매물·개원·공동구매·약국',
+    icon: Sparkles,
+    color: 'violet',
+  },
 }
 
 export function getModule(key: string): ModuleMeta {

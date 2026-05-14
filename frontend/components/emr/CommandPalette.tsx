@@ -8,7 +8,7 @@ import {
   Bell, HelpCircle, Mic, Pill, BarChart3, Building2, CreditCard, Shield,
   UserCog, MessageSquare, Video, ArrowLeftRight, Brain, Clock, Star,
   QrCode, Users2, Landmark, ShoppingCart, TrendingUp, Rocket, HeartPulse,
-  Send, FileText,
+  Send, FileText, Compass, MapPin,
   type LucideIcon,
 } from 'lucide-react'
 
@@ -17,7 +17,7 @@ type Cmd = {
   label: string
   href: string
   icon: LucideIcon
-  group: '진료/운영' | '분석/리포트' | '설정/기타'
+  group: '진료/운영' | '분석/리포트' | '발견 (생태계)' | '설정/기타'
   keywords?: string
 }
 
@@ -50,8 +50,15 @@ const COMMANDS: Cmd[] = [
   { id: 'ai-consulting', label: 'AI 경영컨설팅',       href: '/emr/ai-consulting',   icon: Brain,           group: '분석/리포트' },
   { id: 'reviews',       label: '만족도/리뷰',         href: '/emr/reviews',         icon: Star,            group: '분석/리포트' },
 
+  // 발견 (생태계) — EMR 사용 중 자연스럽게 만나는 도구
+  { id: 'discover',      label: '발견 (허브)',        href: '/emr/discover',        icon: Compass,         group: '발견 (생태계)', keywords: 'hub all' },
+  { id: 'buildings',     label: '병원 매물',          href: '/buildings',           icon: Building2,       group: '발견 (생태계)', keywords: 'real estate property 부동산 임대' },
+  { id: 'opening',       label: '개원 D-Day',         href: '/opening-project',     icon: Rocket,          group: '발견 (생태계)', keywords: 'd-day project 체크리스트' },
+  { id: 'group-buying',  label: '공동구매',           href: '/group-buying',        icon: ShoppingCart,    group: '발견 (생태계)', keywords: 'bulk discount 묶음' },
+  { id: 'pharmacy-match', label: '약국 양도양수',      href: '/pharmacy-match',      icon: ArrowLeftRight,  group: '발견 (생태계)', keywords: 'pharmacy 약사' },
+  { id: 'landlord',      label: '건물주 등록',         href: '/landlord',            icon: MapPin,          group: '발견 (생태계)', keywords: '건물 임대 유치' },
+
   // 설정/기타
-  { id: 'opening',       label: '개원 준비',          href: '/opening-project',     icon: Rocket,          group: '설정/기타', keywords: 'd-day project' },
   { id: 'multi-branch',  label: '멀티 지점',          href: '/emr/multi-branch',    icon: Building2,       group: '설정/기타' },
   { id: 'staff',         label: '직원/권한',          href: '/emr/staff',           icon: UserCog,         group: '설정/기타' },
   { id: 'seats',         label: '직원 ID/요금',       href: '/emr/seats',           icon: CreditCard,      group: '설정/기타', keywords: '과금 billing seat' },
@@ -169,7 +176,7 @@ export function CommandPalette({ open, onClose }: Props) {
               일치하는 항목이 없습니다
             </div>
           ) : (
-            (['진료/운영', '분석/리포트', '설정/기타'] as const).map(groupName => {
+            (['진료/운영', '분석/리포트', '발견 (생태계)', '설정/기타'] as const).map(groupName => {
               const items = grouped[groupName]
               if (!items?.length) return null
               return (

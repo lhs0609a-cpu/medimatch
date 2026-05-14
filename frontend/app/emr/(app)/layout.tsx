@@ -18,6 +18,7 @@ import {
   X,
   Mic,
   HelpCircle,
+  Compass,
   type LucideIcon,
 } from 'lucide-react'
 import { CommandPalette } from '@/components/emr/CommandPalette'
@@ -63,6 +64,13 @@ const primaryLinks: PrimaryLink[] = [
     label: '리포트',
     icon: BarChart3,
     matchPrefixes: ['/emr/dashboard', '/emr-dashboard', '/emr/reports', '/emr/cost', '/emr/ai-consulting', '/emr/multi-branch'],
+  },
+  {
+    href: '/emr/discover',
+    label: '발견',
+    icon: Compass,
+    matchPrefixes: ['/emr/discover', '/buildings', '/opening-project', '/group-buying', '/pharmacy-match', '/pharmacist', '/landlord'],
+    badge: 'NEW',
   },
 ]
 
