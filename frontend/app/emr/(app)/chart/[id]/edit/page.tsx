@@ -7,7 +7,12 @@ import Link from 'next/link'
 import { Save, Plus, X, Stethoscope, ArrowLeft, Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
 import { visitService, Diagnosis, Procedure } from '@/lib/api/emr'
+import { apiClient } from '@/lib/api/client'
 import HiraCodePicker from '@/components/emr/HiraCodePicker'
+import CdssPanel from '@/components/emr/CdssPanel'
+import SoapVoiceCapture from '@/components/emr/SoapVoiceCapture'
+import AttachmentGallery from '@/components/emr/AttachmentGallery'
+import ModuleHeader from '@/components/emr/ModuleHeader'
 
 export default function EditVisitPage() {
   const params = useParams()
@@ -86,26 +91,59 @@ export default function EditVisitPage() {
   const updateD = (i: number, p: Partial<Diagnosis>) => setDiagnoses(diagnoses.map((d, idx) => (idx === i ? { ...d, ...p } : d)))
   const updateP = (i: number, p: Partial<Procedure>) => setProcedures(procedures.map((x, idx) => (idx === i ? { ...x, ...p } : x)))
 
+  // CDSS — 환자 인구통계(나이/성별) 가져오기
+  const { data: patient } = useQuery({
+    queryKey: ['patient-demo', visit?.patient_id],
+    queryFn: async () => {
+      if (!visit?.patient_id) return null
+      const r = await apiClient.get(`/emr/patients/${visit.patient_id}`)
+      return r.data
+    },
+    enabled: !!visit?.patient_id,
+  })
+
+  const cdssPatient = (() => {
+    if (!visit) return undefined
+    let age: number | undefined
+    if (patient?.birth_date) {
+      const b = new Date(patient.birth_date)
+      const t = new Date()
+      age = t.getFullYear() - b.getFullYear() -
+        (t < new Date(t.getFullYear(), b.getMonth(), b.getDate()) ? 1 : 0)
+    }
+    return {
+      id: visit.patient_id,
+      age,
+      sex: patient?.gender as ('M' | 'F' | undefined),
+      weight_kg: weight === '' ? undefined : Number(weight),
+    }
+  })()
+
   if (isLoading) return <div className="flex justify-center py-20"><Loader2 className="w-6 h-6 animate-spin" /></div>
   if (!visit) return <div className="p-6 text-center text-muted-foreground">진료 기록을 찾을 수 없습니다.</div>
 
   return (
-    <div className="max-w-5xl mx-auto p-6 space-y-6">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <Link href={`/emr/chart/${id}`} className="text-muted-foreground hover:text-foreground"><ArrowLeft className="w-5 h-5" /></Link>
-          <Stethoscope className="w-6 h-6 text-blue-600" />
-          <div>
-            <h1 className="text-2xl font-semibold">진료 기록 수정</h1>
-            <p className="text-xs text-muted-foreground font-mono">{visit.visit_no}</p>
-          </div>
-        </div>
-        <button onClick={() => updateMut.mutate()} disabled={updateMut.isPending} className="btn-primary">
-          <Save className="w-4 h-4" /> {updateMut.isPending ? '저장 중...' : '저장'}
-        </button>
-      </div>
-
-      <section className="card p-5 space-y-4">
+    <div>
+      <ModuleHeader
+        moduleKey="chart"
+        title="진료 기록 수정"
+        subtitle={`#${visit.visit_no}`}
+        maxWidthClass="max-w-7xl"
+        breadcrumbs={[
+          { label: '전자차트', href: '/emr/chart' },
+          { label: visit.visit_no, href: `/emr/chart/${id}` },
+          { label: '수정' },
+        ]}
+        actions={
+          <button onClick={() => updateMut.mutate()} disabled={updateMut.isPending} className="btn-primary">
+            <Save className="w-4 h-4" /> {updateMut.isPending ? '저장 중...' : '저장'}
+          </button>
+        }
+      />
+      <div className="max-w-7xl mx-auto p-6">
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-6 items-start">
+        <div className="space-y-6">
+          <section className="card p-5 space-y-4">
         <h2 className="font-semibold">활력징후</h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
           <div><label className="label text-xs">수축기</label><input type="number" className="input" value={systolic} onChange={(e) => setSystolic(e.target.value === '' ? '' : Number(e.target.value))} /></div>
@@ -117,6 +155,32 @@ export default function EditVisitPage() {
           <div><label className="label text-xs">신장</label><input type="number" step="0.1" className="input" value={height} onChange={(e) => setHeight(e.target.value === '' ? '' : Number(e.target.value))} /></div>
         </div>
       </section>
+
+      <SoapVoiceCapture
+        visitId={id}
+        onApply={(p) => {
+          if (p.chief_complaint && !chiefComplaint) setChiefComplaint(p.chief_complaint)
+          if (p.subjective) setSubjective((prev) => prev ? `${prev}\n${p.subjective}` : p.subjective!)
+          if (p.objective) setObjective((prev) => prev ? `${prev}\n${p.objective}` : p.objective!)
+          if (p.assessment) setAssessment((prev) => prev ? `${prev}\n${p.assessment}` : p.assessment!)
+          if (p.plan) setPlan((prev) => prev ? `${prev}\n${p.plan}` : p.plan!)
+          if (p.diagnoses && p.diagnoses.length > 0) {
+            setDiagnoses([
+              ...diagnoses.filter((d) => d.code || d.name),
+              ...p.diagnoses.map((d) => ({ code: d.code || '', name: d.name, is_primary: false, note: '' })),
+            ])
+          }
+          if (p.procedures && p.procedures.length > 0) {
+            setProcedures([
+              ...procedures,
+              ...p.procedures.map((pr) => ({
+                code: '', name: pr.name, category: '시술',
+                quantity: 1, unit_price: 0, insurance_covered: true,
+              })),
+            ])
+          }
+        }}
+      />
 
       <section className="card p-5 space-y-4">
         <h2 className="font-semibold">SOAP</h2>
@@ -169,6 +233,8 @@ export default function EditVisitPage() {
         ))}
       </section>
 
+      <AttachmentGallery visitId={id} />
+
       <section className="card p-5 space-y-3">
         <h2 className="font-semibold">추가</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -176,6 +242,18 @@ export default function EditVisitPage() {
           <div><label className="label text-xs">메모</label><input className="input" value={notes} onChange={(e) => setNotes(e.target.value)} /></div>
         </div>
       </section>
+        </div>
+
+        <div className="lg:sticky lg:top-6">
+          <CdssPanel
+            patient={cdssPatient}
+            diagnoses={diagnoses}
+            procedures={procedures}
+            visitType={visit.visit_type}
+          />
+        </div>
+      </div>
+      </div>
     </div>
   )
 }

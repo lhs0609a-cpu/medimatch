@@ -4,20 +4,25 @@
 - CRUD + CSV 가져오기 + 퍼널 분석 + 동의 현황
 - DB에 데이터 없으면 데모 데이터 반환
 """
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, UploadFile, File, Form
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, and_, or_, func
 from pydantic import BaseModel
 from typing import Optional
 from datetime import date, datetime
+import json
 import random
 import logging
+import uuid
 
 from ..deps import get_db, get_current_active_user
 from .service_guards import require_active_service
 from ...models.user import User
 from ...models.service_subscription import ServiceSubscription, ServiceType
 from ...models.patient import Patient
+from ...services.emr_import import (
+    parse_file, auto_map, apply_mapping, MappedRow,
+)
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
@@ -462,11 +467,328 @@ async def delete_patient(
     return {"message": "삭제 완료"}
 
 
+# ============================================================
+# 임포트 — 어떤 CSV/엑셀이든 자동 매핑 + 정규화
+# ============================================================
+
+@router.get("/import/template.xlsx")
+async def import_template():
+    """표준 임포트 템플릿 — 한국 EMR 호환 컬럼명 + 안내 행."""
+    from openpyxl import Workbook
+    from openpyxl.styles import Font, PatternFill, Alignment
+    from fastapi.responses import StreamingResponse
+    import io as _io
+
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "환자목록"
+
+    headers = [
+        "차트번호", "이름", "성별", "생년월일", "전화번호", "지역",
+        "유입일", "유입경로", "검색키워드", "주증상", "진단명",
+        "상담요약", "DB등급", "실무자판단",
+        "예약일", "예약경로", "내원상태", "취소사유",
+        "담당실장", "검사동의", "치료동의",
+    ]
+    examples = [
+        "A-001", "김환자", "남", "1985-03-15", "010-1234-5678", "서울 강남구",
+        "2026-05-10", "네이버 광고", "허리통증 강남내과", "만성 요통", "요추 추간판 탈출증",
+        "MRI 권유", "상", "적극 치료 의향",
+        "2026-05-15 10:00", "전화", "예약", "",
+        "이실장", "동의", "동의",
+    ]
+    note_row = [
+        "필수: 이름 + (전화 또는 차트번호) — 둘 중 하나는 있어야 등록됩니다.",
+        "", "M/F 또는 남/여 OK", "주민번호 앞자리도 자동 인식", "010 없어도 11자리 OK", "",
+        "다양한 형식 OK (2026.05.10, 2026/5/10, 2026년 5월 10일)", "", "", "", "",
+        "", "상/중/하 또는 H/M/L", "",
+        "", "", "예약/대기/내원/취소 등", "",
+        "", "동의/예/Y/거부/N 등", "동의/예/Y/거부/N 등",
+    ]
+
+    header_font = Font(bold=True, color="FFFFFF")
+    header_fill = PatternFill(start_color="2563EB", end_color="2563EB", fill_type="solid")
+    note_font = Font(italic=True, color="6B7280", size=9)
+    center = Alignment(horizontal="center", vertical="center")
+
+    for col, h in enumerate(headers, start=1):
+        cell = ws.cell(row=1, column=col, value=h)
+        cell.font = header_font
+        cell.fill = header_fill
+        cell.alignment = center
+
+    for col, v in enumerate(examples, start=1):
+        ws.cell(row=2, column=col, value=v)
+
+    for col, v in enumerate(note_row, start=1):
+        cell = ws.cell(row=3, column=col, value=v)
+        cell.font = note_font
+
+    for col in range(1, len(headers) + 1):
+        ws.column_dimensions[chr(64 + col) if col <= 26 else "A" + chr(64 + col - 26)].width = 18
+
+    ws.cell(row=5, column=1, value="※ 알림톡 수신 동의는 정통망법/PIPA에 따라 사람이 직접 받은 동의만 인정합니다.")
+    ws.cell(row=5, column=1).font = Font(italic=True, color="DC2626", size=9)
+    ws.cell(row=6, column=1, value="※ 임포트 후 알림톡 동의는 모두 '미확인'으로 들어가며, 별도 화면에서 일괄 수정 가능합니다.")
+    ws.cell(row=6, column=1).font = Font(italic=True, color="DC2626", size=9)
+    ws.cell(row=7, column=1, value="※ 위 컬럼명을 그대로 쓰지 않아도 됩니다 — 시스템이 자동으로 매핑합니다.")
+    ws.cell(row=7, column=1).font = Font(italic=True, color="6B7280", size=9)
+
+    buf = _io.BytesIO()
+    wb.save(buf)
+    buf.seek(0)
+    return StreamingResponse(
+        buf,
+        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        headers={"Content-Disposition": 'attachment; filename="medimatch_patients_template.xlsx"'},
+    )
+
+
+
+
+# 베타 안전 한도 (2000명 가드와 정합)
+_IMPORT_MAX_ROWS_PER_FILE = 5000   # 파서 자체 한도
+_IMPORT_MAX_ROWS_PER_BATCH = 2000  # 한 번에 커밋 가능한 최대
+_IMPORT_MAX_FILE_BYTES = 20 * 1024 * 1024  # 20 MB
+_ALLOWED_EXTS = (".csv", ".tsv", ".txt", ".xlsx", ".xls", ".xlsm")
+
+
+def _ext_ok(filename: str) -> bool:
+    n = (filename or "").lower()
+    return any(n.endswith(e) for e in _ALLOWED_EXTS)
+
+
+async def _read_upload(file: UploadFile) -> bytes:
+    raw = await file.read()
+    if len(raw) > _IMPORT_MAX_FILE_BYTES:
+        raise HTTPException(
+            status_code=413,
+            detail=f"파일이 너무 큽니다 (최대 {_IMPORT_MAX_FILE_BYTES // 1024 // 1024}MB)",
+        )
+    return raw
+
+
+def _row_to_preview(row: MappedRow) -> dict:
+    """직렬화 가능한 형태로 변환 (date/datetime → ISO 문자열)."""
+    out = {}
+    for k, v in row.fields.items():
+        if isinstance(v, (date, datetime)):
+            out[k] = v.isoformat()
+        else:
+            out[k] = v
+    return {
+        "fields": out,
+        "external_meta_keys": list(row.external_meta.keys()),
+        "issues": row.issues,
+        "valid": row.is_valid(),
+    }
+
+
+@router.post("/import/preview")
+async def import_preview(
+    file: UploadFile = File(...),
+    manual_mapping: Optional[str] = Form(default=None),  # JSON: {"원본헤더": "canonical"}
+    current_user: User = Depends(get_current_active_user),
+    sub: ServiceSubscription = Depends(require_active_service(ServiceType.EMR)),
+):
+    """업로드 → 자동 매핑 결과 + 처음 20행 미리보기 (실제 저장 X).
+
+    프런트는 이 결과로 매핑 화면을 그리고, 사용자가 수정한 매핑을 다음 호출에 전달.
+    """
+    if not _ext_ok(file.filename or ""):
+        raise HTTPException(
+            status_code=400,
+            detail=f"지원하지 않는 형식입니다. 가능: {', '.join(_ALLOWED_EXTS)}",
+        )
+    raw = await _read_upload(file)
+
+    parsed = parse_file(file.filename or "upload", raw, max_rows=_IMPORT_MAX_ROWS_PER_FILE)
+    if not parsed.headers:
+        raise HTTPException(
+            status_code=400,
+            detail=parsed.warnings[0] if parsed.warnings else "파일을 읽지 못했습니다.",
+        )
+
+    manual = None
+    if manual_mapping:
+        try:
+            manual = json.loads(manual_mapping)
+            if not isinstance(manual, dict):
+                raise ValueError("dict 형식이어야 합니다.")
+        except (json.JSONDecodeError, ValueError) as e:
+            raise HTTPException(status_code=400, detail=f"manual_mapping JSON 오류: {e}")
+
+    plan = auto_map(parsed.headers, parsed.rows[:200], manual_mapping=manual)
+    mapped = apply_mapping(plan, parsed.rows[:20])
+
+    return {
+        "filename": file.filename,
+        "encoding": parsed.encoding_used,
+        "sheet": parsed.sheet_used,
+        "warnings": parsed.warnings,
+        "total_rows": len(parsed.rows),
+        "preview_rows": [_row_to_preview(r) for r in mapped],
+        "mapping": plan.mapping,
+        "confidence": plan.confidence,
+        "unmapped_headers": plan.unmapped_headers,
+        "detected_emr": plan.detected_emr,
+        "notes": plan.notes,
+        "valid_count_in_preview": sum(1 for r in mapped if r.is_valid()),
+    }
+
+
 @router.post("/import")
 async def import_patients(
+    file: UploadFile = File(...),
+    manual_mapping: Optional[str] = Form(default=None),
+    source_emr: str = Form(default="manual_csv"),
+    skip_duplicates: bool = Form(default=True),
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_active_user),
     sub: ServiceSubscription = Depends(require_active_service(ServiceType.EMR)),
 ):
-    """CSV/Excel 일괄 가져오기 (placeholder)"""
-    return {"message": "파일 업로드 기능은 추후 구현됩니다.", "imported_count": 0}
+    """CSV/엑셀 → 환자 일괄 등록.
+
+    안전 가드:
+    - 한 파일 최대 _IMPORT_MAX_ROWS_PER_BATCH 행
+    - 알림톡 동의는 무조건 NOT_ASKED (CSV 신뢰 X — 정통망법/PIPA)
+    - (user_id, source_emr, external_id) unique — 같은 출처 중복 자동 skip
+    - 행 단위 정규화 실패는 skip하고 리포트, 트랜잭션은 통째 커밋
+    """
+    if not _ext_ok(file.filename or ""):
+        raise HTTPException(
+            status_code=400,
+            detail=f"지원하지 않는 형식입니다. 가능: {', '.join(_ALLOWED_EXTS)}",
+        )
+    raw = await _read_upload(file)
+
+    parsed = parse_file(file.filename or "upload", raw, max_rows=_IMPORT_MAX_ROWS_PER_FILE)
+    if not parsed.headers:
+        raise HTTPException(
+            status_code=400,
+            detail=parsed.warnings[0] if parsed.warnings else "파일을 읽지 못했습니다.",
+        )
+    if len(parsed.rows) > _IMPORT_MAX_ROWS_PER_BATCH:
+        raise HTTPException(
+            status_code=400,
+            detail=f"한 번에 최대 {_IMPORT_MAX_ROWS_PER_BATCH}명까지 임포트할 수 있습니다. "
+                   f"파일을 나눠서 올려주세요.",
+        )
+
+    manual = None
+    if manual_mapping:
+        try:
+            manual = json.loads(manual_mapping)
+        except json.JSONDecodeError as e:
+            raise HTTPException(status_code=400, detail=f"manual_mapping JSON 오류: {e}")
+
+    plan = auto_map(parsed.headers, parsed.rows[:200], manual_mapping=manual)
+    mapped_rows = apply_mapping(plan, parsed.rows)
+
+    batch_id = uuid.uuid4()
+    now = datetime.utcnow()
+
+    # 같은 출처에서 이미 가져온 external_id 미리 조회 (중복 검출용)
+    existing_ext_ids: set[str] = set()
+    if skip_duplicates:
+        ext_ids_in_file = [
+            r.fields.get("external_id") for r in mapped_rows
+            if r.fields.get("external_id")
+        ]
+        if ext_ids_in_file:
+            res = await db.execute(
+                select(Patient.external_id).where(and_(
+                    Patient.user_id == current_user.id,
+                    Patient.source_emr == source_emr,
+                    Patient.external_id.in_(ext_ids_in_file),
+                ))
+            )
+            existing_ext_ids = {row[0] for row in res.all()}
+
+    inserted = 0
+    skipped_invalid = 0
+    skipped_duplicate = 0
+    issues: list[dict] = []
+
+    for idx, mr in enumerate(mapped_rows, start=2):  # 2부터 = 헤더 다음 줄번호
+        if not mr.is_valid():
+            skipped_invalid += 1
+            if len(issues) < 50:
+                issues.append({"row": idx, "kind": "invalid", "detail": mr.issues})
+            continue
+
+        ext_id = mr.fields.get("external_id")
+        if skip_duplicates and ext_id and ext_id in existing_ext_ids:
+            skipped_duplicate += 1
+            if len(issues) < 50:
+                issues.append({"row": idx, "kind": "duplicate", "external_id": ext_id})
+            continue
+
+        # external_id가 같은 파일 내 중복 → 두 번째부터 skip
+        if ext_id and ext_id in existing_ext_ids:
+            skipped_duplicate += 1
+            continue
+
+        patient = Patient(
+            user_id=current_user.id,
+            source_emr=source_emr,
+            external_id=ext_id,
+            external_meta=mr.external_meta or None,
+            import_batch_id=batch_id,
+            imported_at=now,
+            **{k: v for k, v in mr.fields.items() if k != "external_id"},
+        )
+        db.add(patient)
+        inserted += 1
+        if ext_id:
+            existing_ext_ids.add(ext_id)
+
+    try:
+        await db.commit()
+    except Exception as e:
+        await db.rollback()
+        logger.exception("환자 임포트 커밋 실패")
+        raise HTTPException(status_code=500, detail=f"DB 저장 실패: {e}")
+
+    return {
+        "batch_id": str(batch_id),
+        "imported_count": inserted,
+        "skipped_invalid": skipped_invalid,
+        "skipped_duplicate": skipped_duplicate,
+        "total_in_file": len(parsed.rows),
+        "source_emr": source_emr,
+        "mapping": plan.mapping,
+        "unmapped_headers": plan.unmapped_headers,
+        "issues": issues,
+        "warnings": parsed.warnings,
+        "notes": plan.notes,
+        "message": f"{inserted}명 임포트 완료 (중복 {skipped_duplicate}, 불완전 {skipped_invalid})",
+    }
+
+
+@router.post("/import/rollback/{batch_id}")
+async def rollback_import_batch(
+    batch_id: str,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_active_user),
+    sub: ServiceSubscription = Depends(require_active_service(ServiceType.EMR)),
+):
+    """배치 단위 롤백 — soft delete (의료법 5년 보존). 이번 임포트가 잘못됐을 때 즉시 되돌림."""
+    try:
+        bid = uuid.UUID(batch_id)
+    except ValueError:
+        raise HTTPException(status_code=400, detail="잘못된 batch_id")
+
+    res = await db.execute(
+        select(Patient).where(and_(
+            Patient.user_id == current_user.id,
+            Patient.import_batch_id == bid,
+            Patient.deleted_at.is_(None),
+        ))
+    )
+    targets = res.scalars().all()
+    now = datetime.utcnow()
+    for p in targets:
+        p.deleted_at = now
+    await db.commit()
+    return {"rolled_back": len(targets), "batch_id": batch_id}

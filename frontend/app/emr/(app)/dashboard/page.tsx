@@ -36,6 +36,7 @@ import {
   Ear,
 } from 'lucide-react'
 import { TossIcon } from '@/components/ui/TossIcon'
+import ModuleHeader from '@/components/emr/ModuleHeader'
 
 /* ─── 더미 데이터 ─── */
 const todayStats = {
@@ -108,30 +109,24 @@ export default function EMRDashboardPage() {
   const greeting = now.getHours() < 12 ? '좋은 아침이에요' : now.getHours() < 18 ? '좋은 오후예요' : '수고 많으셨어요'
 
   return (
-    <div className="max-w-[1400px] mx-auto space-y-6">
-      {/* ───── 인사 & 퀵액션 ───── */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl md:text-3xl font-bold">
-            {greeting}, <span className="text-gradient-blue">김원장님</span>
-          </h1>
-          <p className="text-muted-foreground mt-1">
-            {now.toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' })}
-          </p>
-        </div>
-
-        <div className="flex items-center gap-2">
-          <Link href="/emr/chart/new" className="btn-primary">
-            <Mic className="w-4 h-4" />
-            AI 진료 시작
-          </Link>
-          <Link href="/emr/appointments" className="btn-secondary">
-            <CalendarCheck className="w-4 h-4" />
-            접수 관리
-          </Link>
-        </div>
-      </div>
-
+    <div>
+      <ModuleHeader
+        moduleKey="dashboard"
+        title={`${greeting}, 김원장님`}
+        subtitle={now.toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' })}
+        maxWidthClass="max-w-[1400px]"
+        actions={
+          <>
+            <Link href="/emr/chart/new" className="btn-primary">
+              <Mic className="w-4 h-4" /> AI 진료 시작
+            </Link>
+            <Link href="/emr/appointments" className="btn-secondary">
+              <CalendarCheck className="w-4 h-4" /> 접수 관리
+            </Link>
+          </>
+        }
+      />
+    <div className="max-w-[1400px] mx-auto space-y-6 p-6">
       {/* ───── 핵심 지표 카드 4개 ───── */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {/* 오늘 예약 */}
@@ -439,6 +434,7 @@ export default function EMRDashboardPage() {
           </div>
         </div>
       </div>
+    </div>
     </div>
   )
 }

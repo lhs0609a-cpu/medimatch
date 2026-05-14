@@ -2,74 +2,68 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import {
-  LayoutDashboard,
-  Users,
   Stethoscope,
-  CalendarCheck,
-  Receipt,
-  Settings,
+  Users,
+  Pill,
+  Send,
+  BarChart3,
+  LayoutGrid,
   ChevronLeft,
   ChevronRight,
   Bell,
   Search,
-  Moon,
-  Sun,
   Menu,
   X,
   Mic,
-  Pill,
-  BarChart3,
-  FileText,
-  LogOut,
-  User,
   HelpCircle,
-  Building2,
-  CreditCard,
-  Shield,
-  UserCog,
-  MessageSquare,
-  Video,
-  ArrowLeftRight,
-  Brain,
-  Clock,
-  Star,
-  QrCode,
-  Users2,
-  Landmark,
-  ShoppingCart,
-  TrendingUp,
-  Rocket,
+  type LucideIcon,
 } from 'lucide-react'
+import { CommandPalette } from '@/components/emr/CommandPalette'
 
-const sidebarLinks = [
-  { href: '/emr/dashboard', label: '대시보드', icon: LayoutDashboard },
-  { href: '/opening-project', label: '개원 준비', icon: Rocket, badge: '진행중' },
-  { href: '/emr/appointments', label: '예약/접수', icon: CalendarCheck },
-  { href: '/emr/patients', label: '환자 관리', icon: Users },
-  { href: '/emr/chart', label: '전자차트', icon: Mic, accent: true },
-  { href: '/emr/prescriptions', label: '처방전', icon: Pill },
-  { href: '/emr/claims', label: '보험청구', icon: Receipt },
-  { href: '/emr/tax-correction', label: '경정청구', icon: Shield },
-  { href: '/emr/telemedicine', label: '비대면 진료', icon: Video },
-  { href: '/emr/waiting', label: '대기/동선', icon: Clock },
-  { href: '/emr/smart-booking', label: '스마트 예약 QR', icon: QrCode },
-  { href: '/emr/bridge', label: '약국 브릿지', icon: ArrowLeftRight },
-  { href: '/emr/reports', label: '통합 리포트', icon: BarChart3 },
-  { href: '/emr-dashboard', label: '비즈니스 분석', icon: BarChart3, accent: false },
-  { href: '/emr/cost/staff', label: '인건비 최적화', icon: Users2 },
-  { href: '/emr/cost/fixed', label: '고정비 절감', icon: Landmark },
-  { href: '/emr/cost/supplies', label: '소모품/약가 비교', icon: ShoppingCart },
-  { href: '/emr/cost/marketing', label: '마케팅 ROI', icon: TrendingUp },
-  { href: '/emr/ai-consulting', label: 'AI 경영컨설팅', icon: Brain },
-  { href: '/emr/reviews', label: '만족도/리뷰', icon: Star },
-  { href: '/emr/billing', label: '수납/결제', icon: CreditCard },
-  { href: '/emr/crm', label: '환자 리콜/CRM', icon: MessageSquare },
-  { href: '/emr/multi-branch', label: '멀티 지점', icon: Building2 },
-  { href: '/emr/staff', label: '직원/권한', icon: UserCog },
-  { href: '/emr/integrations', label: '연동/API', icon: Building2 },
-  { href: '/emr/settings', label: '설정', icon: Settings },
+type PrimaryLink = {
+  href: string
+  label: string
+  icon: LucideIcon
+  // 활성 처리될 추가 경로 prefix들 (이 prefix로 시작하면 같은 그룹으로 간주)
+  matchPrefixes?: string[]
+  badge?: string
+}
+
+// 일상에서 자주 쓰는 6개만 사이드바에 노출. 나머지 23개는 ⌘K(더보기)로.
+const primaryLinks: PrimaryLink[] = [
+  {
+    href: '/emr/appointments',
+    label: '진료',
+    icon: Stethoscope,
+    matchPrefixes: ['/emr/appointments', '/emr/chart', '/emr/inbox', '/emr/waiting', '/emr/telemedicine', '/emr/chronic-care', '/emr/smart-booking'],
+  },
+  {
+    href: '/emr/patients',
+    label: '환자',
+    icon: Users,
+    matchPrefixes: ['/emr/patients'],
+  },
+  {
+    href: '/emr/prescriptions',
+    label: '처방·청구',
+    icon: Pill,
+    matchPrefixes: ['/emr/prescriptions', '/emr/claims', '/emr/tax-correction', '/emr/bridge', '/emr/billing'],
+  },
+  {
+    href: '/emr/crm',
+    label: 'CRM',
+    icon: Send,
+    matchPrefixes: ['/emr/crm', '/emr/reviews'],
+    badge: 'NEW',
+  },
+  {
+    href: '/emr/dashboard',
+    label: '리포트',
+    icon: BarChart3,
+    matchPrefixes: ['/emr/dashboard', '/emr-dashboard', '/emr/reports', '/emr/cost', '/emr/ai-consulting', '/emr/multi-branch'],
+  },
 ]
 
 export default function EMRAppLayout({
@@ -81,6 +75,47 @@ export default function EMRAppLayout({
   const [collapsed, setCollapsed] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false)
+  const [paletteOpen, setPaletteOpen] = useState(false)
+  const [authReady, setAuthReady] = useState(false)
+
+  // ⌘K / Ctrl+K — 어디서든 명령 팔레트 열기
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault()
+        setPaletteOpen(true)
+      }
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [])
+
+  // EMR 진입 가드 — 토큰 없으면 데모 의사 자동 발급
+  useEffect(() => {
+    const ensureAuth = async () => {
+      const jwt = localStorage.getItem('access_token')
+      const magic = localStorage.getItem('medi_token')
+      if (jwt || magic) {
+        setAuthReady(true)
+        return
+      }
+      try {
+        const base = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1'
+        const r = await fetch(`${base}/auth/demo-doctor`, { method: 'POST' })
+        if (r.ok) {
+          const data = await r.json()
+          if (data.token) {
+            localStorage.setItem('medi_token', data.token)
+          }
+        }
+      } catch (e) {
+        console.warn('demo-doctor 발급 실패 — EMR API 호출이 401될 수 있음', e)
+      } finally {
+        setAuthReady(true)
+      }
+    }
+    ensureAuth()
+  }, [])
 
   return (
     <div className="min-h-screen bg-background flex">
@@ -123,10 +158,11 @@ export default function EMRAppLayout({
           </div>
         )}
 
-        {/* 네비게이션 */}
+        {/* 네비게이션 — 일상 6개만 노출 */}
         <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
-          {sidebarLinks.map((link) => {
-            const isActive = pathname === link.href || pathname.startsWith(link.href + '/')
+          {primaryLinks.map((link) => {
+            const matches = link.matchPrefixes ?? [link.href]
+            const isActive = matches.some(p => pathname === p || pathname.startsWith(p + '/'))
             return (
               <Link
                 key={link.href}
@@ -136,30 +172,43 @@ export default function EMRAppLayout({
                   flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium
                   transition-all duration-200
                   ${isActive
-                    ? link.accent
-                      ? 'bg-red-50 text-red-600 dark:bg-red-900/20 dark:text-red-400'
-                      : 'bg-primary/10 text-primary'
+                    ? 'bg-primary/10 text-primary'
                     : 'text-muted-foreground hover:text-foreground hover:bg-secondary'
                   }
                   ${collapsed ? 'justify-center px-0' : ''}
                 `}
                 title={collapsed ? link.label : undefined}
               >
-                <link.icon className={`w-5 h-5 flex-shrink-0 ${
-                  link.accent && isActive ? 'text-red-500' : ''
-                }`} />
+                <link.icon className="w-5 h-5 flex-shrink-0" />
                 {!collapsed && <span>{link.label}</span>}
-                {'badge' in link && link.badge && !collapsed && (
+                {link.badge && !collapsed && (
                   <span className="ml-auto text-[10px] font-semibold bg-primary/10 text-primary px-1.5 py-0.5 rounded-md">
                     {link.badge}
                   </span>
                 )}
-                {link.accent && !collapsed && (
-                  <span className="ml-auto w-2 h-2 rounded-full bg-red-500 animate-pulse" />
-                )}
               </Link>
             )
           })}
+
+          {/* 더보기 — 전체 메뉴 + 검색 (⌘K) */}
+          <button
+            onClick={() => { setPaletteOpen(true); setMobileOpen(false) }}
+            className={`
+              w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium
+              text-muted-foreground hover:text-foreground hover:bg-secondary
+              transition-all duration-200
+              ${collapsed ? 'justify-center px-0' : ''}
+            `}
+            title={collapsed ? '더보기 (⌘K)' : undefined}
+          >
+            <LayoutGrid className="w-5 h-5 flex-shrink-0" />
+            {!collapsed && (
+              <>
+                <span>더보기</span>
+                <kbd className="ml-auto text-2xs px-1.5 py-0.5 bg-secondary border border-border rounded">⌘K</kbd>
+              </>
+            )}
+          </button>
         </nav>
 
         {/* 하단 */}
@@ -216,16 +265,15 @@ export default function EMRAppLayout({
               <Search className="w-5 h-5" />
             </button>
 
-            {/* 검색 */}
-            <div className="hidden sm:flex items-center gap-2 bg-secondary/50 rounded-xl px-4 py-2 w-72">
+            {/* 명령 팔레트 트리거 — 환자/메뉴 통합 검색 */}
+            <button
+              onClick={() => setPaletteOpen(true)}
+              className="hidden sm:flex items-center gap-2 bg-secondary/50 hover:bg-secondary rounded-xl px-4 py-2 w-72 transition-colors"
+            >
               <Search className="w-4 h-4 text-muted-foreground" />
-              <input
-                type="text"
-                placeholder="환자 검색 (이름, 차트번호, 연락처)"
-                className="bg-transparent text-sm outline-none w-full placeholder:text-muted-foreground"
-              />
+              <span className="text-sm text-muted-foreground flex-1 text-left">메뉴·환자·기능 검색</span>
               <kbd className="hidden md:inline text-2xs text-muted-foreground bg-secondary px-1.5 py-0.5 rounded">⌘K</kbd>
-            </div>
+            </button>
           </div>
 
           <div className="flex items-center gap-2">
@@ -254,9 +302,16 @@ export default function EMRAppLayout({
           </div>
         </header>
 
-        {/* 콘텐츠 */}
+        {/* 콘텐츠 — 인증 준비 후 렌더 (신규 사용자만 200~500ms 대기) */}
         <main className="flex-1 p-4 sm:p-6 overflow-y-auto">
-          {children}
+          {authReady ? children : (
+            <div className="flex items-center justify-center h-[60vh]">
+              <div className="text-center text-muted-foreground">
+                <div className="inline-block w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin mb-3" />
+                <p className="text-sm">EMR 준비 중...</p>
+              </div>
+            </div>
+          )}
         </main>
       </div>
 
@@ -292,6 +347,9 @@ export default function EMRAppLayout({
       >
         <Mic className="w-6 h-6" />
       </Link>
+
+      {/* ⌘K 명령 팔레트 — 23개 숨김 메뉴 즉시 접근 */}
+      <CommandPalette open={paletteOpen} onClose={() => setPaletteOpen(false)} />
     </div>
   )
 }

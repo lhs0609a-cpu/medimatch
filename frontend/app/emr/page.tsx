@@ -458,28 +458,28 @@ export default function EMRLandingPage() {
             {[
               {
                 icon: Mic,
-                color: 'from-red-500 to-rose-600',
+                color: 'from-rose-500 to-red-600',
                 title: 'AI 음성 자동 차트',
                 desc: '진료 대화만 하세요. CC, PI, PMH를 AI가 자동 분류하고, ICD-10 진단코드와 처방까지 추천합니다.',
                 badge: '업계 최초',
               },
               {
                 icon: Shield,
-                color: 'from-emerald-500 to-blue-600',
+                color: 'from-emerald-500 to-teal-600',
                 title: '삭감 방어 AI',
                 desc: '과거 삭감 패턴을 학습해 위험 청구를 실시간 경고. 최적 코드 조합을 추천하여 삭감률을 30% 줄여드립니다.',
                 badge: 'AI 분석',
               },
               {
                 icon: Pill,
-                color: 'from-blue-500 to-blue-600',
+                color: 'from-sky-500 to-blue-600',
                 title: '의원-약국 실시간 브릿지',
                 desc: '처방전 3초 전송, DUR 자동 체크, 조제 완료 알림. 환자 대기시간을 70% 줄이는 실시간 연결.',
                 badge: '업계 최초',
               },
               {
                 icon: CalendarCheck,
-                color: 'from-blue-500 to-blue-700',
+                color: 'from-blue-500 to-indigo-600',
                 title: '스마트 예약/접수',
                 desc: 'QR 체크인, 태블릿 문진, 카톡 대기 알림. 환자가 집에서 미리 문진을 작성하면 도착 즉시 진료.',
               },
@@ -491,25 +491,25 @@ export default function EMRLandingPage() {
               },
               {
                 icon: BarChart3,
-                color: 'from-blue-600 to-blue-600',
+                color: 'from-violet-500 to-purple-600',
                 title: '경영 대시보드',
                 desc: '매출, 환자수, 삭감률을 한눈에. AI가 공백 시간대, 미방문 환자, 재고 이슈를 자동 분석합니다.',
                 link: '/emr-dashboard',
               },
               {
                 icon: Bell,
-                color: 'from-blue-500 to-rose-600',
+                color: 'from-yellow-500 to-amber-600',
                 title: '환자 리콜 자동화',
                 desc: '3개월 미방문 환자 자동 감지. 카톡/문자로 리마인드 발송. 재방문율을 25% 높여드립니다.',
               },
               {
                 icon: Smartphone,
-                color: 'from-blue-600 to-blue-600',
+                color: 'from-cyan-500 to-sky-600',
                 title: '환자 앱 연동',
                 desc: '예약 확인, 복약 알림, 검사결과 조회를 환자가 직접. 문의 전화 50% 감소, 만족도 상승.',
               },
               {
-                icon: Database,
+                icon: Lock,
                 color: 'from-slate-500 to-gray-600',
                 title: '데이터 주권 보장',
                 desc: '원장님 데이터는 원장님 것. 언제든 전체 Export 무료, 타사 전환 시 무료 마이그레이션 지원.',
@@ -520,7 +520,9 @@ export default function EMRLandingPage() {
               return (
                 <Wrapper key={i} {...wrapperProps as any} className={`feature-card group ${f.link ? 'cursor-pointer' : ''}`}>
                   <div className="flex items-start justify-between mb-5">
-                    <TossIcon icon={f.icon} color={f.color} size="lg" />
+                    <div className="transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-3">
+                      <TossIcon icon={f.icon} color={f.color} size="xl" />
+                    </div>
                     {f.badge && (
                       <span className="badge-primary text-2xs">{f.badge}</span>
                     )}

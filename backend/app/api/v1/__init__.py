@@ -46,6 +46,7 @@ from .fixed_cost import router as fixed_cost_router
 from .supply_price import router as supply_price_router
 from .marketing_roi import router as marketing_roi_router
 from .patients import router as patients_router
+from .patient_recall import router as patient_recall_router
 from .opening_project import router as opening_project_router
 from .admin_contacts import router as admin_contacts_router
 from .community import router as community_router
@@ -59,6 +60,15 @@ from .emr_export import router as emr_export_router
 from .doctor_lead import router as doctor_lead_router
 from .diagnosis import router as diagnosis_router
 from .roadmap import router as roadmap_router
+from .cdss import router as cdss_router
+from .questionnaire import doctor_router as questionnaire_doctor_router, public_router as questionnaire_public_router
+from .stt import router as stt_router
+from .attachments import doctor_router as attachments_doctor_router, public_router as attachments_public_router
+from .external_appointments import doctor_router as ext_appt_doctor_router, webhook_router as ext_appt_webhook_router
+from .pharmacy_pickup import router as pharmacy_pickup_router
+from .clinic_setup import router as clinic_setup_router
+from .chronic_care import router as chronic_care_router
+from .staff_seats import router as staff_seats_router
 
 api_router = APIRouter()
 
@@ -110,6 +120,7 @@ api_router.include_router(fixed_cost_router, prefix="/emr/fixed-cost", tags=["EM
 api_router.include_router(supply_price_router, prefix="/emr/supply-price", tags=["EMR Supply Price - 소모품/약가 비교"])
 api_router.include_router(marketing_roi_router, prefix="/emr/marketing-roi", tags=["EMR Marketing ROI - 마케팅 ROI"])
 api_router.include_router(patients_router, prefix="/emr/patients", tags=["EMR Patients - 환자 관리"])
+api_router.include_router(patient_recall_router, prefix="/emr/crm", tags=["EMR CRM - 환자 리콜/캠페인"])
 api_router.include_router(opening_project_router, prefix="/opening-projects", tags=["Opening Project - 개원 프로젝트"])
 api_router.include_router(admin_contacts_router, prefix="/admin", tags=["Admin Contacts - 상담/문의 관리"])
 api_router.include_router(community_router, prefix="/community", tags=["Community - 커뮤니티"])
@@ -123,3 +134,15 @@ api_router.include_router(emr_export_router, prefix="/emr/export", tags=["EMR Ex
 api_router.include_router(doctor_lead_router, prefix="/crm", tags=["CRM - 개원의 Lead 관리"])
 api_router.include_router(diagnosis_router, tags=["Diagnosis - 개원 진단 1분 테스트"])
 api_router.include_router(roadmap_router, prefix="/roadmap", tags=["Roadmap - 의사용 미션맵"])
+api_router.include_router(cdss_router, prefix="/cdss", tags=["CDSS - 사전심사 9종 점검"])
+api_router.include_router(questionnaire_doctor_router, prefix="/questionnaires", tags=["Questionnaire - 사전문진 (의사용)"])
+api_router.include_router(questionnaire_public_router, prefix="/q", tags=["Questionnaire - 사전문진 (환자용)"])
+api_router.include_router(stt_router, prefix="/stt", tags=["STT - 음성 → SOAP 자동파싱"])
+api_router.include_router(attachments_doctor_router, prefix="/emr/visits", tags=["EMR Attachments - 차트 첨부 (의사용)"])
+api_router.include_router(attachments_public_router, prefix="/upload", tags=["EMR Attachments - 폰 업로드 (Public)"])
+api_router.include_router(ext_appt_doctor_router, prefix="/external-appointments", tags=["External Appointments - 외부 예약 인박스"])
+api_router.include_router(ext_appt_webhook_router, prefix="/webhooks", tags=["External Appointments - Webhook"])
+api_router.include_router(pharmacy_pickup_router, prefix="/pharmacy-pickup", tags=["Pharmacy Pickup - 약국 픽업코드"])
+api_router.include_router(clinic_setup_router, prefix="/clinic-setup", tags=["Clinic Setup - 5분 온보딩"])
+api_router.include_router(chronic_care_router, prefix="/chronic-care", tags=["Chronic Care - 만성질환관리"])
+api_router.include_router(staff_seats_router, prefix="/staff-seats", tags=["Staff Seats - ID 과금"])

@@ -115,6 +115,11 @@ from .supply_price import MedicalSupplyItem, VendorPriceQuote
 from .marketing_roi import MarketingSpend
 # 환자 관리
 from .patient import Patient, InboundStatus, ConsentStatus, DBQuality
+# 환자 리콜 / CRM 캠페인
+from .patient_recall import (
+    RecallCampaign, RecallSend,
+    RecallCampaignStatus, RecallSendStatus, RecallChannel,
+)
 # 개원 프로젝트
 from .opening_project import OpeningProject, OpeningProjectTask, ProjectStatus
 # 문의/상담
@@ -332,6 +337,12 @@ __all__ = [
     "InboundStatus",
     "ConsentStatus",
     "DBQuality",
+    # 환자 리콜 / CRM 캠페인
+    "RecallCampaign",
+    "RecallSend",
+    "RecallCampaignStatus",
+    "RecallSendStatus",
+    "RecallChannel",
     # 개원 프로젝트
     "OpeningProject",
     "OpeningProjectTask",

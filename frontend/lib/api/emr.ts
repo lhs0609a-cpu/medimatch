@@ -133,6 +133,13 @@ export interface Prescription {
   dur_warnings: any[]
   patient_note?: string
   items: PrescriptionItem[]
+  pickup_code?: string
+  pickup_token?: string
+  pickup_expires_at?: string
+  pickup_dispensed_at?: string
+  pickup_pharmacy_name?: string
+  patient_phone?: string
+  patient_name?: string
   created_at: string
 }
 

@@ -1,6 +1,7 @@
 """처방전(Prescription) API + DUR 안전 체크"""
 import logging
-from datetime import date, datetime
+import secrets
+from datetime import date, datetime, timedelta
 from typing import List, Optional, Dict
 from uuid import UUID
 
@@ -11,10 +12,23 @@ from sqlalchemy.orm import selectinload
 
 from ..deps import get_db, get_current_active_user
 from ...models.user import User
+from ...models.patient import Patient
 from ...models.prescription import Prescription, PrescriptionItem, PrescriptionStatus
 from ...schemas.emr_core import (
     PrescriptionCreate, PrescriptionOut,
 )
+
+
+# 약국 픽업 코드 — 혼동 문자 제외 (0/O, 1/I, L)
+_PICKUP_ALPHABET = "23456789ABCDEFGHJKMNPQRSTUVWXYZ"
+
+
+def _generate_pickup_code(length: int = 6) -> str:
+    return "".join(secrets.choice(_PICKUP_ALPHABET) for _ in range(length))
+
+
+def _generate_pickup_token() -> str:
+    return secrets.token_urlsafe(32)
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
@@ -216,6 +230,30 @@ async def create_prescription(
     new_count = len(payload.items)
     item_warnings = {i: w for i, w in item_warnings.items() if i < new_count}
 
+    # 환자 정보 캐싱 (약국 픽업 검증용)
+    p_name, p_phone = None, None
+    if payload.patient_id:
+        pat = (await db.execute(
+            select(Patient).where(and_(
+                Patient.id == payload.patient_id,
+                Patient.user_id == current_user.id,
+            ))
+        )).scalar_one_or_none()
+        if pat:
+            p_name = pat.name
+            p_phone = pat.phone
+
+    # 픽업 코드 — 충돌 방지 위해 최대 5회 재시도
+    pickup_code = None
+    for _ in range(5):
+        candidate = _generate_pickup_code()
+        existing = (await db.execute(
+            select(Prescription).where(Prescription.pickup_code == candidate)
+        )).scalar_one_or_none()
+        if not existing:
+            pickup_code = candidate
+            break
+
     rx = Prescription(
         user_id=current_user.id,
         visit_id=payload.visit_id,
@@ -228,6 +266,11 @@ async def create_prescription(
         duration_days=payload.duration_days,
         patient_note=payload.patient_note,
         dur_warnings=warnings,
+        pickup_code=pickup_code,
+        pickup_token=_generate_pickup_token(),
+        pickup_expires_at=datetime.utcnow() + timedelta(days=7),
+        patient_name=p_name,
+        patient_phone=p_phone,
     )
     db.add(rx)
     await db.flush()

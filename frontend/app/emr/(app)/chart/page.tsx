@@ -7,6 +7,7 @@ import { Stethoscope, Plus, FileText, Calendar, Loader2, Search, X } from 'lucid
 import { visitService, VisitListItem } from '@/lib/api/emr'
 import EmrStatsPanel from '@/components/emr/EmrStatsPanel'
 import ExportButton from '@/components/emr/ExportButton'
+import ModuleHeader from '@/components/emr/ModuleHeader'
 
 export default function ChartListPage() {
   const [search, setSearch] = useState('')
@@ -40,23 +41,20 @@ export default function ChartListPage() {
   })
 
   return (
-    <div className="max-w-6xl mx-auto p-6 space-y-6">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <Stethoscope className="w-7 h-7 text-blue-600" />
-          <div>
-            <h1 className="text-2xl font-semibold">전자차트</h1>
-            <p className="text-sm text-muted-foreground">진료 기록 — SOAP · 활력징후 · 진단 · 시술</p>
-          </div>
-        </div>
-        <div className="flex items-center gap-2">
-          <ExportButton endpoint="visits" label="CSV 내보내기" className="btn-secondary text-sm" />
-          <Link href="/emr/chart/new" className="btn-primary">
-            <Plus className="w-4 h-4" /> 신규 진료
-          </Link>
-        </div>
-      </div>
-
+    <div>
+      <ModuleHeader
+        moduleKey="chart"
+        maxWidthClass="max-w-6xl"
+        actions={
+          <>
+            <ExportButton endpoint="visits" label="CSV 내보내기" className="btn-secondary text-sm" />
+            <Link href="/emr/chart/new" className="btn-primary">
+              <Plus className="w-4 h-4" /> 신규 진료
+            </Link>
+          </>
+        }
+      />
+      <div className="max-w-6xl mx-auto p-6 space-y-6">
       <EmrStatsPanel />
 
       <div className="card p-5">
@@ -157,6 +155,7 @@ export default function ChartListPage() {
             </table>
           </div>
         )}
+      </div>
       </div>
     </div>
   )

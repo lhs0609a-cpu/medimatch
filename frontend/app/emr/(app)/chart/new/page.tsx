@@ -9,6 +9,10 @@ import Link from 'next/link'
 import { visitService, Diagnosis, Procedure } from '@/lib/api/emr'
 import PatientPicker from '@/components/emr/PatientPicker'
 import HiraCodePicker from '@/components/emr/HiraCodePicker'
+import CdssPanel from '@/components/emr/CdssPanel'
+import QuestionnairePrefillBanner from '@/components/emr/QuestionnairePrefillBanner'
+import SoapVoiceCapture from '@/components/emr/SoapVoiceCapture'
+import ModuleHeader from '@/components/emr/ModuleHeader'
 import { apiClient } from '@/lib/api/client'
 
 export default function NewChartPage() {
@@ -130,26 +134,37 @@ export default function NewChartPage() {
   }
 
   return (
-    <div className="max-w-5xl mx-auto p-6 space-y-6">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <Link href="/emr/chart" className="text-muted-foreground hover:text-foreground">
-            <ArrowLeft className="w-5 h-5" />
-          </Link>
-          <Stethoscope className="w-6 h-6 text-blue-600" />
-          <h1 className="text-2xl font-semibold">신규 진료 기록</h1>
-        </div>
-        <button
-          onClick={onSubmit}
-          disabled={createMut.isPending}
-          className="btn-primary"
-        >
-          <Save className="w-4 h-4" />
-          {createMut.isPending ? '저장 중...' : '저장'}
-        </button>
-      </div>
-
-      <section className="card p-5 space-y-4">
+    <div>
+      <ModuleHeader
+        moduleKey="chart"
+        title="신규 진료 기록"
+        subtitle={patient ? `${patient.name} · ${visitType === 'INITIAL' ? '초진' : visitType === 'REVISIT' ? '재진' : '검진'}` : '환자를 선택하고 SOAP을 입력하세요'}
+        maxWidthClass="max-w-7xl"
+        breadcrumbs={[{ label: '전자차트', href: '/emr/chart' }, { label: '신규 작성' }]}
+        actions={
+          <button
+            onClick={onSubmit}
+            disabled={createMut.isPending}
+            className="btn-primary"
+          >
+            <Save className="w-4 h-4" />
+            {createMut.isPending ? '저장 중...' : '저장'}
+          </button>
+        }
+      />
+      <div className="max-w-7xl mx-auto p-6">
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-6 items-start">
+        <div className="space-y-6">
+          {patient?.id && (
+            <QuestionnairePrefillBanner
+              patientId={patient.id}
+              onApply={({ chief_complaint, subjective: s }) => {
+                if (chief_complaint && !chiefComplaint) setChiefComplaint(chief_complaint)
+                if (s) setSubjective(prev => prev ? `${prev}\n${s}` : s)
+              }}
+            />
+          )}
+          <section className="card p-5 space-y-4">
         <h2 className="font-semibold">기본 정보</h2>
         <div>
           <label className="label text-xs mb-1 block">환자 (선택)</label>
@@ -190,6 +205,32 @@ export default function NewChartPage() {
           </div>
         </div>
       </section>
+
+      <SoapVoiceCapture
+        onApply={(p) => {
+          if (p.chief_complaint && !chiefComplaint) setChiefComplaint(p.chief_complaint)
+          if (p.subjective) setSubjective((prev) => prev ? `${prev}\n${p.subjective}` : p.subjective!)
+          if (p.objective) setObjective((prev) => prev ? `${prev}\n${p.objective}` : p.objective!)
+          if (p.assessment) setAssessment((prev) => prev ? `${prev}\n${p.assessment}` : p.assessment!)
+          if (p.plan) setPlan((prev) => prev ? `${prev}\n${p.plan}` : p.plan!)
+          if (p.diagnoses && p.diagnoses.length > 0) {
+            const merged = [
+              ...diagnoses.filter((d) => d.code || d.name),
+              ...p.diagnoses.map((d) => ({ code: d.code || '', name: d.name, is_primary: false, note: '' })),
+            ]
+            setDiagnoses(merged.length > 0 ? merged : diagnoses)
+          }
+          if (p.procedures && p.procedures.length > 0) {
+            setProcedures([
+              ...procedures,
+              ...p.procedures.map((pr) => ({
+                code: '', name: pr.name, category: '시술',
+                quantity: 1, unit_price: 0, insurance_covered: true,
+              })),
+            ])
+          }
+        }}
+      />
 
       <section className="card p-5 space-y-4">
         <h2 className="font-semibold">SOAP 기록</h2>
@@ -274,6 +315,21 @@ export default function NewChartPage() {
           <div><label className="label text-xs">진료 메모</label><input className="input" value={notes} onChange={(e) => setNotes(e.target.value)} /></div>
         </div>
       </section>
+        </div>
+
+        <div className="lg:sticky lg:top-6">
+          <CdssPanel
+            patient={{
+              id: patient?.id,
+              weight_kg: weight === '' ? undefined : Number(weight),
+            }}
+            diagnoses={diagnoses}
+            procedures={procedures}
+            visitType={visitType}
+          />
+        </div>
+      </div>
+      </div>
     </div>
   )
 }

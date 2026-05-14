@@ -71,7 +71,7 @@ class LeadCreate(BaseModel):
     priority: Optional[str] = None
     notes: Optional[str] = None
     source: Optional[str] = None
-    source_campaign_id: Optional[int] = None
+    source_campaign_id: Optional[str] = None
     source_meta: Optional[dict] = None
     owner_user_id: Optional[uuid.UUID] = None
 

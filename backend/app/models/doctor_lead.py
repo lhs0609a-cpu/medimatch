@@ -165,7 +165,7 @@ class DoctorLead(Base):
 
     # 출처
     source = Column(String(50), nullable=True, index=True)  # facebook_ad, google, referral, scraped, manual
-    source_campaign_id = Column(Integer, ForeignKey("campaigns.id"), nullable=True)
+    source_campaign_id = Column(String(36), ForeignKey("campaigns.id"), nullable=True)
     source_meta = Column(JSONB, default=dict)  # 광고 ID, utm 등
 
     # 할당

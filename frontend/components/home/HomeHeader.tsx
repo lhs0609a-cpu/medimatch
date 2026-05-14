@@ -21,6 +21,8 @@ import {
   X,
   Globe,
   Target,
+  MessageSquare,
+  Headphones,
 } from 'lucide-react'
 import { TossIcon } from '@/components/ui/TossIcon'
 import { hasGuestToken } from '@/lib/auth/guestToken'
@@ -121,6 +123,23 @@ export function HomeHeader() {
                             <p className="text-xs text-muted-foreground">매출·환자·지역 벤치마크</p>
                           </div>
                         </Link>
+                        <Link href="/emr/crm" className="flex items-center gap-3 p-3 rounded-xl hover:bg-accent transition-colors group">
+                          <TossIcon icon={MessageSquare} color="from-blue-500 to-blue-600" size="xs" shadow="shadow-blue-500/25" className="flex-shrink-0" />
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2">
+                              <span className="text-sm font-medium group-hover:text-[#3182f6]">CRM · 환자 리콜</span>
+                              <span className="px-1.5 py-0.5 text-[10px] font-bold bg-[#3182f6]/10 text-[#3182f6] rounded">NEW</span>
+                            </div>
+                            <p className="text-xs text-muted-foreground">정기검진 리콜·캠페인·알림톡</p>
+                          </div>
+                        </Link>
+                      </div>
+                      <div className="border-t border-border mt-3 pt-3">
+                        <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">운영자 전용</p>
+                        <Link href="/admin/crm" className="flex items-center gap-3 p-2 rounded-lg hover:bg-accent transition-colors">
+                          <Headphones className="w-4 h-4 text-[#3182f6] flex-shrink-0" />
+                          <span className="text-xs">개원의 Lead 콘솔 (라이브 콜)</span>
+                        </Link>
                       </div>
                       <div className="border-t border-border mt-3 pt-3">
                         <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">개원 도구</p>
@@ -219,6 +238,10 @@ export function HomeHeader() {
             <Link href="/services/emr" className="flex items-center gap-3 p-3 rounded-xl hover:bg-accent" onClick={() => setMobileMenuOpen(false)}>
               <TossIcon icon={Stethoscope} color="from-blue-500 to-blue-600" size="xs" shadow="shadow-blue-500/25" className="flex-shrink-0" />
               <span className="flex items-center gap-2">클라우드 EMR <span className="px-1.5 py-0.5 text-[10px] font-bold bg-[#3182f6]/10 text-[#3182f6] rounded">NEW</span></span>
+            </Link>
+            <Link href="/emr/crm" className="flex items-center gap-3 p-3 rounded-xl hover:bg-accent" onClick={() => setMobileMenuOpen(false)}>
+              <TossIcon icon={MessageSquare} color="from-blue-500 to-blue-600" size="xs" shadow="shadow-blue-500/25" className="flex-shrink-0" />
+              <span className="flex items-center gap-2">CRM · 환자 리콜 <span className="px-1.5 py-0.5 text-[10px] font-bold bg-[#3182f6]/10 text-[#3182f6] rounded">NEW</span></span>
             </Link>
             <Link href="/opening-project" className="flex items-center gap-3 p-3 rounded-xl hover:bg-accent" onClick={() => setMobileMenuOpen(false)}>
               <TossIcon icon={Rocket} color="from-blue-500 to-blue-600" size="xs" shadow="shadow-blue-500/25" className="flex-shrink-0" />

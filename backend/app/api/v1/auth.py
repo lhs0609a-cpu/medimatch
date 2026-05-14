@@ -253,3 +253,48 @@ async def reset_password(
     await db.commit()
 
     return {"message": "비밀번호가 성공적으로 변경되었습니다"}
+
+
+# ============================================================
+# Demo Doctor — EMR 1클릭 체험 (가입·로그인 없이 magic-link 토큰 발급)
+# ============================================================
+
+class DemoDoctorOut(BaseModel):
+    token: str
+    expires_at: datetime
+    is_new: bool
+
+
+@router.post("/demo-doctor", response_model=DemoDoctorOut)
+async def create_demo_doctor(db: AsyncSession = Depends(get_db)):
+    """
+    EMR 즉시 체험용 익명 의사 lead 발급.
+
+    프론트 EMR 진입 가드에서 호출 — localStorage에 medi_token이 없을 때
+    이 엔드포인트를 부르고, 반환된 token을 medi_token으로 저장하면
+    이후 모든 EMR API 요청이 dual-token deps에 의해 인증됨.
+
+    체험 사용자 데이터 분리를 위해 매 호출마다 새 익명 lead 생성.
+    """
+    from ...models.doctor_lead import DoctorLead, LeadFunnelStage, LeadOpeningStage, LeadPriority
+    import secrets
+
+    token = secrets.token_urlsafe(48)  # 64자 url-safe
+    expires_at = datetime.utcnow() + timedelta(days=30)
+
+    lead = DoctorLead(
+        id=uuid.uuid4(),
+        name="체험 원장님",
+        source="demo_emr",
+        funnel_stage=LeadFunnelStage.NEW,
+        opening_stage=LeadOpeningStage.PLANNING,
+        priority=LeadPriority.COLD,
+        roadmap_token=token,
+        roadmap_token_expires_at=expires_at,
+        notes="EMR 1클릭 체험 — 자동 발급",
+    )
+    db.add(lead)
+    await db.commit()
+
+    logger.info(f"Demo doctor lead created: {lead.id}")
+    return DemoDoctorOut(token=token, expires_at=expires_at, is_new=True)

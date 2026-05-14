@@ -43,6 +43,18 @@ class Prescription(Base):
     dur_warnings = Column(JSONB, default=list)
     patient_note = Column(Text)
 
+    # 약국 픽업 — magic-link / 6자리 코드
+    pickup_code = Column(String(12), index=True)
+    pickup_token = Column(String(80))
+    pickup_expires_at = Column(DateTime)
+    pickup_dispensed_at = Column(DateTime)
+    pickup_dispensed_by = Column(String(100))
+    pickup_pharmacy_name = Column(String(200))
+
+    # 약국 검증용 캐싱 (전화 마지막 4자리 매칭)
+    patient_phone = Column(String(20))
+    patient_name = Column(String(100))
+
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
