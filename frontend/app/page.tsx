@@ -13,6 +13,9 @@ import {
   ConsultingSection,
   FinalCTA,
   HomeFooter,
+  HomeAppShowcase,
+  HomePricingFree,
+  HomeFAQ,
 } from '@/components/home'
 
 export default function HomePage() {
@@ -53,25 +56,34 @@ export default function HomePage() {
         <HomeHeader />
 
         <main id="main-content" role="main">
-          {/* 1. Hero — EMR·CRM 평생 무료 + CRM/EMR 바로 시작 */}
+          {/* 1. Hero — EMR·CRM 평생 무료 */}
           <HeroSection markers={mapMarkers} />
 
           {/* 2. EMR 핵심 3가치 — AI 차트·삭감 방어·CRM */}
           <ServiceCards />
 
-          {/* 3. EMR 실사용 데모 (음성→차트→처방) */}
+          {/* 3. 의사 EMR + 환자 카톡 듀얼 쇼케이스 */}
+          <HomeAppShowcase />
+
+          {/* 4. EMR 실사용 데모 (음성→차트→처방) */}
           <InteractiveDemo />
 
-          {/* 4. EMR 안의 발견 — 매물·개원·공동구매·약국 */}
+          {/* 5. EMR 안의 발견 — 매물·개원·공동구매·약국 */}
           <EcosystemInsideEMR />
 
-          {/* 5. 사회적 증거 — 의원 후기·통계 */}
+          {/* 6. 사회적 증거 — 의원 후기·통계 */}
           <SocialProof />
 
-          {/* 6. 컨설팅 — 데이터 기반 의사결정 */}
+          {/* 7. 무료 비교 + ID 과금 — 가격 투명성 */}
+          <HomePricingFree />
+
+          {/* 8. 컨설팅 — 데이터 기반 의사결정 */}
           <ConsultingSection />
 
-          {/* 7. 최종 CTA */}
+          {/* 9. FAQ — 무료·보안·이관 신뢰 빌딩 */}
+          <HomeFAQ />
+
+          {/* 10. 최종 CTA */}
           <FinalCTA />
         </main>
 
