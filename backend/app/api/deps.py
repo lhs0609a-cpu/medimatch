@@ -110,20 +110,8 @@ async def _resolve_magic_link_user(
         lead.converted_user_id = user.id
         lead.converted_at = datetime.utcnow()
 
-    # EMR 서비스 구독 자동 발급 (체험 사용자 — service_guards 통과를 위해)
-    sub_q = await db.execute(
-        select(ServiceSubscription).where(
-            ServiceSubscription.user_id == user.id,
-            ServiceSubscription.service_type == ServiceType.EMR,
-        )
-    )
-    if not sub_q.scalar_one_or_none():
-        db.add(ServiceSubscription(
-            user_id=user.id,
-            service_type=ServiceType.EMR,
-            tier=ServiceTier.STARTER,  # 무료 체험 티어 (0원)
-            status=ServiceSubStatus.ACTIVE,
-        ))
+    # 체험 사용자는 service_guards에서 email suffix(@magic.medi)로 자동 통과
+    # → ServiceSubscription 생성 X (billing_key 등 NOT NULL 필드 충돌 방지)
 
     await db.commit()
     await db.refresh(user)

@@ -37,6 +37,16 @@ def require_active_service(service_type: ServiceType):
                 status=ServiceSubStatus.ACTIVE,
             )
 
+        # Magic-link 체험 사용자 (deps._resolve_magic_link_user 가 만든 가상 계정)
+        # — email 도메인이 @magic.medi 이면 모든 서비스 무료 통과
+        # (실제 결제 사용자는 별도 구독으로 가드됨)
+        if current_user.email and current_user.email.endswith("@magic.medi"):
+            return ServiceSubscription(
+                user_id=current_user.id,
+                service_type=service_type,
+                status=ServiceSubStatus.ACTIVE,
+            )
+
         result = await db.execute(
             select(ServiceSubscription).where(
                 and_(
