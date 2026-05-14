@@ -4,7 +4,7 @@ import Link from 'next/link'
 import dynamic from 'next/dynamic'
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { ArrowRight, Stethoscope, Target, MessageCircle } from 'lucide-react'
+import { ArrowRight, Stethoscope, Target, MessageCircle, Monitor, Send } from 'lucide-react'
 import { hasGuestToken } from '@/lib/auth/guestToken'
 
 const KakaoMap = dynamic(() => import('@/components/map/KakaoMap'), {
@@ -111,6 +111,41 @@ export function HeroSection({ markers = [] }: HeroSectionProps) {
             <MessageCircle className="w-4 h-4" />
             이전에 진단했어요 — 카톡으로 링크 받기
           </Link>
+        </motion.div>
+
+        {/* 프로그램 직링크 — 이미 개원한 의사 / CRM 둘러보기 */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.4, ease: 'easeOut' }}
+          className="mb-12 flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-3"
+        >
+          <span className="text-sm text-muted-foreground/80">이미 개원하셨나요?</span>
+          <div className="flex flex-wrap items-center justify-center gap-2">
+            <Link
+              href="/emr"
+              className="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-full bg-[#3182f6]/10 hover:bg-[#3182f6]/20 text-[#3182f6] border border-[#3182f6]/30 transition-all"
+            >
+              <Monitor className="w-4 h-4" />
+              EMR 바로 쓰기
+              <ArrowRight className="w-3.5 h-3.5" />
+            </Link>
+            <Link
+              href="/emr/crm"
+              className="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-full bg-[#3182f6]/10 hover:bg-[#3182f6]/20 text-[#3182f6] border border-[#3182f6]/30 transition-all"
+            >
+              <Send className="w-4 h-4" />
+              CRM · 환자 리콜
+              <ArrowRight className="w-3.5 h-3.5" />
+            </Link>
+            <Link
+              href="/emr/patients/import"
+              className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-full hover:bg-foreground/5 text-muted-foreground border border-transparent transition-all"
+            >
+              기존 EMR에서 환자 옮기기
+              <ArrowRight className="w-3.5 h-3.5" />
+            </Link>
+          </div>
         </motion.div>
 
         {/* Stat pills */}
