@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import Link from 'next/link'
 import {
-  Search, Plus, Phone, UserPlus, X, Loader2, Users, Calendar,
+  Search, Plus, Phone, UserPlus, X, Loader2, Users, Calendar, Upload,
 } from 'lucide-react'
 import { toast } from 'sonner'
 import { apiClient } from '@/lib/api/client'
@@ -56,6 +56,9 @@ export default function PatientsPage() {
         maxWidthClass="max-w-6xl"
         actions={
           <>
+            <Link href="/emr/patients/import" className="btn-secondary text-sm">
+              <Upload className="w-4 h-4" /> 일괄 임포트
+            </Link>
             <ExportButton endpoint="patients" label="CSV 내보내기" className="btn-secondary text-sm" />
             <button onClick={() => setShowForm(true)} className="btn-primary">
               <UserPlus className="w-4 h-4" /> 신규 환자

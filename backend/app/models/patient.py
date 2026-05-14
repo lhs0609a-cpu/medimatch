@@ -9,7 +9,7 @@ from sqlalchemy import (
     Column, Integer, String, Boolean, DateTime, Date, Text, Enum,
     ForeignKey, Index, text,
 )
-from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.dialects.postgresql import UUID, JSONB
 from sqlalchemy.orm import relationship
 from datetime import datetime
 
@@ -98,6 +98,13 @@ class Patient(Base):
         Enum(ConsentStatus, name="consentstatus", create_type=False),
         default=ConsentStatus.NOT_ASKED, nullable=False,
     )
+
+    # 외부 EMR/CRM 임포트 추적 (의료법 보존·재동기화·중복방지 기준)
+    external_id = Column(String(100))            # 원천 시스템의 차트번호/환자코드
+    source_emr = Column(String(50))              # 'usarang' | 'docpalette' | 'bit' | 'manual_csv' | 'unknown'
+    external_meta = Column(JSONB)                # 매핑 안 된 원본 컬럼을 손실 없이 보존
+    imported_at = Column(DateTime)               # 임포트 시각
+    import_batch_id = Column(UUID(as_uuid=True)) # 배치 단위 롤백·감사용
 
     is_demo = Column(Boolean, default=False, nullable=False)
     deleted_at = Column(DateTime)  # soft delete (의료법 5년 보존)
