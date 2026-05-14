@@ -678,19 +678,24 @@ export default function PharmacyMatchPage() {
           </a>
         </div>
 
-        {/* How it Works */}
+        {/* How it Works — 4단계 프로세스 */}
         <div className="mt-12 card p-8">
           <h2 className="text-xl font-bold text-foreground mb-6 text-center">익명 매칭 프로세스</h2>
-          <div className="grid md:grid-cols-4 gap-6">
+          <div className="grid md:grid-cols-4 gap-6 relative">
+            {/* 연결선 (가로 데스크탑) */}
+            <div className="hidden md:block absolute top-5 left-[12.5%] right-[12.5%] h-px bg-border" />
             {[
-              { icon: Lock, color: 'from-slate-500 to-gray-600', shadow: 'shadow-slate-500/25', title: '익명 등록', desc: '구 단위 위치와 조건만 공개\n정확한 주소는 비공개' },
-              { icon: Sparkles, color: 'from-amber-500 to-orange-500', shadow: 'shadow-amber-500/25', title: 'AI 매칭', desc: '조건에 맞는 약사를\n자동으로 추천' },
-              { icon: Heart, color: 'from-blue-500 to-blue-600', shadow: 'shadow-blue-500/25', title: '상호 관심', desc: '양방향 관심 표시 시\n연락처 자동 공개' },
-              { icon: Building2, color: 'from-blue-500 to-blue-600', shadow: 'shadow-blue-500/25', title: '계약 진행', desc: '직접 만나서 협의\n성사 시 수수료 3~5%' },
-            ].map((item) => (
-              <div key={item.title} className="text-center">
-                <div className="flex justify-center mb-3">
-                  <TossIcon icon={item.icon} color={item.color} size="md" shadow={item.shadow} />
+              { icon: Lock, title: '익명 등록', desc: '구 단위 위치와 조건만 공개\n정확한 주소는 비공개' },
+              { icon: Sparkles, title: 'AI 매칭', desc: '조건에 맞는 약사를\n자동으로 추천' },
+              { icon: Heart, title: '상호 관심', desc: '양방향 관심 표시 시\n연락처 자동 공개' },
+              { icon: Building2, title: '계약 진행', desc: '직접 만나서 협의\n성사 시 수수료 3~5%' },
+            ].map((item, idx) => (
+              <div key={item.title} className="text-center relative">
+                <div className="relative inline-flex items-center justify-center w-10 h-10 rounded-full bg-card border-2 border-primary mb-3 z-10">
+                  <item.icon className="w-4 h-4 text-primary" strokeWidth={2} />
+                  <span className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-primary text-white text-[10px] font-bold flex items-center justify-center">
+                    {idx + 1}
+                  </span>
                 </div>
                 <h3 className="font-medium text-foreground mb-2">{item.title}</h3>
                 <p className="text-sm text-muted-foreground whitespace-pre-line">

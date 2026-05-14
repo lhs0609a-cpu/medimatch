@@ -170,7 +170,9 @@ function StatCard({
   return (
     <div className="bg-white rounded-xl border border-gray-200 p-5">
       <div className="flex items-center gap-3 mb-2">
-        <TossIcon icon={icon} color={iconColor || 'from-blue-500 to-blue-600'} size="sm" shadow={iconShadow} />
+        <div className="w-9 h-9 rounded-lg bg-blue-50 flex items-center justify-center flex-shrink-0">
+          {(() => { const I = icon; return <I className="w-4 h-4 text-blue-600" strokeWidth={2} /> })()}
+        </div>
         <span className="text-sm text-gray-600">{label}</span>
       </div>
       <div className="text-2xl font-bold text-gray-900">
@@ -233,9 +235,9 @@ export default function GroupBuyingPage() {
           {/* 주요 특징 */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-3xl mx-auto mb-8">
             {[
-              { icon: Users, color: 'from-blue-500 to-blue-500', shadow: 'shadow-blue-500/25', text: '30명+ 공동 구매력' },
-              { icon: ShieldCheck, color: 'from-blue-500 to-blue-600', shadow: 'shadow-blue-500/25', text: '검증된 우수 업체' },
-              { icon: TrendingDown, color: 'from-red-500 to-rose-500', shadow: 'shadow-red-500/25', text: '평균 15~30% 절감' },
+              { icon: Users, text: '30명+ 공동 구매력' },
+              { icon: ShieldCheck, text: '검증된 우수 업체' },
+              { icon: TrendingDown, text: '평균 15~30% 절감' },
             ].map((item, idx) => (
               <motion.div
                 key={idx}
@@ -244,7 +246,7 @@ export default function GroupBuyingPage() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2 + idx * 0.1 }}
               >
-                <TossIcon icon={item.icon} color={item.color} size="xs" shadow={item.shadow} />
+                <item.icon className="w-5 h-5 text-blue-600" strokeWidth={2} />
                 <span className="font-medium">{item.text}</span>
               </motion.div>
             ))}
@@ -394,9 +396,9 @@ export default function GroupBuyingPage() {
               { step: 4, icon: TrendingDown, color: 'from-red-500 to-rose-500', shadow: 'shadow-red-500/25', title: '할인 혜택', desc: '인원이 모이면 자동으로 할인이 적용됩니다' },
             ].map((item) => (
               <div key={item.step} className="text-center">
-                <div className="relative inline-block mb-4">
-                  <TossIcon icon={item.icon} color={item.color} size="md" shadow={item.shadow} />
-                  <span className="absolute -top-1 -right-1 w-6 h-6 bg-blue-600 text-white rounded-full text-sm font-bold flex items-center justify-center">
+                <div className="relative inline-flex items-center justify-center w-12 h-12 rounded-full bg-white border-2 border-blue-500 mb-4">
+                  <item.icon className="w-5 h-5 text-blue-600" strokeWidth={2} />
+                  <span className="absolute -top-1.5 -right-1.5 w-6 h-6 bg-blue-600 text-white rounded-full text-sm font-bold flex items-center justify-center">
                     {item.step}
                   </span>
                 </div>
