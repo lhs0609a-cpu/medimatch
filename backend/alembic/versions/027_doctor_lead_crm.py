@@ -70,7 +70,7 @@ TABLES_SQL = (
     "next_followup_at TIMESTAMP,"
     "last_contacted_at TIMESTAMP,"
     "source VARCHAR(50),"
-    "source_campaign_id INTEGER REFERENCES campaigns(id) ON DELETE SET NULL,"
+    "source_campaign_id VARCHAR(36) REFERENCES campaigns(id) ON DELETE SET NULL,"
     "source_meta JSONB DEFAULT '{}'::jsonb,"
     "owner_user_id UUID REFERENCES users(id) ON DELETE SET NULL,"
     "converted_user_id UUID REFERENCES users(id) ON DELETE SET NULL,"
