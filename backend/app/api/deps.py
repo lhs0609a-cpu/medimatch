@@ -11,7 +11,7 @@ from ..core.database import async_session
 from ..core.security import get_current_user, TokenData, RoleChecker, UserRole, verify_token
 from ..models.user import User, UserRole as UserRoleEnum
 from ..models.doctor_lead import DoctorLead
-from ..models.service_subscription import ServiceSubscription, ServiceType, ServiceSubStatus
+from ..models.service_subscription import ServiceSubscription, ServiceType, ServiceSubStatus, ServiceTier
 
 logger = logging.getLogger(__name__)
 
@@ -121,6 +121,7 @@ async def _resolve_magic_link_user(
         db.add(ServiceSubscription(
             user_id=user.id,
             service_type=ServiceType.EMR,
+            tier=ServiceTier.STARTER,  # 무료 체험 티어 (0원)
             status=ServiceSubStatus.ACTIVE,
         ))
 
