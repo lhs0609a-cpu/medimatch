@@ -9,12 +9,18 @@ export const apiClient = axios.create({
   },
 })
 
-// Request interceptor - add auth token
+// Request interceptor - add auth token (JWT access_token 우선, 없으면 magic-link medi_token)
 apiClient.interceptors.request.use(
   (config) => {
-    const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`
+    if (typeof window !== 'undefined') {
+      // 1) 정통 JWT 로그인 토큰
+      const jwt = localStorage.getItem('access_token')
+      // 2) 무로그인 magic-link 토큰 (백엔드 deps.py가 roadmap_token으로 자동 인식)
+      const magic = localStorage.getItem('medi_token')
+      const token = jwt || magic
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`
+      }
     }
     return config
   },
