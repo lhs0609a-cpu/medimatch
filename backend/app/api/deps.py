@@ -11,6 +11,7 @@ from ..core.database import async_session
 from ..core.security import get_current_user, TokenData, RoleChecker, UserRole, verify_token
 from ..models.user import User, UserRole as UserRoleEnum
 from ..models.doctor_lead import DoctorLead
+from ..models.service_subscription import ServiceSubscription, ServiceType, ServiceSubStatus
 
 logger = logging.getLogger(__name__)
 
@@ -108,6 +109,20 @@ async def _resolve_magic_link_user(
     if not lead.converted_user_id:
         lead.converted_user_id = user.id
         lead.converted_at = datetime.utcnow()
+
+    # EMR 서비스 구독 자동 발급 (체험 사용자 — service_guards 통과를 위해)
+    sub_q = await db.execute(
+        select(ServiceSubscription).where(
+            ServiceSubscription.user_id == user.id,
+            ServiceSubscription.service_type == ServiceType.EMR,
+        )
+    )
+    if not sub_q.scalar_one_or_none():
+        db.add(ServiceSubscription(
+            user_id=user.id,
+            service_type=ServiceType.EMR,
+            status=ServiceSubStatus.ACTIVE,
+        ))
 
     await db.commit()
     await db.refresh(user)
