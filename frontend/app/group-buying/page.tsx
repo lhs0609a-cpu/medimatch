@@ -9,7 +9,6 @@ import {
   CheckCircle, Building2, Stethoscope, Package,
   Calculator, ChevronRight, Sparkles, ShieldCheck
 } from 'lucide-react'
-import { TossIcon } from '@/components/ui/TossIcon'
 import { groupBuyingService } from '@/lib/api/services'
 import { CohortStatus, CohortSummary, GroupBuyingCategory } from '@/lib/api/client'
 

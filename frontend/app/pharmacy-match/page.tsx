@@ -11,7 +11,6 @@ import {
 import Image from 'next/image'
 import { generatePharmacyListings, generateActivityFeed, platformStats, recentSuccessStories, memberTestimonials, type PharmacyListing } from '@/lib/data/seedListings'
 import { pharmacyListingImages } from '@/components/BlurredListingImage'
-import { TossIcon } from '@/components/ui/TossIcon'
 
 // 시드 데이터 생성
 const allListings = generatePharmacyListings(80)
@@ -207,7 +206,9 @@ export default function PharmacyMatchPage() {
                 <ArrowLeft className="w-5 h-5" />
               </Link>
               <div className="flex items-center gap-2">
-                <TossIcon icon={Pill} color="from-blue-500 to-blue-600" size="xs" shadow="shadow-blue-500/25" />
+                <div className="w-7 h-7 rounded-lg bg-blue-100 dark:bg-blue-900/40 flex items-center justify-center">
+                  <Pill className="w-4 h-4 text-blue-600 dark:text-blue-400" strokeWidth={2} />
+                </div>
                 <span className="text-lg font-bold text-foreground">익명 약국 매칭</span>
                 <span className="badge-info">
                   {platformStats.activePharmacyListings}+ 매물

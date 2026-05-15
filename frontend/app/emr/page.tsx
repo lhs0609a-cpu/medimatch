@@ -45,7 +45,6 @@ import {
   Bot,
   Volume2,
 } from 'lucide-react'
-import { TossIcon } from '@/components/ui/TossIcon'
 
 /* ────────────────────────────────────────── */
 /*  숫자 카운트업 훅                          */
@@ -630,7 +629,9 @@ export default function EMRLandingPage() {
             {/* 의원 측 */}
             <div className="card p-6 border border-blue-200 dark:border-blue-800">
               <div className="flex items-center gap-3 mb-5">
-                <TossIcon icon={Building2} color="from-blue-500 to-blue-700" />
+                <div className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center flex-shrink-0">
+                  <Building2 className="w-5 h-5 text-blue-600 dark:text-blue-400" strokeWidth={2} />
+                </div>
                 <div>
                   <div className="font-bold">의원</div>
                   <div className="text-xs text-muted-foreground">MediMatch EMR</div>
@@ -681,7 +682,9 @@ export default function EMRLandingPage() {
             {/* 약국 측 */}
             <div className="card p-6 border border-blue-200 dark:border-blue-800">
               <div className="flex items-center gap-3 mb-5">
-                <TossIcon icon={Pill} color="from-blue-500 to-blue-600" />
+                <div className="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-900/30 flex items-center justify-center flex-shrink-0">
+                  <Pill className="w-5 h-5 text-emerald-600 dark:text-emerald-400" strokeWidth={2} />
+                </div>
                 <div>
                   <div className="font-bold">약국</div>
                   <div className="text-xs text-muted-foreground">MediMatch Pharmacy</div>
@@ -800,19 +803,28 @@ export default function EMRLandingPage() {
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {[
-              { icon: Lock, title: 'AES-256 암호화', desc: '모든 의료 데이터 군사급 암호화', color: 'from-blue-500 to-blue-700' },
-              { icon: Monitor, title: 'AWS 서울 리전', desc: '한국 내 데이터 저장, 해외 유출 불가', color: 'from-emerald-500 to-blue-600' },
-              { icon: WifiOff, title: '오프라인 모드', desc: '인터넷 끊겨도 진료 가능, 자동 동기화', color: 'from-amber-500 to-orange-600' },
-              { icon: RefreshCw, title: '자동 백업', desc: '일일 자동 백업 + 재해복구(DR) 지원', color: 'from-blue-500 to-blue-600' },
-            ].map((t, i) => (
-              <div key={i} className="feature-card text-center">
-                <div className="flex justify-center mb-4">
-                  <TossIcon icon={t.icon} color={t.color} size="lg" />
+              { icon: Lock, title: 'AES-256 암호화', desc: '모든 의료 데이터 군사급 암호화', tone: 'blue' },
+              { icon: Monitor, title: 'AWS 서울 리전', desc: '한국 내 데이터 저장, 해외 유출 불가', tone: 'emerald' },
+              { icon: WifiOff, title: '오프라인 모드', desc: '인터넷 끊겨도 진료 가능, 자동 동기화', tone: 'amber' },
+              { icon: RefreshCw, title: '자동 백업', desc: '일일 자동 백업 + 재해복구(DR) 지원', tone: 'sky' },
+            ].map((t, i) => {
+              const toneMap: Record<string, string> = {
+                blue:    'bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400',
+                emerald: 'bg-emerald-50 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400',
+                amber:   'bg-amber-50 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400',
+                sky:     'bg-sky-50 text-sky-600 dark:bg-sky-900/30 dark:text-sky-400',
+              }
+              const Icon = t.icon
+              return (
+                <div key={i} className="feature-card text-center">
+                  <div className={`mx-auto mb-4 w-14 h-14 rounded-2xl flex items-center justify-center ${toneMap[t.tone]}`}>
+                    <Icon className="w-6 h-6" strokeWidth={1.8} />
+                  </div>
+                  <h4 className="text-lg font-bold mb-2">{t.title}</h4>
+                  <p className="text-sm text-muted-foreground">{t.desc}</p>
                 </div>
-                <h4 className="text-lg font-bold mb-2">{t.title}</h4>
-                <p className="text-sm text-muted-foreground">{t.desc}</p>
-              </div>
-            ))}
+              )
+            })}
           </div>
         </div>
       </section>
@@ -942,7 +954,9 @@ export default function EMRLandingPage() {
             <div className="card p-6 border border-blue-200 dark:border-blue-800 bg-blue-50/50 dark:bg-blue-900/10">
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div className="flex items-center gap-3">
-                  <TossIcon icon={Pill} color="from-blue-500 to-blue-600" />
+                  <div className="w-10 h-10 rounded-xl bg-blue-100 dark:bg-blue-900/40 flex items-center justify-center flex-shrink-0">
+                    <Pill className="w-5 h-5 text-blue-600 dark:text-blue-400" strokeWidth={2} />
+                  </div>
                   <div>
                     <div className="font-bold">Pharmacy 플랜</div>
                     <div className="text-sm text-muted-foreground">조제관리 + 처방전수신 + DUR + 재고ERP</div>
