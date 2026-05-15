@@ -9,6 +9,7 @@ import {
   Flame, Clock, Zap, AlertTriangle, SlidersHorizontal, X, RotateCcw
 } from 'lucide-react'
 import Image from 'next/image'
+import { PharmacyMatchMockup } from '@/components/home/mockups/DomainScreens'
 import { generatePharmacyListings, generateActivityFeed, platformStats, recentSuccessStories, memberTestimonials, type PharmacyListing } from '@/lib/data/seedListings'
 import { pharmacyListingImages } from '@/components/BlurredListingImage'
 
@@ -229,33 +230,42 @@ export default function PharmacyMatchPage() {
       </header>
 
       <main className="max-w-6xl mx-auto px-4 sm:px-6 py-8">
-        {/* Hero Section */}
-        <div className="bg-gradient-to-br from-blue-600 to-blue-700 dark:from-blue-700 dark:to-blue-800 text-white rounded-2xl p-8 mb-8 relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2" />
-          <div className="relative z-10">
-            <h1 className="text-2xl md:text-3xl font-bold mb-2">익명 약국 매칭</h1>
-            <p className="text-white/80 mb-6">
-              신원 노출 없이 약국 매물을 등록하고<br />
-              조건에 맞는 약사를 AI가 자동으로 매칭해드립니다.
-            </p>
-            <div className="flex gap-4 flex-wrap">
-              <div className="bg-white/10 backdrop-blur rounded-xl px-4 py-3">
-                <div className="text-2xl font-bold">{platformStats.activePharmacyListings}+</div>
-                <div className="text-sm text-white/70">활성 매물</div>
-              </div>
-              <div className="bg-white/10 backdrop-blur rounded-xl px-4 py-3">
-                <div className="text-2xl font-bold">{platformStats.monthlyMatches}건</div>
-                <div className="text-sm text-white/70">이번달 매칭</div>
-              </div>
-              <div className="bg-white/10 backdrop-blur rounded-xl px-4 py-3">
-                <div className="text-2xl font-bold">100%</div>
-                <div className="text-sm text-white/70">익명 보장</div>
-              </div>
-              <div className="bg-white/10 backdrop-blur rounded-xl px-4 py-3">
-                <div className="text-2xl font-bold">{platformStats.onlineNow}</div>
-                <div className="text-sm text-white/70">현재 접속</div>
+        {/* Hero Section — 좌측 카피·통계 + 우측 실 화면 mockup */}
+        <div className="grid lg:grid-cols-[1.1fr_1fr] gap-6 mb-8 items-stretch">
+          <div className="bg-gradient-to-br from-blue-600 to-blue-700 dark:from-blue-700 dark:to-blue-800 text-white rounded-2xl p-8 relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2" />
+            <div className="relative z-10">
+              <h1 className="text-2xl md:text-3xl font-bold mb-2">익명 약국 매칭</h1>
+              <p className="text-white/80 mb-6">
+                신원 노출 없이 약국 매물을 등록하고<br />
+                조건에 맞는 약사를 AI가 자동으로 매칭해드립니다.
+              </p>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="bg-white/10 backdrop-blur rounded-xl px-4 py-3">
+                  <div className="text-2xl font-bold">{platformStats.activePharmacyListings}+</div>
+                  <div className="text-sm text-white/70">활성 매물</div>
+                </div>
+                <div className="bg-white/10 backdrop-blur rounded-xl px-4 py-3">
+                  <div className="text-2xl font-bold">{platformStats.monthlyMatches}건</div>
+                  <div className="text-sm text-white/70">이번달 매칭</div>
+                </div>
+                <div className="bg-white/10 backdrop-blur rounded-xl px-4 py-3">
+                  <div className="text-2xl font-bold">100%</div>
+                  <div className="text-sm text-white/70">익명 보장</div>
+                </div>
+                <div className="bg-white/10 backdrop-blur rounded-xl px-4 py-3">
+                  <div className="text-2xl font-bold">{platformStats.onlineNow}</div>
+                  <div className="text-sm text-white/70">현재 접속</div>
+                </div>
               </div>
             </div>
+          </div>
+          {/* 실제 매칭 화면 mockup */}
+          <div className="flex flex-col">
+            <PharmacyMatchMockup />
+            <p className="mt-3 text-center text-xs text-muted-foreground">
+              실제 매칭 화면 — 익명 ID + 매칭 % + 상호 관심 시 정보 공개
+            </p>
           </div>
         </div>
 
