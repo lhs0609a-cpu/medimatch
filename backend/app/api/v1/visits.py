@@ -64,7 +64,7 @@ async def create_visit(
         vital_height=payload.vital_height,
         vital_bmi=_calc_bmi(payload.vital_weight, payload.vital_height),
         doctor_id=current_user.id,
-        doctor_name=payload.doctor_name or current_user.name,
+        doctor_name=payload.doctor_name or current_user.full_name,
         next_visit_date=payload.next_visit_date,
         visit_notes=payload.visit_notes,
         voice_transcript=payload.voice_transcript,

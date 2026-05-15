@@ -200,7 +200,7 @@ async def get_token_info(
                     patient_name = p.name
             user = (await db.execute(select(User).where(User.id == rec.user_id))).scalar_one_or_none()
             if user:
-                clinic_name = user.name or user.email
+                clinic_name = user.full_name or user.email
     except Exception:
         pass
 

@@ -116,7 +116,7 @@ async def send_questionnaire(
     qr = await qsvc.create_and_send(
         db,
         user_id=current_user.id,
-        user_name=current_user.name or current_user.email,
+        user_name=current_user.full_name or current_user.email,
         appointment_id=appointment_id,
         patient_id=patient_id,
         patient_name=patient_name,
@@ -250,7 +250,7 @@ async def get_public_form(
     try:
         user = (await db.execute(select(User).where(User.id == qr.user_id))).scalar_one_or_none()
         if user:
-            clinic_name = user.name or user.email
+            clinic_name = user.full_name or user.email
     except Exception:
         pass
 
