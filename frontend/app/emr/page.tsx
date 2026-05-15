@@ -45,6 +45,10 @@ import {
   Bot,
   Volume2,
 } from 'lucide-react'
+import {
+  ChartMockup, ClaimsMockup, CRMMockup,
+  BookingMockup, DashboardMockup, PharmacyBridgeMockup,
+} from '@/components/home/mockups/EMRScreens'
 
 /* ────────────────────────────────────────── */
 /*  숫자 카운트업 훅                          */
@@ -433,6 +437,52 @@ export default function EMRLandingPage() {
               <div className="stat-value text-amber-500">{stat4.count}<span className="text-2xl">%</span></div>
               <div className="stat-label">서비스 가동률</div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ───── 실제 EMR 화면 갤러리 ───── */}
+      <section id="screens" className="section bg-secondary/30">
+        <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <div className="badge-primary mb-4">실제 프로그램 화면</div>
+            <h2 className="mb-4">
+              <span className="text-gradient-blue">진짜 EMR 화면</span>으로
+              <br className="hidden sm:block" />
+              직접 확인하세요
+            </h2>
+            <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+              포토샵 합성 X. 실제로 작동하는 프로그램 UI 그대로.
+            </p>
+          </div>
+
+          <div className="grid lg:grid-cols-2 gap-6">
+            {[
+              { Mockup: ChartMockup,           title: 'AI 음성 차트',     desc: '진료 대화 → 자동 SOAP·진단코드' },
+              { Mockup: ClaimsMockup,          title: '삭감 방어 청구',   desc: '위험 청구 실시간 경고 + 대안 코드' },
+              { Mockup: CRMMockup,             title: '환자 리콜 CRM',    desc: '캠페인·전환율 추적' },
+              { Mockup: BookingMockup,         title: '예약/접수',        desc: '실시간 상태 + 자동 충돌 검증' },
+              { Mockup: DashboardMockup,       title: '경영 대시보드',    desc: '매출·환자 추이 + AI 인사이트' },
+              { Mockup: PharmacyBridgeMockup,  title: '약국 브릿지',      desc: '3초 전송 + DUR 자동 검증' },
+            ].map((s) => {
+              const M = s.Mockup
+              return (
+                <div key={s.title} className="card overflow-hidden">
+                  <div className="p-4 bg-gradient-to-br from-zinc-50 to-zinc-100 dark:from-zinc-900 dark:to-zinc-950">
+                    <M />
+                  </div>
+                  <div className="px-5 py-4 border-t border-border flex items-center justify-between">
+                    <div>
+                      <div className="font-semibold">{s.title}</div>
+                      <div className="text-xs text-muted-foreground">{s.desc}</div>
+                    </div>
+                    <span className="text-2xs px-2 py-1 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 font-semibold">
+                      실 화면
+                    </span>
+                  </div>
+                </div>
+              )
+            })}
           </div>
         </div>
       </section>
