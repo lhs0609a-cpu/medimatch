@@ -2,32 +2,28 @@
 
 import Link from 'next/link'
 import { motion } from 'framer-motion'
-import { ArrowRight, Mic, Shield, Send } from 'lucide-react'
-import { TossIcon } from '@/components/ui/TossIcon'
+import { ArrowRight } from 'lucide-react'
+import { ChartMockup, ClaimsMockup, CRMMockup } from './mockups/EMRScreens'
 import { staggerContainer, staggerItem, viewportConfig } from '@/components/animation/MotionWrapper'
 
-// EMR이 메인 제품 — 3가지 핵심 가치만 보여줌. 나머지(매물/개원/공동구매/약국)는
-// EMR 안의 "발견" 섹션에서 노출됨 (EcosystemInsideEMR 컴포넌트).
+// EMR 핵심 3가치 — 각 카드가 실제 EMR 프로그램 화면 mockup을 보여줌
 const features = [
   {
-    icon: Mic,
-    color: 'from-rose-500 to-red-600',
+    Mockup: ChartMockup,
     title: 'AI 음성 자동 차트',
     desc: '진료 대화만 하세요. CC·PI·PMH를 AI가 자동 분류하고 ICD-10 진단코드까지 추천합니다.',
     metric: '평균 차트 시간 70%↓',
     href: '/services/emr#ai-chart',
   },
   {
-    icon: Shield,
-    color: 'from-emerald-500 to-teal-600',
+    Mockup: ClaimsMockup,
     title: '삭감 방어 AI',
     desc: '과거 삭감 패턴을 학습해 위험 청구를 실시간 경고. 최적 코드 조합으로 삭감률 30% 감소.',
     metric: '삭감률 평균 30%↓',
     href: '/services/emr#claims',
   },
   {
-    icon: Send,
-    color: 'from-blue-500 to-indigo-600',
+    Mockup: CRMMockup,
     title: 'CRM · 환자 리콜',
     desc: '3개월 미방문 환자 자동 감지·알림톡 발송. 야간 차단·동의 검증 등 안전 가드 18종.',
     metric: '재방문율 25%↑',
@@ -50,7 +46,7 @@ export function ServiceCards() {
             variants={staggerItem}
             className="inline-block px-3 py-1 mb-4 text-xs font-semibold text-primary bg-primary/10 rounded-full"
           >
-            EMR 핵심 3가치
+            실제 화면 — EMR 핵심 3가치
           </motion.span>
           <motion.h2
             variants={staggerItem}
@@ -71,33 +67,42 @@ export function ServiceCards() {
           whileInView="visible"
           viewport={viewportConfig}
           variants={staggerContainer}
-          className="grid md:grid-cols-3 gap-5 max-w-6xl mx-auto"
+          className="grid md:grid-cols-3 gap-6 max-w-7xl mx-auto"
         >
-          {features.map((f) => (
-            <motion.div key={f.title} variants={staggerItem}>
-              <Link
-                href={f.href}
-                className="card p-6 group block h-full hover:shadow-xl hover:-translate-y-0.5 transition-all"
-              >
-                <div className="transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-3 mb-5 inline-block">
-                  <TossIcon icon={f.icon} color={f.color} size="xl" />
-                </div>
-                <h3 className="text-xl font-bold mb-2 group-hover:text-primary transition-colors">
-                  {f.title}
-                </h3>
-                <p className="text-muted-foreground text-sm leading-relaxed mb-4">
-                  {f.desc}
-                </p>
-                <div className="flex items-center justify-between pt-3 border-t border-border">
-                  <span className="text-xs font-semibold text-primary">{f.metric}</span>
-                  <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all" />
-                </div>
-              </Link>
-            </motion.div>
-          ))}
+          {features.map((f) => {
+            const M = f.Mockup
+            return (
+              <motion.div key={f.title} variants={staggerItem}>
+                <Link
+                  href={f.href}
+                  className="group block h-full rounded-2xl overflow-hidden bg-card border border-border hover:shadow-xl hover:-translate-y-0.5 transition-all"
+                >
+                  {/* 실제 EMR 프로그램 화면 mockup */}
+                  <div className="p-4 bg-gradient-to-br from-zinc-50 to-zinc-100 dark:from-zinc-900 dark:to-zinc-950">
+                    <div className="transition-transform duration-500 group-hover:scale-[1.02]">
+                      <M />
+                    </div>
+                  </div>
+                  {/* 텍스트 */}
+                  <div className="p-5">
+                    <h3 className="text-xl font-bold mb-2 group-hover:text-primary transition-colors">
+                      {f.title}
+                    </h3>
+                    <p className="text-muted-foreground text-sm leading-relaxed mb-4">
+                      {f.desc}
+                    </p>
+                    <div className="flex items-center justify-between pt-3 border-t border-border">
+                      <span className="text-xs font-semibold text-primary">{f.metric}</span>
+                      <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all" />
+                    </div>
+                  </div>
+                </Link>
+              </motion.div>
+            )
+          })}
         </motion.div>
 
-        {/* 하단 가격 안내 — ID당 과금 */}
+        {/* 하단 가격 안내 */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}

@@ -9,9 +9,9 @@ import {
   CheckCircle, Building2, Stethoscope, Package,
   Calculator, ChevronRight, Sparkles, ShieldCheck
 } from 'lucide-react'
-import { TossIcon } from '@/components/ui/TossIcon'
 import { groupBuyingService } from '@/lib/api/services'
 import { CohortStatus, CohortSummary, GroupBuyingCategory } from '@/lib/api/client'
+import { GroupBuyingMockup } from '@/components/home/mockups/DomainScreens'
 
 // 상태 뱃지 컴포넌트
 function StatusBadge({ status }: { status: CohortStatus }) {
@@ -170,7 +170,9 @@ function StatCard({
   return (
     <div className="bg-white rounded-xl border border-gray-200 p-5">
       <div className="flex items-center gap-3 mb-2">
-        <TossIcon icon={icon} color={iconColor || 'from-blue-500 to-blue-600'} size="sm" shadow={iconShadow} />
+        <div className="w-9 h-9 rounded-lg bg-blue-50 flex items-center justify-center flex-shrink-0">
+          {(() => { const I = icon; return <I className="w-4 h-4 text-blue-600" strokeWidth={2} /> })()}
+        </div>
         <span className="text-sm text-gray-600">{label}</span>
       </div>
       <div className="text-2xl font-bold text-gray-900">
@@ -209,9 +211,10 @@ export default function GroupBuyingPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
-      {/* 히어로 섹션 */}
+      {/* 히어로 섹션 — 좌측 카피 + 우측 실 화면 mockup */}
       <section className="pt-20 pb-12 px-4">
-        <div className="max-w-6xl mx-auto text-center">
+        <div className="max-w-6xl mx-auto grid lg:grid-cols-2 gap-10 items-center">
+          {/* Left */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -224,38 +227,27 @@ export default function GroupBuyingPage() {
             <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
               개원 공동구매
             </h1>
-            <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
+            <p className="text-xl text-gray-600 mb-8 max-w-xl">
               같은 시기에 개원 준비하는 의사분들과 함께 구매하여<br />
               <strong className="text-blue-600">최대 30% 할인</strong>받으세요
             </p>
-          </motion.div>
 
-          {/* 주요 특징 */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-3xl mx-auto mb-8">
-            {[
-              { icon: Users, color: 'from-blue-500 to-blue-500', shadow: 'shadow-blue-500/25', text: '30명+ 공동 구매력' },
-              { icon: ShieldCheck, color: 'from-blue-500 to-blue-600', shadow: 'shadow-blue-500/25', text: '검증된 우수 업체' },
-              { icon: TrendingDown, color: 'from-red-500 to-rose-500', shadow: 'shadow-red-500/25', text: '평균 15~30% 절감' },
-            ].map((item, idx) => (
-              <motion.div
-                key={idx}
-                className="flex items-center justify-center gap-3 px-4 py-3 bg-white rounded-xl border border-gray-200 text-gray-700"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 + idx * 0.1 }}
-              >
-                <TossIcon icon={item.icon} color={item.color} size="xs" shadow={item.shadow} />
-                <span className="font-medium">{item.text}</span>
-              </motion.div>
-            ))}
-          </div>
+            <div className="space-y-2 mb-8">
+              {[
+                { icon: Users, text: '30명+ 공동 구매력' },
+                { icon: ShieldCheck, text: '검증된 우수 업체' },
+                { icon: TrendingDown, text: '평균 15~30% 절감' },
+              ].map((item) => (
+                <div
+                  key={item.text}
+                  className="flex items-center gap-3 px-4 py-2 bg-white rounded-xl border border-gray-200 text-gray-700"
+                >
+                  <item.icon className="w-5 h-5 text-blue-600" strokeWidth={2} />
+                  <span className="font-medium">{item.text}</span>
+                </div>
+              ))}
+            </div>
 
-          {/* 절감액 계산기 CTA */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5 }}
-          >
             <Link
               href="/group-buying/calculator"
               className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl font-semibold hover:shadow-lg hover:shadow-blue-500/30 transition-all"
@@ -264,6 +256,18 @@ export default function GroupBuyingPage() {
               내 예상 절감액 계산하기
               <ChevronRight className="w-5 h-5" />
             </Link>
+          </motion.div>
+
+          {/* Right — 실제 코호트 진행 화면 */}
+          <motion.div
+            initial={{ opacity: 0, x: 30 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+          >
+            <GroupBuyingMockup />
+            <p className="mt-3 text-center text-xs text-gray-500">
+              실제 화면 — 코호트 진행률 + 카테고리별 절감액
+            </p>
           </motion.div>
         </div>
       </section>
@@ -394,9 +398,9 @@ export default function GroupBuyingPage() {
               { step: 4, icon: TrendingDown, color: 'from-red-500 to-rose-500', shadow: 'shadow-red-500/25', title: '할인 혜택', desc: '인원이 모이면 자동으로 할인이 적용됩니다' },
             ].map((item) => (
               <div key={item.step} className="text-center">
-                <div className="relative inline-block mb-4">
-                  <TossIcon icon={item.icon} color={item.color} size="md" shadow={item.shadow} />
-                  <span className="absolute -top-1 -right-1 w-6 h-6 bg-blue-600 text-white rounded-full text-sm font-bold flex items-center justify-center">
+                <div className="relative inline-flex items-center justify-center w-12 h-12 rounded-full bg-white border-2 border-blue-500 mb-4">
+                  <item.icon className="w-5 h-5 text-blue-600" strokeWidth={2} />
+                  <span className="absolute -top-1.5 -right-1.5 w-6 h-6 bg-blue-600 text-white rounded-full text-sm font-bold flex items-center justify-center">
                     {item.step}
                   </span>
                 </div>

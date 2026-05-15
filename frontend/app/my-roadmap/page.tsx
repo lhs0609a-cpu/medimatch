@@ -10,6 +10,7 @@ import {
   Star, FileText, Award, ShieldCheck,
 } from 'lucide-react';
 import { HomeHeader, HomeFooter } from '@/components/home';
+import { DiagnoseMockup } from '@/components/home/mockups/DomainScreens';
 import { resolveGuestToken, clearGuestToken } from '@/lib/auth/guestToken';
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1';
@@ -145,34 +146,44 @@ function RoadmapInner() {
     return (
       <>
         <HomeHeader />
-        <main className="min-h-screen flex items-center justify-center px-4 pt-24 pb-16">
-          <div className="text-center max-w-md">
-            {noToken ? (
-              <>
-                <Sparkles className="w-12 h-12 text-[#3182f6] mx-auto mb-4" />
-                <h1 className="text-2xl font-bold mb-2">아직 진단을 안 하셨어요</h1>
-                <p className="text-sm text-muted-foreground mb-8 leading-relaxed">
-                  메디플라톤은 가입·로그인 없이 1분 진단으로 시작합니다.
-                  <br />
-                  진단하시면 본인 미션맵이 자동 생성돼요.
-                </p>
-              </>
-            ) : (
-              <>
-                <AlertTriangle className="w-12 h-12 text-amber-500 mx-auto mb-4" />
-                <h1 className="text-xl font-bold mb-2">링크가 만료됐거나 유효하지 않아요</h1>
-                <p className="text-sm text-muted-foreground mb-8">
-                  카톡으로 새 링크를 받으시거나 다시 진단해주세요.
-                </p>
-              </>
-            )}
-            <div className="flex flex-col sm:flex-row gap-2 justify-center">
-              <Link href="/diagnose" className="inline-flex items-center justify-center gap-1 px-5 py-3 text-sm font-bold bg-foreground text-background rounded-xl">
-                {noToken ? '1분 진단으로 시작' : '다시 진단받기'} <ChevronRight className="w-4 h-4" />
-              </Link>
-              <Link href="/recover" className="inline-flex items-center justify-center gap-1 px-5 py-3 text-sm font-semibold border border-foreground/15 rounded-xl hover:bg-muted/40">
-                카톡으로 링크 받기
-              </Link>
+        <main className="min-h-screen px-4 pt-24 pb-16">
+          <div className="max-w-5xl mx-auto grid lg:grid-cols-2 gap-10 items-center">
+            {/* 좌측: 안내 */}
+            <div className="text-center lg:text-left">
+              {noToken ? (
+                <>
+                  <Sparkles className="w-12 h-12 text-[#3182f6] mb-4 mx-auto lg:mx-0" />
+                  <h1 className="text-3xl md:text-4xl font-bold mb-3">아직 진단을 안 하셨어요</h1>
+                  <p className="text-base text-muted-foreground mb-6 leading-relaxed">
+                    메디플라톤은 가입·로그인 없이 1분 진단으로 시작합니다.<br />
+                    진단하시면 우측처럼 본인 미션맵이 자동 생성돼요.
+                  </p>
+                </>
+              ) : (
+                <>
+                  <AlertTriangle className="w-12 h-12 text-amber-500 mb-4 mx-auto lg:mx-0" />
+                  <h1 className="text-3xl md:text-4xl font-bold mb-3">링크가 만료됐거나 유효하지 않아요</h1>
+                  <p className="text-base text-muted-foreground mb-6">
+                    카톡으로 새 링크를 받으시거나 다시 진단해주세요.
+                  </p>
+                </>
+              )}
+              <div className="flex flex-col sm:flex-row gap-2 justify-center lg:justify-start">
+                <Link href="/diagnose" className="inline-flex items-center justify-center gap-1 px-5 py-3 text-sm font-bold bg-foreground text-background rounded-xl">
+                  {noToken ? '1분 진단으로 시작' : '다시 진단받기'} <ChevronRight className="w-4 h-4" />
+                </Link>
+                <Link href="/recover" className="inline-flex items-center justify-center gap-1 px-5 py-3 text-sm font-semibold border border-foreground/15 rounded-xl hover:bg-muted/40">
+                  카톡으로 링크 받기
+                </Link>
+              </div>
+            </div>
+
+            {/* 우측: 실제 미션맵 화면 미리보기 */}
+            <div>
+              <DiagnoseMockup />
+              <p className="mt-3 text-center text-xs text-muted-foreground">
+                실제 미션맵 화면 — 진단 직후 받게 되는 결과
+              </p>
             </div>
           </div>
         </main>

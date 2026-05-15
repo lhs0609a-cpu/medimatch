@@ -9,6 +9,7 @@ import {
   Send, Loader2, Phone, User, MessageSquare,
   Stethoscope, Calendar, MapPinned,
 } from 'lucide-react';
+import { OpeningProjectMockup } from '@/components/home/mockups/DomainScreens';
 import {
   ServiceHero,
   ServiceProblemSection,
@@ -91,15 +92,12 @@ function OpeningChecklist() {
             </div>
           </div>
 
-          {/* Right: Image */}
-          <div className="relative rounded-2xl overflow-hidden shadow-lg">
-            <Image
-              src="/popup-checklist.jpg"
-              alt="개원 체크리스트"
-              width={600}
-              height={500}
-              className="w-full h-auto"
-            />
+          {/* Right: 실제 EMR D-Day 체크리스트 화면 */}
+          <div className="relative">
+            <OpeningProjectMockup />
+            <p className="mt-3 text-center text-xs text-gray-500">
+              실제 프로그램 화면 — 단계별 진행률·할 일·D-Day 자동 추적
+            </p>
           </div>
         </div>
       </div>

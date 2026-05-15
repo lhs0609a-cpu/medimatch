@@ -45,7 +45,10 @@ import {
   Bot,
   Volume2,
 } from 'lucide-react'
-import { TossIcon } from '@/components/ui/TossIcon'
+import {
+  ChartMockup, ClaimsMockup, CRMMockup,
+  BookingMockup, DashboardMockup, PharmacyBridgeMockup,
+} from '@/components/home/mockups/EMRScreens'
 
 /* ────────────────────────────────────────── */
 /*  숫자 카운트업 훅                          */
@@ -438,6 +441,52 @@ export default function EMRLandingPage() {
         </div>
       </section>
 
+      {/* ───── 실제 EMR 화면 갤러리 ───── */}
+      <section id="screens" className="section bg-secondary/30">
+        <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <div className="badge-primary mb-4">실제 프로그램 화면</div>
+            <h2 className="mb-4">
+              <span className="text-gradient-blue">진짜 EMR 화면</span>으로
+              <br className="hidden sm:block" />
+              직접 확인하세요
+            </h2>
+            <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+              포토샵 합성 X. 실제로 작동하는 프로그램 UI 그대로.
+            </p>
+          </div>
+
+          <div className="grid lg:grid-cols-2 gap-6">
+            {[
+              { Mockup: ChartMockup,           title: 'AI 음성 차트',     desc: '진료 대화 → 자동 SOAP·진단코드' },
+              { Mockup: ClaimsMockup,          title: '삭감 방어 청구',   desc: '위험 청구 실시간 경고 + 대안 코드' },
+              { Mockup: CRMMockup,             title: '환자 리콜 CRM',    desc: '캠페인·전환율 추적' },
+              { Mockup: BookingMockup,         title: '예약/접수',        desc: '실시간 상태 + 자동 충돌 검증' },
+              { Mockup: DashboardMockup,       title: '경영 대시보드',    desc: '매출·환자 추이 + AI 인사이트' },
+              { Mockup: PharmacyBridgeMockup,  title: '약국 브릿지',      desc: '3초 전송 + DUR 자동 검증' },
+            ].map((s) => {
+              const M = s.Mockup
+              return (
+                <div key={s.title} className="card overflow-hidden">
+                  <div className="p-4 bg-gradient-to-br from-zinc-50 to-zinc-100 dark:from-zinc-900 dark:to-zinc-950">
+                    <M />
+                  </div>
+                  <div className="px-5 py-4 border-t border-border flex items-center justify-between">
+                    <div>
+                      <div className="font-semibold">{s.title}</div>
+                      <div className="text-xs text-muted-foreground">{s.desc}</div>
+                    </div>
+                    <span className="text-2xs px-2 py-1 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 font-semibold">
+                      실 화면
+                    </span>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      </section>
+
       {/* ───── 핵심 기능 ───── */}
       <section id="features" className="section">
         <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
@@ -457,60 +506,51 @@ export default function EMRLandingPage() {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[
               {
-                icon: Mic,
-                color: 'from-rose-500 to-red-600',
+                image: '/assets/consulting/consultation-1.jpg',
                 title: 'AI 음성 자동 차트',
                 desc: '진료 대화만 하세요. CC, PI, PMH를 AI가 자동 분류하고, ICD-10 진단코드와 처방까지 추천합니다.',
                 badge: '업계 최초',
               },
               {
-                icon: Shield,
-                color: 'from-emerald-500 to-teal-600',
+                image: '/assets/hospital/medical-equipment.jpg',
                 title: '삭감 방어 AI',
                 desc: '과거 삭감 패턴을 학습해 위험 청구를 실시간 경고. 최적 코드 조합을 추천하여 삭감률을 30% 줄여드립니다.',
                 badge: 'AI 분석',
               },
               {
-                icon: Pill,
-                color: 'from-sky-500 to-blue-600',
+                image: '/assets/hospital/treatment-beds.jpg',
                 title: '의원-약국 실시간 브릿지',
                 desc: '처방전 3초 전송, DUR 자동 체크, 조제 완료 알림. 환자 대기시간을 70% 줄이는 실시간 연결.',
                 badge: '업계 최초',
               },
               {
-                icon: CalendarCheck,
-                color: 'from-blue-500 to-indigo-600',
+                image: '/assets/hospital/waiting-room-render.jpg',
                 title: '스마트 예약/접수',
                 desc: 'QR 체크인, 태블릿 문진, 카톡 대기 알림. 환자가 집에서 미리 문진을 작성하면 도착 즉시 진료.',
               },
               {
-                icon: Receipt,
-                color: 'from-amber-500 to-orange-600',
+                image: '/assets/consulting/consultation-2.jpg',
                 title: '1클릭 보험청구',
                 desc: 'AI가 청구 코드를 자동 매핑. 삭감 위험도를 색상으로 표시하고, 1클릭으로 심평원에 전송합니다.',
               },
               {
-                icon: BarChart3,
-                color: 'from-violet-500 to-purple-600',
+                image: '/assets/consulting/doctor-meeting.jpg',
                 title: '경영 대시보드',
                 desc: '매출, 환자수, 삭감률을 한눈에. AI가 공백 시간대, 미방문 환자, 재고 이슈를 자동 분석합니다.',
                 link: '/emr-dashboard',
               },
               {
-                icon: Bell,
-                color: 'from-yellow-500 to-amber-600',
+                image: '/assets/consulting/doctor-interview.jpg',
                 title: '환자 리콜 자동화',
                 desc: '3개월 미방문 환자 자동 감지. 카톡/문자로 리마인드 발송. 재방문율을 25% 높여드립니다.',
               },
               {
-                icon: Smartphone,
-                color: 'from-cyan-500 to-sky-600',
+                image: '/assets/hospital/luxury-lobby-1.jpg',
                 title: '환자 앱 연동',
                 desc: '예약 확인, 복약 알림, 검사결과 조회를 환자가 직접. 문의 전화 50% 감소, 만족도 상승.',
               },
               {
-                icon: Lock,
-                color: 'from-slate-500 to-gray-600',
+                image: '/assets/hospital/treatment-room.jpg',
                 title: '데이터 주권 보장',
                 desc: '원장님 데이터는 원장님 것. 언제든 전체 Export 무료, 타사 전환 시 무료 마이그레이션 지원.',
               },
@@ -518,20 +558,31 @@ export default function EMRLandingPage() {
               const Wrapper = f.link ? Link : 'div'
               const wrapperProps = f.link ? { href: f.link } : {}
               return (
-                <Wrapper key={i} {...wrapperProps as any} className={`feature-card group ${f.link ? 'cursor-pointer' : ''}`}>
-                  <div className="flex items-start justify-between mb-5">
-                    <div className="transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-3">
-                      <TossIcon icon={f.icon} color={f.color} size="xl" />
-                    </div>
+                <Wrapper key={i} {...wrapperProps as any} className={`group block rounded-2xl overflow-hidden bg-card border border-border hover:shadow-xl hover:-translate-y-0.5 transition-all ${f.link ? 'cursor-pointer' : ''}`}>
+                  {/* 실제 사진 */}
+                  <div className="relative aspect-[16/10] overflow-hidden bg-zinc-100">
+                    <img
+                      src={f.image}
+                      alt={f.title}
+                      className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
                     {f.badge && (
-                      <span className="badge-primary text-2xs">{f.badge}</span>
+                      <span className="absolute top-3 right-3 px-2 py-0.5 bg-white/95 text-zinc-700 text-2xs font-semibold rounded-full">
+                        {f.badge}
+                      </span>
                     )}
                     {f.link && (
-                      <span className="badge-primary text-2xs">체험하기 →</span>
+                      <span className="absolute top-3 right-3 px-2 py-0.5 bg-primary text-white text-2xs font-semibold rounded-full">
+                        체험하기 →
+                      </span>
                     )}
                   </div>
-                  <h3 className="text-xl font-bold mb-2">{f.title}</h3>
-                  <p className="text-muted-foreground text-sm leading-relaxed">{f.desc}</p>
+                  {/* 텍스트 */}
+                  <div className="p-5">
+                    <h3 className="text-lg font-bold mb-2 group-hover:text-primary transition-colors">{f.title}</h3>
+                    <p className="text-muted-foreground text-sm leading-relaxed">{f.desc}</p>
+                  </div>
                 </Wrapper>
               )
             })}
@@ -628,7 +679,9 @@ export default function EMRLandingPage() {
             {/* 의원 측 */}
             <div className="card p-6 border border-blue-200 dark:border-blue-800">
               <div className="flex items-center gap-3 mb-5">
-                <TossIcon icon={Building2} color="from-blue-500 to-blue-700" />
+                <div className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center flex-shrink-0">
+                  <Building2 className="w-5 h-5 text-blue-600 dark:text-blue-400" strokeWidth={2} />
+                </div>
                 <div>
                   <div className="font-bold">의원</div>
                   <div className="text-xs text-muted-foreground">MediMatch EMR</div>
@@ -679,7 +732,9 @@ export default function EMRLandingPage() {
             {/* 약국 측 */}
             <div className="card p-6 border border-blue-200 dark:border-blue-800">
               <div className="flex items-center gap-3 mb-5">
-                <TossIcon icon={Pill} color="from-blue-500 to-blue-600" />
+                <div className="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-900/30 flex items-center justify-center flex-shrink-0">
+                  <Pill className="w-5 h-5 text-emerald-600 dark:text-emerald-400" strokeWidth={2} />
+                </div>
                 <div>
                   <div className="font-bold">약국</div>
                   <div className="text-xs text-muted-foreground">MediMatch Pharmacy</div>
@@ -798,19 +853,28 @@ export default function EMRLandingPage() {
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {[
-              { icon: Lock, title: 'AES-256 암호화', desc: '모든 의료 데이터 군사급 암호화', color: 'from-blue-500 to-blue-700' },
-              { icon: Monitor, title: 'AWS 서울 리전', desc: '한국 내 데이터 저장, 해외 유출 불가', color: 'from-emerald-500 to-blue-600' },
-              { icon: WifiOff, title: '오프라인 모드', desc: '인터넷 끊겨도 진료 가능, 자동 동기화', color: 'from-amber-500 to-orange-600' },
-              { icon: RefreshCw, title: '자동 백업', desc: '일일 자동 백업 + 재해복구(DR) 지원', color: 'from-blue-500 to-blue-600' },
-            ].map((t, i) => (
-              <div key={i} className="feature-card text-center">
-                <div className="flex justify-center mb-4">
-                  <TossIcon icon={t.icon} color={t.color} size="lg" />
+              { icon: Lock, title: 'AES-256 암호화', desc: '모든 의료 데이터 군사급 암호화', tone: 'blue' },
+              { icon: Monitor, title: 'AWS 서울 리전', desc: '한국 내 데이터 저장, 해외 유출 불가', tone: 'emerald' },
+              { icon: WifiOff, title: '오프라인 모드', desc: '인터넷 끊겨도 진료 가능, 자동 동기화', tone: 'amber' },
+              { icon: RefreshCw, title: '자동 백업', desc: '일일 자동 백업 + 재해복구(DR) 지원', tone: 'sky' },
+            ].map((t, i) => {
+              const toneMap: Record<string, string> = {
+                blue:    'bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400',
+                emerald: 'bg-emerald-50 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400',
+                amber:   'bg-amber-50 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400',
+                sky:     'bg-sky-50 text-sky-600 dark:bg-sky-900/30 dark:text-sky-400',
+              }
+              const Icon = t.icon
+              return (
+                <div key={i} className="feature-card text-center">
+                  <div className={`mx-auto mb-4 w-14 h-14 rounded-2xl flex items-center justify-center ${toneMap[t.tone]}`}>
+                    <Icon className="w-6 h-6" strokeWidth={1.8} />
+                  </div>
+                  <h4 className="text-lg font-bold mb-2">{t.title}</h4>
+                  <p className="text-sm text-muted-foreground">{t.desc}</p>
                 </div>
-                <h4 className="text-lg font-bold mb-2">{t.title}</h4>
-                <p className="text-sm text-muted-foreground">{t.desc}</p>
-              </div>
-            ))}
+              )
+            })}
           </div>
         </div>
       </section>
@@ -940,7 +1004,9 @@ export default function EMRLandingPage() {
             <div className="card p-6 border border-blue-200 dark:border-blue-800 bg-blue-50/50 dark:bg-blue-900/10">
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div className="flex items-center gap-3">
-                  <TossIcon icon={Pill} color="from-blue-500 to-blue-600" />
+                  <div className="w-10 h-10 rounded-xl bg-blue-100 dark:bg-blue-900/40 flex items-center justify-center flex-shrink-0">
+                    <Pill className="w-5 h-5 text-blue-600 dark:text-blue-400" strokeWidth={2} />
+                  </div>
                   <div>
                     <div className="font-bold">Pharmacy 플랜</div>
                     <div className="text-sm text-muted-foreground">조제관리 + 처방전수신 + DUR + 재고ERP</div>
