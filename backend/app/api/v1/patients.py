@@ -138,7 +138,8 @@ def _build_demo_patients() -> list[dict]:
 # Endpoints
 # ============================================================
 
-@router.get("/")
+@router.get("")
+@router.get("/", include_in_schema=False)
 async def list_patients(
     page: int = Query(default=1, ge=1),
     size: int = Query(default=20, ge=1, le=100),
@@ -414,13 +415,15 @@ async def get_patient(
     return {**patient, "is_demo": True}
 
 
-@router.post("/")
+@router.post("")
+@router.post("/", include_in_schema=False)
 async def create_patient(
     payload: PatientCreate,
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_active_user),
     sub: ServiceSubscription = Depends(require_active_service(ServiceType.EMR)),
 ):
+    """신규 환자 등록 — 슬래시 유무 모두 받음 (Vercel rewrite 정규화 대응)."""
     patient = Patient(user_id=current_user.id, **payload.model_dump())
     db.add(patient)
     await db.commit()

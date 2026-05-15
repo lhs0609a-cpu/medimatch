@@ -6,6 +6,7 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
+from sqlalchemy.exc import IntegrityError
 
 from ..core.database import async_session
 from ..core.security import get_current_user, TokenData, RoleChecker, UserRole, verify_token
@@ -84,26 +85,33 @@ async def _resolve_magic_link_user(
             return user
 
     # 자동 전환: lead → 신규 User 생성
-    # email은 lead.email 우선, 없으면 token prefix로 unique placeholder
-    email = lead.email or f"lead-{token[:8]}@magic.medi"
+    # email은 lead.email 우선, 없으면 lead.id로 unique placeholder (UUID 충돌 X)
+    email = lead.email or f"lead-{lead.id}@magic.medi"
 
-    # 이메일 중복 방지 (재호출 시 race condition 보호)
+    # 이메일 중복 방지 (1) — pre-check
     existing = await db.execute(select(User).where(User.email == email))
     user = existing.scalar_one_or_none()
     if not user:
-        user = User(
-            email=email,
-            hashed_password="!magic-link-no-password!",  # bcrypt 호환 X — 일반 로그인 차단
-            full_name=lead.name or "원장님",
-            phone=lead.phone,
-            role=UserRoleEnum.DOCTOR,
-            is_active=True,
-            is_verified=True,
-            license_number=lead.license_number,
-            specialty=lead.specialty,
-        )
-        db.add(user)
-        await db.flush()  # id 확보
+        # 이메일 중복 방지 (2) — concurrent insert race 대응
+        try:
+            user = User(
+                email=email,
+                hashed_password="!magic-link-no-password!",  # bcrypt 호환 X — 일반 로그인 차단
+                full_name=lead.name or "원장님",
+                phone=lead.phone,
+                role=UserRoleEnum.DOCTOR,
+                is_active=True,
+                is_verified=True,
+                license_number=lead.license_number,
+                specialty=lead.specialty,
+            )
+            db.add(user)
+            await db.flush()  # id 확보
+        except IntegrityError:
+            # 다른 동시 트랜잭션이 이미 생성 — rollback 후 재조회
+            await db.rollback()
+            r = await db.execute(select(User).where(User.email == email))
+            user = r.scalar_one()
 
     # lead 연결 업데이트
     if not lead.converted_user_id:
