@@ -43,6 +43,15 @@ async def _check_conflict(
     return res.scalar_one_or_none() is not None
 
 
+def _strip_tz(dt: datetime) -> datetime:
+    """DB가 TIMESTAMP WITHOUT TIME ZONE이라 tz-aware → tz-naive 변환.
+    프론트가 ISO Z(UTC)로 보내면 UTC 기준 시각 그대로 사용.
+    """
+    if dt.tzinfo is not None:
+        return dt.replace(tzinfo=None)
+    return dt
+
+
 @router.post("", response_model=AppointmentOut, status_code=status.HTTP_201_CREATED)
 async def create_appointment(
     payload: AppointmentCreate,
@@ -50,9 +59,10 @@ async def create_appointment(
     current_user: User = Depends(get_current_active_user),
 ):
     """예약 생성 (시간 충돌 자동 검증)."""
-    end = payload.start_time + timedelta(minutes=payload.duration_min)
+    start = _strip_tz(payload.start_time)
+    end = start + timedelta(minutes=payload.duration_min)
 
-    if await _check_conflict(db, current_user.id, payload.start_time, end):
+    if await _check_conflict(db, current_user.id, start, end):
         raise HTTPException(
             status_code=409,
             detail="해당 시간대에 이미 예약이 있습니다.",
@@ -66,7 +76,7 @@ async def create_appointment(
         patient_birth=payload.patient_birth,
         doctor_id=current_user.id,
         doctor_name=payload.doctor_name or current_user.name,
-        start_time=payload.start_time,
+        start_time=start,
         end_time=end,
         duration_min=payload.duration_min,
         appointment_type=payload.appointment_type,
@@ -92,8 +102,12 @@ async def list_appointments(
     """예약 목록. 기본: 오늘 ~ 7일 후."""
     if date_from is None:
         date_from = datetime.combine(date.today(), datetime.min.time())
+    else:
+        date_from = _strip_tz(date_from)
     if date_to is None:
         date_to = date_from + timedelta(days=7)
+    else:
+        date_to = _strip_tz(date_to)
 
     q = (
         select(Appointment)
@@ -150,6 +164,8 @@ async def update_appointment(
 
     # 시간 변경 시 충돌 재검증
     new_start = data.get("start_time", appt.start_time)
+    if new_start is not None and hasattr(new_start, "tzinfo"):
+        new_start = _strip_tz(new_start)
     new_dur = data.get("duration_min", appt.duration_min)
     new_end = new_start + timedelta(minutes=new_dur)
 
