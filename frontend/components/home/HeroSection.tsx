@@ -1,22 +1,11 @@
 'use client'
 
 import Link from 'next/link'
-import dynamic from 'next/dynamic'
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { ArrowRight, Stethoscope, Target, MessageCircle, Monitor, Send } from 'lucide-react'
 import { hasGuestToken } from '@/lib/auth/guestToken'
-
-const KakaoMap = dynamic(() => import('@/components/map/KakaoMap'), {
-  ssr: false,
-  loading: () => null,
-})
-
-const stats = [
-  { value: '13', label: '전문 분야' },
-  { value: '470+', label: '매물·솔루션' },
-  { value: '150+', label: '개원 성공' },
-]
+import { ChartMockup } from './mockups/EMRScreens'
 
 interface HeroSectionProps {
   markers?: Array<{
@@ -33,143 +22,140 @@ export function HeroSection({ markers = [] }: HeroSectionProps) {
   useEffect(() => { setHasToken(hasGuestToken()) }, [])
 
   return (
-    <section className="relative min-h-[100dvh] flex items-center justify-center overflow-hidden" aria-label="히어로 섹션">
-      {/* 배경 지도 + gradient 오버레이 */}
-      <div className="absolute inset-0 -z-10">
-        <div className="absolute inset-0">
-          <KakaoMap
-            center={{ lat: 37.5172, lng: 127.0473 }}
-            level={8}
-            markers={markers}
-            className="w-full h-full opacity-50"
-          />
-        </div>
-        <div className="absolute inset-0 bg-gradient-to-b from-background/70 via-background/55 to-background pointer-events-none" />
-        <div className="absolute top-1/4 left-1/4 w-[600px] h-[600px] bg-[#3182f6]/5 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] bg-[#3182f6]/8 rounded-full blur-3xl pointer-events-none" />
-      </div>
+    <section className="relative pt-32 pb-20 md:pt-40 md:pb-32 overflow-hidden" aria-label="히어로 섹션">
+      {/* 배경 그라데이션 */}
+      <div className="absolute inset-0 -z-10 bg-gradient-to-b from-background via-background to-secondary/20" />
+      <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-[#3182f6]/8 rounded-full blur-3xl pointer-events-none -z-10 translate-x-1/4 -translate-y-1/4" />
+      <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-[#3182f6]/5 rounded-full blur-3xl pointer-events-none -z-10 -translate-x-1/4" />
 
-      <div className="relative max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-16 text-center">
-        <motion.h1
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, ease: 'easeOut' }}
-          className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black tracking-tight leading-[1.1] mb-6"
-        >
-          <span className="text-foreground">EMR·CRM 평생 무료,</span>
-          <br />
-          <span className="text-[#3182f6]">개원까지 한 번에</span>
-        </motion.h1>
-
-        <motion.p
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.15, ease: 'easeOut' }}
-          className="text-lg md:text-xl text-muted-foreground mb-4 max-w-2xl mx-auto leading-relaxed"
-        >
-          환자 리콜·예약·문진·청구까지 — 가입 없이 지금 바로 사용하세요.<br className="hidden md:block" />
-          기존 EMR 환자도 CSV/엑셀 한 번에 이관됩니다.
-        </motion.p>
-        <motion.p
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.2, ease: 'easeOut' }}
-          className="text-sm text-muted-foreground/80 mb-10"
-        >
-          ✓ 회원가입 불필요 &nbsp;·&nbsp; ✓ 비밀번호 없음 &nbsp;·&nbsp; ✓ 의사 평생 무료
-        </motion.p>
-
-        {/* 메인 CTA — CRM·EMR 바로 시작 (2-col, 동등 강조) */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.3, ease: 'easeOut' }}
-          className="mb-4 flex flex-col sm:flex-row items-stretch justify-center gap-3 max-w-2xl mx-auto"
-        >
-          <Link
-            href="/emr/crm"
-            className="btn-primary btn-lg group text-base px-8 py-4 inline-flex flex-1 justify-center"
+      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+          {/* 좌: 텍스트 */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, ease: 'easeOut' }}
+            className="text-center lg:text-left"
           >
-            <Send className="w-5 h-5" />
-            CRM 바로 시작
-            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-          </Link>
-          <Link
-            href="/emr"
-            className="inline-flex flex-1 items-center justify-center gap-2 px-8 py-4 text-base font-semibold rounded-2xl bg-[#3182f6]/10 hover:bg-[#3182f6]/20 text-[#3182f6] border-2 border-[#3182f6]/30 transition-all"
-          >
-            <Monitor className="w-5 h-5" />
-            EMR 바로 시작
-            <ArrowRight className="w-4 h-4" />
-          </Link>
-        </motion.div>
+            <span className="inline-block px-3 py-1 mb-6 text-xs font-bold text-primary bg-primary/10 rounded-full uppercase tracking-wider">
+              의사 평생 무료
+            </span>
+            <h1 className="text-5xl sm:text-6xl lg:text-7xl xl:text-8xl font-black tracking-tight leading-[0.95] mb-8">
+              <span className="text-foreground">진료에만</span>
+              <br />
+              <span className="text-foreground">집중하세요.</span>
+              <br />
+              <span className="text-[#3182f6]">나머지는 AI가.</span>
+            </h1>
 
-        {/* 보조 동선 — 환자 이관 / 진단 / 카톡 복원 / 미션맵 */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.4, ease: 'easeOut' }}
-          className="mb-12 flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-sm"
-        >
-          <Link
-            href="/emr/patients/import"
-            className="inline-flex items-center gap-1.5 text-muted-foreground hover:text-[#3182f6] transition-colors"
-          >
-            <ArrowRight className="w-3.5 h-3.5" />
-            기존 EMR에서 환자 옮기기
-          </Link>
-          <span className="text-muted-foreground/30">·</span>
-          {hasToken ? (
-            <Link
-              href="/my-roadmap"
-              className="inline-flex items-center gap-1.5 text-muted-foreground hover:text-[#3182f6] transition-colors"
-            >
-              <Target className="w-3.5 h-3.5" />
-              내 개원 미션맵
-            </Link>
-          ) : (
-            <Link
-              href="/diagnose"
-              className="inline-flex items-center gap-1.5 text-muted-foreground hover:text-[#3182f6] transition-colors"
-            >
-              <Stethoscope className="w-3.5 h-3.5" />
-              개원 준비 중 — 1분 진단
-            </Link>
-          )}
-          <span className="text-muted-foreground/30">·</span>
-          <Link
-            href="/recover"
-            className="inline-flex items-center gap-1.5 text-muted-foreground hover:text-[#3182f6] transition-colors"
-          >
-            <MessageCircle className="w-3.5 h-3.5" />
-            카톡으로 링크 받기
-          </Link>
-        </motion.div>
+            <p className="text-xl md:text-2xl text-muted-foreground mb-10 max-w-xl mx-auto lg:mx-0 leading-relaxed">
+              차트 작성·청구 검증·환자 리콜.<br className="hidden md:block" />
+              가입 없이 지금 바로 시작.
+            </p>
 
-        {/* Stat pills */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.45, ease: 'easeOut' }}
-          className="flex items-center justify-center gap-3 sm:gap-4"
-        >
-          {stats.map((s) => (
-            <div
-              key={s.label}
-              className="px-5 py-2.5 rounded-full bg-[#3182f6]/10 border border-[#3182f6]/20 backdrop-blur-sm"
-            >
-              <span className="text-lg sm:text-xl font-bold text-[#3182f6]">{s.value}</span>
-              <span className="text-sm text-muted-foreground ml-1.5">{s.label}</span>
+            <div className="flex flex-col sm:flex-row items-stretch gap-3 mb-8">
+              <Link
+                href="/emr/crm"
+                className="group inline-flex items-center justify-center gap-2 px-8 py-5 text-base font-bold rounded-2xl bg-[#3182f6] hover:bg-[#1e5fc7] text-white transition-all hover:shadow-2xl hover:shadow-[#3182f6]/30"
+              >
+                <Send className="w-5 h-5" />
+                CRM 바로 시작
+                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+              </Link>
+              <Link
+                href="/emr"
+                className="inline-flex items-center justify-center gap-2 px-8 py-5 text-base font-bold rounded-2xl bg-[#3182f6]/10 hover:bg-[#3182f6]/20 text-[#3182f6] border-2 border-[#3182f6]/30 transition-all"
+              >
+                <Monitor className="w-5 h-5" />
+                EMR 바로 시작
+              </Link>
             </div>
-          ))}
-        </motion.div>
-      </div>
 
-      {/* Scroll indicator */}
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce">
-        <svg className="w-6 h-6 text-muted-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-        </svg>
+            <div className="flex flex-wrap items-center justify-center lg:justify-start gap-x-5 gap-y-2 text-sm text-muted-foreground">
+              <span className="flex items-center gap-1.5">
+                <span className="w-1 h-1 rounded-full bg-emerald-500" />
+                가입·로그인 없음
+              </span>
+              <span className="flex items-center gap-1.5">
+                <span className="w-1 h-1 rounded-full bg-emerald-500" />
+                카드 등록 없음
+              </span>
+              <span className="flex items-center gap-1.5">
+                <span className="w-1 h-1 rounded-full bg-emerald-500" />
+                평생 무료
+              </span>
+            </div>
+
+            <div className="mt-8 flex flex-wrap items-center justify-center lg:justify-start gap-x-4 gap-y-2 text-sm">
+              <Link href="/emr/patients/import" className="inline-flex items-center gap-1.5 text-muted-foreground hover:text-[#3182f6] transition-colors">
+                <ArrowRight className="w-3.5 h-3.5" />
+                기존 EMR에서 환자 옮기기
+              </Link>
+              <span className="text-muted-foreground/30">·</span>
+              {hasToken ? (
+                <Link href="/my-roadmap" className="inline-flex items-center gap-1.5 text-muted-foreground hover:text-[#3182f6] transition-colors">
+                  <Target className="w-3.5 h-3.5" />
+                  내 개원 미션맵
+                </Link>
+              ) : (
+                <Link href="/diagnose" className="inline-flex items-center gap-1.5 text-muted-foreground hover:text-[#3182f6] transition-colors">
+                  <Stethoscope className="w-3.5 h-3.5" />
+                  개원 준비 중 — 1분 진단
+                </Link>
+              )}
+              <span className="text-muted-foreground/30">·</span>
+              <Link href="/recover" className="inline-flex items-center gap-1.5 text-muted-foreground hover:text-[#3182f6] transition-colors">
+                <MessageCircle className="w-3.5 h-3.5" />
+                카톡으로 링크 받기
+              </Link>
+            </div>
+          </motion.div>
+
+          {/* 우: 큰 mockup — 살짝 기울어진 입체감 */}
+          <motion.div
+            initial={{ opacity: 0, x: 50, rotate: 4 }}
+            animate={{ opacity: 1, x: 0, rotate: 0 }}
+            transition={{ duration: 0.8, delay: 0.2, ease: 'easeOut' }}
+            className="relative lg:scale-110 xl:scale-125 lg:translate-x-4"
+          >
+            {/* 뒤에 후광 */}
+            <div className="absolute -inset-8 bg-gradient-to-br from-[#3182f6]/20 to-[#3182f6]/0 rounded-3xl blur-2xl -z-10" />
+            <ChartMockup />
+            {/* 부유하는 메트릭 카드 — 토스 스타일 */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.6 }}
+              className="absolute -bottom-6 -left-6 md:-bottom-8 md:-left-12 bg-card border border-border rounded-2xl shadow-2xl px-5 py-4 z-10 hidden sm:block"
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center">
+                  <span className="text-2xl">⚡</span>
+                </div>
+                <div>
+                  <div className="text-2xl font-black">70%</div>
+                  <div className="text-xs text-muted-foreground">차트 시간 단축</div>
+                </div>
+              </div>
+            </motion.div>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.8 }}
+              className="absolute -top-6 -right-6 md:-top-8 md:-right-12 bg-card border border-border rounded-2xl shadow-2xl px-5 py-4 z-10 hidden sm:block"
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
+                  <span className="text-2xl">💰</span>
+                </div>
+                <div>
+                  <div className="text-2xl font-black">30%↓</div>
+                  <div className="text-xs text-muted-foreground">삭감률 감소</div>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        </div>
       </div>
     </section>
   )
