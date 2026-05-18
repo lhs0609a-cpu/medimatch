@@ -1,230 +1,272 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import {
-  Landmark,
-  TrendingUp,
-  TrendingDown,
-  DollarSign,
-  Calendar,
-  Brain,
-  BarChart3,
-  FileText,
-  Clock,
-  Lightbulb,
-  ChevronRight,
-  AlertTriangle,
-  CheckCircle2,
-  Info,
+  Landmark, TrendingUp, DollarSign, Calendar, Brain, BarChart3,
+  AlertTriangle, Info, Plus, Trash2, Edit2, X, Save,
 } from 'lucide-react'
 
-type TabKey = 'overview' | 'trend' | 'benchmark' | 'contracts' | 'ai'
+type Urgency = 'HIGH' | 'MEDIUM' | 'LOW'
 
-const tabs: { key: TabKey; label: string; icon: typeof BarChart3 }[] = [
-  { key: 'overview', label: '비용 현황', icon: BarChart3 },
-  { key: 'trend', label: '월별 추이', icon: TrendingUp },
-  { key: 'benchmark', label: '벤치마크', icon: Landmark },
-  { key: 'contracts', label: '계약 관리', icon: Calendar },
-  { key: 'ai', label: 'AI 권고', icon: Brain },
-]
-
-const kpi = {
-  totalCost: 11_400_000,
-  revenueRatio: 11.9,
-  expiringContracts: 3,
-  savingsOpportunity: 912_000,
+interface CostItem {
+  id: string
+  category: string
+  vendor: string
+  amount: number           // 월 비용 (원)
+  endDate?: string         // 계약 만료 (YYYY-MM-DD, 선택)
 }
 
-const costItems = [
-  { category: '임대료', amount: 5_500_000, vendor: '강남빌딩 관리사무소', share: 48.2 },
-  { category: '대출 상환', amount: 2_300_000, vendor: '국민은행', share: 20.2 },
-  { category: '장비 리스', amount: 1_200_000, vendor: 'GE Healthcare', share: 10.5 },
-  { category: '공과금', amount: 850_000, vendor: '한국전력/서울도시가스', share: 7.5 },
-  { category: '기타', amount: 500_000, vendor: '세무법인 택스원', share: 4.4 },
-  { category: '보험료', amount: 420_000, vendor: '삼성화재', share: 3.7 },
-  { category: '유지보수', amount: 350_000, vendor: '의료기기정비(주)', share: 3.1 },
-  { category: '통신비', amount: 280_000, vendor: 'KT', share: 2.5 },
+const DEMO_ITEMS: CostItem[] = [
+  { id: 'd1', category: '임대료',    vendor: '강남빌딩 관리사무소', amount: 5_500_000, endDate: '2026-08-27' },
+  { id: 'd2', category: '대출 상환', vendor: '국민은행',           amount: 2_300_000 },
+  { id: 'd3', category: '장비 리스', vendor: 'GE Healthcare',      amount: 1_200_000, endDate: '2027-02-27' },
+  { id: 'd4', category: '공과금',    vendor: '한국전력/서울도시가스', amount: 850_000 },
+  { id: 'd5', category: '기타',      vendor: '세무법인 택스원',     amount: 500_000, endDate: '2027-02-27' },
+  { id: 'd6', category: '보험료',    vendor: '삼성화재',            amount: 420_000, endDate: '2026-05-29' },
+  { id: 'd7', category: '유지보수',  vendor: '의료기기정비(주)',    amount: 350_000, endDate: '2026-04-29' },
+  { id: 'd8', category: '통신비',    vendor: 'KT',                  amount: 280_000, endDate: '2026-04-14' },
 ]
 
-const monthlyTrend = [
-  { month: '3월', rent: 5_500_000, utilities: 820_000, lease: 1_200_000, other: 3_800_000, total: 11_320_000 },
-  { month: '4월', rent: 5_500_000, utilities: 780_000, lease: 1_200_000, other: 3_850_000, total: 11_330_000 },
-  { month: '5월', rent: 5_500_000, utilities: 850_000, lease: 1_200_000, other: 3_800_000, total: 11_350_000 },
-  { month: '6월', rent: 5_500_000, utilities: 920_000, lease: 1_200_000, other: 3_780_000, total: 11_400_000 },
-  { month: '7월', rent: 5_500_000, utilities: 1_050_000, lease: 1_200_000, other: 3_800_000, total: 11_550_000 },
-  { month: '8월', rent: 5_500_000, utilities: 1_100_000, lease: 1_200_000, other: 3_850_000, total: 11_650_000 },
-  { month: '9월', rent: 5_500_000, utilities: 920_000, lease: 1_200_000, other: 3_800_000, total: 11_420_000 },
-  { month: '10월', rent: 5_500_000, utilities: 830_000, lease: 1_200_000, other: 3_820_000, total: 11_350_000 },
-  { month: '11월', rent: 5_500_000, utilities: 880_000, lease: 1_200_000, other: 3_810_000, total: 11_390_000 },
-  { month: '12월', rent: 5_500_000, utilities: 950_000, lease: 1_200_000, other: 3_830_000, total: 11_480_000 },
-  { month: '1월', rent: 5_500_000, utilities: 980_000, lease: 1_200_000, other: 3_800_000, total: 11_480_000 },
-  { month: '2월', rent: 5_500_000, utilities: 850_000, lease: 1_200_000, other: 3_850_000, total: 11_400_000 },
-]
+const LS_KEY = 'fixedCost.v1'
+const LS_REVENUE = 'fixedCost.monthlyRevenue.v1'
 
-const contracts = [
-  { category: '통신비', vendor: 'KT', endDate: '2026-04-14', dDay: 45, amount: 280_000, urgency: 'HIGH' },
-  { category: '유지보수', vendor: '의료기기정비(주)', endDate: '2026-04-29', dDay: 60, amount: 350_000, urgency: 'HIGH' },
-  { category: '보험료', vendor: '삼성화재', endDate: '2026-05-29', dDay: 90, amount: 420_000, urgency: 'MEDIUM' },
-  { category: '임대료', vendor: '강남빌딩 관리사무소', endDate: '2026-08-27', dDay: 180, amount: 5_500_000, urgency: 'LOW' },
-  { category: '장비 리스', vendor: 'GE Healthcare', endDate: '2027-02-27', dDay: 365, amount: 1_200_000, urgency: 'LOW' },
-  { category: '기타', vendor: '세무법인 택스원', endDate: '2027-02-27', dDay: 365, amount: 500_000, urgency: 'LOW' },
-]
+const safeNum = (n: number | undefined | null): number =>
+  typeof n === 'number' && Number.isFinite(n) ? n : 0
+const fmt = (n: number | undefined | null) => safeNum(n).toLocaleString() + '원'
+const fmtMan = (n: number | undefined | null) => (safeNum(n) / 10000).toFixed(0) + '만'
 
-const benchmarkData = [
-  { name: '임대료', my: 5_500_000, avg: 5_000_000 },
-  { name: '공과금', my: 850_000, avg: 780_000 },
-  { name: '장비 리스', my: 1_200_000, avg: 1_350_000 },
-  { name: '통신비', my: 280_000, avg: 220_000 },
-  { name: '보험료', my: 420_000, avg: 380_000 },
-]
-
-const aiRecommendations = [
-  { id: 1, title: '임대료 재협상 시점', priority: 'HIGH', savings: 550_000, desc: '임대차 계약 갱신이 6개월 이내입니다. 주변 시세 대비 10% 높은 편으로, 재협상 시 월 55만원 절감이 가능합니다.', actions: ['주변 의원 임대료 시세 조사', '계약 갱신 3개월 전 협상 시작', '리노베이션 투자 대비 임대료 할인 제안'] },
-  { id: 2, title: '장비 리스 vs 구매 분석', priority: 'MEDIUM', savings: 300_000, desc: 'CT 장비 리스 만기가 1년 남았습니다. 잔여 리스료 대비 중고 매입이 유리한 구간입니다.', actions: ['리스 잔여 비용 총액 확인', '중고 장비 시세 조회', '의료기기 감가상각 세금 효과 계산'] },
-  { id: 3, title: '통신비 절감', priority: 'LOW', savings: 80_000, desc: '현재 통신 요금제가 사용량 대비 과다합니다. 요금제 변경으로 월 8만원 절감이 가능합니다.', actions: ['현재 통신 사용량 분석', '경쟁사 요금제 비교', '번들 할인 적용 가능 여부 확인'] },
-]
-
-const urgencyColors: Record<string, string> = {
-  HIGH: 'bg-red-50 text-red-600 dark:bg-red-900/30 dark:text-red-400 border-red-200 dark:border-red-800',
-  MEDIUM: 'bg-amber-50 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400 border-amber-200 dark:border-amber-800',
-  LOW: 'bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400 border-blue-200 dark:border-blue-800',
+const daysUntil = (dateStr?: string): number | null => {
+  if (!dateStr) return null
+  const d = new Date(dateStr).getTime()
+  if (Number.isNaN(d)) return null
+  return Math.ceil((d - Date.now()) / 86400000)
 }
-const priorityColors: Record<string, string> = {
+const urgencyOf = (days: number | null): Urgency | null => {
+  if (days === null) return null
+  if (days <= 60) return 'HIGH'
+  if (days <= 120) return 'MEDIUM'
+  return 'LOW'
+}
+const urgencyColors: Record<Urgency, string> = {
   HIGH: 'bg-red-50 text-red-600 dark:bg-red-900/30 dark:text-red-400',
   MEDIUM: 'bg-amber-50 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400',
   LOW: 'bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400',
 }
 
-function fmt(n: number) { return n.toLocaleString() + '원' }
-function fmtMan(n: number) { return (n / 10000).toFixed(0) + '만' }
-
 export default function FixedCostPage() {
-  const [activeTab, setActiveTab] = useState<TabKey>('overview')
-  const maxAmount = Math.max(...costItems.map(c => c.amount))
-  const maxTrend = Math.max(...monthlyTrend.map(m => m.total))
+  const [items, setItems] = useState<CostItem[]>([])
+  const [monthlyRevenue, setMonthlyRevenue] = useState(0)
+  const [isReal, setIsReal] = useState(false)
+  const [editorOpen, setEditorOpen] = useState(false)
+  const [hydrated, setHydrated] = useState(false)
+
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(LS_KEY)
+      if (raw) {
+        const p = JSON.parse(raw) as CostItem[]
+        if (Array.isArray(p) && p.length > 0) {
+          setItems(p)
+          setIsReal(true)
+        } else setItems(DEMO_ITEMS)
+      } else setItems(DEMO_ITEMS)
+      const rev = localStorage.getItem(LS_REVENUE)
+      if (rev) setMonthlyRevenue(Number(rev) || 0)
+    } catch { setItems(DEMO_ITEMS) }
+    setHydrated(true)
+  }, [])
+
+  const kpi = useMemo(() => {
+    const total = items.reduce((s, i) => s + safeNum(i.amount), 0)
+    const expiringSoon = items.filter(i => {
+      const d = daysUntil(i.endDate)
+      return d !== null && d > 0 && d <= 60
+    }).length
+    const revenueRatio = monthlyRevenue > 0 ? (total / monthlyRevenue) * 100 : 0
+    return { total, expiringSoon, revenueRatio, count: items.length }
+  }, [items, monthlyRevenue])
+
+  const sortedItems = useMemo(() => {
+    return [...items]
+      .map(i => ({
+        ...i,
+        share: kpi.total > 0 ? (safeNum(i.amount) / kpi.total) * 100 : 0,
+        daysLeft: daysUntil(i.endDate),
+      }))
+      .sort((a, b) => safeNum(b.amount) - safeNum(a.amount))
+  }, [items, kpi.total])
+
+  const upcomingContracts = useMemo(() => {
+    return sortedItems
+      .filter(i => i.daysLeft !== null && i.daysLeft >= 0)
+      .sort((a, b) => (a.daysLeft ?? 999) - (b.daysLeft ?? 999))
+  }, [sortedItems])
+
+  const saveAll = (next: CostItem[], rev?: number) => {
+    setItems(next)
+    try {
+      localStorage.setItem(LS_KEY, JSON.stringify(next))
+      if (rev !== undefined) localStorage.setItem(LS_REVENUE, String(rev))
+    } catch {}
+    setIsReal(next.length > 0)
+  }
+
+  const resetToDemo = () => {
+    if (!confirm('내 고정비 데이터를 모두 삭제하고 데모로 돌아갈까요?')) return
+    try {
+      localStorage.removeItem(LS_KEY)
+      localStorage.removeItem(LS_REVENUE)
+    } catch {}
+    setItems(DEMO_ITEMS)
+    setMonthlyRevenue(0)
+    setIsReal(false)
+  }
+
+  if (!hydrated) return null
 
   return (
     <div className="max-w-[1400px] mx-auto space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold">고정비 절감 분석</h1>
-        <p className="text-sm text-muted-foreground mt-1">임대료/공과금/보험/리스 등 고정비를 분석하고 계약 갱신 시점을 관리합니다</p>
+      <div className="flex items-start justify-between gap-4 flex-wrap">
+        <div>
+          <div className="flex items-center gap-2 mb-1">
+            <h1 className="text-2xl font-bold">고정비 절감</h1>
+            <span className={`text-2xs font-bold px-2 py-0.5 rounded-full ${
+              isReal
+                ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300'
+                : 'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300'
+            }`}>
+              {isReal ? '내 데이터' : '데모 데이터'}
+            </span>
+          </div>
+          <p className="text-sm text-muted-foreground mt-1">
+            임대·공과금·리스·보험을 한 곳에서 추적하고 만료 임박 계약을 알려드립니다
+          </p>
+        </div>
+        <div className="flex items-center gap-2">
+          {isReal && (
+            <button onClick={resetToDemo} className="btn-secondary btn-sm">데모로 초기화</button>
+          )}
+          <button onClick={() => setEditorOpen(true)} className="btn-primary btn-sm">
+            <Edit2 className="w-4 h-4" /> 내 데이터 입력
+          </button>
+        </div>
       </div>
 
       {/* KPI */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <div className="card p-4">
-          <div className="flex items-center gap-2 mb-2"><DollarSign className="w-5 h-5 text-primary" /><span className="text-xs text-muted-foreground">총 고정비</span></div>
-          <div className="text-2xl font-bold">{fmtMan(kpi.totalCost)}</div>
+          <div className="flex items-center gap-2 mb-2">
+            <DollarSign className="w-5 h-5 text-primary" />
+            <span className="text-xs text-muted-foreground">총 고정비 (월)</span>
+          </div>
+          <div className="text-2xl font-bold">{fmtMan(kpi.total)}</div>
+          <div className="text-xs mt-1 text-muted-foreground">{kpi.count}개 항목</div>
         </div>
         <div className="card p-4">
-          <div className="flex items-center gap-2 mb-2"><BarChart3 className="w-5 h-5 text-blue-500" /><span className="text-xs text-muted-foreground">매출 대비</span></div>
-          <div className="text-2xl font-bold">{kpi.revenueRatio}%</div>
-          <div className="text-xs mt-1 text-muted-foreground">권장: 10~15%</div>
+          <div className="flex items-center gap-2 mb-2">
+            <BarChart3 className="w-5 h-5 text-blue-500" />
+            <span className="text-xs text-muted-foreground">매출 대비</span>
+          </div>
+          {monthlyRevenue > 0 ? (
+            <>
+              <div className="text-2xl font-bold">{kpi.revenueRatio.toFixed(1)}%</div>
+              <div className="text-xs mt-1 text-muted-foreground">권장: 15% 이하</div>
+            </>
+          ) : (
+            <>
+              <div className="text-2xl font-bold text-muted-foreground/50">—</div>
+              <div className="text-xs mt-1 text-muted-foreground">월 매출 입력 시 표시</div>
+            </>
+          )}
         </div>
         <div className="card p-4">
-          <div className="flex items-center gap-2 mb-2"><Calendar className="w-5 h-5 text-amber-500" /><span className="text-xs text-muted-foreground">계약 갱신 임박</span></div>
-          <div className="text-2xl font-bold">{kpi.expiringContracts}건</div>
-          <div className="text-xs mt-1 text-muted-foreground">90일 이내</div>
+          <div className="flex items-center gap-2 mb-2">
+            <Calendar className="w-5 h-5 text-amber-500" />
+            <span className="text-xs text-muted-foreground">60일 내 만료</span>
+          </div>
+          <div className="text-2xl font-bold">{kpi.expiringSoon}건</div>
+          <div className="text-xs mt-1 text-muted-foreground">재협상 권장</div>
         </div>
         <div className="card p-4">
-          <div className="flex items-center gap-2 mb-2"><Lightbulb className="w-5 h-5 text-emerald-500" /><span className="text-xs text-muted-foreground">절감 기회</span></div>
-          <div className="text-2xl font-bold text-emerald-600">{fmtMan(kpi.savingsOpportunity)}</div>
+          <div className="flex items-center gap-2 mb-2">
+            <TrendingUp className="w-5 h-5 text-emerald-500" />
+            <span className="text-xs text-muted-foreground">연 환산</span>
+          </div>
+          <div className="text-2xl font-bold">{fmtMan(kpi.total * 12)}</div>
+          <div className="text-xs mt-1 text-muted-foreground">월 × 12</div>
         </div>
       </div>
 
-      {/* 탭 */}
-      <div className="flex items-center gap-1 overflow-x-auto hide-scrollbar border-b border-border">
-        {tabs.map(tab => (
-          <button key={tab.key} onClick={() => setActiveTab(tab.key)}
-            className={`flex items-center gap-2 px-4 py-3 text-sm font-medium whitespace-nowrap border-b-2 transition-colors ${activeTab === tab.key ? 'border-primary text-primary' : 'border-transparent text-muted-foreground hover:text-foreground'}`}>
-            <tab.icon className="w-4 h-4" />{tab.label}
-          </button>
-        ))}
-      </div>
-
-      {/* 비용 현황 */}
-      {activeTab === 'overview' && (
-        <div className="card p-6 space-y-4">
-          <h3 className="font-bold">항목별 고정비</h3>
-          <div className="space-y-3">
-            {costItems.map((item) => (
-              <div key={item.category} className="flex items-center gap-3">
-                <span className="text-sm font-medium w-20">{item.category}</span>
-                <div className="flex-1 h-8 bg-secondary/30 rounded-lg overflow-hidden">
-                  <div className="h-full bg-primary/60 rounded-lg flex items-center px-2" style={{ width: `${(item.amount / maxAmount) * 100}%` }}>
-                    <span className="text-2xs text-white font-medium truncate">{item.vendor}</span>
-                  </div>
-                </div>
-                <span className="text-sm font-semibold w-20 text-right">{fmtMan(item.amount)}</span>
-                <span className="text-xs text-muted-foreground w-10 text-right">{item.share}%</span>
-              </div>
-            ))}
-          </div>
+      {/* 비용 항목 */}
+      <div className="card overflow-hidden">
+        <div className="p-4 border-b border-border flex items-center justify-between">
+          <h3 className="font-bold">비용 항목</h3>
+          <span className="text-xs text-muted-foreground">큰 금액 순</span>
         </div>
-      )}
-
-      {/* 월별 추이 */}
-      {activeTab === 'trend' && (
-        <div className="card p-6 space-y-4">
-          <h3 className="font-bold">12개월 고정비 추이</h3>
-          <div className="space-y-3">
-            {monthlyTrend.map((m) => (
-              <div key={m.month} className="flex items-center gap-3">
-                <span className="text-xs text-muted-foreground w-10 text-right">{m.month}</span>
-                <div className="flex-1 flex h-7 rounded-lg overflow-hidden bg-secondary/30">
-                  <div className="bg-primary/70 h-full" style={{ width: `${(m.rent / maxTrend) * 100}%` }} />
-                  <div className="bg-amber-400 h-full" style={{ width: `${(m.utilities / maxTrend) * 100}%` }} />
-                  <div className="bg-blue-400 h-full" style={{ width: `${(m.lease / maxTrend) * 100}%` }} />
-                  <div className="bg-gray-400 h-full" style={{ width: `${(m.other / maxTrend) * 100}%` }} />
-                </div>
-                <span className="text-xs font-semibold w-16 text-right">{fmtMan(m.total)}</span>
-              </div>
-            ))}
+        {sortedItems.length === 0 ? (
+          <div className="p-12 text-center text-muted-foreground">
+            <Landmark className="w-10 h-10 mx-auto mb-3 opacity-30" />
+            <p className="mb-4">등록된 고정비가 없습니다</p>
+            <button onClick={() => setEditorOpen(true)} className="btn-primary btn-sm">
+              <Plus className="w-4 h-4" /> 첫 항목 추가
+            </button>
           </div>
-          <div className="flex items-center gap-6 pt-2 text-xs text-muted-foreground">
-            <div className="flex items-center gap-1.5"><div className="w-3 h-3 rounded bg-primary/70" /> 임대료</div>
-            <div className="flex items-center gap-1.5"><div className="w-3 h-3 rounded bg-amber-400" /> 공과금</div>
-            <div className="flex items-center gap-1.5"><div className="w-3 h-3 rounded bg-blue-400" /> 장비리스</div>
-            <div className="flex items-center gap-1.5"><div className="w-3 h-3 rounded bg-gray-400" /> 기타</div>
-          </div>
-        </div>
-      )}
-
-      {/* 벤치마크 */}
-      {activeTab === 'benchmark' && (
-        <div className="card p-6 space-y-4">
-          <div className="flex items-center justify-between">
-            <h3 className="font-bold">내 의원 vs 지역 평균 (내과 · 강남구)</h3>
-            <span className="text-xs bg-amber-50 text-amber-600 dark:bg-amber-900/20 px-2 py-0.5 rounded-full font-semibold">상위 42%</span>
-          </div>
-          <div className="space-y-4">
-            {benchmarkData.map((item) => {
-              const maxVal = Math.max(item.my, item.avg)
-              const diff = item.my - item.avg
+        ) : (
+          <div className="divide-y divide-border">
+            {sortedItems.map((it) => {
+              const urgency = urgencyOf(it.daysLeft)
               return (
-                <div key={item.name} className="space-y-1.5">
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="font-medium">{item.name}</span>
-                    <span className={`text-xs font-semibold ${diff > 0 ? 'text-red-500' : 'text-emerald-500'}`}>
-                      {diff > 0 ? '+' : ''}{fmtMan(diff)}
-                    </span>
-                  </div>
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-2">
-                      <span className="text-2xs text-muted-foreground w-8">내 의원</span>
-                      <div className="flex-1 h-3 bg-secondary rounded-full overflow-hidden">
-                        <div className={`h-full rounded-full ${diff > 0 ? 'bg-red-400' : 'bg-emerald-400'}`} style={{ width: `${(item.my / maxVal) * 100}%` }} />
-                      </div>
-                      <span className="text-2xs w-12 text-right">{fmtMan(item.my)}</span>
+                <div key={it.id} className="p-4 flex items-center gap-3 hover:bg-secondary/30 transition-colors">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="font-semibold">{it.category}</span>
+                      {urgency && (
+                        <span className={`text-2xs px-1.5 py-0.5 rounded ${urgencyColors[urgency]}`}>
+                          {it.daysLeft! <= 0 ? '만료됨' : `D-${it.daysLeft}`}
+                        </span>
+                      )}
                     </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-2xs text-muted-foreground w-8">평균</span>
-                      <div className="flex-1 h-3 bg-secondary rounded-full overflow-hidden">
-                        <div className="h-full bg-muted-foreground/40 rounded-full" style={{ width: `${(item.avg / maxVal) * 100}%` }} />
-                      </div>
-                      <span className="text-2xs w-12 text-right">{fmtMan(item.avg)}</span>
+                    <div className="text-xs text-muted-foreground truncate">
+                      {it.vendor || '거래처 미입력'}
+                      {it.endDate && ` · 만료 ${it.endDate}`}
                     </div>
                   </div>
+                  <div className="text-right">
+                    <div className="font-bold">{fmt(it.amount)}</div>
+                    <div className="text-2xs text-muted-foreground">{it.share.toFixed(1)}%</div>
+                  </div>
+                  <div className="w-32 hidden md:block">
+                    <div className="h-2 bg-secondary rounded-full overflow-hidden">
+                      <div className="h-full bg-primary rounded-full" style={{ width: `${it.share}%` }} />
+                    </div>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        )}
+      </div>
+
+      {/* 만료 임박 계약 */}
+      {upcomingContracts.length > 0 && (
+        <div className="card p-5">
+          <div className="flex items-center gap-2 mb-3">
+            <Calendar className="w-5 h-5 text-amber-500" />
+            <h3 className="font-bold">만료 임박 계약 — 재협상 기회</h3>
+          </div>
+          <div className="space-y-2">
+            {upcomingContracts.slice(0, 5).map((c) => {
+              const u = urgencyOf(c.daysLeft)
+              return (
+                <div key={c.id} className="flex items-center gap-3 p-3 bg-secondary/30 rounded-lg">
+                  <span className={`text-2xs font-semibold px-2 py-0.5 rounded ${urgencyColors[u || 'LOW']}`}>
+                    {c.daysLeft! <= 0 ? '만료' : `D-${c.daysLeft}`}
+                  </span>
+                  <div className="flex-1 min-w-0">
+                    <div className="text-sm font-medium">{c.category} · {c.vendor}</div>
+                    <div className="text-2xs text-muted-foreground">{c.endDate}</div>
+                  </div>
+                  <span className="text-sm font-semibold">{fmt(c.amount)}</span>
                 </div>
               )
             })}
@@ -232,69 +274,143 @@ export default function FixedCostPage() {
         </div>
       )}
 
-      {/* 계약 관리 */}
-      {activeTab === 'contracts' && (
-        <div className="space-y-4">
-          {contracts.map((c) => (
-            <div key={c.vendor} className={`card p-5 border ${urgencyColors[c.urgency]}`}>
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                <div>
-                  <div className="flex items-center gap-2 mb-1">
-                    <h4 className="font-bold">{c.category}</h4>
-                    <span className={`px-2 py-0.5 rounded-full text-2xs font-semibold ${c.urgency === 'HIGH' ? 'bg-red-100 text-red-700' : c.urgency === 'MEDIUM' ? 'bg-amber-100 text-amber-700' : 'bg-blue-100 text-blue-700'}`}>
-                      D-{c.dDay}
-                    </span>
-                  </div>
-                  <div className="text-sm text-muted-foreground">{c.vendor}</div>
-                </div>
-                <div className="text-right">
-                  <div className="text-lg font-bold">{fmt(c.amount)}/월</div>
-                  <div className="text-xs text-muted-foreground">만료: {c.endDate}</div>
-                </div>
-              </div>
-            </div>
-          ))}
+      {!isReal && (
+        <div className="card p-3 bg-amber-50/50 dark:bg-amber-900/10 border-amber-200 dark:border-amber-800">
+          <div className="flex items-center gap-2 text-xs text-amber-600 dark:text-amber-400">
+            <AlertTriangle className="w-3.5 h-3.5 flex-shrink-0" />
+            <span>
+              데모 데이터로 표시 중입니다. <b>"내 데이터 입력"</b>을 누르시면 실 비용 분석으로 전환됩니다.
+            </span>
+          </div>
         </div>
       )}
 
-      {/* AI 권고 */}
-      {activeTab === 'ai' && (
-        <div className="space-y-4">
-          <div className="card p-4 bg-primary/5 border-primary/20">
-            <div className="flex items-center gap-2 mb-1">
-              <Brain className="w-5 h-5 text-primary" />
-              <span className="font-bold">AI 분석 총 절감 가능액</span>
-            </div>
-            <div className="text-2xl font-bold text-primary">월 {fmt(aiRecommendations.reduce((s, r) => s + r.savings, 0))}</div>
+      {editorOpen && (
+        <FixedCostEditor
+          initial={isReal ? items : []}
+          initialRevenue={monthlyRevenue}
+          onClose={() => setEditorOpen(false)}
+          onSave={(next, rev) => { saveAll(next, rev); setEditorOpen(false) }}
+        />
+      )}
+    </div>
+  )
+}
+
+/* ════════ 편집 모달 ════════ */
+interface EditorProps {
+  initial: CostItem[]
+  initialRevenue: number
+  onClose: () => void
+  onSave: (next: CostItem[], revenue: number) => void
+}
+function FixedCostEditor({ initial, initialRevenue, onClose, onSave }: EditorProps) {
+  const [rows, setRows] = useState<CostItem[]>(initial)
+  const [revenue, setRevenue] = useState(initialRevenue)
+
+  const addRow = () => setRows([...rows, {
+    id: `n${Date.now()}`, category: '', vendor: '', amount: 0, endDate: '',
+  }])
+  const updateRow = (idx: number, patch: Partial<CostItem>) =>
+    setRows(rows.map((r, i) => i === idx ? { ...r, ...patch } : r))
+  const removeRow = (idx: number) =>
+    setRows(rows.filter((_, i) => i !== idx))
+  const handleSave = () => {
+    const cleaned = rows.filter(r => r.category.trim().length > 0)
+    onSave(cleaned, revenue)
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4">
+      <div className="bg-card border border-border rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-border flex-shrink-0">
+          <div>
+            <h2 className="font-bold text-lg">내 고정비 데이터 입력</h2>
+            <p className="text-xs text-muted-foreground mt-0.5">브라우저에 저장됩니다</p>
           </div>
-          {aiRecommendations.map((rec) => (
-            <div key={rec.id} className="card p-5">
-              <div className="flex items-center gap-3 mb-3">
-                <Lightbulb className="w-5 h-5 text-amber-500 flex-shrink-0" />
-                <h4 className="font-bold flex-1">{rec.title}</h4>
-                <span className={`px-2 py-0.5 rounded-full text-2xs font-semibold ${priorityColors[rec.priority]}`}>
-                  {rec.priority === 'HIGH' ? '높음' : rec.priority === 'MEDIUM' ? '보통' : '낮음'}
-                </span>
-                <span className="text-sm font-bold text-emerald-600">월 {fmt(rec.savings)}</span>
+          <button onClick={onClose} className="btn-icon"><X className="w-4 h-4" /></button>
+        </div>
+
+        <div className="flex-1 overflow-y-auto p-6 space-y-5">
+          <div>
+            <label className="text-sm font-semibold mb-1.5 block">월 평균 매출 (선택)</label>
+            <div className="flex items-center gap-2">
+              <input
+                type="number" inputMode="numeric"
+                value={revenue || ''}
+                onChange={(e) => setRevenue(Number(e.target.value) || 0)}
+                placeholder="예: 96000000"
+                className="input flex-1"
+              />
+              <span className="text-sm text-muted-foreground">원/월</span>
+            </div>
+          </div>
+
+          <div>
+            <div className="flex items-center justify-between mb-2">
+              <label className="text-sm font-semibold">고정비 항목 ({rows.length}개)</label>
+              <button onClick={addRow} className="btn-secondary btn-sm">
+                <Plus className="w-3.5 h-3.5" /> 항목 추가
+              </button>
+            </div>
+            {rows.length === 0 ? (
+              <div className="border border-dashed border-border rounded-xl p-8 text-center text-sm text-muted-foreground">
+                항목이 없습니다. "항목 추가"를 눌러 등록하세요.
               </div>
-              <p className="text-sm text-muted-foreground mb-3">{rec.desc}</p>
-              <div className="space-y-1.5">
-                {rec.actions.map((action, i) => (
-                  <div key={i} className="flex items-center gap-2 text-sm">
-                    <ChevronRight className="w-3.5 h-3.5 text-primary flex-shrink-0" />
-                    <span>{action}</span>
+            ) : (
+              <div className="space-y-2">
+                {rows.map((r, idx) => (
+                  <div key={r.id} className="grid grid-cols-12 gap-2 items-center p-3 border border-border rounded-xl">
+                    <input
+                      className="input col-span-3 text-sm"
+                      placeholder="항목명 (예: 임대료)"
+                      value={r.category}
+                      onChange={(e) => updateRow(idx, { category: e.target.value })}
+                    />
+                    <input
+                      className="input col-span-3 text-sm"
+                      placeholder="거래처"
+                      value={r.vendor}
+                      onChange={(e) => updateRow(idx, { vendor: e.target.value })}
+                    />
+                    <input
+                      className="input col-span-3 text-sm text-right"
+                      type="number" inputMode="numeric"
+                      placeholder="월 비용 (원)"
+                      value={r.amount || ''}
+                      onChange={(e) => updateRow(idx, { amount: Number(e.target.value) || 0 })}
+                    />
+                    <input
+                      className="input col-span-2 text-sm"
+                      type="date"
+                      value={r.endDate || ''}
+                      onChange={(e) => updateRow(idx, { endDate: e.target.value })}
+                    />
+                    <button
+                      onClick={() => removeRow(idx)}
+                      className="col-span-1 btn-icon text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30 mx-auto"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
                   </div>
                 ))}
+                <div className="grid grid-cols-12 gap-2 px-3 text-2xs text-muted-foreground">
+                  <span className="col-span-3">항목명</span>
+                  <span className="col-span-3">거래처</span>
+                  <span className="col-span-3 text-right">월 비용</span>
+                  <span className="col-span-2">계약 만료일</span>
+                  <span className="col-span-1" />
+                </div>
               </div>
-            </div>
-          ))}
+            )}
+          </div>
         </div>
-      )}
 
-      <div className="card p-3 bg-amber-50/50 dark:bg-amber-900/10 border-amber-200 dark:border-amber-800">
-        <div className="flex items-center gap-2 text-xs text-amber-600 dark:text-amber-400">
-          <AlertTriangle className="w-3.5 h-3.5 flex-shrink-0" />
-          <span>데모 데이터로 표시 중입니다. 실제 고정비 데이터를 입력하면 정확한 분석이 가능합니다.</span>
+        <div className="flex items-center justify-end gap-2 px-6 py-4 border-t border-border flex-shrink-0">
+          <button onClick={onClose} className="btn-secondary btn-sm">취소</button>
+          <button onClick={handleSave} className="btn-primary btn-sm">
+            <Save className="w-3.5 h-3.5" /> 저장
+          </button>
         </div>
       </div>
     </div>

@@ -1,128 +1,118 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import {
-  TrendingUp,
-  TrendingDown,
-  DollarSign,
-  Users,
-  Brain,
-  BarChart3,
-  Target,
-  Lightbulb,
-  ChevronRight,
-  AlertTriangle,
-  Calendar,
-  Award,
+  TrendingUp, DollarSign, Users, Brain, BarChart3, Target,
+  AlertTriangle, Plus, Trash2, Edit2, X, Save,
 } from 'lucide-react'
 
-type TabKey = 'channels' | 'trend' | 'budget' | 'season' | 'ai'
-
-const tabs: { key: TabKey; label: string; icon: typeof BarChart3 }[] = [
-  { key: 'channels', label: '채널 성과', icon: BarChart3 },
-  { key: 'trend', label: '월별 추이', icon: TrendingUp },
-  { key: 'budget', label: '예산 배분', icon: Target },
-  { key: 'season', label: '계절 분석', icon: Calendar },
-  { key: 'ai', label: 'AI 권고', icon: Brain },
-]
-
-const kpi = {
-  totalSpend: 3_800_000,
-  totalPatients: 67,
-  avgCpa: 56_716,
-  overallRoi: 557,
-  bestChannel: '네이버 블로그',
-  bestRoi: 500,
+interface Channel {
+  id: string
+  name: string         // 네이버 광고, 인스타그램, 카카오, 소개 등
+  spend: number        // 월 광고비 (원, 0이면 무료)
+  inquiries: number    // 월 문의 수
+  newPatients: number  // 신규 환자 (실제 내원)
+  revenuePerPatient: number  // 신환 1명당 예상 매출
 }
 
-const channels = [
-  { name: '소개/추천', spend: 0, patients: 15, inquiries: 15, appointments: 15, revenue: 6_000_000, roi: 0, cpa: 0, color: 'bg-blue-400' },
-  { name: '네이버 블로그', spend: 800_000, patients: 12, inquiries: 45, appointments: 18, revenue: 4_800_000, roi: 500, cpa: 66_667, color: 'bg-emerald-400' },
-  { name: '네이버 광고', spend: 1_500_000, patients: 20, inquiries: 80, appointments: 30, revenue: 7_200_000, roi: 380, cpa: 75_000, color: 'bg-blue-400' },
-  { name: '인스타그램/SNS', spend: 400_000, patients: 8, inquiries: 35, appointments: 12, revenue: 3_200_000, roi: 700, cpa: 50_000, color: 'bg-blue-400' },
-  { name: '구글 광고', spend: 600_000, patients: 5, inquiries: 25, appointments: 8, revenue: 2_000_000, roi: 233, cpa: 120_000, color: 'bg-red-400' },
-  { name: '카카오톡', spend: 300_000, patients: 4, inquiries: 15, appointments: 6, revenue: 1_200_000, roi: 300, cpa: 75_000, color: 'bg-amber-400' },
-  { name: '오프라인 전단', spend: 200_000, patients: 3, inquiries: 10, appointments: 4, revenue: 900_000, roi: 350, cpa: 66_667, color: 'bg-orange-400' },
+const DEMO: Channel[] = [
+  { id: 'd1', name: '소개/추천',      spend: 0,         inquiries: 15, newPatients: 15, revenuePerPatient: 400_000 },
+  { id: 'd2', name: '네이버 블로그',   spend: 800_000,   inquiries: 45, newPatients: 12, revenuePerPatient: 400_000 },
+  { id: 'd3', name: '네이버 광고',     spend: 1_500_000, inquiries: 80, newPatients: 20, revenuePerPatient: 360_000 },
+  { id: 'd4', name: '인스타그램/SNS', spend: 400_000,   inquiries: 35, newPatients:  8, revenuePerPatient: 400_000 },
+  { id: 'd5', name: '구글 광고',       spend: 600_000,   inquiries: 25, newPatients:  5, revenuePerPatient: 400_000 },
+  { id: 'd6', name: '카카오톡',        spend: 300_000,   inquiries: 15, newPatients:  4, revenuePerPatient: 300_000 },
+  { id: 'd7', name: '오프라인 전단',   spend: 200_000,   inquiries: 10, newPatients:  3, revenuePerPatient: 300_000 },
 ]
 
-const monthlyTrend = [
-  { month: '3월', naver: 2_100_000, google: 550_000, sns: 380_000, other: 650_000, total: 3_680_000, patients: 62 },
-  { month: '4월', naver: 2_300_000, google: 620_000, sns: 420_000, other: 700_000, total: 4_040_000, patients: 70 },
-  { month: '5월', naver: 2_200_000, google: 580_000, sns: 400_000, other: 680_000, total: 3_860_000, patients: 65 },
-  { month: '6월', naver: 2_000_000, google: 500_000, sns: 350_000, other: 600_000, total: 3_450_000, patients: 58 },
-  { month: '7월', naver: 1_800_000, google: 480_000, sns: 320_000, other: 550_000, total: 3_150_000, patients: 52 },
-  { month: '8월', naver: 1_700_000, google: 450_000, sns: 300_000, other: 520_000, total: 2_970_000, patients: 48 },
-  { month: '9월', naver: 2_000_000, google: 530_000, sns: 370_000, other: 620_000, total: 3_520_000, patients: 60 },
-  { month: '10월', naver: 2_100_000, google: 560_000, sns: 390_000, other: 650_000, total: 3_700_000, patients: 63 },
-  { month: '11월', naver: 2_200_000, google: 600_000, sns: 410_000, other: 680_000, total: 3_890_000, patients: 66 },
-  { month: '12월', naver: 2_300_000, google: 580_000, sns: 420_000, other: 700_000, total: 4_000_000, patients: 68 },
-  { month: '1월', naver: 2_100_000, google: 550_000, sns: 380_000, other: 650_000, total: 3_680_000, patients: 62 },
-  { month: '2월', naver: 2_300_000, google: 600_000, sns: 400_000, other: 500_000, total: 3_800_000, patients: 67 },
-]
+const LS_KEY = 'marketing.v1'
+const safeNum = (n: any): number => typeof n === 'number' && Number.isFinite(n) ? n : 0
+const fmt = (n: number | undefined | null) => safeNum(n).toLocaleString() + '원'
+const fmtMan = (n: number | undefined | null) => (safeNum(n) / 10000).toFixed(0) + '만'
 
-const budgetCurrent = [
-  { channel: '네이버 광고', current: 39, recommended: 30 },
-  { channel: '네이버 블로그', current: 21, recommended: 28 },
-  { channel: '구글 광고', current: 16, recommended: 10 },
-  { channel: '인스타그램/SNS', current: 11, recommended: 18 },
-  { channel: '카카오톡', current: 8, recommended: 8 },
-  { channel: '오프라인 전단', current: 5, recommended: 6 },
-]
+export default function MarketingPage() {
+  const [channels, setChannels] = useState<Channel[]>([])
+  const [isReal, setIsReal] = useState(false)
+  const [editorOpen, setEditorOpen] = useState(false)
+  const [hydrated, setHydrated] = useState(false)
 
-const seasonData = [
-  { month: '1월', naver: 65, google: 45, sns: 55, kakao: 40, offline: 30 },
-  { month: '2월', naver: 60, google: 50, sns: 50, kakao: 35, offline: 25 },
-  { month: '3월', naver: 80, google: 60, sns: 70, kakao: 55, offline: 45 },
-  { month: '4월', naver: 85, google: 65, sns: 75, kakao: 60, offline: 50 },
-  { month: '5월', naver: 75, google: 55, sns: 65, kakao: 50, offline: 40 },
-  { month: '6월', naver: 60, google: 45, sns: 55, kakao: 40, offline: 30 },
-  { month: '7월', naver: 50, google: 35, sns: 45, kakao: 30, offline: 20 },
-  { month: '8월', naver: 45, google: 30, sns: 40, kakao: 25, offline: 20 },
-  { month: '9월', naver: 65, google: 50, sns: 60, kakao: 45, offline: 35 },
-  { month: '10월', naver: 70, google: 55, sns: 65, kakao: 50, offline: 40 },
-  { month: '11월', naver: 75, google: 60, sns: 70, kakao: 55, offline: 45 },
-  { month: '12월', naver: 80, google: 55, sns: 65, kakao: 50, offline: 40 },
-]
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(LS_KEY)
+      if (raw) {
+        const p = JSON.parse(raw)
+        if (Array.isArray(p) && p.length > 0) { setChannels(p); setIsReal(true) }
+        else setChannels(DEMO)
+      } else setChannels(DEMO)
+    } catch { setChannels(DEMO) }
+    setHydrated(true)
+  }, [])
 
-const aiRecommendations = [
-  { id: 1, title: '예산 재배분 제안', priority: 'HIGH', improvement: '신규 환자 +15%', desc: '구글 광고의 CPA가 네이버 블로그 대비 80% 높습니다. 구글 광고 예산 30만원을 네이버 블로그로 이전하면 월 5명 추가 확보가 예상됩니다.', actions: ['구글 광고 캠페인 성과 상세 분석', '네이버 블로그 콘텐츠 제작 빈도 증가', '전환 추적 코드 설치 확인'] },
-  { id: 2, title: '시즌별 예산 조정', priority: 'MEDIUM', improvement: '비용 효율 +20%', desc: '봄철(3-5월)에 환자 유입이 15% 증가하는 패턴이 관찰됩니다. 봄철에 마케팅 예산을 집중 투자하면 ROI를 20% 개선할 수 있습니다.', actions: ['월별 유입 패턴 데이터 확인', '봄철 캠페인 사전 기획', '비수기 예산 최소화 계획'] },
-  { id: 3, title: '소개 프로그램 강화', priority: 'HIGH', improvement: 'CPA 0원 채널 확대', desc: '소개/추천 채널의 CPA가 0원이며 환자 충성도가 가장 높습니다. 체계적인 환자 소개 프로그램을 도입하면 월 5-10명 추가 확보가 가능합니다.', actions: ['환자 소개 인센티브 프로그램 설계', '소개 카드/QR코드 제작', '기존 환자 만족도 조사 실시'] },
-]
+  const enriched = useMemo(() =>
+    channels.map(c => {
+      const spend = safeNum(c.spend)
+      const newPatients = safeNum(c.newPatients)
+      const revenue = newPatients * safeNum(c.revenuePerPatient)
+      const cpa = newPatients > 0 ? spend / newPatients : 0
+      const roi = spend > 0 ? ((revenue - spend) / spend) * 100 : (revenue > 0 ? Infinity : 0)
+      const conversionRate = safeNum(c.inquiries) > 0 ? (newPatients / safeNum(c.inquiries)) * 100 : 0
+      return { ...c, revenue, cpa, roi, conversionRate }
+    }), [channels])
 
-const priorityColors: Record<string, string> = {
-  HIGH: 'bg-red-50 text-red-600 dark:bg-red-900/30 dark:text-red-400',
-  MEDIUM: 'bg-amber-50 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400',
-  LOW: 'bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400',
-}
+  const kpi = useMemo(() => {
+    const totalSpend = enriched.reduce((s, c) => s + safeNum(c.spend), 0)
+    const totalRevenue = enriched.reduce((s, c) => s + c.revenue, 0)
+    const totalPatients = enriched.reduce((s, c) => s + safeNum(c.newPatients), 0)
+    const avgCpa = totalPatients > 0 ? totalSpend / totalPatients : 0
+    const overallRoi = totalSpend > 0 ? ((totalRevenue - totalSpend) / totalSpend) * 100 : 0
+    const paidChannels = enriched.filter(c => safeNum(c.spend) > 0)
+    const best = paidChannels.length > 0
+      ? paidChannels.reduce((a, b) => (a.roi > b.roi ? a : b))
+      : null
+    return { totalSpend, totalRevenue, totalPatients, avgCpa, overallRoi, bestChannel: best?.name || '—', bestRoi: best?.roi || 0, count: channels.length }
+  }, [enriched, channels])
 
-function fmt(n: number) { return n.toLocaleString() + '원' }
-function fmtMan(n: number) { return (n / 10000).toFixed(0) + '만' }
+  const sorted = useMemo(() =>
+    [...enriched].sort((a, b) => b.roi - a.roi),
+  [enriched])
 
-function heatColor(val: number) {
-  if (val >= 75) return 'bg-emerald-500 text-white'
-  if (val >= 60) return 'bg-emerald-300 text-emerald-900'
-  if (val >= 45) return 'bg-amber-200 text-amber-900'
-  if (val >= 30) return 'bg-orange-200 text-orange-900'
-  return 'bg-red-200 text-red-900'
-}
+  const saveAll = (next: Channel[]) => {
+    setChannels(next)
+    try { localStorage.setItem(LS_KEY, JSON.stringify(next)) } catch {}
+    setIsReal(next.length > 0)
+  }
+  const resetToDemo = () => {
+    if (!confirm('내 마케팅 데이터를 모두 삭제하고 데모로 돌아갈까요?')) return
+    try { localStorage.removeItem(LS_KEY) } catch {}
+    setChannels(DEMO); setIsReal(false)
+  }
 
-export default function MarketingROIPage() {
-  const [activeTab, setActiveTab] = useState<TabKey>('channels')
-  const maxSpend = Math.max(...channels.filter(c => c.spend > 0).map(c => c.spend))
-  const maxTrend = Math.max(...monthlyTrend.map(m => m.total))
+  if (!hydrated) return null
 
   return (
     <div className="max-w-[1400px] mx-auto space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold">마케팅 ROI 분석</h1>
-        <p className="text-sm text-muted-foreground mt-1">채널별 마케팅 지출과 환자 확보 성과를 분석합니다</p>
+      <div className="flex items-start justify-between gap-4 flex-wrap">
+        <div>
+          <div className="flex items-center gap-2 mb-1">
+            <h1 className="text-2xl font-bold">마케팅 ROI</h1>
+            <span className={`text-2xs font-bold px-2 py-0.5 rounded-full ${
+              isReal ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40' : 'bg-amber-100 text-amber-700 dark:bg-amber-900/40'
+            }`}>{isReal ? '내 데이터' : '데모 데이터'}</span>
+          </div>
+          <p className="text-sm text-muted-foreground mt-1">채널별 광고비 대비 신규 환자·매출을 추적합니다</p>
+        </div>
+        <div className="flex items-center gap-2">
+          {isReal && <button onClick={resetToDemo} className="btn-secondary btn-sm">데모로 초기화</button>}
+          <button onClick={() => setEditorOpen(true)} className="btn-primary btn-sm">
+            <Edit2 className="w-4 h-4" /> 내 데이터 입력
+          </button>
+        </div>
       </div>
 
       {/* KPI */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <div className="card p-4">
-          <div className="flex items-center gap-2 mb-2"><DollarSign className="w-5 h-5 text-primary" /><span className="text-xs text-muted-foreground">총 마케팅비</span></div>
+          <div className="flex items-center gap-2 mb-2"><DollarSign className="w-5 h-5 text-primary" /><span className="text-xs text-muted-foreground">월 광고비</span></div>
           <div className="text-2xl font-bold">{fmtMan(kpi.totalSpend)}</div>
         </div>
         <div className="card p-4">
@@ -131,220 +121,164 @@ export default function MarketingROIPage() {
         </div>
         <div className="card p-4">
           <div className="flex items-center gap-2 mb-2"><Target className="w-5 h-5 text-amber-500" /><span className="text-xs text-muted-foreground">평균 CPA</span></div>
-          <div className="text-2xl font-bold">{fmtMan(kpi.avgCpa)}</div>
-          <div className="text-xs mt-1 text-muted-foreground">환자 1명 획득 비용</div>
+          <div className="text-2xl font-bold">{fmt(Math.round(kpi.avgCpa))}</div>
+          <div className="text-xs mt-1 text-muted-foreground">광고비 ÷ 신환</div>
         </div>
         <div className="card p-4">
-          <div className="flex items-center gap-2 mb-2"><Award className="w-5 h-5 text-emerald-500" /><span className="text-xs text-muted-foreground">최고 ROI 채널</span></div>
-          <div className="text-lg font-bold">{kpi.bestChannel}</div>
-          <div className="text-xs mt-1 text-emerald-500 font-semibold">ROI {kpi.bestRoi}%</div>
+          <div className="flex items-center gap-2 mb-2"><TrendingUp className="w-5 h-5 text-emerald-500" /><span className="text-xs text-muted-foreground">전체 ROI</span></div>
+          <div className={`text-2xl font-bold ${kpi.overallRoi > 0 ? 'text-emerald-600' : 'text-muted-foreground'}`}>
+            {kpi.totalSpend > 0 ? `${Math.round(kpi.overallRoi)}%` : '—'}
+          </div>
         </div>
       </div>
 
-      {/* 탭 */}
-      <div className="flex items-center gap-1 overflow-x-auto hide-scrollbar border-b border-border">
-        {tabs.map(tab => (
-          <button key={tab.key} onClick={() => setActiveTab(tab.key)}
-            className={`flex items-center gap-2 px-4 py-3 text-sm font-medium whitespace-nowrap border-b-2 transition-colors ${activeTab === tab.key ? 'border-primary text-primary' : 'border-transparent text-muted-foreground hover:text-foreground'}`}>
-            <tab.icon className="w-4 h-4" />{tab.label}
-          </button>
-        ))}
-      </div>
-
-      {/* 채널 성과 */}
-      {activeTab === 'channels' && (
-        <div className="space-y-4">
-          <div className="card p-6 space-y-4">
-            <h3 className="font-bold">채널별 ROI 순위</h3>
-            <div className="space-y-3">
-              {channels.sort((a, b) => b.roi - a.roi).filter(c => c.spend > 0).map((ch, idx) => (
-                <div key={ch.name} className="flex items-center gap-3">
-                  <span className="text-sm font-bold text-muted-foreground w-6">{idx + 1}</span>
-                  <span className="text-sm font-medium w-28 truncate">{ch.name}</span>
-                  <div className="flex-1 h-7 bg-secondary/30 rounded-lg overflow-hidden">
-                    <div className={`h-full rounded-lg ${ch.color}`} style={{ width: `${Math.min((ch.roi / 800) * 100, 100)}%` }} />
-                  </div>
-                  <span className="text-sm font-bold w-16 text-right text-emerald-600">ROI {ch.roi}%</span>
-                </div>
-              ))}
+      {/* 베스트 채널 강조 */}
+      {kpi.bestChannel !== '—' && (
+        <div className="card p-5 bg-emerald-50/50 dark:bg-emerald-900/10 border-emerald-200 dark:border-emerald-800">
+          <div className="flex items-center gap-3">
+            <BarChart3 className="w-5 h-5 text-emerald-500" />
+            <div className="flex-1">
+              <div className="text-xs text-muted-foreground">가장 효율적인 채널</div>
+              <div className="font-bold">{kpi.bestChannel}</div>
             </div>
-          </div>
-
-          <div className="card overflow-hidden">
-            <div className="hidden md:grid grid-cols-12 gap-4 p-4 bg-secondary/30 text-xs font-semibold text-muted-foreground border-b border-border">
-              <div className="col-span-2">채널</div>
-              <div className="col-span-2 text-right">지출</div>
-              <div className="col-span-1 text-right">환자</div>
-              <div className="col-span-1 text-right">문의</div>
-              <div className="col-span-2 text-right">매출 귀속</div>
-              <div className="col-span-2 text-right">ROI</div>
-              <div className="col-span-2 text-right">CPA</div>
-            </div>
-            <div className="divide-y divide-border">
-              {channels.map((ch) => (
-                <div key={ch.name} className="grid grid-cols-1 md:grid-cols-12 gap-2 md:gap-4 p-4 hover:bg-secondary/30 transition-colors items-center">
-                  <div className="md:hidden space-y-1">
-                    <div className="flex items-center justify-between">
-                      <span className="font-semibold">{ch.name}</span>
-                      <span className="text-emerald-600 font-bold">ROI {ch.roi}%</span>
-                    </div>
-                    <div className="text-xs text-muted-foreground">지출 {fmtMan(ch.spend)} · 환자 {ch.patients}명 · CPA {ch.cpa > 0 ? fmtMan(ch.cpa) : '0원'}</div>
-                  </div>
-                  <div className="hidden md:flex col-span-2 items-center gap-2">
-                    <div className={`w-3 h-3 rounded-full ${ch.color}`} />
-                    <span className="text-sm font-medium">{ch.name}</span>
-                  </div>
-                  <div className="hidden md:block col-span-2 text-right text-sm">{ch.spend > 0 ? fmt(ch.spend) : '-'}</div>
-                  <div className="hidden md:block col-span-1 text-right text-sm font-semibold">{ch.patients}명</div>
-                  <div className="hidden md:block col-span-1 text-right text-sm text-muted-foreground">{ch.inquiries}</div>
-                  <div className="hidden md:block col-span-2 text-right text-sm">{fmt(ch.revenue)}</div>
-                  <div className="hidden md:block col-span-2 text-right text-sm font-bold text-emerald-600">{ch.spend > 0 ? `${ch.roi}%` : '무비용'}</div>
-                  <div className="hidden md:block col-span-2 text-right text-sm">{ch.cpa > 0 ? fmt(ch.cpa) : '-'}</div>
-                </div>
-              ))}
+            <div className="text-right">
+              <div className="text-xs text-muted-foreground">ROI</div>
+              <div className="text-xl font-bold text-emerald-600">{Math.round(kpi.bestRoi)}%</div>
             </div>
           </div>
         </div>
       )}
 
-      {/* 월별 추이 */}
-      {activeTab === 'trend' && (
-        <div className="card p-6 space-y-4">
-          <h3 className="font-bold">12개월 마케팅 지출 추이</h3>
-          <div className="space-y-3">
-            {monthlyTrend.map((m) => (
-              <div key={m.month} className="flex items-center gap-3">
-                <span className="text-xs text-muted-foreground w-10 text-right">{m.month}</span>
-                <div className="flex-1 flex h-7 rounded-lg overflow-hidden bg-secondary/30">
-                  <div className="bg-blue-400 h-full" style={{ width: `${(m.naver / maxTrend) * 100}%` }} />
-                  <div className="bg-red-400 h-full" style={{ width: `${(m.google / maxTrend) * 100}%` }} />
-                  <div className="bg-blue-400 h-full" style={{ width: `${(m.sns / maxTrend) * 100}%` }} />
-                  <div className="bg-gray-400 h-full" style={{ width: `${(m.other / maxTrend) * 100}%` }} />
+      {/* 채널 리스트 */}
+      <div className="card overflow-hidden">
+        <div className="p-4 border-b border-border flex items-center justify-between">
+          <h3 className="font-bold">채널별 성과</h3>
+          <span className="text-xs text-muted-foreground">ROI 높은 순</span>
+        </div>
+        {sorted.length === 0 ? (
+          <div className="p-12 text-center text-muted-foreground">
+            <Target className="w-10 h-10 mx-auto mb-3 opacity-30" />
+            <p className="mb-4">등록된 채널이 없습니다</p>
+            <button onClick={() => setEditorOpen(true)} className="btn-primary btn-sm">
+              <Plus className="w-4 h-4" /> 첫 채널 추가
+            </button>
+          </div>
+        ) : (
+          <div className="divide-y divide-border">
+            {sorted.map(c => (
+              <div key={c.id} className="p-4 hover:bg-secondary/30 transition-colors">
+                <div className="flex items-center gap-3 mb-2">
+                  <span className="font-semibold flex-1">{c.name}</span>
+                  {c.spend === 0 ? (
+                    <span className="text-2xs px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-600 dark:bg-emerald-900/30">무료</span>
+                  ) : (
+                    <span className={`text-2xs px-1.5 py-0.5 rounded font-bold ${
+                      c.roi > 300 ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-900/30' :
+                      c.roi > 100 ? 'bg-amber-50 text-amber-600 dark:bg-amber-900/30' :
+                      'bg-red-50 text-red-600 dark:bg-red-900/30'
+                    }`}>ROI {Math.round(c.roi)}%</span>
+                  )}
                 </div>
-                <span className="text-xs font-semibold w-12 text-right">{fmtMan(m.total)}</span>
-                <span className="text-xs text-blue-500 w-10 text-right">{m.patients}명</span>
+                <div className="grid grid-cols-2 md:grid-cols-5 gap-3 text-xs">
+                  <div><div className="text-muted-foreground">월 광고비</div><div className="font-medium">{fmtMan(c.spend)}</div></div>
+                  <div><div className="text-muted-foreground">문의</div><div className="font-medium">{c.inquiries}건</div></div>
+                  <div><div className="text-muted-foreground">신환</div><div className="font-medium">{c.newPatients}명</div></div>
+                  <div><div className="text-muted-foreground">전환율</div><div className="font-medium">{c.conversionRate.toFixed(1)}%</div></div>
+                  <div><div className="text-muted-foreground">CPA</div><div className="font-medium">{c.cpa > 0 ? fmt(Math.round(c.cpa)) : '-'}</div></div>
+                </div>
               </div>
             ))}
           </div>
-          <div className="flex items-center gap-6 pt-2 text-xs text-muted-foreground">
-            <div className="flex items-center gap-1.5"><div className="w-3 h-3 rounded bg-blue-400" /> 네이버</div>
-            <div className="flex items-center gap-1.5"><div className="w-3 h-3 rounded bg-red-400" /> 구글</div>
-            <div className="flex items-center gap-1.5"><div className="w-3 h-3 rounded bg-blue-400" /> SNS</div>
-            <div className="flex items-center gap-1.5"><div className="w-3 h-3 rounded bg-gray-400" /> 기타</div>
+        )}
+      </div>
+
+      {!isReal && (
+        <div className="card p-3 bg-amber-50/50 dark:bg-amber-900/10 border-amber-200 dark:border-amber-800">
+          <div className="flex items-center gap-2 text-xs text-amber-600 dark:text-amber-400">
+            <AlertTriangle className="w-3.5 h-3.5 flex-shrink-0" />
+            <span>데모 데이터입니다. <b>"내 데이터 입력"</b>으로 실 채널 ROI 분석으로 전환됩니다.</span>
           </div>
         </div>
       )}
 
-      {/* 예산 배분 */}
-      {activeTab === 'budget' && (
-        <div className="card p-6 space-y-6">
-          <h3 className="font-bold">현재 vs 추천 예산 배분</h3>
-          <div className="space-y-4">
-            {budgetCurrent.map((item) => {
-              const diff = item.recommended - item.current
-              return (
-                <div key={item.channel} className="space-y-2">
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="font-medium">{item.channel}</span>
-                    <span className={`text-xs font-semibold ${diff > 0 ? 'text-emerald-500' : diff < 0 ? 'text-red-500' : 'text-muted-foreground'}`}>
-                      {diff > 0 ? `+${diff}%p` : diff < 0 ? `${diff}%p` : '유지'}
-                    </span>
-                  </div>
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-2">
-                      <span className="text-2xs text-muted-foreground w-8">현재</span>
-                      <div className="flex-1 h-4 bg-secondary rounded-full overflow-hidden">
-                        <div className="h-full bg-primary/60 rounded-full" style={{ width: `${item.current}%` }} />
-                      </div>
-                      <span className="text-2xs font-medium w-8 text-right">{item.current}%</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-2xs text-muted-foreground w-8">추천</span>
-                      <div className="flex-1 h-4 bg-secondary rounded-full overflow-hidden">
-                        <div className="h-full bg-emerald-400 rounded-full" style={{ width: `${item.recommended}%` }} />
-                      </div>
-                      <span className="text-2xs font-medium w-8 text-right">{item.recommended}%</span>
-                    </div>
-                  </div>
+      {editorOpen && (
+        <MarketingEditor
+          initial={isReal ? channels : []}
+          onClose={() => setEditorOpen(false)}
+          onSave={(n) => { saveAll(n); setEditorOpen(false) }}
+        />
+      )}
+    </div>
+  )
+}
+
+function MarketingEditor({ initial, onClose, onSave }: { initial: Channel[]; onClose: () => void; onSave: (n: Channel[]) => void }) {
+  const [rows, setRows] = useState<Channel[]>(initial)
+  const addRow = () => setRows([...rows, {
+    id: `n${Date.now()}`, name: '', spend: 0, inquiries: 0, newPatients: 0, revenuePerPatient: 400000,
+  }])
+  const updateRow = (idx: number, patch: Partial<Channel>) => setRows(rows.map((r, i) => i === idx ? { ...r, ...patch } : r))
+  const removeRow = (idx: number) => setRows(rows.filter((_, i) => i !== idx))
+  const handleSave = () => onSave(rows.filter(r => r.name.trim().length > 0))
+
+  return (
+    <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4">
+      <div className="bg-card border border-border rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-border flex-shrink-0">
+          <div>
+            <h2 className="font-bold text-lg">내 마케팅 채널 입력</h2>
+            <p className="text-xs text-muted-foreground mt-0.5">월 단위 광고비·문의·신환을 입력해주세요</p>
+          </div>
+          <button onClick={onClose} className="btn-icon"><X className="w-4 h-4" /></button>
+        </div>
+
+        <div className="flex-1 overflow-y-auto p-6">
+          <div className="flex items-center justify-between mb-3">
+            <label className="text-sm font-semibold">마케팅 채널 ({rows.length}개)</label>
+            <button onClick={addRow} className="btn-secondary btn-sm">
+              <Plus className="w-3.5 h-3.5" /> 채널 추가
+            </button>
+          </div>
+          {rows.length === 0 ? (
+            <div className="border border-dashed border-border rounded-xl p-8 text-center text-sm text-muted-foreground">
+              채널이 없습니다. "채널 추가"를 눌러 등록하세요.
+            </div>
+          ) : (
+            <div className="space-y-2">
+              {rows.map((r, idx) => (
+                <div key={r.id} className="grid grid-cols-12 gap-2 items-center p-3 border border-border rounded-xl">
+                  <input className="input col-span-3 text-sm" placeholder="채널명 (예: 네이버 광고)" value={r.name}
+                    onChange={(e) => updateRow(idx, { name: e.target.value })} />
+                  <input className="input col-span-2 text-sm text-right" type="number" placeholder="월 광고비" value={r.spend || ''}
+                    onChange={(e) => updateRow(idx, { spend: Number(e.target.value) || 0 })} />
+                  <input className="input col-span-2 text-sm text-right" type="number" placeholder="월 문의" value={r.inquiries || ''}
+                    onChange={(e) => updateRow(idx, { inquiries: Number(e.target.value) || 0 })} />
+                  <input className="input col-span-2 text-sm text-right" type="number" placeholder="월 신환" value={r.newPatients || ''}
+                    onChange={(e) => updateRow(idx, { newPatients: Number(e.target.value) || 0 })} />
+                  <input className="input col-span-2 text-sm text-right" type="number" placeholder="신환1명 매출" value={r.revenuePerPatient || ''}
+                    onChange={(e) => updateRow(idx, { revenuePerPatient: Number(e.target.value) || 0 })} />
+                  <button onClick={() => removeRow(idx)} className="col-span-1 btn-icon text-red-500 mx-auto">
+                    <Trash2 className="w-4 h-4" />
+                  </button>
                 </div>
-              )
-            })}
-          </div>
-        </div>
-      )}
-
-      {/* 계절 분석 */}
-      {activeTab === 'season' && (
-        <div className="card p-6 space-y-4">
-          <h3 className="font-bold">월별 채널 효율 히트맵</h3>
-          <p className="text-xs text-muted-foreground">숫자가 클수록 해당 월/채널의 효율이 높음 (100점 만점)</p>
-          <div className="overflow-x-auto">
-            <table className="w-full text-xs">
-              <thead>
-                <tr>
-                  <th className="p-2 text-left font-semibold text-muted-foreground">월</th>
-                  <th className="p-2 text-center font-semibold text-muted-foreground">네이버</th>
-                  <th className="p-2 text-center font-semibold text-muted-foreground">구글</th>
-                  <th className="p-2 text-center font-semibold text-muted-foreground">SNS</th>
-                  <th className="p-2 text-center font-semibold text-muted-foreground">카카오</th>
-                  <th className="p-2 text-center font-semibold text-muted-foreground">오프라인</th>
-                </tr>
-              </thead>
-              <tbody>
-                {seasonData.map((row) => (
-                  <tr key={row.month}>
-                    <td className="p-2 font-medium">{row.month}</td>
-                    <td className="p-1"><div className={`p-2 rounded text-center font-bold ${heatColor(row.naver)}`}>{row.naver}</div></td>
-                    <td className="p-1"><div className={`p-2 rounded text-center font-bold ${heatColor(row.google)}`}>{row.google}</div></td>
-                    <td className="p-1"><div className={`p-2 rounded text-center font-bold ${heatColor(row.sns)}`}>{row.sns}</div></td>
-                    <td className="p-1"><div className={`p-2 rounded text-center font-bold ${heatColor(row.kakao)}`}>{row.kakao}</div></td>
-                    <td className="p-1"><div className={`p-2 rounded text-center font-bold ${heatColor(row.offline)}`}>{row.offline}</div></td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      )}
-
-      {/* AI 권고 */}
-      {activeTab === 'ai' && (
-        <div className="space-y-4">
-          <div className="card p-4 bg-primary/5 border-primary/20">
-            <div className="flex items-center gap-2 mb-1">
-              <Brain className="w-5 h-5 text-primary" />
-              <span className="font-bold">AI 마케팅 최적화 권고</span>
-            </div>
-            <p className="text-sm text-muted-foreground">데이터 기반 예산 재배분으로 신규 환자 확보를 극대화하세요</p>
-          </div>
-          {aiRecommendations.map((rec) => (
-            <div key={rec.id} className="card p-5">
-              <div className="flex items-center gap-3 mb-3">
-                <Lightbulb className="w-5 h-5 text-amber-500 flex-shrink-0" />
-                <h4 className="font-bold flex-1">{rec.title}</h4>
-                <span className={`px-2 py-0.5 rounded-full text-2xs font-semibold ${priorityColors[rec.priority]}`}>
-                  {rec.priority === 'HIGH' ? '높음' : rec.priority === 'MEDIUM' ? '보통' : '낮음'}
-                </span>
-                <span className="text-sm font-bold text-emerald-600">{rec.improvement}</span>
-              </div>
-              <p className="text-sm text-muted-foreground mb-3">{rec.desc}</p>
-              <div className="space-y-1.5">
-                {rec.actions.map((action, i) => (
-                  <div key={i} className="flex items-center gap-2 text-sm">
-                    <ChevronRight className="w-3.5 h-3.5 text-primary flex-shrink-0" />
-                    <span>{action}</span>
-                  </div>
-                ))}
+              ))}
+              <div className="grid grid-cols-12 gap-2 px-3 text-2xs text-muted-foreground pt-1">
+                <span className="col-span-3">채널명</span>
+                <span className="col-span-2 text-right">월 광고비</span>
+                <span className="col-span-2 text-right">월 문의</span>
+                <span className="col-span-2 text-right">월 신환</span>
+                <span className="col-span-2 text-right">신환1명당 매출</span>
+                <span className="col-span-1" />
               </div>
             </div>
-          ))}
+          )}
         </div>
-      )}
 
-      <div className="card p-3 bg-amber-50/50 dark:bg-amber-900/10 border-amber-200 dark:border-amber-800">
-        <div className="flex items-center gap-2 text-xs text-amber-600 dark:text-amber-400">
-          <AlertTriangle className="w-3.5 h-3.5 flex-shrink-0" />
-          <span>데모 데이터로 표시 중입니다. 실제 마케팅 데이터를 입력하면 정확한 분석이 가능합니다.</span>
+        <div className="flex items-center justify-end gap-2 px-6 py-4 border-t border-border flex-shrink-0">
+          <button onClick={onClose} className="btn-secondary btn-sm">취소</button>
+          <button onClick={handleSave} className="btn-primary btn-sm">
+            <Save className="w-3.5 h-3.5" /> 저장
+          </button>
         </div>
       </div>
     </div>
