@@ -2,12 +2,12 @@
 
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ChevronDown } from 'lucide-react'
+import { Plus } from 'lucide-react'
 import { viewportConfig } from '@/components/animation/MotionWrapper'
 
 const FAQS = [
   {
-    q: '진짜 평생 무료인가요? 나중에 유료 전환되지 않나요?',
+    q: '진짜 평생 무료인가요? 나중에 유료로 전환되지 않나요?',
     a: '1ID(원장 1명) 기준 평생 무료가 약정입니다. 의원 규모가 커져 2명 이상 사용자가 필요하면 ID당 정액(2~4: 39,000원, 5~9: 29,000원, 10+: 19,000원). 수익 모델은 EMR 사용료가 아니라 인테리어·기기·매물·공동구매 매칭 수수료입니다.',
   },
   {
@@ -44,45 +44,50 @@ export function HomeFAQ() {
   const [open, setOpen] = useState<number | null>(0)
 
   return (
-    <section className="py-[80px] md:py-[120px]">
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section className="py-[120px] md:py-[180px] overflow-hidden">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={viewportConfig}
-          className="text-center mb-10"
+          className="text-center mb-20"
         >
-          <span className="inline-block px-3 py-1 mb-4 text-xs font-semibold text-primary bg-primary/10 rounded-full">
-            FAQ
+          <span className="inline-block px-3 py-1 mb-6 text-xs font-bold text-primary bg-primary/10 rounded-full uppercase tracking-wider">
+            자주 묻는 질문
           </span>
-          <h2 className="text-3xl md:text-4xl font-bold tracking-tight">
-            궁금한 것을 먼저 물어보셨습니다
+          <h2 className="text-5xl md:text-6xl lg:text-7xl font-black tracking-tight leading-[1.05] mb-6">
+            궁금한 게<br />
+            <span className="text-primary">있으시겠죠</span>
           </h2>
         </motion.div>
 
-        <div className="space-y-3">
+        <div className="space-y-4">
           {FAQS.map((f, i) => {
             const isOpen = open === i
             return (
               <motion.div
                 key={i}
-                initial={{ opacity: 0, y: 10 }}
+                initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={viewportConfig}
                 transition={{ delay: Math.min(i * 0.04, 0.3) }}
-                className="card overflow-hidden"
+                className={`rounded-3xl border transition-all ${
+                  isOpen
+                    ? 'bg-card border-primary/40 shadow-lg'
+                    : 'bg-card border-border hover:border-primary/30'
+                }`}
               >
                 <button
                   onClick={() => setOpen(isOpen ? null : i)}
-                  className="w-full px-5 py-4 flex items-start justify-between gap-4 text-left hover:bg-secondary/40 transition-colors"
+                  className="w-full px-6 md:px-8 py-6 md:py-7 flex items-center justify-between gap-6 text-left"
                   aria-expanded={isOpen}
                 >
-                  <span className="font-semibold text-sm md:text-base">{f.q}</span>
-                  <ChevronDown
-                    className={`w-5 h-5 text-muted-foreground flex-shrink-0 transition-transform duration-200 ${
-                      isOpen ? 'rotate-180' : ''
-                    }`}
-                  />
+                  <span className="text-lg md:text-xl font-bold leading-snug">{f.q}</span>
+                  <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 transition-all ${
+                    isOpen ? 'bg-primary text-white rotate-45' : 'bg-secondary text-foreground'
+                  }`}>
+                    <Plus className="w-5 h-5" />
+                  </div>
                 </button>
                 <AnimatePresence initial={false}>
                   {isOpen && (
@@ -90,10 +95,10 @@ export function HomeFAQ() {
                       initial={{ height: 0, opacity: 0 }}
                       animate={{ height: 'auto', opacity: 1 }}
                       exit={{ height: 0, opacity: 0 }}
-                      transition={{ duration: 0.2 }}
+                      transition={{ duration: 0.25 }}
                       className="overflow-hidden"
                     >
-                      <div className="px-5 pb-4 text-sm text-muted-foreground leading-relaxed">
+                      <div className="px-6 md:px-8 pb-6 md:pb-7 text-base md:text-lg text-muted-foreground leading-relaxed">
                         {f.a}
                       </div>
                     </motion.div>

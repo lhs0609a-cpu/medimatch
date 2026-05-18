@@ -2,150 +2,181 @@
 
 import { motion } from 'framer-motion'
 import Link from 'next/link'
-import { Check, X, ArrowRight, Sparkles } from 'lucide-react'
+import { Check, ArrowRight, Sparkles } from 'lucide-react'
 import { viewportConfig } from '@/components/animation/MotionWrapper'
 
-// 무료 강조 + 의사랑·오름차트 같은 유료 EMR과 직관적 비교.
-// "왜 무료인가? — 협력사 매칭이 BM" 한 줄 honest 설명 포함.
-type Row = {
-  feature: string
-  ours: string | true
-  others: string | false
-}
-
-const ROWS: Row[] = [
-  { feature: '월 사용료 (1ID)',          ours: '0원',           others: '약 30~80만원' },
-  { feature: '설치·세팅·서버 관리',       ours: '필요 없음',      others: '필요' },
-  { feature: 'AI 음성 자동 차트',         ours: true,           others: false },
-  { feature: '삭감 방어 AI 청구',          ours: true,           others: '일부' },
-  { feature: 'CRM 알림톡 환자 리콜',       ours: true,           others: false },
-  { feature: '환자 카톡 인터페이스',       ours: true,           others: false },
-  { feature: '클라우드 백업·자동 업데이트', ours: true,           others: '별도 비용' },
-  { feature: '타사 데이터 무료 마이그레이션', ours: true,         others: false },
-  { feature: '가입·카드 등록',             ours: '0초',          others: '필요' },
+const plans = [
+  {
+    badge: '평생 무료',
+    badgeColor: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300',
+    name: '1ID',
+    price: '0',
+    unit: '원',
+    period: '평생',
+    desc: '의사 1명 의원',
+    features: [
+      'AI 음성 자동 차트',
+      '삭감 방어 AI 청구',
+      'CRM 환자 리콜 (월 1,000건)',
+      '환자 카톡 알림톡',
+      '예약·접수·수납',
+      '데이터 무료 Export',
+    ],
+    cta: '지금 시작',
+    href: '/emr',
+    highlight: false,
+  },
+  {
+    badge: '가장 인기',
+    badgeColor: 'bg-primary text-white',
+    name: '2~4ID',
+    price: '39,000',
+    unit: '원',
+    period: '/ID/월',
+    desc: '페이닥·이중원장',
+    features: [
+      '1ID 모든 기능 +',
+      'CRM 무제한 발송',
+      '실시간 충돌 검증',
+      '의원 운영 인사이트',
+      '직원 권한 관리',
+      '우선 기술지원',
+    ],
+    cta: '시작하기',
+    href: '/emr',
+    highlight: true,
+  },
+  {
+    badge: '대형 의원',
+    badgeColor: 'bg-violet-100 text-violet-700 dark:bg-violet-900/30 dark:text-violet-300',
+    name: '5+ID',
+    price: '29,000~',
+    unit: '원',
+    period: '/ID/월',
+    desc: '다인 진료실·분원',
+    features: [
+      '2~4ID 모든 기능 +',
+      '멀티 지점 통합 관리',
+      '백오피스 권한 그룹',
+      'SSO·SAML 연동',
+      '전담 매니저',
+      'SLA 99.9%',
+    ],
+    cta: '문의하기',
+    href: '/contact',
+    highlight: false,
+  },
 ]
 
 export function HomePricingFree() {
   return (
-    <section className="py-[80px] md:py-[120px]">
+    <section className="py-[120px] md:py-[180px] bg-gradient-to-b from-background to-secondary/30 overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={viewportConfig}
-          className="text-center mb-12"
+          className="text-center mb-20"
         >
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 mb-4 text-xs font-semibold text-emerald-700 dark:text-emerald-300 bg-emerald-100 dark:bg-emerald-900/30 rounded-full">
+          <span className="inline-flex items-center gap-2 px-3 py-1 mb-6 text-xs font-bold text-emerald-700 dark:text-emerald-300 bg-emerald-100 dark:bg-emerald-900/30 rounded-full uppercase tracking-wider">
             <Sparkles className="w-3.5 h-3.5" />
-            평생 무료 (의사용)
+            의사 평생 무료
           </span>
-          <h2 className="text-3xl md:text-5xl font-bold tracking-tight mb-4">
-            왜 무료인가요?
+          <h2 className="text-5xl md:text-6xl lg:text-7xl font-black tracking-tight leading-[1.05] mb-6">
+            의원 크기에 맞춰<br />
+            <span className="text-primary">사용자 ID당</span>
           </h2>
-          <p className="text-muted-foreground text-lg max-w-2xl mx-auto leading-relaxed">
-            EMR 사용료가 아닌, 의원 운영 중 자연스럽게 만나는 협력사 매칭<br className="hidden md:block" />
-            (인테리어·기기·매물·공동구매)에서 수수료를 받는 구조입니다.
+          <p className="text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto">
+            PC 대수가 아닌 사람 수 기준.<br className="hidden md:block" />
+            페이닥·이중원장·다인 진료실에 유리합니다.
           </p>
         </motion.div>
 
-        {/* 비교표 */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={viewportConfig}
-          transition={{ delay: 0.1 }}
-          className="max-w-4xl mx-auto card overflow-hidden"
-        >
-          <div className="grid grid-cols-[1.5fr_1fr_1fr] divide-x divide-border">
-            {/* 헤더 */}
-            <div className="p-4 bg-secondary/40">
-              <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                비교 항목
-              </span>
-            </div>
-            <div className="p-4 bg-primary/10 text-center">
-              <span className="text-xs font-semibold text-primary uppercase tracking-wider block mb-1">
-                MediMatch
-              </span>
-              <span className="text-lg font-bold text-primary">평생 무료</span>
-            </div>
-            <div className="p-4 bg-secondary/40 text-center">
-              <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider block mb-1">
-                기존 EMR
-              </span>
-              <span className="text-sm text-muted-foreground">의사랑·오름차트 등</span>
-            </div>
-          </div>
-
-          <div className="divide-y divide-border">
-            {ROWS.map((r) => (
-              <div key={r.feature} className="grid grid-cols-[1.5fr_1fr_1fr] divide-x divide-border text-sm">
-                <div className="p-4 font-medium">{r.feature}</div>
-                <div className="p-4 text-center">
-                  {r.ours === true ? (
-                    <Check className="w-5 h-5 text-emerald-500 mx-auto" />
-                  ) : (
-                    <span className="font-semibold text-primary">{r.ours}</span>
-                  )}
-                </div>
-                <div className="p-4 text-center">
-                  {r.others === false ? (
-                    <X className="w-5 h-5 text-muted-foreground/50 mx-auto" />
-                  ) : (
-                    <span className="text-muted-foreground">{r.others}</span>
-                  )}
-                </div>
+        {/* 거대 가격 카드 3개 */}
+        <div className="grid lg:grid-cols-3 gap-6 lg:gap-8 max-w-6xl mx-auto">
+          {plans.map((p, i) => (
+            <motion.div
+              key={p.name}
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={viewportConfig}
+              transition={{ duration: 0.6, delay: i * 0.1 }}
+              className={`relative rounded-3xl p-8 md:p-10 ${
+                p.highlight
+                  ? 'bg-gradient-to-br from-primary to-blue-700 text-white shadow-2xl shadow-primary/30 lg:scale-105 lg:-translate-y-2'
+                  : 'bg-card border border-border'
+              }`}
+            >
+              {/* Badge */}
+              <div className={`inline-block px-3 py-1 mb-6 text-xs font-bold rounded-full uppercase tracking-wider ${
+                p.highlight ? 'bg-white text-primary' : p.badgeColor
+              }`}>
+                {p.badge}
               </div>
-            ))}
-          </div>
-        </motion.div>
 
-        {/* 사용자 ID당 과금 — 1ID 무료, 그 이상은 저렴한 정액 */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={viewportConfig}
-          transition={{ delay: 0.2 }}
-          className="mt-10 max-w-4xl mx-auto"
-        >
-          <div className="bg-secondary/40 rounded-2xl p-6 md:p-8">
-            <div className="text-center mb-5">
-              <h3 className="font-bold text-lg mb-1">의원이 커지면 — 사용자 ID당 정액</h3>
-              <p className="text-xs text-muted-foreground">
-                PC 대수가 아닌 사람 수 기준. 페이닥·이중원장·다인 진료실에 유리합니다.
-              </p>
-            </div>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-              {[
-                { range: '1 ID',       price: '0원',     note: '평생' },
-                { range: '2~4 ID',     price: '39,000',  note: '/ID/월' },
-                { range: '5~9 ID',     price: '29,000',  note: '/ID/월' },
-                { range: '10+ ID',     price: '19,000',  note: '/ID/월' },
-              ].map((p) => (
-                <div key={p.range} className="text-center bg-background rounded-xl p-4 border border-border">
-                  <div className="text-xs text-muted-foreground mb-1">{p.range}</div>
-                  <div className="text-xl font-bold">{p.price}</div>
-                  <div className="text-2xs text-muted-foreground">{p.note}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </motion.div>
+              {/* Plan name */}
+              <div className={`text-2xl font-black mb-1 ${p.highlight ? 'text-white' : 'text-foreground'}`}>
+                {p.name}
+              </div>
+              <div className={`text-sm mb-8 ${p.highlight ? 'text-white/80' : 'text-muted-foreground'}`}>
+                {p.desc}
+              </div>
 
-        {/* 최종 CTA */}
+              {/* Price — 거대 */}
+              <div className="mb-8 flex items-baseline gap-1">
+                <span className={`text-6xl md:text-7xl font-black leading-none ${
+                  p.highlight ? 'text-white' : 'text-foreground'
+                }`}>
+                  {p.price}
+                </span>
+                <span className={`text-2xl font-bold ${
+                  p.highlight ? 'text-white' : 'text-foreground'
+                }`}>{p.unit}</span>
+                <span className={`text-base ml-1 ${
+                  p.highlight ? 'text-white/70' : 'text-muted-foreground'
+                }`}>{p.period}</span>
+              </div>
+
+              {/* Features */}
+              <ul className="space-y-3 mb-10">
+                {p.features.map((f) => (
+                  <li key={f} className="flex items-start gap-2 text-sm">
+                    <Check className={`w-5 h-5 flex-shrink-0 mt-0.5 ${
+                      p.highlight ? 'text-white' : 'text-primary'
+                    }`} />
+                    <span className={p.highlight ? 'text-white/95' : 'text-foreground'}>
+                      {f}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+
+              {/* CTA */}
+              <Link
+                href={p.href}
+                className={`inline-flex w-full items-center justify-center gap-2 px-6 py-4 text-base font-bold rounded-2xl transition-all ${
+                  p.highlight
+                    ? 'bg-white text-primary hover:bg-white/90'
+                    : 'bg-foreground text-background hover:opacity-90'
+                }`}
+              >
+                {p.cta}
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+            </motion.div>
+          ))}
+        </div>
+
+        {/* "왜 무료?" 신뢰 빌딩 한 줄 */}
         <motion.div
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={viewportConfig}
-          transition={{ delay: 0.3 }}
-          className="mt-10 text-center"
+          className="mt-16 text-center max-w-3xl mx-auto"
         >
-          <Link href="/emr" className="btn-primary btn-lg inline-flex">
-            지금 1초 만에 시작
-            <ArrowRight className="w-4 h-4" />
-          </Link>
-          <p className="text-xs text-muted-foreground mt-3">
-            가입·카드 등록·약정 0. 24시간 안에 해지하면 데이터 자동 삭제.
+          <p className="text-base md:text-lg text-muted-foreground leading-relaxed">
+            <b className="text-foreground">왜 의사는 무료인가요?</b> EMR 사용료 대신,
+            의원 운영 중 자연스럽게 만나는 협력사 매칭(인테리어·기기·매물·공동구매)에서 수수료를 받습니다. 의사는 EMR만 쓰면 됩니다.
           </p>
         </motion.div>
       </div>

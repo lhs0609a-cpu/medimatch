@@ -1,219 +1,91 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import {
-  Mic, Brain, FileText, Check, MessageSquare, Calendar, Pill, ChevronRight,
-} from 'lucide-react'
-import { BrowserMockup } from './mockups/BrowserMockup'
-import { PhoneMockup } from './mockups/PhoneMockup'
+import { ArrowRight } from 'lucide-react'
+import { ChartMockup, PatientPhoneMockup } from './mockups/EMRScreens'
 import { viewportConfig } from '@/components/animation/MotionWrapper'
 
+// 의사용 EMR + 환자용 카톡 알림톡을 풀-블리드로 거대하게.
 export function HomeAppShowcase() {
   return (
-    <section className="py-[80px] md:py-[120px] bg-secondary/30">
+    <section className="py-[120px] md:py-[180px] bg-gradient-to-br from-secondary/30 via-background to-secondary/40 overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={viewportConfig}
-          className="text-center mb-12"
+          className="text-center mb-20 lg:mb-28"
         >
-          <span className="inline-block px-3 py-1 mb-4 text-xs font-semibold text-primary bg-primary/10 rounded-full">
-            의원과 환자, 같은 흐름
+          <span className="inline-block px-3 py-1 mb-6 text-xs font-bold text-primary bg-primary/10 rounded-full uppercase tracking-wider">
+            의원과 환자, 한 흐름
           </span>
-          <h2 className="text-3xl md:text-5xl font-bold tracking-tight mb-4">
-            의사가 차트 쓰면<br className="md:hidden" /> 환자에게 자동 전달
+          <h2 className="text-5xl md:text-6xl lg:text-7xl font-black tracking-tight leading-[1.05] mb-6">
+            의사가 차트 쓰면<br />
+            <span className="text-primary">환자에게 자동 전달</span>
           </h2>
-          <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-            EMR과 환자 앱이 분리된 시스템이 아닙니다. 한 흐름으로 묶여 있습니다.
+          <p className="text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto">
+            EMR과 환자 앱이 분리된 시스템이 아닙니다.<br className="hidden md:block" />
+            한 매직링크로 모두 묶여 있습니다.
           </p>
         </motion.div>
 
-        <div className="grid lg:grid-cols-2 gap-8 lg:gap-10 max-w-6xl mx-auto items-center">
-          {/* === 의사용 EMR — 브라우저 목업 === */}
+        <div className="grid lg:grid-cols-[1.4fr_1fr] gap-16 lg:gap-24 items-center">
+          {/* 의사용 EMR — 거대 브라우저 mockup */}
           <motion.div
-            initial={{ opacity: 0, x: -30 }}
-            whileInView={{ opacity: 1, x: 0 }}
+            initial={{ opacity: 0, x: -40, rotate: -2 }}
+            whileInView={{ opacity: 1, x: 0, rotate: 0 }}
             viewport={viewportConfig}
-            transition={{ duration: 0.6 }}
+            transition={{ duration: 0.7 }}
           >
-            <BrowserMockup url="medi.brandplaton.com/emr/chart/new">
-              <div className="p-4 text-[11px]">
-                {/* 사이드바 시뮬 */}
-                <div className="flex gap-3">
-                  <div className="w-24 space-y-1 flex-shrink-0">
-                    {['진료', '환자', '처방·청구', 'CRM', '리포트', '발견'].map((m, i) => (
-                      <div
-                        key={m}
-                        className={`px-2 py-1 rounded text-[10px] ${
-                          i === 0 ? 'bg-primary/15 text-primary font-semibold' : 'text-muted-foreground'
-                        }`}
-                      >
-                        {m}
-                      </div>
-                    ))}
-                  </div>
-                  {/* 차트 영역 */}
-                  <div className="flex-1 space-y-2">
-                    {/* 환자 헤더 */}
-                    <div className="flex items-center justify-between pb-2 border-b border-zinc-200 dark:border-zinc-700">
-                      <div>
-                        <div className="font-semibold text-[12px] text-zinc-900 dark:text-zinc-100">김환자 · 남 · 38세</div>
-                        <div className="text-[9px] text-muted-foreground">차트 A-1024 · 2026-05-14 14:30</div>
-                      </div>
-                      <div className="flex items-center gap-1 text-red-500 text-[10px] font-medium">
-                        <span className="relative flex h-1.5 w-1.5">
-                          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                          <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-red-500"></span>
-                        </span>
-                        REC 01:42
-                      </div>
-                    </div>
-                    {/* CC */}
-                    <div>
-                      <div className="text-[9px] font-semibold text-primary mb-0.5">CC · 주호소</div>
-                      <div className="bg-zinc-50 dark:bg-zinc-800/50 rounded px-2 py-1 text-zinc-700 dark:text-zinc-300">
-                        3일 전부터 시작된 우측 하복부 통증, 식후 악화
-                      </div>
-                    </div>
-                    {/* PI */}
-                    <div>
-                      <div className="text-[9px] font-semibold text-primary mb-0.5">PI · 현병력</div>
-                      <div className="bg-zinc-50 dark:bg-zinc-800/50 rounded px-2 py-1 text-zinc-700 dark:text-zinc-300 leading-relaxed">
-                        지속 통증 NRS 6/10, 발열·구토 동반 없음. 최근 회식 후 발생
-                      </div>
-                    </div>
-                    {/* AI 추천 진단코드 */}
-                    <div>
-                      <div className="text-[9px] font-semibold text-primary mb-0.5 flex items-center gap-1">
-                        <Brain className="w-2.5 h-2.5" /> AI 진단코드 추천
-                      </div>
-                      <div className="flex flex-wrap gap-1">
-                        <span className="px-1.5 py-0.5 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 rounded font-mono">
-                          K59.0 변비
-                        </span>
-                        <span className="px-1.5 py-0.5 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 rounded font-mono">
-                          K30 소화불량
-                        </span>
-                        <span className="px-1.5 py-0.5 bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 rounded font-mono">
-                          R10.4 복통 NOS
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </BrowserMockup>
+            <div className="relative">
+              <div className="absolute -inset-12 bg-gradient-to-br from-primary/15 to-primary/0 rounded-3xl blur-2xl -z-10" />
+              <ChartMockup />
+              {/* 부유 메트릭 */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={viewportConfig}
+                transition={{ delay: 0.4 }}
+                className="absolute -bottom-8 -left-8 bg-card border border-border rounded-2xl shadow-2xl px-6 py-4 hidden md:block"
+              >
+                <div className="text-xs text-muted-foreground font-semibold uppercase tracking-wider">의사·실장용</div>
+                <div className="text-2xl font-black mt-1">브라우저만 있으면 어디서든</div>
+              </motion.div>
+            </div>
 
-            <div className="mt-6 px-1">
-              <div className="text-xs font-semibold text-primary uppercase tracking-wider mb-2">의사·실장용</div>
-              <h3 className="text-xl font-bold mb-3">브라우저만 있으면 어디서든</h3>
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                {[
-                  { icon: Mic, t: 'AI 음성으로 차트 자동 작성' },
-                  { icon: Check, t: '삭감 위험 실시간 경고 + 1클릭 청구' },
-                  { icon: MessageSquare, t: '환자 리콜 알림톡 자동 발송' },
-                ].map((it) => (
-                  <li key={it.t} className="flex items-start gap-2">
-                    <it.icon className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
-                    <span>{it.t}</span>
-                  </li>
-                ))}
-              </ul>
-              <div className="mt-4 inline-flex items-center gap-1 text-xs font-semibold text-emerald-600 dark:text-emerald-400">
-                1ID 평생 무료 <span className="text-muted-foreground font-normal">· 가입·카드 등록 없음</span>
-              </div>
+            <div className="mt-10 lg:hidden">
+              <div className="text-xs font-bold text-primary uppercase tracking-wider mb-3">의사·실장용</div>
+              <h3 className="text-3xl font-black mb-3">브라우저만 있으면 어디서든</h3>
+              <p className="text-base text-muted-foreground">설치·서버 관리·백업 신경쓸 필요 없음</p>
             </div>
           </motion.div>
 
-          {/* === 환자용 카톡 알림톡 — 폰 목업 === */}
+          {/* 환자용 카톡 — 거대 폰 mockup */}
           <motion.div
-            initial={{ opacity: 0, x: 30 }}
-            whileInView={{ opacity: 1, x: 0 }}
+            initial={{ opacity: 0, x: 40, rotate: 2 }}
+            whileInView={{ opacity: 1, x: 0, rotate: 0 }}
             viewport={viewportConfig}
-            transition={{ duration: 0.6, delay: 0.1 }}
+            transition={{ duration: 0.7, delay: 0.1 }}
+            className="lg:scale-110"
           >
-            <PhoneMockup>
-              {/* 카톡 헤더 */}
-              <div className="flex items-center gap-2 pb-2 border-b border-zinc-200 dark:border-zinc-700 mb-2">
-                <div className="w-7 h-7 rounded-full bg-[#FEE500] flex items-center justify-center text-[10px] font-bold text-zinc-800">
-                  메디
+            <div className="relative">
+              <div className="absolute -inset-12 bg-gradient-to-br from-emerald-500/15 to-emerald-500/0 rounded-3xl blur-2xl -z-10" />
+              <PatientPhoneMockup />
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={viewportConfig}
+                transition={{ delay: 0.5 }}
+                className="absolute -top-8 -right-4 lg:-right-12 bg-card border border-border rounded-2xl shadow-2xl px-5 py-3 hidden md:block"
+              >
+                <div className="flex items-center gap-2">
+                  <span className="text-2xl">💬</span>
+                  <div>
+                    <div className="text-xs text-muted-foreground">앱 설치</div>
+                    <div className="text-lg font-black text-emerald-600">불필요</div>
+                  </div>
                 </div>
-                <div className="flex-1 min-w-0">
-                  <div className="text-[10px] font-semibold truncate">메디매치 내과의원</div>
-                  <div className="text-[8px] text-muted-foreground">알림톡</div>
-                </div>
-              </div>
-
-              {/* 알림톡 메시지 1 */}
-              <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-100 dark:border-yellow-900/40 rounded-lg p-2 mb-2 text-[9px]">
-                <div className="flex items-center gap-1 mb-1 text-[8px] font-semibold text-yellow-700 dark:text-yellow-400">
-                  <Calendar className="w-2.5 h-2.5" />
-                  예약 확정
-                </div>
-                <div className="text-zinc-700 dark:text-zinc-300 leading-snug">
-                  김환자님, <b>2026-05-15 (목) 14:30</b> 진료 예약이 확정되었습니다.
-                </div>
-                <button className="mt-1.5 w-full text-[8px] text-center bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded py-1">
-                  지도 보기
-                </button>
-              </div>
-
-              {/* 알림톡 메시지 2 — 문진 */}
-              <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-900/40 rounded-lg p-2 mb-2 text-[9px]">
-                <div className="flex items-center gap-1 mb-1 text-[8px] font-semibold text-blue-700 dark:text-blue-400">
-                  <FileText className="w-2.5 h-2.5" />
-                  사전 문진 (1분)
-                </div>
-                <div className="text-zinc-700 dark:text-zinc-300 leading-snug">
-                  내원 전 11문항 작성하시면<br />대기 시간 없이 진료 시작됩니다.
-                </div>
-                <button className="mt-1.5 w-full text-[8px] text-center bg-blue-500 text-white rounded py-1 font-semibold">
-                  문진 시작 →
-                </button>
-              </div>
-
-              {/* 알림톡 메시지 3 — 복약 */}
-              <div className="bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-100 dark:border-emerald-900/40 rounded-lg p-2 text-[9px]">
-                <div className="flex items-center gap-1 mb-1 text-[8px] font-semibold text-emerald-700 dark:text-emerald-400">
-                  <Pill className="w-2.5 h-2.5" />
-                  복약 시간
-                </div>
-                <div className="text-zinc-700 dark:text-zinc-300 leading-snug">
-                  점심 식후 처방약 복용 시간입니다.<br />
-                  부작용 있으면 바로 알려주세요.
-                </div>
-                <div className="flex gap-1 mt-1.5">
-                  <button className="flex-1 text-[8px] bg-emerald-500 text-white rounded py-1 font-semibold">
-                    복용 완료
-                  </button>
-                  <button className="flex-1 text-[8px] bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded py-1">
-                    부작용 보고
-                  </button>
-                </div>
-              </div>
-            </PhoneMockup>
-
-            <div className="mt-6 px-1">
-              <div className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider mb-2">
-                환자용 · 별도 앱 다운로드 X
-              </div>
-              <h3 className="text-xl font-bold mb-3">카톡 한 줄로 모든 안내</h3>
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                {[
-                  '예약 확인·도착 알림·취소 가드',
-                  '내원 전 문진 1분 작성 → 차트 prefill',
-                  '복약 시간 알림 + 부작용 보고 폼',
-                ].map((t) => (
-                  <li key={t} className="flex items-start gap-2">
-                    <ChevronRight className="w-4 h-4 text-emerald-500 flex-shrink-0 mt-0.5" />
-                    <span>{t}</span>
-                  </li>
-                ))}
-              </ul>
-              <div className="mt-4 inline-flex items-center gap-1 text-xs font-semibold text-emerald-600 dark:text-emerald-400">
-                환자 비용 0원 <span className="text-muted-foreground font-normal">· PIPA·정통망법 가드 내장</span>
-              </div>
+              </motion.div>
             </div>
           </motion.div>
         </div>
@@ -223,11 +95,21 @@ export function HomeAppShowcase() {
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={viewportConfig}
-          transition={{ delay: 0.2 }}
-          className="mt-10 text-center text-sm text-muted-foreground"
+          transition={{ delay: 0.3 }}
+          className="mt-20 lg:mt-28 text-center"
         >
-          의사 진료 → 환자 카톡 알림 → 만족도 회신 → 리뷰 → 다음 환자 유입
-          <span className="text-primary font-medium"> 한 흐름</span>으로 완결.
+          <div className="inline-flex flex-wrap items-center justify-center gap-x-3 gap-y-2 text-base md:text-lg text-muted-foreground">
+            <span className="font-semibold">의사 진료</span>
+            <ArrowRight className="w-4 h-4 text-primary" />
+            <span className="font-semibold">환자 카톡 알림</span>
+            <ArrowRight className="w-4 h-4 text-primary" />
+            <span className="font-semibold">만족도 회신</span>
+            <ArrowRight className="w-4 h-4 text-primary" />
+            <span className="font-semibold">리뷰</span>
+            <ArrowRight className="w-4 h-4 text-primary" />
+            <span className="font-semibold">다음 환자 유입</span>
+          </div>
+          <div className="mt-3 text-sm text-primary font-bold">한 흐름으로 완결</div>
         </motion.div>
       </div>
     </section>
