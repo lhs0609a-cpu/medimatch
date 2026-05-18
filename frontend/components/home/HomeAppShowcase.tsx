@@ -20,8 +20,8 @@ export function HomeAppShowcase() {
             의원과 환자, 한 흐름
           </span>
           <h2 className="text-5xl md:text-6xl lg:text-7xl font-black tracking-tight leading-[1.05] mb-6">
-            의사가 차트 쓰면<br />
-            <span className="text-primary">환자에게 자동 전달</span>
+            의사가 차트를 쓰면<br />
+            <span className="text-primary">환자에게 자동으로 전달됩니다</span>
           </h2>
           <p className="text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto">
             EMR과 환자 앱이 분리된 시스템이 아닙니다.<br className="hidden md:block" />

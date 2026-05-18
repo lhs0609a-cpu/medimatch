@@ -45,12 +45,12 @@ export function HeroSection({ markers = [] }: HeroSectionProps) {
               <br />
               <span className="text-foreground">집중하세요.</span>
               <br />
-              <span className="text-[#3182f6]">나머지는 AI가.</span>
+              <span className="text-[#3182f6]">나머지는 AI가 합니다.</span>
             </h1>
 
             <p className="text-xl md:text-2xl text-muted-foreground mb-10 max-w-xl mx-auto lg:mx-0 leading-relaxed">
-              차트 작성·청구 검증·환자 리콜.<br className="hidden md:block" />
-              가입 없이 지금 바로 시작.
+              차트 작성·청구 검증·환자 리콜까지.<br className="hidden md:block" />
+              가입 없이 지금 바로 시작하세요.
             </p>
 
             <div className="flex flex-col sm:flex-row items-stretch gap-3 mb-8">

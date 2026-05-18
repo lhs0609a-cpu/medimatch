@@ -43,14 +43,13 @@ export function HomeHeader() {
             />
           </Link>
 
-          {/* Desktop Nav — 토스풍 간결 5개 */}
+          {/* Desktop Nav — 간결 4개 */}
           <nav className="hidden lg:flex items-center gap-1">
             {[
               { label: 'EMR',        href: '/services/emr' },
               { label: 'CRM',        href: '/emr/crm',  badge: 'NEW' },
               { label: '발견',       href: '/emr/discover' },
               { label: '가격',       href: '/#pricing' },
-              { label: '컨설팅',     href: '/opening-package' },
             ].map((n) => (
               <Link
                 key={n.href}
@@ -126,13 +125,12 @@ export function HomeHeader() {
           aria-label="모바일 메뉴"
         >
           <div className="px-4 py-6 space-y-1">
-            {/* 메인 메뉴 5개 */}
+            {/* 메인 메뉴 4개 */}
             {[
               { label: 'EMR · 클라우드',         icon: Monitor,        href: '/services/emr' },
               { label: 'CRM · 환자 리콜',        icon: Send,           href: '/emr/crm', badge: 'NEW' },
               { label: 'EMR 안의 발견',          icon: Sparkles,       href: '/emr/discover' },
               { label: '가격 안내',              icon: Stethoscope,    href: '/#pricing' },
-              { label: '개원 컨설팅',            icon: Rocket,         href: '/opening-package' },
             ].map((n) => {
               const I = n.icon
               return (

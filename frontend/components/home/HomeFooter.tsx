@@ -43,11 +43,11 @@ export function HomeFooter() {
           <div className="grid md:grid-cols-[1.5fr_1fr] gap-10 items-center">
             <div>
               <h3 className="text-3xl md:text-4xl lg:text-5xl font-black tracking-tight leading-[1.1] mb-3">
-                준비됐나요?<br />
-                <span className="text-primary">1초 만에 시작합니다</span>
+                준비되셨나요?<br />
+                <span className="text-primary">1초 만에 시작해보세요</span>
               </h3>
               <p className="text-base md:text-lg text-muted-foreground">
-                가입·카드 등록 없음. 의사 평생 무료.
+                가입·카드 등록 없이, 의사 평생 무료입니다.
               </p>
             </div>
             <div className="flex flex-col sm:flex-row gap-3">

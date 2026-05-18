@@ -84,10 +84,10 @@ export function HomePricingFree() {
           </span>
           <h2 className="text-5xl md:text-6xl lg:text-7xl font-black tracking-tight leading-[1.05] mb-6">
             의원 크기에 맞춰<br />
-            <span className="text-primary">사용자 ID당</span>
+            <span className="text-primary">사용자 ID당 책정합니다</span>
           </h2>
           <p className="text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto">
-            PC 대수가 아닌 사람 수 기준.<br className="hidden md:block" />
+            PC 대수가 아닌 사람 수 기준입니다.<br className="hidden md:block" />
             페이닥·이중원장·다인 진료실에 유리합니다.
           </p>
         </motion.div>

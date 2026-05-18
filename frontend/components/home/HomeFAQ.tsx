@@ -56,8 +56,8 @@ export function HomeFAQ() {
             자주 묻는 질문
           </span>
           <h2 className="text-5xl md:text-6xl lg:text-7xl font-black tracking-tight leading-[1.05] mb-6">
-            궁금한 게<br />
-            <span className="text-primary">있으시겠죠</span>
+            궁금하실 만한 것을<br />
+            <span className="text-primary">미리 모았습니다</span>
           </h2>
         </motion.div>
 

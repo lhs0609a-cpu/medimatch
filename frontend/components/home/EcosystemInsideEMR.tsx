@@ -67,11 +67,11 @@ export function EcosystemInsideEMR() {
           </span>
           <h2 className="text-5xl md:text-6xl lg:text-7xl font-black tracking-tight leading-[1.05] mb-6">
             진료실에서<br />
-            <span className="text-primary">분원·매물·공구까지</span>
+            <span className="text-primary">분원·매물·공구까지 해결합니다</span>
           </h2>
           <p className="text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto">
-            매출 추이를 보다가 분원이 필요해지면 그 자리에서 매물 검색.<br className="hidden md:block" />
-            모두 같은 매직링크 로그인.
+            매출 추이를 보다가 분원이 필요해지면 그 자리에서 매물을 검색하세요.<br className="hidden md:block" />
+            모두 같은 매직링크로 연결됩니다.
           </p>
         </motion.div>
 
