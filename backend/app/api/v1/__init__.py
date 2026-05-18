@@ -69,6 +69,7 @@ from .pharmacy_pickup import router as pharmacy_pickup_router
 from .clinic_setup import router as clinic_setup_router
 from .chronic_care import router as chronic_care_router
 from .staff_seats import router as staff_seats_router
+from .admin_schema import router as admin_schema_router
 
 api_router = APIRouter()
 
@@ -92,6 +93,7 @@ api_router.include_router(campaign_router, prefix="/campaigns", tags=["Campaigns
 api_router.include_router(chat_router, tags=["Chat - 파트너 채팅"])
 api_router.include_router(notification_router, tags=["Notifications - 알림 시스템"])
 api_router.include_router(admin_router, prefix="/admin", tags=["Admin - 관리자"])
+api_router.include_router(admin_schema_router, prefix="/admin", tags=["Admin - Schema 버전 관측"])
 api_router.include_router(landlord_router, prefix="/landlord", tags=["Landlord - 건물주 셀프 등록"])
 api_router.include_router(banner_router, tags=["Banner - 배너 광고 CPM"])
 api_router.include_router(sales_match_router, tags=["Sales Match - 영업사원 매칭"])

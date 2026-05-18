@@ -157,8 +157,41 @@ async def root():
 
 @app.get("/health")
 async def health_check():
-    """Health check endpoint"""
-    return {"status": "healthy"}
+    """Health check + schema 상태.
+
+    응답 필드:
+      status: "healthy" 항상 (Fly health check는 200만 보면 OK)
+      schema: { current: 최신 마이그레이션 버전, drift_ok: bool }
+              — release_command가 한 번도 안 돌았으면 null
+    """
+    import os
+    import asyncpg
+
+    schema_info: dict = {"current": None, "drift_ok": None}
+    db_url = os.environ.get("DATABASE_URL", "")
+    if db_url:
+        if db_url.startswith("postgres://"):
+            db_url = db_url.replace("postgres://", "postgresql://", 1)
+        dsn = db_url.replace("postgresql+asyncpg://", "postgresql://")
+        try:
+            conn = await asyncpg.connect(dsn, timeout=2)
+            try:
+                exists = await conn.fetchval(
+                    "SELECT EXISTS (SELECT 1 FROM information_schema.tables "
+                    "WHERE table_schema='public' AND table_name='schema_migrations')"
+                )
+                if exists:
+                    schema_info["current"] = await conn.fetchval(
+                        "SELECT version FROM schema_migrations ORDER BY version DESC LIMIT 1"
+                    )
+            finally:
+                await conn.close()
+        except Exception:
+            pass  # health check는 실패해선 안 됨
+
+    # drift 점검은 cached하지 않고 매번? 비용 ~100ms — Fly health 5s interval 감안 OK.
+    # 다만 health check는 가벼워야 하니 drift는 별도 /admin/schema-version에서.
+    return {"status": "healthy", "schema": schema_info}
 
 
 if __name__ == "__main__":
