@@ -3,279 +3,215 @@
 import Link from 'next/link'
 import { useState, useEffect } from 'react'
 import {
-  ArrowRight,
-  BarChart3,
-  Building2,
-  ChevronDown,
-  Calculator,
-  LayoutDashboard,
-  Map,
-  Menu,
-  Pill,
-  Rocket,
-  Settings,
-  Sparkles,
-  Stethoscope,
-  TrendingUp,
-  Wrench,
-  X,
-  Globe,
-  Target,
-  MessageSquare,
-  Headphones,
+  ArrowRight, Menu, X, Send, Monitor, Target, Sparkles,
+  Stethoscope, Building2, Rocket, ShoppingCart, MessageSquare,
 } from 'lucide-react'
-import { TossIcon } from '@/components/ui/TossIcon'
 import { hasGuestToken } from '@/lib/auth/guestToken'
 
 export function HomeHeader() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-  const [servicesOpen, setServicesOpen] = useState(false)
   const [hasToken, setHasToken] = useState(false)
+  const [scrolled, setScrolled] = useState(false)
 
-  // 토큰 인식 — SSR mismatch 피하려고 mount 후 1회 체크
   useEffect(() => { setHasToken(hasGuestToken()) }, [])
 
+  // 스크롤 시 헤더 톤 변화 (토스풍 마이크로 인터랙션)
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 8)
+    onScroll()
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
+
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 glass" role="banner">
+    <header
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+        scrolled
+          ? 'bg-background/85 backdrop-blur-xl border-b border-border/60'
+          : 'bg-background/0 backdrop-blur-0 border-b border-transparent'
+      }`}
+      role="banner"
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
-          <Link href="/" className="flex items-center gap-2">
+        <div className="flex items-center justify-between h-20">
+          {/* Logo */}
+          <Link href="/" className="flex items-center gap-2 transition-transform hover:scale-[1.02]">
             <img
               src="/assets/logo/mediplaton-horizontal.png"
               alt="MEDI-PLATON"
-              className="h-8 object-contain"
+              className="h-9 object-contain"
             />
           </Link>
 
+          {/* Desktop Nav — 토스풍 간결 5개 */}
           <nav className="hidden lg:flex items-center gap-1">
-            <div className="relative">
-              <button
-                onClick={() => setServicesOpen(!servicesOpen)}
-                onMouseEnter={() => setServicesOpen(true)}
-                className="nav-link flex items-center gap-1"
+            {[
+              { label: 'EMR',        href: '/services/emr' },
+              { label: 'CRM',        href: '/emr/crm',  badge: 'NEW' },
+              { label: '발견',       href: '/emr/discover' },
+              { label: '가격',       href: '/#pricing' },
+              { label: '컨설팅',     href: '/opening-package' },
+            ].map((n) => (
+              <Link
+                key={n.href}
+                href={n.href}
+                className="relative px-4 py-2 text-sm font-semibold text-foreground/80 hover:text-foreground rounded-xl hover:bg-foreground/5 transition-colors"
               >
-                서비스
-                <ChevronDown className={`w-4 h-4 transition-transform ${servicesOpen ? 'rotate-180' : ''}`} />
-              </button>
-
-              {servicesOpen && (
-                <div
-                  className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-[600px] p-6 bg-card border border-border rounded-2xl shadow-2xl animate-fade-in-down"
-                  onMouseLeave={() => setServicesOpen(false)}
-                >
-                  <div className="grid grid-cols-2 gap-6">
-                    <div>
-                      <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">핵심 서비스</p>
-                      <div className="space-y-1">
-                        <Link href="/opening-package" className="flex items-center gap-3 p-3 rounded-xl bg-[#3182f6]/5 dark:bg-[#3182f6]/10 border border-[#3182f6]/20 dark:border-[#3182f6]/30 group">
-                          <TossIcon icon={Sparkles} color="from-blue-500 to-blue-600" size="sm" shadow="shadow-blue-500/25" />
-                          <div>
-                            <div className="flex items-center gap-2">
-                              <p className="font-medium text-foreground group-hover:text-[#3182f6]">개원의 패키지</p>
-                              <span className="px-1.5 py-0.5 text-[10px] font-bold bg-[#3182f6] text-white rounded">HOT</span>
-                            </div>
-                            <p className="text-xs text-muted-foreground">대출 + 마케팅 + PG + 중개 원스톱</p>
-                          </div>
-                        </Link>
-                        <Link href="/simulate" className="flex items-center gap-3 p-3 rounded-xl hover:bg-accent transition-colors group">
-                          <TossIcon icon={BarChart3} color="from-blue-500 to-blue-600" size="xs" shadow="shadow-blue-500/25" className="flex-shrink-0" />
-                          <div>
-                            <p className="font-medium text-foreground group-hover:text-[#3182f6]">OpenSim</p>
-                            <p className="text-xs text-muted-foreground">AI 개원 시뮬레이터</p>
-                          </div>
-                        </Link>
-                        <Link href="/buildings" className="flex items-center gap-3 p-3 rounded-xl hover:bg-accent transition-colors group">
-                          <TossIcon icon={Building2} color="from-blue-500 to-blue-600" size="xs" shadow="shadow-blue-500/25" className="flex-shrink-0" />
-                          <div>
-                            <p className="font-medium text-foreground group-hover:text-[#3182f6]">매물 검색</p>
-                            <p className="text-xs text-muted-foreground">개원 적합 공간 찾기</p>
-                          </div>
-                        </Link>
-                        <Link href="/pharmacy-match" className="flex items-center gap-3 p-3 rounded-xl hover:bg-accent transition-colors group">
-                          <TossIcon icon={Pill} color="from-blue-500 to-blue-600" size="xs" shadow="shadow-blue-500/25" className="flex-shrink-0" />
-                          <div>
-                            <p className="font-medium text-foreground group-hover:text-[#3182f6]">PharmMatch</p>
-                            <p className="text-xs text-muted-foreground">약국 양도양수</p>
-                          </div>
-                        </Link>
-                      </div>
-                    </div>
-                    <div>
-                      <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">제작 서비스</p>
-                      <div className="space-y-1">
-                        <Link href="/services/emr" className="flex items-center gap-3 p-3 rounded-xl hover:bg-accent transition-colors group">
-                          <TossIcon icon={Stethoscope} color="from-blue-500 to-blue-600" size="xs" shadow="shadow-blue-500/25" className="flex-shrink-0" />
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2">
-                              <span className="text-sm font-medium group-hover:text-[#3182f6]">클라우드 EMR</span>
-                              <span className="px-1.5 py-0.5 text-[10px] font-bold bg-[#3182f6]/10 text-[#3182f6] rounded">NEW</span>
-                            </div>
-                            <p className="text-xs text-muted-foreground">AI 차트, 클라우드 네이티브</p>
-                          </div>
-                        </Link>
-                        <Link href="/emr-dashboard" className="flex items-center gap-3 p-3 rounded-xl hover:bg-accent transition-colors group">
-                          <TossIcon icon={BarChart3} color="from-blue-600 to-blue-700" size="xs" shadow="shadow-blue-500/25" className="flex-shrink-0" />
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2">
-                              <span className="text-sm font-medium group-hover:text-[#3182f6]">EMR 비즈니스 분석</span>
-                              <span className="px-1.5 py-0.5 text-[10px] font-bold bg-[#3182f6]/10 text-[#3182f6] rounded">NEW</span>
-                            </div>
-                            <p className="text-xs text-muted-foreground">매출·환자·지역 벤치마크</p>
-                          </div>
-                        </Link>
-                        <Link href="/emr/crm" className="flex items-center gap-3 p-3 rounded-xl hover:bg-accent transition-colors group">
-                          <TossIcon icon={MessageSquare} color="from-blue-500 to-blue-600" size="xs" shadow="shadow-blue-500/25" className="flex-shrink-0" />
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2">
-                              <span className="text-sm font-medium group-hover:text-[#3182f6]">CRM · 환자 리콜</span>
-                              <span className="px-1.5 py-0.5 text-[10px] font-bold bg-[#3182f6]/10 text-[#3182f6] rounded">NEW</span>
-                            </div>
-                            <p className="text-xs text-muted-foreground">정기검진 리콜·캠페인·알림톡</p>
-                          </div>
-                        </Link>
-                      </div>
-                      <div className="border-t border-border mt-3 pt-3">
-                        <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">운영자 전용</p>
-                        <Link href="/admin/crm" className="flex items-center gap-3 p-2 rounded-lg hover:bg-accent transition-colors">
-                          <Headphones className="w-4 h-4 text-[#3182f6] flex-shrink-0" />
-                          <span className="text-xs">개원의 Lead 콘솔 (라이브 콜)</span>
-                        </Link>
-                      </div>
-                      <div className="border-t border-border mt-3 pt-3">
-                        <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">개원 도구</p>
-                        <div className="space-y-1">
-                          <Link href="/opening-project" className="flex items-center gap-3 p-2 rounded-lg hover:bg-accent transition-colors">
-                            <Rocket className="w-4 h-4 text-[#3182f6] flex-shrink-0" />
-                            <span className="text-xs">개원 D-Day 체크리스트</span>
-                          </Link>
-                          <Link href="/cost-calculator" className="flex items-center gap-3 p-2 rounded-lg hover:bg-accent transition-colors">
-                            <Calculator className="w-4 h-4 text-[#3182f6] flex-shrink-0" />
-                            <span className="text-xs">개원 비용 계산기</span>
-                          </Link>
-                          <Link href="/bep-analyzer" className="flex items-center gap-3 p-2 rounded-lg hover:bg-accent transition-colors">
-                            <TrendingUp className="w-4 h-4 text-[#3182f6] flex-shrink-0" />
-                            <span className="text-xs">BEP 분석기</span>
-                          </Link>
-                          <Link href="/#services" className="flex items-center gap-3 p-2 rounded-lg hover:bg-accent transition-colors">
-                            <Wrench className="w-4 h-4 text-[#3182f6] flex-shrink-0" />
-                            <span className="text-xs">전체 도구 보기</span>
-                          </Link>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-
-            <Link href="/opening-package" className="nav-link flex items-center gap-1">
-              개원의 패키지
-              <span className="px-1.5 py-0.5 text-[10px] font-bold bg-[#3182f6] text-white rounded">HOT</span>
-            </Link>
-            <Link href="/buildings" className="nav-link">매물</Link>
-            <Link href="/opening-project" className="nav-link flex items-center gap-1">
-              개원 D-Day
-              <span className="px-1.5 py-0.5 text-[10px] font-bold bg-[#3182f6]/80 text-white rounded">NEW</span>
-            </Link>
-            <Link href="/group-buying" className="nav-link hidden xl:block">공동구매</Link>
-            <Link href="/map" className="nav-link">지도</Link>
+                <span className="inline-flex items-center gap-1.5">
+                  {n.label}
+                  {n.badge && (
+                    <span className="text-[9px] font-bold text-primary bg-primary/10 px-1.5 py-0.5 rounded">
+                      {n.badge}
+                    </span>
+                  )}
+                </span>
+              </Link>
+            ))}
           </nav>
 
+          {/* Right — 단일 CTA 강조 */}
           <div className="hidden lg:flex items-center gap-3">
             {hasToken ? (
               <>
-                <Link href="/recover" className="nav-link text-sm">링크 분실?</Link>
-                <Link href="/my-roadmap" className="btn-primary">
+                <Link
+                  href="/recover"
+                  className="text-sm text-foreground/60 hover:text-foreground transition-colors"
+                >
+                  링크 분실?
+                </Link>
+                <Link
+                  href="/my-roadmap"
+                  className="group inline-flex items-center gap-1.5 px-5 py-2.5 text-sm font-bold rounded-full bg-foreground text-background hover:opacity-90 transition-all hover:shadow-lg"
+                >
                   <Target className="w-4 h-4" />
                   내 미션맵
-                  <ArrowRight className="w-4 h-4" />
+                  <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
                 </Link>
               </>
             ) : (
               <>
-                <Link href="/recover" className="nav-link text-sm">링크 분실?</Link>
-                <Link href="/diagnose" className="btn-primary">
-                  <Sparkles className="w-4 h-4" />
-                  1분 진단으로 시작
-                  <ArrowRight className="w-4 h-4" />
+                <Link
+                  href="/recover"
+                  className="text-sm text-foreground/60 hover:text-foreground transition-colors"
+                >
+                  로그인 링크 받기
+                </Link>
+                <Link
+                  href="/emr"
+                  className="group inline-flex items-center gap-1.5 px-5 py-2.5 text-sm font-bold rounded-full bg-primary text-white hover:bg-blue-700 transition-all hover:shadow-lg hover:shadow-primary/30"
+                >
+                  무료로 시작
+                  <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
                 </Link>
               </>
             )}
           </div>
 
+          {/* Mobile hamburger */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="lg:hidden btn-icon"
+            className="lg:hidden w-11 h-11 rounded-full flex items-center justify-center hover:bg-foreground/5 transition-colors"
             aria-label={mobileMenuOpen ? '메뉴 닫기' : '메뉴 열기'}
             aria-expanded={mobileMenuOpen}
-            aria-controls="mobile-menu"
           >
-            {mobileMenuOpen ? <X className="w-5 h-5" aria-hidden="true" /> : <Menu className="w-5 h-5" aria-hidden="true" />}
+            {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>
         </div>
       </div>
 
-      {/* Mobile Menu */}
+      {/* Mobile Menu — 풀스크린 오버레이 */}
       {mobileMenuOpen && (
-        <nav id="mobile-menu" className="lg:hidden border-t border-border bg-background animate-fade-in-down" aria-label="모바일 메뉴">
-          <div className="px-4 py-4 space-y-2">
-            <Link href="/simulate" className="flex items-center gap-3 p-3 rounded-xl hover:bg-accent" onClick={() => setMobileMenuOpen(false)}>
-              <TossIcon icon={BarChart3} color="from-blue-500 to-blue-600" size="xs" shadow="shadow-blue-500/25" className="flex-shrink-0" />
-              <span>OpenSim - 개원 시뮬레이터</span>
-            </Link>
-            <Link href="/buildings" className="flex items-center gap-3 p-3 rounded-xl hover:bg-accent" onClick={() => setMobileMenuOpen(false)}>
-              <TossIcon icon={Building2} color="from-blue-500 to-blue-600" size="xs" shadow="shadow-blue-500/25" className="flex-shrink-0" />
-              <span>매물 검색</span>
-            </Link>
-            <Link href="/pharmacy-match" className="flex items-center gap-3 p-3 rounded-xl hover:bg-accent" onClick={() => setMobileMenuOpen(false)}>
-              <TossIcon icon={Pill} color="from-blue-500 to-blue-600" size="xs" shadow="shadow-blue-500/25" className="flex-shrink-0" />
-              <span>PharmMatch - 약국 매칭</span>
-            </Link>
-            <Link href="/map" className="flex items-center gap-3 p-3 rounded-xl hover:bg-accent" onClick={() => setMobileMenuOpen(false)}>
-              <TossIcon icon={Map} color="from-blue-500 to-blue-600" size="xs" shadow="shadow-blue-500/25" className="flex-shrink-0" />
-              <span>지도</span>
-            </Link>
-            <Link href="/services/emr" className="flex items-center gap-3 p-3 rounded-xl hover:bg-accent" onClick={() => setMobileMenuOpen(false)}>
-              <TossIcon icon={Stethoscope} color="from-blue-500 to-blue-600" size="xs" shadow="shadow-blue-500/25" className="flex-shrink-0" />
-              <span className="flex items-center gap-2">클라우드 EMR <span className="px-1.5 py-0.5 text-[10px] font-bold bg-[#3182f6]/10 text-[#3182f6] rounded">NEW</span></span>
-            </Link>
-            <Link href="/emr/crm" className="flex items-center gap-3 p-3 rounded-xl hover:bg-accent" onClick={() => setMobileMenuOpen(false)}>
-              <TossIcon icon={MessageSquare} color="from-blue-500 to-blue-600" size="xs" shadow="shadow-blue-500/25" className="flex-shrink-0" />
-              <span className="flex items-center gap-2">CRM · 환자 리콜 <span className="px-1.5 py-0.5 text-[10px] font-bold bg-[#3182f6]/10 text-[#3182f6] rounded">NEW</span></span>
-            </Link>
-            <Link href="/opening-project" className="flex items-center gap-3 p-3 rounded-xl hover:bg-accent" onClick={() => setMobileMenuOpen(false)}>
-              <TossIcon icon={Rocket} color="from-blue-500 to-blue-600" size="xs" shadow="shadow-blue-500/25" className="flex-shrink-0" />
-              <span className="flex items-center gap-2">개원 D-Day 체크리스트 <span className="px-1.5 py-0.5 text-[10px] font-bold bg-[#3182f6]/80 text-white rounded">NEW</span></span>
-            </Link>
-            <Link href="/cost-calculator" className="flex items-center gap-3 p-3 rounded-xl hover:bg-accent" onClick={() => setMobileMenuOpen(false)}>
-              <TossIcon icon={Calculator} color="from-blue-500 to-blue-600" size="xs" shadow="shadow-blue-500/25" className="flex-shrink-0" />
-              <span>개원 비용 계산기</span>
-            </Link>
-            <Link href="/opening-package" className="flex items-center gap-3 p-3 rounded-xl bg-[#3182f6]/5 dark:bg-[#3182f6]/10 border border-[#3182f6]/20 dark:border-[#3182f6]/30" onClick={() => setMobileMenuOpen(false)}>
-              <TossIcon icon={Sparkles} color="from-blue-500 to-blue-600" size="xs" shadow="shadow-blue-500/25" className="flex-shrink-0" />
-              <span>개원의 패키지</span>
-              <span className="px-1.5 py-0.5 text-[10px] font-bold bg-[#3182f6] text-white rounded">HOT</span>
-            </Link>
-            <Link href="/#services" className="flex items-center gap-3 p-3 rounded-xl hover:bg-accent" onClick={() => setMobileMenuOpen(false)}>
-              <TossIcon icon={Wrench} color="from-blue-600 to-blue-700" size="xs" shadow="shadow-blue-500/25" className="flex-shrink-0" />
-              <span>전체 도구 27종</span>
-              <span className="px-1.5 py-0.5 text-[10px] font-bold bg-[#3182f6]/10 text-[#3182f6] rounded">NEW</span>
-            </Link>
-            <div className="pt-4 border-t border-border space-y-2">
-              <Link href="/recover" className="block w-full text-center py-3 text-muted-foreground hover:bg-accent rounded-xl text-sm" onClick={() => setMobileMenuOpen(false)}>
-                링크 분실 시 복구
+        <nav
+          className="lg:hidden fixed inset-0 top-20 bg-background animate-fade-in-down overflow-y-auto"
+          aria-label="모바일 메뉴"
+        >
+          <div className="px-4 py-6 space-y-1">
+            {/* 메인 메뉴 5개 */}
+            {[
+              { label: 'EMR · 클라우드',         icon: Monitor,        href: '/services/emr' },
+              { label: 'CRM · 환자 리콜',        icon: Send,           href: '/emr/crm', badge: 'NEW' },
+              { label: 'EMR 안의 발견',          icon: Sparkles,       href: '/emr/discover' },
+              { label: '가격 안내',              icon: Stethoscope,    href: '/#pricing' },
+              { label: '개원 컨설팅',            icon: Rocket,         href: '/opening-package' },
+            ].map((n) => {
+              const I = n.icon
+              return (
+                <Link
+                  key={n.href}
+                  href={n.href}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center gap-4 px-4 py-4 rounded-2xl hover:bg-foreground/5 transition-colors"
+                >
+                  <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+                    <I className="w-5 h-5 text-primary" />
+                  </div>
+                  <span className="flex-1 text-lg font-bold">{n.label}</span>
+                  {n.badge && (
+                    <span className="text-[10px] font-bold text-primary bg-primary/10 px-2 py-1 rounded">
+                      {n.badge}
+                    </span>
+                  )}
+                  <ArrowRight className="w-4 h-4 text-muted-foreground" />
+                </Link>
+              )
+            })}
+
+            {/* 추가 진입점 */}
+            <div className="pt-4 border-t border-border mt-4 space-y-1">
+              <Link
+                href="/buildings"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center gap-3 px-4 py-3 text-sm text-muted-foreground hover:bg-foreground/5 rounded-xl"
+              >
+                <Building2 className="w-4 h-4" />
+                병원 매물
               </Link>
+              <Link
+                href="/group-buying"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center gap-3 px-4 py-3 text-sm text-muted-foreground hover:bg-foreground/5 rounded-xl"
+              >
+                <ShoppingCart className="w-4 h-4" />
+                공동구매
+              </Link>
+              <Link
+                href="/contact"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center gap-3 px-4 py-3 text-sm text-muted-foreground hover:bg-foreground/5 rounded-xl"
+              >
+                <MessageSquare className="w-4 h-4" />
+                상담 문의
+              </Link>
+            </div>
+
+            {/* 하단 CTA — 거대 */}
+            <div className="pt-6 mt-6 border-t border-border space-y-3">
               {hasToken ? (
-                <Link href="/my-roadmap" className="btn-primary w-full justify-center" onClick={() => setMobileMenuOpen(false)}>
-                  <Target className="w-4 h-4" />
+                <Link
+                  href="/my-roadmap"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center justify-center gap-2 w-full px-6 py-4 text-base font-bold rounded-2xl bg-foreground text-background"
+                >
+                  <Target className="w-5 h-5" />
                   내 미션맵 보기
                 </Link>
               ) : (
-                <Link href="/diagnose" className="btn-primary w-full justify-center" onClick={() => setMobileMenuOpen(false)}>
-                  <Sparkles className="w-4 h-4" />
-                  1분 진단으로 시작
+                <Link
+                  href="/emr"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center justify-center gap-2 w-full px-6 py-4 text-base font-bold rounded-2xl bg-primary text-white"
+                >
+                  무료로 시작
+                  <ArrowRight className="w-5 h-5" />
                 </Link>
               )}
+              <Link
+                href="/recover"
+                onClick={() => setMobileMenuOpen(false)}
+                className="block w-full text-center py-3 text-sm text-muted-foreground hover:bg-foreground/5 rounded-xl"
+              >
+                로그인 링크 받기
+              </Link>
             </div>
           </div>
         </nav>

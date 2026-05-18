@@ -2,84 +2,103 @@
 
 import Link from 'next/link'
 import { motion } from 'framer-motion'
-import { ArrowRight, Stethoscope } from 'lucide-react'
-import { fadeInUp, staggerContainer, staggerItem, viewportConfig } from '@/components/animation/MotionWrapper'
+import { ArrowRight } from 'lucide-react'
+import { viewportConfig } from '@/components/animation/MotionWrapper'
 
 const stats = [
-  { value: '150+', label: '컨설팅 누적 건수' },
-  { value: '97%', label: '고객 만족도' },
-  { value: '8년', label: '의료 컨설팅 경력' },
-  { value: '30+', label: '전문 파트너 네트워크' },
+  { value: '150', unit: '+', label: '컨설팅 누적' },
+  { value: '97',  unit: '%', label: '고객 만족도' },
+  { value: '8',   unit: '년', label: '의료 컨설팅 경력' },
+  { value: '30',  unit: '+', label: '전문 파트너 네트워크' },
 ]
 
 const photos = [
-  { src: '/assets/consulting/doctor-interview.jpg', alt: '원장 인터뷰 촬영', aspect: 'aspect-[3/4]' },
-  { src: '/assets/consulting/consultation-2.jpg', alt: '데이터 기반 상담', aspect: 'aspect-[4/3]' },
-  { src: '/assets/consulting/doctor-meeting.jpg', alt: '원장 미팅', aspect: 'aspect-[4/3]' },
-  { src: '/assets/consulting/clinic-lobby.jpg', alt: '병원 로비 촬영', aspect: 'aspect-[3/4]' },
+  { src: '/assets/consulting/doctor-interview.jpg', alt: '원장 인터뷰' },
+  { src: '/assets/consulting/consultation-2.jpg',   alt: '데이터 기반 상담' },
+  { src: '/assets/consulting/doctor-meeting.jpg',   alt: '원장 미팅' },
+  { src: '/assets/consulting/clinic-lobby.jpg',     alt: '병원 로비' },
 ]
 
 export function ConsultingSection() {
   return (
-    <section className="py-[80px] md:py-[120px] bg-foreground text-background">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid lg:grid-cols-2 gap-12 items-center">
-          {/* Text */}
+    <section className="py-[120px] md:py-[180px] bg-foreground text-background overflow-hidden relative">
+      {/* 배경 후광 */}
+      <div className="absolute top-1/4 left-0 w-[500px] h-[500px] bg-primary/10 rounded-full blur-3xl -translate-x-1/2 pointer-events-none" />
+      <div className="absolute bottom-1/4 right-0 w-[400px] h-[400px] bg-primary/15 rounded-full blur-3xl translate-x-1/2 pointer-events-none" />
+
+      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="grid lg:grid-cols-2 gap-16 lg:gap-20 items-center">
+          {/* 좌: 텍스트 */}
           <motion.div
-            initial="hidden"
-            whileInView="visible"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
             viewport={viewportConfig}
-            variants={staggerContainer}
+            transition={{ duration: 0.6 }}
           >
-            <motion.div variants={staggerItem} className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-white/80 text-sm font-medium mb-6">
-              <Stethoscope className="w-4 h-4" />
-              현장에서 직접 뜁니다
-            </motion.div>
-            <motion.h2 variants={staggerItem} className="text-3xl md:text-5xl font-bold text-white mb-6">
-              오직 한 분의 원장님을 위해<br />
-              <span className="text-[#3182f6]">최고들이 모였습니다</span>
-            </motion.h2>
-            <motion.p variants={staggerItem} className="text-white/60 text-lg mb-8 leading-relaxed">
-              메디플라톤은 책상 위의 컨설팅이 아닙니다. 직접 현장을 방문하고, 원장님과 마주 앉아 데이터를 분석하고, 카메라 앞에서 솔직한 이야기를 나눕니다.
-            </motion.p>
-            <motion.div variants={staggerItem} className="grid grid-cols-2 gap-6 mb-8">
-              {stats.map((s) => (
-                <div key={s.label}>
-                  <div className="text-3xl font-bold text-[#3182f6] mb-1">{s.value}</div>
+            <span className="inline-block px-3 py-1 mb-8 text-xs font-bold text-white bg-white/15 rounded-full uppercase tracking-wider backdrop-blur-sm">
+              사람이 직접 — 책상 위 컨설팅 아닙니다
+            </span>
+            <h2 className="text-5xl md:text-6xl lg:text-7xl font-black text-white tracking-tight leading-[1.05] mb-8">
+              데이터만으론<br />
+              <span className="text-primary">부족합니다</span>
+            </h2>
+            <p className="text-xl md:text-2xl text-white/70 leading-relaxed mb-12 max-w-xl">
+              현장 방문, 마주 앉은 상담, 카메라 앞 솔직한 이야기.<br className="hidden md:block" />
+              EMR이 자동화하는 것 외의 모든 의사결정을 함께 합니다.
+            </p>
+
+            {/* 거대 stat 4개 */}
+            <div className="grid grid-cols-2 gap-x-8 gap-y-10 mb-12">
+              {stats.map((s, i) => (
+                <motion.div
+                  key={s.label}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={viewportConfig}
+                  transition={{ delay: 0.2 + i * 0.08 }}
+                >
+                  <div className="flex items-baseline gap-1 mb-2">
+                    <span className="text-5xl md:text-6xl font-black text-primary leading-none">
+                      {s.value}
+                    </span>
+                    <span className="text-2xl md:text-3xl font-black text-primary/80">{s.unit}</span>
+                  </div>
                   <div className="text-sm text-white/50">{s.label}</div>
-                </div>
+                </motion.div>
               ))}
-            </motion.div>
-            <motion.div variants={staggerItem}>
-              <Link href="/opening-package" className="btn-primary btn-lg text-lg">
-                개원 컨설팅 알아보기
-                <ArrowRight className="w-5 h-5" />
-              </Link>
-            </motion.div>
+            </div>
+
+            <Link
+              href="/opening-package"
+              className="inline-flex items-center gap-2 px-8 py-5 text-base font-bold rounded-2xl bg-primary text-white hover:bg-blue-700 transition-all hover:shadow-2xl hover:shadow-primary/40"
+            >
+              개원 컨설팅 알아보기
+              <ArrowRight className="w-5 h-5" />
+            </Link>
           </motion.div>
 
-          {/* Photo grid */}
+          {/* 우: 사진 4개 — 비대칭 배치 */}
           <motion.div
-            initial="hidden"
-            whileInView="visible"
+            initial={{ opacity: 0, x: 30 }}
+            whileInView={{ opacity: 1, x: 0 }}
             viewport={viewportConfig}
-            variants={fadeInUp}
-            className="grid grid-cols-2 gap-3"
+            transition={{ duration: 0.7, delay: 0.2 }}
+            className="grid grid-cols-2 gap-4"
           >
-            <div className="space-y-3">
-              <div className="rounded-2xl overflow-hidden">
-                <img src={photos[0].src} alt={photos[0].alt} className={`w-full ${photos[0].aspect} object-cover`} />
+            <div className="space-y-4">
+              <div className="rounded-3xl overflow-hidden aspect-[3/4]">
+                <img src={photos[0].src} alt={photos[0].alt} className="w-full h-full object-cover" />
               </div>
-              <div className="rounded-2xl overflow-hidden">
-                <img src={photos[1].src} alt={photos[1].alt} className={`w-full ${photos[1].aspect} object-cover`} />
+              <div className="rounded-3xl overflow-hidden aspect-[4/3]">
+                <img src={photos[1].src} alt={photos[1].alt} className="w-full h-full object-cover" />
               </div>
             </div>
-            <div className="space-y-3 pt-6">
-              <div className="rounded-2xl overflow-hidden">
-                <img src={photos[2].src} alt={photos[2].alt} className={`w-full ${photos[2].aspect} object-cover`} />
+            <div className="space-y-4 pt-12">
+              <div className="rounded-3xl overflow-hidden aspect-[4/3]">
+                <img src={photos[2].src} alt={photos[2].alt} className="w-full h-full object-cover" />
               </div>
-              <div className="rounded-2xl overflow-hidden">
-                <img src={photos[3].src} alt={photos[3].alt} className={`w-full ${photos[3].aspect} object-cover`} />
+              <div className="rounded-3xl overflow-hidden aspect-[3/4]">
+                <img src={photos[3].src} alt={photos[3].alt} className="w-full h-full object-cover" />
               </div>
             </div>
           </motion.div>
