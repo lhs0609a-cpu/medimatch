@@ -120,6 +120,17 @@ class InsuranceClaim(Base):
     has_appeal = Column(Boolean, default=False, nullable=False)
     appeal_count = Column(Integer, default=0, nullable=False)
 
+    # === 신규 컬럼: 임포트/소급 누락 검출 ===
+    external_id = Column(String(100), nullable=True)
+    source_emr = Column(String(50), nullable=True)
+    import_batch_id = Column(UUID(as_uuid=True), nullable=True)
+    imported_at = Column(DateTime, nullable=True)
+    deleted_at = Column(DateTime, nullable=True)
+    audit_status = Column(String(20), nullable=True)  # NULL/SCANNED/RECOVERED/IGNORED
+    audit_potential_amount = Column(BigInteger, default=0, nullable=False)
+    audit_findings = Column(JSONB, default=[], nullable=False)
+    audit_scanned_at = Column(DateTime, nullable=True)
+
     # 타임스탬프
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)

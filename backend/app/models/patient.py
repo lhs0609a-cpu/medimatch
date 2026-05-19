@@ -111,6 +111,14 @@ class Patient(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
+    # 운영 태그 (VIP/연예인/외국인/임신부/주의/단골 등) — 의원 자유 정의
+    tags = Column(JSONB, default=list, nullable=False)
+    """예: ["VIP", "일본", "재방문"] — PatientTag 사전에 등록된 이름과 매칭"""
+
+    # 동반자(보호자/가족) — 같은 의원의 다른 환자 chart_no 리스트
+    companion_chart_nos = Column(JSONB, default=list, nullable=False)
+    """예: [{"chart_no": "C-1234", "name": "정민식", "relation": "남편"}, ...]"""
+
     user = relationship("User", backref="patients")
 
     __table_args__ = (

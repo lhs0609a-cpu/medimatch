@@ -38,6 +38,10 @@ from .claims_ai import router as claims_ai_router
 from .claims_edi import router as claims_edi_router
 from .claims_appeal import router as claims_appeal_router
 from .claims_analytics import router as claims_analytics_router
+from .claims_import import router as claims_import_router
+from .tickets import router as tickets_router
+from .patient_tags import router as patient_tags_router
+from .visit_analytics import router as visit_analytics_router
 from .dur import router as dur_router
 from .hira_codes import router as hira_codes_router
 from .tax import router as tax_v2_router
@@ -113,6 +117,10 @@ api_router.include_router(claims_ai_router, prefix="/claims", tags=["Claims AI -
 api_router.include_router(claims_edi_router, prefix="/claims", tags=["Claims EDI - 심평원 EDI"])
 api_router.include_router(claims_appeal_router, prefix="/appeals", tags=["Claims Appeal - 이의신청"])
 api_router.include_router(claims_analytics_router, prefix="/claims-analytics", tags=["Claims Analytics - 청구 분석"])
+api_router.include_router(claims_import_router, prefix="/claims", tags=["Claims Import - 기존 EMR 청구 임포트 + 누락 검출"])
+api_router.include_router(tickets_router, prefix="/emr", tags=["EMR Tickets - 시술 회차권"])
+api_router.include_router(patient_tags_router, prefix="/emr", tags=["EMR Patient Tags - 환자 운영 태그"])
+api_router.include_router(visit_analytics_router, prefix="/emr/analytics", tags=["EMR Analytics - 방문 분석"])
 api_router.include_router(dur_router, prefix="/dur", tags=["DUR - 약물 안전성"])
 api_router.include_router(hira_codes_router, prefix="/hira-codes", tags=["HIRA Codes - 코드 검색"])
 # tax_correction_router (v1) removed — v2 (tax/) includes all v1 endpoints plus extras

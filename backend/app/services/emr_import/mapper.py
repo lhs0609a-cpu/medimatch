@@ -182,6 +182,8 @@ def apply_mapping(
             v = row.get(src_header)
             if v is None or v == "":
                 continue
+            if isinstance(v, float) and v != v:  # pandas NaN — JSON 직렬화 깨짐 방지
+                continue
             external_meta[src_header] = str(v) if not isinstance(v, (int, float, bool)) else v
 
         # 알림톡 동의 강제 NOT_ASKED

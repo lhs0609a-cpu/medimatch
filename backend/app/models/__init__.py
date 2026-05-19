@@ -145,6 +145,11 @@ from .visit import Visit, VisitDiagnosis, VisitProcedure, VisitStatus
 from .appointment import Appointment, AppointmentStatus
 from .prescription import Prescription, PrescriptionItem, PrescriptionStatus
 from .bill import Bill, BillItem, EmrPayment, BillStatus, PaymentMethod as BillPaymentMethod
+from .treatment_ticket import (
+    TreatmentPackage, PatientTicket, TicketUsage,
+    PackageCategory, TicketStatus,
+)
+from .patient_tag import PatientTag
 
 __all__ = [
     "User",
@@ -398,4 +403,12 @@ __all__ = [
     "EmrPayment",
     "BillStatus",
     "BillPaymentMethod",
+    # 시술 회차권
+    "TreatmentPackage",
+    "PatientTicket",
+    "TicketUsage",
+    "PackageCategory",
+    "TicketStatus",
+    # 환자 태그 사전
+    "PatientTag",
 ]

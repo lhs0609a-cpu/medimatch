@@ -9,6 +9,7 @@ import {
 } from 'lucide-react'
 import { apiClient } from '@/lib/api/client'
 import { visitService, prescriptionService, billService } from '@/lib/api/emr'
+import { PatientTags, PatientTickets } from '@/components/emr/PatientTagsAndTickets'
 
 interface PatientDetail {
   id: string
@@ -26,6 +27,8 @@ interface PatientDetail {
   appointment_date?: string
   inbound_status?: string
   manager_name?: string
+  tags?: string[]
+  companion_chart_nos?: Array<{ chart_no: string; name?: string; relation?: string }>
   is_demo?: boolean
 }
 
@@ -72,7 +75,10 @@ export default function PatientDetailPage() {
           </Link>
           <User className="w-7 h-7 text-blue-600" />
           <div>
-            <h1 className="text-2xl font-semibold">{patient.name}</h1>
+            <div className="flex items-center gap-3 flex-wrap">
+              <h1 className="text-2xl font-semibold">{patient.name}</h1>
+              <PatientTags patientId={id} initialTags={patient.tags || []} />
+            </div>
             <p className="text-xs text-muted-foreground font-mono">{patient.chart_no || '차트번호 미등록'}</p>
           </div>
         </div>
@@ -108,6 +114,8 @@ export default function PatientDetailPage() {
           </div>
         )}
       </section>
+
+      {!patient.is_demo && <PatientTickets patientId={id} />}
 
       {!patient.is_demo && (
         <>

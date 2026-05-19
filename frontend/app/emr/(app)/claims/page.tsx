@@ -246,6 +246,7 @@ export default function ClaimsPage() {
       <div className="flex items-center gap-2 overflow-x-auto hide-scrollbar pb-1">
         {[
           { href: '/emr/claims', label: '대시보드', active: true },
+          { href: '/emr/claims/audit', label: '잃어버린 돈 찾기', highlight: true },
           { href: '/emr/claims/new', label: '청구 작성' },
           { href: '/emr/claims/batch', label: '일괄 전송' },
           { href: '/emr/claims/defense', label: 'AI 삭감방어' },
@@ -259,7 +260,11 @@ export default function ClaimsPage() {
             key={nav.href}
             href={nav.href}
             className={`px-3 py-1.5 text-xs font-semibold rounded-lg whitespace-nowrap transition-colors ${
-              nav.active ? 'bg-primary text-white' : 'bg-secondary text-muted-foreground hover:text-foreground'
+              nav.active
+                ? 'bg-primary text-white'
+                : (nav as any).highlight
+                ? 'bg-rose-50 text-rose-700 border border-rose-200 hover:bg-rose-100'
+                : 'bg-secondary text-muted-foreground hover:text-foreground'
             }`}
           >
             {nav.label}

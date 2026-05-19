@@ -50,7 +50,7 @@ const primaryLinks: PrimaryLink[] = [
     href: '/emr/prescriptions',
     label: '처방·청구',
     icon: Pill,
-    matchPrefixes: ['/emr/prescriptions', '/emr/claims', '/emr/tax-correction', '/emr/bridge', '/emr/billing'],
+    matchPrefixes: ['/emr/prescriptions', '/emr/claims', '/emr/tax-correction', '/emr/bridge', '/emr/billing', '/emr/packages'],
   },
   {
     href: '/emr/crm',
@@ -63,7 +63,7 @@ const primaryLinks: PrimaryLink[] = [
     href: '/emr/dashboard',
     label: '리포트',
     icon: BarChart3,
-    matchPrefixes: ['/emr/dashboard', '/emr-dashboard', '/emr/reports', '/emr/cost', '/emr/ai-consulting', '/emr/multi-branch'],
+    matchPrefixes: ['/emr/dashboard', '/emr-dashboard', '/emr/reports', '/emr/cost', '/emr/ai-consulting', '/emr/multi-branch', '/emr/analytics'],
   },
   {
     href: '/emr/discover',
