@@ -119,11 +119,12 @@ def _aggregate_summary(metrics: list[dict]) -> dict:
     total_non_ins = sum(m["revenue_non_insurance"] for m in this_month)
     non_insurance_ratio = (total_non_ins / total_revenue * 100) if total_revenue > 0 else 0
 
-    # 지역 순위 (평균 백분위)
-    avg_percentile = (
-        sum(m["regional_percentile"] for m in this_month) / len(this_month)
-        if this_month else 50
-    )
+    # 지역 순위 (평균 백분위) — 실데이터엔 지역 소스가 없어 None일 수 있음
+    pctile_vals = [
+        m["regional_percentile"] for m in this_month
+        if m.get("regional_percentile") is not None
+    ]
+    avg_percentile = (sum(pctile_vals) / len(pctile_vals)) if pctile_vals else None
 
     # 전월 대비 증감율
     prev_revenue = sum(m["revenue_total"] for m in last_month) if last_month else 0
@@ -142,7 +143,7 @@ def _aggregate_summary(metrics: list[dict]) -> dict:
         "total_patients": total_patients,
         "patient_change_pct": round(patient_change, 1),
         "non_insurance_ratio": round(non_insurance_ratio, 1),
-        "regional_percentile": round(avg_percentile),
+        "regional_percentile": round(avg_percentile) if avg_percentile is not None else None,
         "specialty": this_month[0]["specialty"] if this_month else DEMO_SPECIALTY,
         "region": this_month[0]["region"] if this_month else DEMO_REGION,
     }
@@ -151,7 +152,7 @@ def _aggregate_summary(metrics: list[dict]) -> dict:
 async def _get_real_metrics(
     db: AsyncSession, user_id, days: int
 ) -> list[dict] | None:
-    """DB에서 실제 메트릭 조회. 없으면 None 반환."""
+    """DB의 사전집계 메트릭 테이블(EMRDailyMetrics) 조회. 없으면 None."""
     start_date = date.today() - timedelta(days=days)
     result = await db.execute(
         select(EMRDailyMetrics).where(
@@ -185,6 +186,150 @@ async def _get_real_metrics(
 
 
 # ============================================================
+# 실데이터 집계 (bills + visits → 일별 메트릭)
+# ============================================================
+
+def build_live_metrics(
+    bill_rows: list[tuple],
+    visit_rows: list[tuple],
+    *,
+    specialty: str | None = None,
+    region: str | None = None,
+) -> list[dict]:
+    """수납/진료 원장에서 일별 메트릭을 집계한다 (순수 함수, DB 무관 → 단위테스트 가능).
+
+    bill_rows:  (bill_date: date, final_amount, insurance_amount, non_covered_amount)
+    visit_rows: (visit_date: date, patient_id, visit_type)
+
+    매출 분해: 총매출=final_amount, 비급여=non_covered_amount,
+              급여(보험)=총매출-비급여 (음수 방지). 두 값의 합 = 총매출 (파이/추이 정합).
+    환자: 일별 distinct patient, 초진(INITIAL)=신규 / 그 외=재진.
+    지역 벤치마크는 외부 데이터 소스가 없으므로 None(미제공)으로 둔다.
+    """
+    days: dict = {}
+
+    def _day(d: date) -> dict:
+        return days.setdefault(d, {
+            "revenue_total": 0,
+            "revenue_non_insurance": 0,
+            "_new_patients": set(),
+            "_all_patients": set(),
+            "_new_count": 0,
+            "_total_count": 0,
+        })
+
+    for bill_date, final_amount, insurance_amount, non_covered_amount in bill_rows:
+        if bill_date is None:
+            continue
+        bucket = _day(bill_date)
+        bucket["revenue_total"] += int(final_amount or 0)
+        bucket["revenue_non_insurance"] += int(non_covered_amount or 0)
+
+    for visit_date, patient_id, visit_type in visit_rows:
+        if visit_date is None:
+            continue
+        bucket = _day(visit_date)
+        is_new = (visit_type or "").upper() == "INITIAL"
+        if patient_id is not None:
+            bucket["_all_patients"].add(patient_id)
+            if is_new:
+                bucket["_new_patients"].add(patient_id)
+        else:
+            # patient_id 없는 진료도 카운트엔 포함 (익명/외부)
+            bucket["_total_count"] += 1
+            if is_new:
+                bucket["_new_count"] += 1
+
+    metrics: list[dict] = []
+    for d in sorted(days.keys()):
+        b = days[d]
+        total_patients = len(b["_all_patients"]) + b["_total_count"]
+        new_patients = len(b["_new_patients"]) + b["_new_count"]
+        revenue_total = b["revenue_total"]
+        revenue_non_ins = min(b["revenue_non_insurance"], revenue_total)
+        revenue_ins = max(revenue_total - revenue_non_ins, 0)
+        metrics.append({
+            "metric_date": d.isoformat(),
+            "revenue_total": revenue_total,
+            "revenue_insurance": revenue_ins,
+            "revenue_non_insurance": revenue_non_ins,
+            "patient_count_total": total_patients,
+            "patient_count_new": new_patients,
+            "patient_count_returning": max(total_patients - new_patients, 0),
+            "regional_avg_revenue": None,
+            "regional_percentile": None,
+            "specialty": specialty,
+            "region": region,
+            "is_demo": False,
+        })
+    return metrics
+
+
+async def _get_live_metrics(
+    db: AsyncSession, user_id, days: int
+) -> list[dict] | None:
+    """bills + visits 원장을 일별 집계. 둘 다 비어있으면 None."""
+    from ...models.bill import Bill, BillStatus
+    from ...models.visit import Visit, VisitStatus
+    from ...models.user import User
+
+    start_date = date.today() - timedelta(days=days)
+
+    bill_res = await db.execute(
+        select(
+            Bill.bill_date, Bill.final_amount,
+            Bill.insurance_amount, Bill.non_covered_amount,
+        ).where(and_(
+            Bill.user_id == user_id,
+            Bill.bill_date >= start_date,
+            Bill.status != BillStatus.CANCELLED,
+        ))
+    )
+    bill_rows = list(bill_res.all())
+
+    visit_res = await db.execute(
+        select(Visit.visit_date, Visit.patient_id, Visit.visit_type).where(and_(
+            Visit.user_id == user_id,
+            Visit.visit_date >= start_date,
+            Visit.status != VisitStatus.CANCELLED,
+        ))
+    )
+    visit_rows = list(visit_res.all())
+
+    if not bill_rows and not visit_rows:
+        return None
+
+    # 진료과/지역은 사용자 프로필에서 (있으면)
+    specialty = None
+    region = None
+    try:
+        u = (await db.execute(select(User).where(User.id == user_id))).scalar_one_or_none()
+        if u is not None:
+            specialty = getattr(u, "specialty", None) or getattr(u, "department", None)
+            region = getattr(u, "region", None) or getattr(u, "address_region", None)
+    except Exception:
+        pass
+
+    return build_live_metrics(bill_rows, visit_rows, specialty=specialty, region=region)
+
+
+async def _resolve_metrics(
+    db: AsyncSession, user_id, days: int
+) -> tuple[list[dict], str]:
+    """메트릭 우선순위: 사전집계 테이블 → 실데이터 집계 → 데모.
+
+    반환: (metrics, source)  source ∈ {"metrics", "live", "demo"}
+    """
+    pre = await _get_real_metrics(db, user_id, days)
+    if pre:
+        return pre, "metrics"
+    live = await _get_live_metrics(db, user_id, days)
+    if live:
+        return live, "live"
+    return generate_demo_metrics(days), "demo"
+
+
+# ============================================================
 # Endpoints
 # ============================================================
 
@@ -195,15 +340,11 @@ async def get_summary(
     sub: ServiceSubscription = Depends(require_active_service(ServiceType.EMR)),
 ):
     """KPI 4개: 이번달 매출 / 환자 수 / 비급여 비율 / 지역 순위"""
-    real = await _get_real_metrics(db, current_user.id, days=90)
-    if real:
-        summary = _aggregate_summary(real)
-        summary["is_demo"] = any(m["is_demo"] for m in real)
-    else:
-        demo = generate_demo_metrics(90)
-        summary = _aggregate_summary(demo)
-        summary["is_demo"] = True
-
+    metrics, source = await _resolve_metrics(db, current_user.id, days=90)
+    summary = _aggregate_summary(metrics)
+    summary["is_demo"] = source == "demo"
+    summary["data_source"] = source
+    summary["regional_available"] = summary.get("regional_percentile") is not None
     return summary
 
 
@@ -215,32 +356,17 @@ async def get_revenue_trend(
     sub: ServiceSubscription = Depends(require_active_service(ServiceType.EMR)),
 ):
     """일별 매출 추이 (전체/급여/비급여)"""
-    real = await _get_real_metrics(db, current_user.id, days=days)
-    if real:
-        is_demo = any(m["is_demo"] for m in real)
-        data = [
-            {
-                "date": m["metric_date"],
-                "total": m["revenue_total"],
-                "insurance": m["revenue_insurance"],
-                "non_insurance": m["revenue_non_insurance"],
-            }
-            for m in real
-        ]
-    else:
-        demo = generate_demo_metrics(days)
-        is_demo = True
-        data = [
-            {
-                "date": m["metric_date"],
-                "total": m["revenue_total"],
-                "insurance": m["revenue_insurance"],
-                "non_insurance": m["revenue_non_insurance"],
-            }
-            for m in demo
-        ]
-
-    return {"data": data, "is_demo": is_demo, "days": days}
+    metrics, source = await _resolve_metrics(db, current_user.id, days=days)
+    data = [
+        {
+            "date": m["metric_date"],
+            "total": m["revenue_total"],
+            "insurance": m["revenue_insurance"],
+            "non_insurance": m["revenue_non_insurance"],
+        }
+        for m in metrics
+    ]
+    return {"data": data, "is_demo": source == "demo", "data_source": source, "days": days}
 
 
 @router.get("/patient-trend")
@@ -251,32 +377,17 @@ async def get_patient_trend(
     sub: ServiceSubscription = Depends(require_active_service(ServiceType.EMR)),
 ):
     """일별 환자 수 추이 (전체/신규/재진)"""
-    real = await _get_real_metrics(db, current_user.id, days=days)
-    if real:
-        is_demo = any(m["is_demo"] for m in real)
-        data = [
-            {
-                "date": m["metric_date"],
-                "total": m["patient_count_total"],
-                "new": m["patient_count_new"],
-                "returning": m["patient_count_returning"],
-            }
-            for m in real
-        ]
-    else:
-        demo = generate_demo_metrics(days)
-        is_demo = True
-        data = [
-            {
-                "date": m["metric_date"],
-                "total": m["patient_count_total"],
-                "new": m["patient_count_new"],
-                "returning": m["patient_count_returning"],
-            }
-            for m in demo
-        ]
-
-    return {"data": data, "is_demo": is_demo, "days": days}
+    metrics, source = await _resolve_metrics(db, current_user.id, days=days)
+    data = [
+        {
+            "date": m["metric_date"],
+            "total": m["patient_count_total"],
+            "new": m["patient_count_new"],
+            "returning": m["patient_count_returning"],
+        }
+        for m in metrics
+    ]
+    return {"data": data, "is_demo": source == "demo", "data_source": source, "days": days}
 
 
 @router.get("/insurance-breakdown")
@@ -286,21 +397,14 @@ async def get_insurance_breakdown(
     sub: ServiceSubscription = Depends(require_active_service(ServiceType.EMR)),
 ):
     """이번달 보험/비보험 비율 (파이차트용)"""
-    real = await _get_real_metrics(db, current_user.id, days=90)
+    metrics, source = await _resolve_metrics(db, current_user.id, days=90)
     today = date.today()
     first_of_month = today.replace(day=1)
 
-    if real:
-        this_month = [m for m in real if m["metric_date"] >= first_of_month.isoformat()]
-        if not this_month:
-            this_month = real[-30:]
-        is_demo = any(m["is_demo"] for m in this_month)
-    else:
-        demo = generate_demo_metrics(90)
-        this_month = [m for m in demo if m["metric_date"] >= first_of_month.isoformat()]
-        if not this_month:
-            this_month = demo[-30:]
-        is_demo = True
+    this_month = [m for m in metrics if m["metric_date"] >= first_of_month.isoformat()]
+    if not this_month:
+        this_month = metrics[-30:]
+    is_demo = source == "demo"
 
     total_insurance = sum(m["revenue_insurance"] for m in this_month)
     total_non_insurance = sum(m["revenue_non_insurance"] for m in this_month)
@@ -316,6 +420,7 @@ async def get_insurance_breakdown(
         ],
         "total": grand_total,
         "is_demo": is_demo,
+        "data_source": source,
     }
 
 
@@ -325,41 +430,57 @@ async def get_regional_benchmark(
     current_user: User = Depends(get_current_active_user),
     sub: ServiceSubscription = Depends(require_active_service(ServiceType.EMR)),
 ):
-    """내 매출 vs 지역 평균 + 백분위"""
-    real = await _get_real_metrics(db, current_user.id, days=90)
+    """내 매출 vs 지역 평균 + 백분위.
+
+    내 매출(my_revenue)은 실데이터로 계산하지만, 지역 평균/백분위는 외부 벤치마크
+    데이터 소스가 연동되기 전까지 실데이터(source=='live')에서는 제공하지 않는다
+    (regional_available=false). 데모/사전집계에서만 비교치를 채운다.
+    """
+    metrics, source = await _resolve_metrics(db, current_user.id, days=90)
     today = date.today()
     first_of_month = today.replace(day=1)
 
-    if real:
-        this_month = [m for m in real if m["metric_date"] >= first_of_month.isoformat()]
-        if not this_month:
-            this_month = real[-30:]
-        is_demo = any(m["is_demo"] for m in this_month)
-    else:
-        demo = generate_demo_metrics(90)
-        this_month = [m for m in demo if m["metric_date"] >= first_of_month.isoformat()]
-        if not this_month:
-            this_month = demo[-30:]
-        is_demo = True
+    this_month = [m for m in metrics if m["metric_date"] >= first_of_month.isoformat()]
+    if not this_month:
+        this_month = metrics[-30:]
+    is_demo = source == "demo"
 
     my_avg_daily = (
         sum(m["revenue_total"] for m in this_month) / len(this_month)
         if this_month else 0
     )
-    regional_avg_daily = (
-        sum(m["regional_avg_revenue"] for m in this_month) / len(this_month)
-        if this_month else 0
-    )
-    avg_percentile = (
-        sum(m["regional_percentile"] for m in this_month) / len(this_month)
-        if this_month else 50
-    )
-
     my_monthly = int(my_avg_daily * 30)
-    regional_monthly = int(regional_avg_daily * 30)
 
     specialty = this_month[0]["specialty"] if this_month else DEMO_SPECIALTY
     region = this_month[0]["region"] if this_month else DEMO_REGION
+
+    # 지역 벤치마크 가용 여부 — regional_avg_revenue 값이 실제로 채워져 있을 때만
+    regional_vals = [
+        m["regional_avg_revenue"] for m in this_month
+        if m.get("regional_avg_revenue") is not None
+    ]
+    pctile_vals = [
+        m["regional_percentile"] for m in this_month
+        if m.get("regional_percentile") is not None
+    ]
+    regional_available = bool(regional_vals)
+
+    if not regional_available:
+        return {
+            "my_revenue": my_monthly,
+            "regional_avg_revenue": None,
+            "percentile": None,
+            "specialty": specialty,
+            "region": region,
+            "comparison_pct": None,
+            "regional_available": False,
+            "is_demo": is_demo,
+            "data_source": source,
+        }
+
+    regional_avg_daily = sum(regional_vals) / len(regional_vals)
+    avg_percentile = (sum(pctile_vals) / len(pctile_vals)) if pctile_vals else 50
+    regional_monthly = int(regional_avg_daily * 30)
 
     return {
         "my_revenue": my_monthly,
@@ -372,5 +493,7 @@ async def get_regional_benchmark(
             if regional_monthly > 0 else 0,
             1,
         ),
+        "regional_available": True,
         "is_demo": is_demo,
+        "data_source": source,
     }

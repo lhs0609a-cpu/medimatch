@@ -267,12 +267,14 @@ export default function EMRDashboardPage() {
             <p className="text-2xl font-bold text-gray-900">
               {summaryLoading ? (
                 <span className="inline-block w-20 h-7 bg-gray-100 rounded animate-pulse" />
+              ) : summary?.regional_percentile != null ? (
+                `상위 ${summary.regional_percentile}%`
               ) : (
-                `상위 ${summary?.regional_percentile || 0}%`
+                <span className="text-gray-400">준비중</span>
               )}
             </p>
             <p className="text-xs text-gray-500 mt-1">
-              {summary ? `${summary.specialty} \u00B7 ${summary.region}` : '지역 순위'}
+              {summary?.regional_percentile != null ? `${summary.specialty} \u00B7 ${summary.region}` : '지역 벤치마크 연동 예정'}
             </p>
           </div>
         </div>
@@ -444,6 +446,17 @@ export default function EMRDashboardPage() {
               <div className="space-y-6">
                 <div className="h-10 bg-gray-50 rounded-xl animate-pulse" />
                 <div className="h-10 bg-gray-50 rounded-xl animate-pulse" />
+              </div>
+            ) : benchmark?.regional_avg_revenue == null ? (
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-medium text-gray-700">우리 병원</span>
+                  <span className="text-sm font-bold text-blue-600">₩{formatKRW(benchmark?.my_revenue || 0)}/월</span>
+                </div>
+                <div className="p-4 bg-gray-50 rounded-xl text-center">
+                  <p className="text-sm text-gray-500">지역 평균 벤치마크는 준비 중입니다</p>
+                  <p className="text-xs text-gray-400 mt-1">내 매출은 실데이터로 집계됩니다</p>
+                </div>
               </div>
             ) : (
               <div className="space-y-6">

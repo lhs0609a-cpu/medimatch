@@ -27,8 +27,10 @@
 """
 from .detector import scan_claims_for_findings, AuditFinding, AuditSummary
 from .rules_internal import INTERNAL_MEDICINE_RULES
+from .fee_schedule import FeeSchedule, load_fee_schedule, load_chronic_dx
 
 __all__ = [
     "scan_claims_for_findings", "AuditFinding", "AuditSummary",
     "INTERNAL_MEDICINE_RULES",
+    "FeeSchedule", "load_fee_schedule", "load_chronic_dx",
 ]

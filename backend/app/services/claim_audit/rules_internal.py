@@ -11,21 +11,54 @@ from datetime import timedelta
 from typing import Any
 
 
-# 진찰료 표준 (2026년 기준 — 추후 hira_fee_codes 테이블과 연동 가능)
-FEE_AA157 = 8930   # 외래 재진 진찰료 (의원급)
-FEE_AA154 = 17040  # 외래 초진 진찰료
-FEE_B0030 = 4040   # 기본 처치료 (행위료)
-FEE_AA570 = 1900   # 외래 처방전 발급료
+# ----------------------------------------------------------------------
+# 수가 코드 + 폴백 단가
+#
+# 실제 단가는 ctx["fee_schedule"](hira_fee_codes 테이블 로드분)에서 우선 조회하고,
+# 테이블에 없으면 아래 폴백 상수를 쓴다. 폴백 값은 시드된 hira_fee_codes(026) 및
+# HIRA 2024 의원급 기준에 맞춰 둔다.
+# ----------------------------------------------------------------------
+CODE_REVISIT = "AA200"        # 재진 진찰료 (의원) — 시드 11,540
+CODE_INITIAL = "AA100"        # 초진 진찰료 (의원) — 시드 17,700
+CODE_BASIC_TREATMENT = "M0050"  # 기본 처치 — 시드 1,440
+CODE_RX_FEE = "AA570"         # 외래 처방전 발급료 (시드 미포함 → 폴백)
+
+FALLBACK_REVISIT = 11_540
+FALLBACK_INITIAL = 17_700
+FALLBACK_BASIC_TREATMENT = 1_440
+FALLBACK_RX_FEE = 1_900
+
+# 진찰료 prefix (AA1xx 초진 / AA2xx 재진 / AA3xx 가산) — 어느 것이든 있으면 진찰료 청구됨
+CONSULT_FEE_PREFIX = "AA"
+# 이미 기본 처치료가 청구된 것으로 볼 코드 prefix (시드 M0050 + 관행상 B003 계열)
+BASIC_TREATMENT_PRESENT_PREFIXES = ("M005", "B003")
 
 
-# 외과 처치/주사 코드 패턴 → 기본 처치료(B0030) 동반 권장
+def _fee(ctx: dict, code: str, fallback: int) -> int:
+    """ctx에 주입된 fee_schedule에서 실단가 조회, 없으면 폴백."""
+    fs = ctx.get("fee_schedule")
+    if fs is None:
+        return fallback
+    try:
+        return fs.price(code, fallback)
+    except AttributeError:
+        # fee_schedule 이 평범한 dict 로 주입된 경우도 허용
+        return int(fs.get(code, fallback)) if isinstance(fs, dict) else fallback
+
+
+# 외과 처치/주사 코드 패턴 → 기본 처치료 동반 권장
 PROCEDURE_PREFIX_NEEDS_BASIC = ("KK", "MM", "PP", "QQ", "RR")  # 외과·도수·국부 등
 INJECTION_CODES = {"KK054", "KK055", "B0040", "B0050"}  # 주사 일부
 TEST_PREFIXES_LAB = ("L", "C")  # 검사료 (실제 코드 패턴은 hira 코드와 연동 권장)
 
 
-# 흔한 만성질환 상병 (정기검사 동반 시 합리적 청구)
+# 흔한 만성질환 상병 (정기검사 동반 시 합리적 청구).
+# ctx["chronic_dx"]가 주입되면 그쪽(hira_disease_codes)을 우선 사용.
 CHRONIC_DX = {"I10", "I11", "E10", "E11", "E14", "J45", "K21", "M17", "M19", "F32", "F33"}
+
+
+def _chronic_set(ctx: dict) -> set[str]:
+    return ctx.get("chronic_dx") or CHRONIC_DX
 
 # 상병별 표준 진찰+처치+검사 평균 청구액 (외래 1회)
 # 이건 보수적인 *최저 합리선*. 실제 의원이 이보다 한참 낮으면 저청구 의심.
@@ -69,8 +102,8 @@ def rule_missed_revisit_fee(claim: dict, ctx: dict) -> dict | None:
     - 직전 청구에는 진찰료 있었거나 만성질환 상병
     """
     items = claim.get("items", [])
-    if _has_item_code(items, "AA"):
-        return None  # 진찰료 있음 — 정상
+    if _has_item_code(items, CONSULT_FEE_PREFIX):
+        return None  # 진찰료(AA*) 있음 — 정상
 
     prev = ctx.get("previous_claim_within_90d")
     if not prev:
@@ -80,18 +113,19 @@ def rule_missed_revisit_fee(claim: dict, ctx: dict) -> dict | None:
     if days_gap > 90:
         return None
 
+    amount = _fee(ctx, CODE_REVISIT, FALLBACK_REVISIT)
     return {
         "rule": "missed_revisit_fee",
         "severity": "HIGH",
         "title": "재진 진찰료 누락 의심",
         "detail": (
             f"동일 환자가 {days_gap}일 전에도 내원했지만 이번 청구에 진찰료(AA*) 0건입니다. "
-            f"외래 재진(AA157) 청구 누락 가능성이 높습니다."
+            f"외래 재진({CODE_REVISIT}) 청구 누락 가능성이 높습니다."
         ),
-        "potential_amount": FEE_AA157,
+        "potential_amount": amount,
         "confidence": 88 if days_gap <= 30 else 70,
-        "suggested_action": f"AA157 (외래 재진 진찰료) 추가 청구 — 약 {FEE_AA157:,}원 회수 가능",
-        "suggested_code": "AA157",
+        "suggested_action": f"{CODE_REVISIT} (외래 재진 진찰료) 추가 청구 — 약 {amount:,}원 회수 가능",
+        "suggested_code": CODE_REVISIT,
     }
 
 
@@ -105,8 +139,8 @@ def rule_missed_basic_treatment_fee(claim: dict, ctx: dict) -> dict | None:
     보수적: 주사·외과처치·도수 등 *명백히 처치료 동반인* 경우만.
     """
     items = claim.get("items", [])
-    if _has_item_code(items, "B003"):
-        return None  # 기본 처치료 있음
+    if _has_any_item_prefix(items, BASIC_TREATMENT_PRESENT_PREFIXES):
+        return None  # 기본 처치료 이미 청구됨
 
     has_procedure = (
         _has_any_item_prefix(items, PROCEDURE_PREFIX_NEEDS_BASIC)
@@ -122,18 +156,19 @@ def rule_missed_basic_treatment_fee(claim: dict, ctx: dict) -> dict | None:
         or (it.get("code") or "").upper() in INJECTION_CODES
     ][:3]
 
+    amount = _fee(ctx, CODE_BASIC_TREATMENT, FALLBACK_BASIC_TREATMENT)
     return {
         "rule": "missed_basic_treatment_fee",
         "severity": "MEDIUM",
-        "title": "기본 처치료(B0030) 누락 의심",
+        "title": "기본 처치료 누락 의심",
         "detail": (
             f"청구에 처치/주사 행위({', '.join(procedure_names)})가 있지만 "
             f"기본 처치료 청구가 없습니다. 일부 행위는 기본 처치료가 동반 청구되어야 합니다."
         ),
-        "potential_amount": FEE_B0030,
+        "potential_amount": amount,
         "confidence": 65,  # 일부 행위는 처치료 동반 아님 — 의사 검토 필요
-        "suggested_action": f"B0030 (기본 처치료) 추가 청구 검토 — 약 {FEE_B0030:,}원",
-        "suggested_code": "B0030",
+        "suggested_action": f"{CODE_BASIC_TREATMENT} (기본 처치료) 추가 청구 검토 — 약 {amount:,}원",
+        "suggested_code": CODE_BASIC_TREATMENT,
     }
 
 
@@ -148,6 +183,15 @@ def rule_low_total_for_dx(claim: dict, ctx: dict) -> dict | None:
     if not floor:
         # KCD 점이 있는 형태도 시도 (J06.9 → J06)
         floor = DX_STANDARD_FLOOR.get(dx.split(".")[0])
+    if not floor:
+        # 명시적 floor가 없어도 만성질환이면 (재진 진찰료 + 기본 처치료)를
+        # 합리적 최저선으로 사용 — 실수가 기반.
+        dx_base = dx.split(".")[0]
+        if dx in _chronic_set(ctx) or dx_base in _chronic_set(ctx):
+            floor = (
+                _fee(ctx, CODE_REVISIT, FALLBACK_REVISIT)
+                + _fee(ctx, CODE_BASIC_TREATMENT, FALLBACK_BASIC_TREATMENT)
+            )
     if not floor:
         return None
 

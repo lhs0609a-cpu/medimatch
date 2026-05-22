@@ -28,7 +28,11 @@ from ...services.claim_import import (
     parse_claim_file, auto_map_claims, group_into_claims,
 )
 from ...services.claim_import.mapper import apply_mapping_claims
-from ...services.claim_audit import scan_claims_for_findings
+from ...services.claim_audit import (
+    scan_claims_for_findings,
+    load_fee_schedule,
+    load_chronic_dx,
+)
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
@@ -366,7 +370,17 @@ async def claim_audit_scan(
             "items": items_by_claim.get(c.id, []),
         })
 
-    summary = scan_claims_for_findings(claim_dicts, min_confidence=min_confidence)
+    # 실제 수가표(hira_fee_codes) + 만성질환 상병집합(hira_disease_codes) 로드해
+    # 룰이 하드코딩 추정값 대신 실단가로 회수액을 계산하도록 주입.
+    fee_schedule = await load_fee_schedule(db)
+    chronic_dx = await load_chronic_dx(db)
+
+    summary = scan_claims_for_findings(
+        claim_dicts,
+        min_confidence=min_confidence,
+        fee_schedule=fee_schedule,
+        chronic_dx=chronic_dx,
+    )
 
     # 청구별 findings 저장
     findings_by_claim: dict = {}

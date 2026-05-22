@@ -100,6 +100,8 @@ def scan_claims_for_findings(
     rules: list = INTERNAL_MEDICINE_RULES,
     *,
     min_confidence: int = 0,
+    fee_schedule: Any = None,
+    chronic_dx: set[str] | None = None,
 ) -> AuditSummary:
     """청구 리스트 → AuditSummary.
 
@@ -107,6 +109,10 @@ def scan_claims_for_findings(
     - id (있으면 그대로, 없으면 None)
     - patient_chart_no, service_date (date), primary_dx_code
     - total_amount, items (list of {code, name, item_type, total_price})
+
+    fee_schedule: FeeSchedule(또는 {code: 단가} dict). 룰이 실제 수가를 조회.
+                  None이면 룰 내장 폴백 상수 사용.
+    chronic_dx:   만성질환 상병코드 집합(hira_disease_codes 기반). None이면 룰 내장 집합.
     """
     history = _build_patient_history(claims)
     findings: list[AuditFinding] = []
@@ -122,6 +128,8 @@ def scan_claims_for_findings(
             "previous_claim_within_90d": prev,
             "days_since_previous": days_gap if days_gap is not None else 999,
             "patient_history": history.get(chart, []),
+            "fee_schedule": fee_schedule,
+            "chronic_dx": chronic_dx,
         }
 
         for rule_fn in rules:
