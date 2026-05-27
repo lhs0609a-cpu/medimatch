@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useMemo } from 'react'
+import ComingSoonBanner from '@/components/emr/ComingSoonBanner'
 import {
   Bell,
   CheckCircle2,
@@ -212,6 +213,7 @@ export default function NotificationsPage() {
 
   return (
     <div className="space-y-6">
+      <ComingSoonBanner />
       {/* 헤더 */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div className="flex items-center gap-3">

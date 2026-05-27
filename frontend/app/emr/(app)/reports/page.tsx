@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import ComingSoonBanner from '@/components/emr/ComingSoonBanner'
 import {
   FileText,
   Download,
@@ -126,6 +127,7 @@ export default function ReportsPage() {
 
   return (
     <div className="space-y-6">
+      <ComingSoonBanner />
       {/* 헤더 */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>

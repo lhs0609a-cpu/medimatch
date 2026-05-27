@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import ComingSoonBanner from '@/components/emr/ComingSoonBanner'
 import {
   Video,
   VideoOff,
@@ -130,6 +131,7 @@ export default function TelemedicinePage() {
 
   return (
     <div className="space-y-4">
+      <ComingSoonBanner note="원격진료(화상연결)는 실제 WebRTC 연동 전입니다." />
       {/* 헤더 */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div className="flex items-center gap-3">

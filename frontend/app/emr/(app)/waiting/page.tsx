@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import ComingSoonBanner from '@/components/emr/ComingSoonBanner'
 import {
   Users,
   Clock,
@@ -165,6 +166,7 @@ export default function WaitingPage() {
 
   return (
     <div className="space-y-4">
+      <ComingSoonBanner />
       {/* 헤더 */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div className="flex items-center gap-3">

@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import ComingSoonBanner from '@/components/emr/ComingSoonBanner'
 import Link from 'next/link'
 import {
   FileText,
@@ -91,6 +92,7 @@ export default function PharmacyDashboardPage() {
 
   return (
     <div className="max-w-[1400px] mx-auto space-y-6">
+      <ComingSoonBanner />
       {/* 인사 */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>

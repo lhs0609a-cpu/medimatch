@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import ComingSoonBanner from '@/components/emr/ComingSoonBanner'
 import {
   Zap,
   Send,
@@ -188,6 +189,7 @@ export default function BridgePage() {
 
   return (
     <div className="space-y-4">
+      <ComingSoonBanner note="의약품 안전사용(DUR)·약국 연계는 실연동 전입니다." />
       {/* 헤더 */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div className="flex items-center gap-3">

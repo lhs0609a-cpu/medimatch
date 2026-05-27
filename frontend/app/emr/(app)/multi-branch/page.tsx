@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useMemo } from 'react'
+import ComingSoonBanner from '@/components/emr/ComingSoonBanner'
 import {
   Building2, TrendingUp, DollarSign, Users, Activity,
   Star, MapPin, Phone, AlertTriangle, Plus, Trash2, Edit2, X, Save,
@@ -89,6 +90,7 @@ export default function MultiBranchPage() {
 
   return (
     <div className="max-w-[1400px] mx-auto space-y-6">
+      <ComingSoonBanner />
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div>
           <div className="flex items-center gap-2 mb-1">
