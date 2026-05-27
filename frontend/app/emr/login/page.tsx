@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import { useAuth } from '@/lib/hooks/useAuth'
 import {
   Stethoscope,
   Pill,
@@ -28,8 +29,9 @@ export default function LoginPage() {
   const [rememberMe, setRememberMe] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
+  const login = useAuth((s) => s.login)
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!email || !password) {
       setError('이메일과 비밀번호를 입력해주세요')
@@ -37,10 +39,15 @@ export default function LoginPage() {
     }
     setError('')
     setIsLoading(true)
-    setTimeout(() => {
+    try {
+      await login(email, password)
+      // 실제 역할 기준으로 이동 (선택한 유형과 무관하게 정확히)
+      const role = useAuth.getState().user?.role
+      window.location.href = role === 'PHARMACIST' ? '/emr/pharmacy' : '/emr/dashboard'
+    } catch (err: any) {
+      setError(err?.response?.data?.detail || '로그인에 실패했습니다. 이메일과 비밀번호를 확인해주세요.')
       setIsLoading(false)
-      window.location.href = userType === 'clinic' ? '/emr/dashboard' : '/emr/pharmacy'
-    }, 1500)
+    }
   }
 
   return (

@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import { useAuth } from '@/lib/hooks/useAuth'
 import {
   Stethoscope,
   Pill,
@@ -48,16 +49,42 @@ export default function SignupPage() {
     setForm(prev => ({ ...prev, [key]: value }))
   }
 
+  const [error, setError] = useState('')
+  const register = useAuth((s) => s.register)
+
   const allRequiredAgreed = agreed.terms && agreed.privacy
   const passwordMatch = form.password === form.passwordConfirm
   const passwordValid = form.password.length >= 8
+  const step2Valid =
+    form.name.trim().length >= 2 &&
+    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email) &&
+    passwordValid &&
+    passwordMatch
 
-  const handleSignup = () => {
+  const handleSignup = async () => {
+    if (!step2Valid) {
+      setError('입력 정보를 다시 확인해주세요. (이름 2자 이상, 올바른 이메일, 비밀번호 8자 이상·일치)')
+      setStep(2)
+      return
+    }
+    setError('')
     setIsLoading(true)
-    setTimeout(() => {
-      setIsLoading(false)
+    try {
+      await register({
+        email: form.email.trim(),
+        password: form.password,
+        full_name: form.name.trim(),
+        phone: form.phone.trim() || undefined,
+        role: userType === 'pharmacy' ? 'PHARMACIST' : 'DOCTOR',
+        company: form.facilityName.trim() || undefined,
+        license_number: form.facilityNo.trim() || undefined,
+      })
+      // 가입 성공 시 useAuth가 자동 로그인(토큰 저장) → 온보딩으로 이동
       window.location.href = '/emr/onboarding'
-    }, 2000)
+    } catch (err: any) {
+      setError(err?.response?.data?.detail || '회원가입에 실패했습니다. 이미 가입된 이메일인지 확인해주세요.')
+      setIsLoading(false)
+    }
   }
 
   return (
@@ -131,6 +158,13 @@ export default function SignupPage() {
               {step === 1 ? '유형 선택' : step === 2 ? '정보 입력' : '약관 동의'}
             </span>
           </div>
+
+          {error && (
+            <div className="flex items-center gap-2 p-3 mb-4 rounded-xl bg-red-50 dark:bg-red-900/20 text-red-600 text-sm">
+              <AlertCircle className="w-4 h-4 flex-shrink-0" />
+              {error}
+            </div>
+          )}
 
           {/* Step 1: 유형 선택 */}
           {step === 1 && (
@@ -349,7 +383,10 @@ export default function SignupPage() {
                   <ArrowLeft className="w-4 h-4" /> 이전
                 </button>
                 <button
-                  onClick={() => setStep(3)}
+                  onClick={() => {
+                    if (step2Valid) { setError(''); setStep(3) }
+                    else setError('이름(2자 이상), 올바른 이메일, 비밀번호(8자 이상·일치)를 모두 입력해주세요')
+                  }}
                   className="flex-1 py-3 rounded-xl font-semibold text-sm text-white transition-all flex items-center justify-center gap-2"
                   style={{ backgroundColor: 'rgb(37 99 235)' }}
                 >

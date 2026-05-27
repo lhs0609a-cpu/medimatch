@@ -1,6 +1,10 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useAuth } from '@/lib/hooks/useAuth'
+import { authService } from '@/lib/api/services'
+import { apiClient } from '@/lib/api/client'
+import ComingSoonBanner from '@/components/emr/ComingSoonBanner'
 import {
   Settings,
   Building2,
@@ -50,12 +54,88 @@ const tabs: { key: SettingsTab; label: string; icon: typeof Settings }[] = [
 export default function EMRSettingsPage() {
   const [activeTab, setActiveTab] = useState<SettingsTab>('clinic')
 
+  const user = useAuth((s) => s.user)
+  const fetchUser = useAuth((s) => s.fetchUser)
+  const logout = useAuth((s) => s.logout)
+
+  const [profile, setProfile] = useState({ full_name: '', phone: '', license_number: '' })
+  const [saving, setSaving] = useState(false)
+  const [pwSending, setPwSending] = useState(false)
+  const [msg, setMsg] = useState<{ type: 'ok' | 'err'; text: string } | null>(null)
+
+  useEffect(() => {
+    if (!user) fetchUser()
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    if (user) {
+      setProfile({
+        full_name: user.full_name || '',
+        phone: user.phone || '',
+        license_number: user.license_number || '',
+      })
+    }
+  }, [user])
+
+  const handleSaveProfile = async () => {
+    setSaving(true)
+    setMsg(null)
+    try {
+      await authService.updateMe({
+        full_name: profile.full_name,
+        phone: profile.phone,
+        license_number: profile.license_number,
+      })
+      await fetchUser()
+      setMsg({ type: 'ok', text: '저장되었습니다.' })
+    } catch (e: any) {
+      setMsg({ type: 'err', text: e?.response?.data?.detail || '저장에 실패했습니다.' })
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  const handlePasswordReset = async () => {
+    if (!user?.email) {
+      setMsg({ type: 'err', text: '계정 이메일을 불러오지 못했습니다.' })
+      return
+    }
+    setPwSending(true)
+    setMsg(null)
+    try {
+      await apiClient.post('/auth/forgot-password', { email: user.email })
+      setMsg({ type: 'ok', text: `비밀번호 재설정 링크를 ${user.email}로 보냈습니다.` })
+    } catch (e: any) {
+      setMsg({ type: 'err', text: '재설정 요청에 실패했습니다. 잠시 후 다시 시도해주세요.' })
+    } finally {
+      setPwSending(false)
+    }
+  }
+
+  const handleDeleteAccount = async () => {
+    if (!window.confirm('정말 계정을 삭제하시겠습니까?\n모든 데이터가 영구적으로 삭제되며 되돌릴 수 없습니다.')) return
+    try {
+      await apiClient.delete('/auth/me')
+      await logout()
+      window.location.href = '/emr/login'
+    } catch (e: any) {
+      setMsg({ type: 'err', text: '계정 삭제에 실패했습니다.' })
+    }
+  }
+
   return (
     <div className="max-w-[1200px] mx-auto space-y-6">
       <div>
         <h1 className="text-2xl font-bold">설정</h1>
         <p className="text-sm text-muted-foreground mt-1">EMR 시스템 설정을 관리합니다</p>
       </div>
+
+      {msg && (
+        <div className={`flex items-center gap-2 p-3 rounded-xl text-sm ${msg.type === 'ok' ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-300' : 'bg-red-50 text-red-600 dark:bg-red-900/20'}`}>
+          {msg.type === 'ok' ? <Check className="w-4 h-4 flex-shrink-0" /> : <X className="w-4 h-4 flex-shrink-0" />}
+          {msg.text}
+        </div>
+      )}
 
       <div className="grid lg:grid-cols-4 gap-6">
         {/* 사이드 탭 */}
@@ -81,6 +161,7 @@ export default function EMRSettingsPage() {
           {/* 의원 정보 */}
           {activeTab === 'clinic' && (
             <>
+              <ComingSoonBanner note="의원 정보·진료시간 저장은 곧 연동됩니다. 현재 값은 예시입니다." />
               <div className="card p-6 space-y-5">
                 <h3 className="font-bold text-lg">의원 기본 정보</h3>
 
@@ -182,11 +263,11 @@ export default function EMRSettingsPage() {
 
               <div className="flex items-center gap-4 p-4 bg-secondary/30 rounded-xl">
                 <div className="avatar avatar-xl bg-primary/10 text-primary">
-                  <span className="text-xl font-bold">김</span>
+                  <span className="text-xl font-bold">{(user?.full_name || '?').charAt(0)}</span>
                 </div>
                 <div>
-                  <div className="font-bold">김원장</div>
-                  <div className="text-sm text-muted-foreground">doctor@medimatch.kr</div>
+                  <div className="font-bold">{user?.full_name || '—'}</div>
+                  <div className="text-sm text-muted-foreground">{user?.email || ''}</div>
                 </div>
                 <button className="btn-outline btn-sm ml-auto">사진 변경</button>
               </div>
@@ -194,29 +275,41 @@ export default function EMRSettingsPage() {
               <div className="grid md:grid-cols-2 gap-4">
                 <div>
                   <label className="label mb-1.5 block">이름</label>
-                  <input className="input" defaultValue="김원장" />
+                  <input
+                    className="input"
+                    value={profile.full_name}
+                    onChange={(e) => setProfile((p) => ({ ...p, full_name: e.target.value }))}
+                  />
                 </div>
                 <div>
                   <label className="label mb-1.5 block">면허번호</label>
-                  <input className="input" defaultValue="12345" />
+                  <input
+                    className="input"
+                    value={profile.license_number}
+                    onChange={(e) => setProfile((p) => ({ ...p, license_number: e.target.value }))}
+                  />
                 </div>
               </div>
 
               <div className="grid md:grid-cols-2 gap-4">
                 <div>
                   <label className="label mb-1.5 block">이메일</label>
-                  <input className="input" defaultValue="doctor@medimatch.kr" />
+                  <input className="input bg-secondary/40 cursor-not-allowed" value={user?.email || ''} readOnly />
                 </div>
                 <div>
                   <label className="label mb-1.5 block">연락처</label>
-                  <input className="input" defaultValue="010-1234-5678" />
+                  <input
+                    className="input"
+                    value={profile.phone}
+                    onChange={(e) => setProfile((p) => ({ ...p, phone: e.target.value }))}
+                  />
                 </div>
               </div>
 
               <div className="pt-4 border-t border-border flex justify-end">
-                <button className="btn-primary">
+                <button className="btn-primary disabled:opacity-50" onClick={handleSaveProfile} disabled={saving}>
                   <Save className="w-4 h-4" />
-                  저장하기
+                  {saving ? '저장 중...' : '저장하기'}
                 </button>
               </div>
             </div>
@@ -225,6 +318,7 @@ export default function EMRSettingsPage() {
           {/* AI 설정 */}
           {activeTab === 'ai' && (
             <div className="space-y-6">
+              <ComingSoonBanner note="AI·삭감방어 설정 저장은 곧 연동됩니다." />
               <div className="card p-6 space-y-5">
                 <h3 className="font-bold text-lg">AI 음성 차트 설정</h3>
 
@@ -304,6 +398,7 @@ export default function EMRSettingsPage() {
           {/* 알림 설정 */}
           {activeTab === 'notification' && (
             <div className="card p-6 space-y-5">
+              <ComingSoonBanner note="알림 on/off 저장은 곧 연동됩니다." />
               <h3 className="font-bold text-lg">알림 설정</h3>
 
               {[
@@ -335,19 +430,17 @@ export default function EMRSettingsPage() {
             <div className="space-y-6">
               <div className="card p-6 space-y-5">
                 <h3 className="font-bold text-lg">비밀번호 변경</h3>
-                <div>
-                  <label className="label mb-1.5 block">현재 비밀번호</label>
-                  <input type="password" className="input" />
-                </div>
-                <div>
-                  <label className="label mb-1.5 block">새 비밀번호</label>
-                  <input type="password" className="input" />
-                </div>
-                <div>
-                  <label className="label mb-1.5 block">비밀번호 확인</label>
-                  <input type="password" className="input" />
-                </div>
-                <button className="btn-primary btn-sm">비밀번호 변경</button>
+                <p className="text-sm text-muted-foreground">
+                  보안을 위해 비밀번호 변경은 이메일 인증으로 진행됩니다. 아래 버튼을 누르면
+                  가입하신 이메일({user?.email || '—'})로 재설정 링크를 보내드립니다.
+                </p>
+                <button
+                  className="btn-primary btn-sm disabled:opacity-50"
+                  onClick={handlePasswordReset}
+                  disabled={pwSending}
+                >
+                  {pwSending ? '전송 중...' : '재설정 링크 받기'}
+                </button>
               </div>
 
               <div className="card p-6 space-y-5">
@@ -375,6 +468,7 @@ export default function EMRSettingsPage() {
           {/* 데이터 관리 */}
           {activeTab === 'data' && (
             <div className="space-y-6">
+              <ComingSoonBanner note="데이터 내보내기/가져오기는 곧 연동됩니다." />
               <div className="card p-6 space-y-5">
                 <h3 className="font-bold text-lg">데이터 내보내기</h3>
                 <p className="text-sm text-muted-foreground">
@@ -420,7 +514,10 @@ export default function EMRSettingsPage() {
                     <div className="font-semibold text-sm">계정 삭제</div>
                     <div className="text-xs text-muted-foreground">모든 데이터가 영구적으로 삭제됩니다</div>
                   </div>
-                  <button className="btn-outline btn-sm text-red-500 border-red-300 hover:bg-red-50">
+                  <button
+                    className="btn-outline btn-sm text-red-500 border-red-300 hover:bg-red-50"
+                    onClick={handleDeleteAccount}
+                  >
                     계정 삭제
                   </button>
                 </div>
@@ -431,6 +528,7 @@ export default function EMRSettingsPage() {
           {/* 구독 관리 */}
           {activeTab === 'subscription' && (
             <div className="space-y-6">
+              <ComingSoonBanner note="플랜 변경·결제수단 등록은 곧 연동됩니다." />
               <div className="card p-6">
                 <div className="flex items-center justify-between mb-6">
                   <div>
