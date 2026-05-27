@@ -25,17 +25,6 @@ const services = [
     image: 'https://loan.brandplaton.com/images/strategy-i5.jpg',
     number: '02',
   },
-  {
-    id: 'marketing',
-    title: '브랜딩',
-    subtitle: 'BRANDING',
-    tagline: 'Brand',
-    description: '데이터 기반 브랜드 전략으로\n가치를 극대화합니다',
-    features: ['브랜드 전략', '디지털 마케팅', '콘텐츠 제작'],
-    url: 'https://www.brandplaton.com/',
-    image: '/images/platon-marketing.jpg',
-    number: '03',
-  },
 ]
 
 const GOLD = '#b8956a'
