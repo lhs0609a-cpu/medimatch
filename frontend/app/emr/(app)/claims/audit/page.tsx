@@ -91,7 +91,7 @@ export default function ClaimAuditPage() {
   const [sourceEmr, setSourceEmr] = useState('manual_csv')
   const [minConfidence, setMinConfidence] = useState(0)
   const [ruleFilter, setRuleFilter] = useState<string | null>(null)
-  const fileInputRef = useRef<HTMLInputElement | null>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   const refresh = async () => {
     setLoading(true)
@@ -234,7 +234,7 @@ function EmptyStateUpload({
   scanning: boolean
   onFile: (f: File | null) => void
   onRun: () => void
-  inputRef: React.RefObject<HTMLInputElement | null>
+  inputRef: React.RefObject<HTMLInputElement>
 }) {
   return (
     <div className="space-y-6">

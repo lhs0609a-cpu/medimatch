@@ -95,7 +95,7 @@ export default function ImportPage() {
   const [importing, setImporting] = useState(false)
   const [previewing, setPreviewing] = useState(false)
   const [result, setResult] = useState<ImportResp | null>(null)
-  const inputRef = useRef<HTMLInputElement | null>(null)
+  const inputRef = useRef<HTMLInputElement>(null)
 
   const totalHeaders = useMemo(
     () => preview ? Object.keys(preview.mapping).length + preview.unmapped_headers.length : 0,
