@@ -12,6 +12,8 @@ import Image from 'next/image'
 import { generateBuildingListings, generateActivityFeed, platformStats, type BuildingListing } from '@/lib/data/seedListings'
 import { buildingListingImages } from '@/components/BlurredListingImage'
 import KakaoMap from '@/components/map/KakaoMap'
+import { event, naverConversion } from '@/components/analytics'
+import { getAttribution } from '@/lib/utm'
 
 // 시드 데이터 생성 (클라이언트에서 한 번만)
 const seedListings = generateBuildingListings(120)
@@ -46,6 +48,9 @@ export default function BuildingsPage() {
   const [dataSource, setDataSource] = useState<DataSource>('seed')
   const [apiListings, setApiListings] = useState<BuildingListing[]>([])
   const [apiTotal, setApiTotal] = useState(0)
+  const [inquiryForm, setInquiryForm] = useState({ name: '', phone: '', specialty: '', message: '' })
+  const [submitting, setSubmitting] = useState(false)
+  const [submitted, setSubmitted] = useState(false)
 
   // 적용된 필터 개수 계산
   const activeFilterCount = useMemo(() => {
@@ -77,18 +82,16 @@ export default function BuildingsPage() {
     }))
   }
 
-  // 로그인 시 실제 매물 데이터 로드
+  // 실제 ACTIVE 매물 로드 (공개 — 비로그인 광고 유입 방문자도 노출)
   useEffect(() => {
     const fetchRealListings = async () => {
-      const token = localStorage.getItem('access_token')
-      if (!token) return
-
       try {
         const apiUrl = process.env.NEXT_PUBLIC_API_URL
         if (!apiUrl) return
 
-        const res = await fetch(`${apiUrl}/landlord/buildings?page_size=100`, {
-          headers: { Authorization: `Bearer ${token}` },
+        const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null
+        const res = await fetch(`${apiUrl}/landlord/search-buildings?page_size=100`, {
+          headers: token ? { Authorization: `Bearer ${token}` } : undefined,
         })
         if (!res.ok) return
 
@@ -208,7 +211,43 @@ export default function BuildingsPage() {
 
   const handleInquiry = (listing: BuildingListing) => {
     setSelectedListing(listing)
+    setSubmitted(false)
+    setInquiryForm({ name: '', phone: '', specialty: '', message: '' })
     setShowInquiryModal(true)
+    event('view_listing', { listing_id: listing.id, label: listing.title })
+  }
+
+  const handleSubmitInquiry = async () => {
+    if (!selectedListing) return
+    if (!inquiryForm.name.trim() || !inquiryForm.phone.trim()) return
+    setSubmitting(true)
+    try {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL
+      const attribution = getAttribution()
+      const res = await fetch(`${apiUrl}/contact`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: inquiryForm.name.trim(),
+          phone: inquiryForm.phone.trim(),
+          type: 'listing_inquiry',
+          subject: `매물 문의: ${selectedListing.title}`,
+          message: inquiryForm.message.trim() || '상세 정보 문의 (주소·연락처)',
+          specialty: inquiryForm.specialty.trim() || undefined,
+          region: selectedListing.region || undefined,
+          listing_id: selectedListing.id,
+          ...attribution,
+        }),
+      })
+      if (!res.ok) throw new Error('submit failed')
+      setSubmitted(true)
+      event('submit_inquiry', { listing_id: selectedListing.id, label: selectedListing.title })
+      naverConversion('1', '0') // 네이버 검색광고 전환
+    } catch {
+      alert('문의 접수에 실패했습니다. 잠시 후 다시 시도해주세요.')
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   return (
@@ -727,25 +766,75 @@ export default function BuildingsPage() {
               </div>
             </div>
 
-            <div className="space-y-3">
-              <a
-                href="https://open.kakao.com/o/sMLX4Zei"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="btn-primary w-full py-3 bg-[#FEE500] hover:bg-[#FDD835] text-[#3C1E1E]"
-              >
-                <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M12 3C6.48 3 2 6.58 2 11c0 2.83 1.87 5.32 4.68 6.73l-.95 3.52c-.08.3.26.55.52.38l4.23-2.82c.5.05 1 .09 1.52.09 5.52 0 10-3.58 10-8S17.52 3 12 3z"/>
-                </svg>
-                카카오톡 오픈채팅 문의
-              </a>
-              <button
-                onClick={() => setShowInquiryModal(false)}
-                className="btn-secondary w-full py-3"
-              >
-                닫기
-              </button>
-            </div>
+            {submitted ? (
+              <div className="text-center space-y-4">
+                <div className="w-14 h-14 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mx-auto">
+                  <CheckCircle className="w-7 h-7 text-green-600" />
+                </div>
+                <div>
+                  <p className="font-bold text-foreground">문의가 접수되었습니다</p>
+                  <p className="text-sm text-muted-foreground mt-1">담당자가 영업일 기준 빠르게 연락드립니다.</p>
+                </div>
+                <button onClick={() => setShowInquiryModal(false)} className="btn-primary w-full py-3">
+                  확인
+                </button>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                <input
+                  type="text"
+                  value={inquiryForm.name}
+                  onChange={(e) => setInquiryForm((p) => ({ ...p, name: e.target.value }))}
+                  placeholder="성함 *"
+                  className="input w-full"
+                />
+                <input
+                  type="tel"
+                  value={inquiryForm.phone}
+                  onChange={(e) => setInquiryForm((p) => ({ ...p, phone: e.target.value }))}
+                  placeholder="연락처 * (예: 010-0000-0000)"
+                  className="input w-full"
+                />
+                <input
+                  type="text"
+                  value={inquiryForm.specialty}
+                  onChange={(e) => setInquiryForm((p) => ({ ...p, specialty: e.target.value }))}
+                  placeholder="희망 진료과 (선택)"
+                  className="input w-full"
+                />
+                <textarea
+                  value={inquiryForm.message}
+                  onChange={(e) => setInquiryForm((p) => ({ ...p, message: e.target.value }))}
+                  placeholder="문의 내용 (선택)"
+                  rows={2}
+                  className="input w-full resize-none"
+                />
+                <button
+                  onClick={handleSubmitInquiry}
+                  disabled={submitting || !inquiryForm.name.trim() || !inquiryForm.phone.trim()}
+                  className="btn-primary w-full py-3 disabled:opacity-50"
+                >
+                  {submitting ? '접수 중...' : '문의하고 상세정보 받기'}
+                </button>
+                <a
+                  href="https://open.kakao.com/o/sMLX4Zei"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn-secondary w-full py-3 flex items-center justify-center gap-2"
+                >
+                  <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 3C6.48 3 2 6.58 2 11c0 2.83 1.87 5.32 4.68 6.73l-.95 3.52c-.08.3.26.55.52.38l4.23-2.82c.5.05 1 .09 1.52.09 5.52 0 10-3.58 10-8S17.52 3 12 3z"/>
+                  </svg>
+                  카카오톡으로 바로 문의
+                </a>
+                <button
+                  onClick={() => setShowInquiryModal(false)}
+                  className="w-full py-2 text-sm text-muted-foreground hover:text-foreground"
+                >
+                  닫기
+                </button>
+              </div>
+            )}
 
             <p className="text-center text-xs text-muted-foreground mt-4">
               실시간 상담 가능 (평일 09:00 - 18:00)

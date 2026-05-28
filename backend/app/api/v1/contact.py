@@ -18,7 +18,7 @@ router = APIRouter()
 
 class ContactRequest(BaseModel):
     name: str = Field(..., min_length=1, max_length=100)
-    email: EmailStr
+    email: Optional[EmailStr] = None  # 매물 문의 등 전화 위주 리드는 생략 가능
     phone: Optional[str] = Field(None, max_length=20)
     type: str = Field(..., pattern="^(general|simulation|matching|payment|partnership|bug|other|homepage_consultation|program_consultation|consultation|listing_inquiry)$")
     subject: str = Field(..., min_length=1, max_length=200)
