@@ -54,8 +54,20 @@ class ContactInquiry(Base):
     admin_reply = Column(Text)
     replied_at = Column(DateTime)
 
+    # 유입 추적 (광고 캠페인 귀속 — first-touch)
+    utm_source = Column(String(100))
+    utm_medium = Column(String(100))
+    utm_campaign = Column(String(150))
+    utm_term = Column(String(150))
+    utm_content = Column(String(150))
+    referrer = Column(String(500))
+    landing_path = Column(String(500))
+    listing_id = Column(String(64))  # 문의 대상 매물(LandlordListing UUID 문자열, nullable)
+
     __table_args__ = (
         Index("ix_contact_inquiry_type", "contact_type"),
         Index("ix_contact_inquiry_status", "status"),
         Index("ix_contact_inquiry_created", "created_at"),
+        Index("ix_contact_inquiry_campaign", "utm_campaign"),
+        Index("ix_contact_inquiry_listing", "listing_id"),
     )

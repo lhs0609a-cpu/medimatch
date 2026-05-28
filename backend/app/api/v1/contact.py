@@ -20,7 +20,7 @@ class ContactRequest(BaseModel):
     name: str = Field(..., min_length=1, max_length=100)
     email: EmailStr
     phone: Optional[str] = Field(None, max_length=20)
-    type: str = Field(..., pattern="^(general|simulation|matching|payment|partnership|bug|other|homepage_consultation|program_consultation|consultation)$")
+    type: str = Field(..., pattern="^(general|simulation|matching|payment|partnership|bug|other|homepage_consultation|program_consultation|consultation|listing_inquiry)$")
     subject: str = Field(..., min_length=1, max_length=200)
     message: str = Field(..., min_length=1, max_length=5000)
     # 상담 전용 (optional)
@@ -29,6 +29,15 @@ class ContactRequest(BaseModel):
     region: Optional[str] = Field(None, max_length=200)
     need_loan: Optional[str] = Field(None, max_length=20)
     interests: Optional[str] = None
+    # 매물 문의 + 광고 유입 추적 (optional)
+    listing_id: Optional[str] = Field(None, max_length=64)
+    utm_source: Optional[str] = Field(None, max_length=100)
+    utm_medium: Optional[str] = Field(None, max_length=100)
+    utm_campaign: Optional[str] = Field(None, max_length=150)
+    utm_term: Optional[str] = Field(None, max_length=150)
+    utm_content: Optional[str] = Field(None, max_length=150)
+    referrer: Optional[str] = Field(None, max_length=500)
+    landing_path: Optional[str] = Field(None, max_length=500)
 
 
 class ContactResponse(BaseModel):
@@ -54,6 +63,14 @@ async def submit_contact(data: ContactRequest, db: AsyncSession = Depends(get_db
             region=data.region,
             need_loan=data.need_loan,
             interests=data.interests,
+            listing_id=data.listing_id,
+            utm_source=data.utm_source,
+            utm_medium=data.utm_medium,
+            utm_campaign=data.utm_campaign,
+            utm_term=data.utm_term,
+            utm_content=data.utm_content,
+            referrer=data.referrer,
+            landing_path=data.landing_path,
         )
         db.add(record)
         await db.commit()

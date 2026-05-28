@@ -4,7 +4,7 @@ import './globals.css'
 import { Providers } from './providers'
 import { Toaster } from 'sonner'
 import { SkipLink } from '@/components/common/SkipLink'
-import { GoogleAnalytics, WebVitalsReporter } from '@/components/analytics'
+import { GoogleAnalytics, WebVitalsReporter, NaverAnalytics } from '@/components/analytics'
 import { InstallPrompt, UpdatePrompt, OfflineIndicator } from '@/components/pwa'
 import { jsonLd } from '@/lib/seo'
 
@@ -130,6 +130,7 @@ export default function RootLayout({
       </head>
       <body className={inter.className} suppressHydrationWarning>
         <GoogleAnalytics />
+        <NaverAnalytics />
         <WebVitalsReporter />
         <SkipLink />
         <Providers>
