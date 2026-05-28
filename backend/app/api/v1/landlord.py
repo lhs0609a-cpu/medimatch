@@ -145,38 +145,42 @@ async def create_landlord_listing(
     관리자 승인 후 공개됩니다.
     구독 크레딧이 필요합니다.
     """
-    # 구독 크레딧 확인
-    sub_result = await db.execute(
-        select(ListingSubscription).where(
-            ListingSubscription.user_id == current_user.id
-        ).with_for_update()
-    )
-    sub = sub_result.scalar_one_or_none()
-
-    if not sub:
-        raise HTTPException(
-            status_code=status.HTTP_402_PAYMENT_REQUIRED,
-            detail="매물 등록 구독이 필요합니다."
+    # 운영자(ADMIN)는 구독/크레딧 없이 등록 (first-party 매물 — 즉시 공개)
+    is_admin = getattr(current_user, "role", None) == UserRole.ADMIN
+    sub = None
+    if not is_admin:
+        # 구독 크레딧 확인
+        sub_result = await db.execute(
+            select(ListingSubscription).where(
+                ListingSubscription.user_id == current_user.id
+            ).with_for_update()
         )
+        sub = sub_result.scalar_one_or_none()
 
-    if sub.status in (ListingSubStatus.EXPIRED, ListingSubStatus.SUSPENDED):
-        raise HTTPException(
-            status_code=status.HTTP_402_PAYMENT_REQUIRED,
-            detail="구독이 만료되었습니다. 구독을 갱신해주세요."
-        )
+        if not sub:
+            raise HTTPException(
+                status_code=status.HTTP_402_PAYMENT_REQUIRED,
+                detail="매물 등록 구독이 필요합니다."
+            )
 
-    if sub.status not in (ListingSubStatus.ACTIVE, ListingSubStatus.CANCELED):
-        raise HTTPException(
-            status_code=status.HTTP_402_PAYMENT_REQUIRED,
-            detail="구독 상태를 확인해주세요."
-        )
+        if sub.status in (ListingSubStatus.EXPIRED, ListingSubStatus.SUSPENDED):
+            raise HTTPException(
+                status_code=status.HTTP_402_PAYMENT_REQUIRED,
+                detail="구독이 만료되었습니다. 구독을 갱신해주세요."
+            )
 
-    remaining = sub.total_credits - sub.used_credits
-    if remaining <= 0:
-        raise HTTPException(
-            status_code=status.HTTP_402_PAYMENT_REQUIRED,
-            detail="사용 가능한 크레딧이 없습니다. 다음 결제일까지 기다리거나 추가 구독이 필요합니다."
-        )
+        if sub.status not in (ListingSubStatus.ACTIVE, ListingSubStatus.CANCELED):
+            raise HTTPException(
+                status_code=status.HTTP_402_PAYMENT_REQUIRED,
+                detail="구독 상태를 확인해주세요."
+            )
+
+        remaining = sub.total_credits - sub.used_credits
+        if remaining <= 0:
+            raise HTTPException(
+                status_code=status.HTTP_402_PAYMENT_REQUIRED,
+                detail="사용 가능한 크레딧이 없습니다. 다음 결제일까지 기다리거나 추가 구독이 필요합니다."
+            )
 
     # 지역명 추출 (간단한 파싱)
     region_name = data.region_name or (" ".join(data.address.split()[:2]) if data.address else None)
@@ -220,9 +224,10 @@ async def create_landlord_listing(
 
     db.add(listing)
 
-    # 크레딧 차감
-    sub.used_credits += 1
-    sub.updated_at = datetime.utcnow()
+    # 크레딧 차감 (운영자는 제외)
+    if sub is not None:
+        sub.used_credits += 1
+        sub.updated_at = datetime.utcnow()
 
     await db.commit()
     await db.refresh(listing)
@@ -231,9 +236,43 @@ async def create_landlord_listing(
         "id": str(listing.id),
         "status": listing.status.value,
         "verification_status": listing.verification_status.value,
-        "remaining_credits": sub.total_credits - sub.used_credits,
+        "remaining_credits": (sub.total_credits - sub.used_credits) if sub is not None else None,
         "message": "매물이 등록되었습니다. 즉시 공개됩니다."
     }
+
+
+@router.post("/admin/upload-image")
+async def admin_upload_listing_image(
+    file: UploadFile = File(...),
+    current_user: User = Depends(get_current_active_user),
+):
+    """운영자(ADMIN) 매물 사진 업로드 → 공개 URL 반환 (로컬 디스크 /uploads/listings)."""
+    if current_user.role != UserRole.ADMIN:
+        raise HTTPException(status_code=403, detail="관리자만 사용할 수 있습니다.")
+
+    import os
+    import uuid as _uuid
+    from pathlib import Path
+
+    ext_by_type = {
+        "image/jpeg": ".jpg",
+        "image/png": ".png",
+        "image/webp": ".webp",
+        "image/gif": ".gif",
+    }
+    if file.content_type not in ext_by_type:
+        raise HTTPException(status_code=400, detail="이미지 파일(JPG/PNG/WEBP/GIF)만 업로드 가능합니다.")
+
+    data = await file.read()
+    if len(data) > 10 * 1024 * 1024:
+        raise HTTPException(status_code=400, detail="이미지는 10MB 이하만 업로드 가능합니다.")
+
+    upload_dir = Path(os.getenv("UPLOAD_DIR", "./uploads")).resolve() / "listings"
+    upload_dir.mkdir(parents=True, exist_ok=True)
+    fname = f"{_uuid.uuid4().hex}{ext_by_type[file.content_type]}"
+    (upload_dir / fname).write_bytes(data)
+
+    return {"url": f"/uploads/listings/{fname}"}
 
 
 @router.get("/listings/my")

@@ -19,6 +19,8 @@ import {
   Phone,
   Mail,
   AlertTriangle,
+  Plus,
+  Upload,
 } from 'lucide-react';
 import { TossIcon } from '@/components/ui/TossIcon';
 import { toast } from 'sonner';
@@ -149,6 +151,18 @@ export default function AdminListingsPage() {
   const [statusReason, setStatusReason] = useState('');
   const [actionLoading, setActionLoading] = useState(false);
   const [dropdownId, setDropdownId] = useState<string | null>(null);
+
+  // 직접 매물 등록 (운영자)
+  const [showCreate, setShowCreate] = useState(false);
+  const [creating, setCreating] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const emptyCreateForm = {
+    title: '', address: '', region_name: '', floor: '',
+    area_pyeong: '', rent_deposit: '', rent_monthly: '', premium: '',
+    preferred_tenants: '', description: '',
+    has_parking: false, has_elevator: false, images: [] as string[],
+  };
+  const [createForm, setCreateForm] = useState(emptyCreateForm);
 
   const pageSize = 20;
   const totalPages = Math.ceil(total / pageSize);
@@ -303,6 +317,83 @@ export default function AdminListingsPage() {
     setPage(1);
   };
 
+  const fileBase = apiUrl.replace(/\/api\/v1\/?$/, '');
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+    setUploading(true);
+    try {
+      const urls: string[] = [];
+      for (const file of Array.from(files)) {
+        const fd = new FormData();
+        fd.append('file', file);
+        const res = await fetch(`${apiUrl}/landlord/admin/upload-image`, {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${getToken()}` },
+          body: fd,
+        });
+        if (!res.ok) throw new Error('upload failed');
+        const data = await res.json();
+        urls.push(data.url);
+      }
+      setCreateForm((p) => ({ ...p, images: [...p.images, ...urls] }));
+      toast.success(`이미지 ${urls.length}장 업로드됨`);
+    } catch {
+      toast.error('이미지 업로드 실패');
+    } finally {
+      setUploading(false);
+      e.target.value = '';
+    }
+  };
+
+  const handleCreate = async () => {
+    if (!createForm.title.trim() || !createForm.address.trim()) {
+      toast.error('제목과 주소는 필수입니다.');
+      return;
+    }
+    setCreating(true);
+    try {
+      // 만원 단위 입력 → 원 단위 저장
+      const toWon = (v: string) => {
+        const n = parseInt(v.replace(/[^0-9]/g, ''), 10);
+        return v.trim() && !isNaN(n) ? n * 10000 : null;
+      };
+      const body = {
+        title: createForm.title.trim(),
+        address: createForm.address.trim(),
+        region_name: createForm.region_name.trim() || undefined,
+        floor: createForm.floor.trim() || undefined,
+        area_pyeong: createForm.area_pyeong.trim() ? parseFloat(createForm.area_pyeong) : undefined,
+        rent_deposit: toWon(createForm.rent_deposit),
+        rent_monthly: toWon(createForm.rent_monthly),
+        premium: toWon(createForm.premium),
+        preferred_tenants: createForm.preferred_tenants.split(',').map((s) => s.trim()).filter(Boolean),
+        description: createForm.description.trim() || undefined,
+        has_parking: createForm.has_parking,
+        has_elevator: createForm.has_elevator,
+        images: createForm.images,
+      };
+      const res = await fetch(`${apiUrl}/landlord/listings`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${getToken()}` },
+        body: JSON.stringify(body),
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.detail || '등록 실패');
+      }
+      toast.success('매물이 등록되어 즉시 공개됩니다.');
+      setShowCreate(false);
+      setCreateForm(emptyCreateForm);
+      fetchListings();
+    } catch (e: any) {
+      toast.error(e.message || '등록 실패');
+    } finally {
+      setCreating(false);
+    }
+  };
+
   return (
     <div className="p-8">
       {/* Header */}
@@ -314,13 +405,22 @@ export default function AdminListingsPage() {
             <p className="text-sm text-gray-500">건물주 등록 매물의 심사 및 상태 관리</p>
           </div>
         </div>
-        <button
-          onClick={fetchListings}
-          className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-xl text-gray-700 hover:bg-gray-50 transition-colors"
-        >
-          <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
-          새로고침
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setShowCreate(true)}
+            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors"
+          >
+            <Plus className="w-4 h-4" />
+            직접 매물 등록
+          </button>
+          <button
+            onClick={fetchListings}
+            className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-xl text-gray-700 hover:bg-gray-50 transition-colors"
+          >
+            <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+            새로고침
+          </button>
+        </div>
       </div>
 
       {/* Stats Cards */}
@@ -796,6 +896,69 @@ export default function AdminListingsPage() {
               >
                 {actionLoading ? '처리 중...' : '변경'}
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ============================================================ */}
+      {/* 직접 매물 등록 (운영자) */}
+      {/* ============================================================ */}
+      {showCreate && (
+        <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/40 p-4 overflow-y-auto" onClick={() => setShowCreate(false)}>
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg my-8 p-6" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-1">
+              <h3 className="text-lg font-bold text-gray-900">직접 매물 등록</h3>
+              <button onClick={() => setShowCreate(false)} className="text-gray-400 hover:text-gray-600"><X className="w-5 h-5" /></button>
+            </div>
+            <p className="text-xs text-gray-500 mb-5">운영자 등록 매물은 즉시 공개되어 <b>/buildings</b>에 노출됩니다. (금액 단위: 만원)</p>
+
+            <div className="space-y-3">
+              <input value={createForm.title} onChange={(e) => setCreateForm((p) => ({ ...p, title: e.target.value }))} placeholder="매물 제목 *" className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-200" />
+              <input value={createForm.address} onChange={(e) => setCreateForm((p) => ({ ...p, address: e.target.value }))} placeholder="전체 주소 * (예: 서울시 강남구 역삼동 123-4)" className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-200" />
+              <div className="grid grid-cols-2 gap-3">
+                <input value={createForm.region_name} onChange={(e) => setCreateForm((p) => ({ ...p, region_name: e.target.value }))} placeholder="지역명 (예: 서울시 강남구)" className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-200" />
+                <input value={createForm.floor} onChange={(e) => setCreateForm((p) => ({ ...p, floor: e.target.value }))} placeholder="층 (예: 2층)" className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-200" />
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <input value={createForm.area_pyeong} onChange={(e) => setCreateForm((p) => ({ ...p, area_pyeong: e.target.value }))} placeholder="전용면적 (평)" inputMode="decimal" className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-200" />
+                <input value={createForm.premium} onChange={(e) => setCreateForm((p) => ({ ...p, premium: e.target.value }))} placeholder="권리금 (만원)" inputMode="numeric" className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-200" />
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <input value={createForm.rent_deposit} onChange={(e) => setCreateForm((p) => ({ ...p, rent_deposit: e.target.value }))} placeholder="보증금 (만원)" inputMode="numeric" className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-200" />
+                <input value={createForm.rent_monthly} onChange={(e) => setCreateForm((p) => ({ ...p, rent_monthly: e.target.value }))} placeholder="월세 (만원)" inputMode="numeric" className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-200" />
+              </div>
+              <input value={createForm.preferred_tenants} onChange={(e) => setCreateForm((p) => ({ ...p, preferred_tenants: e.target.value }))} placeholder="추천 진료과 (콤마 구분, 예: 피부과, 성형외과)" className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-200" />
+              <textarea value={createForm.description} onChange={(e) => setCreateForm((p) => ({ ...p, description: e.target.value }))} placeholder="매물 설명" rows={3} className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-200 resize-none" />
+              <div className="flex items-center gap-4 text-sm text-gray-700">
+                <label className="flex items-center gap-2 cursor-pointer"><input type="checkbox" checked={createForm.has_parking} onChange={(e) => setCreateForm((p) => ({ ...p, has_parking: e.target.checked }))} /> 주차 가능</label>
+                <label className="flex items-center gap-2 cursor-pointer"><input type="checkbox" checked={createForm.has_elevator} onChange={(e) => setCreateForm((p) => ({ ...p, has_elevator: e.target.checked }))} /> 엘리베이터</label>
+              </div>
+
+              {/* 이미지 업로드 */}
+              <div>
+                <label className="flex items-center justify-center gap-2 w-full px-4 py-3 border-2 border-dashed border-gray-200 rounded-xl text-sm text-gray-500 cursor-pointer hover:bg-gray-50">
+                  <Upload className="w-4 h-4" />
+                  {uploading ? '업로드 중...' : '사진 업로드 (JPG/PNG/WEBP, 여러 장 가능)'}
+                  <input type="file" accept="image/*" multiple className="hidden" onChange={handleImageUpload} disabled={uploading} />
+                </label>
+                {createForm.images.length > 0 && (
+                  <div className="flex flex-wrap gap-2 mt-2">
+                    {createForm.images.map((url, i) => (
+                      <div key={i} className="relative">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={`${fileBase}${url}`} alt="" className="w-16 h-16 object-cover rounded-lg border border-gray-200" />
+                        <button onClick={() => setCreateForm((p) => ({ ...p, images: p.images.filter((_, idx) => idx !== i) }))} className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-rose-500 text-white rounded-full flex items-center justify-center text-xs">×</button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div className="flex gap-3 mt-6">
+              <button onClick={() => setShowCreate(false)} className="flex-1 px-4 py-2.5 border border-gray-200 text-gray-700 rounded-xl text-sm hover:bg-gray-50 transition-colors">취소</button>
+              <button onClick={handleCreate} disabled={creating || uploading} className="flex-1 px-4 py-2.5 bg-blue-600 text-white rounded-xl text-sm font-medium hover:bg-blue-700 disabled:opacity-50 transition-colors">{creating ? '등록 중...' : '등록하고 공개'}</button>
             </div>
           </div>
         </div>
