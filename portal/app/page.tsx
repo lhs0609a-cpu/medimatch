@@ -1,6 +1,9 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+
+const REDIRECT_URL = 'https://loan.brandplaton.com'
+const COUNTDOWN_SECONDS = 3
 
 const services = [
   {
@@ -20,6 +23,18 @@ const GOLD = '#b8956a'
 
 export default function PortalPage() {
   const [hoveredService, setHoveredService] = useState<string | null>(null)
+  const [countdown, setCountdown] = useState(COUNTDOWN_SECONDS)
+  const [cancelled, setCancelled] = useState(false)
+
+  useEffect(() => {
+    if (cancelled) return
+    if (countdown <= 0) {
+      window.location.href = REDIRECT_URL
+      return
+    }
+    const t = setTimeout(() => setCountdown((n) => n - 1), 1000)
+    return () => clearTimeout(t)
+  }, [countdown, cancelled])
 
   return (
     <div className="min-h-screen relative overflow-hidden" style={{ background: '#fafaf7' }}>
@@ -259,6 +274,28 @@ export default function PortalPage() {
           />
         ))}
       </div>
+
+      {/* Countdown — auto-redirect to loan.brandplaton.com */}
+      {!cancelled && (
+        <div className="fixed top-10 right-10 z-50 flex flex-col items-end gap-2">
+          <div className="flex items-center gap-3 px-4 py-2 rounded-full backdrop-blur-sm" style={{ background: 'rgba(250,250,247,0.7)', border: `1px solid ${GOLD}30` }}>
+            <span className="text-[10px] tracking-[0.3em] font-light text-stone-500">
+              FINANCE
+            </span>
+            <span className="w-px h-3" style={{ background: `${GOLD}50` }} />
+            <span className="font-serif-en text-[14px] tabular-nums" style={{ color: GOLD }}>
+              {countdown}
+            </span>
+            <span className="text-[10px] text-stone-500 font-light">초 후 이동</span>
+          </div>
+          <button
+            onClick={() => setCancelled(true)}
+            className="text-[10px] tracking-[0.2em] font-light text-stone-400 hover:text-stone-700 transition-colors px-2"
+          >
+            머무르기
+          </button>
+        </div>
+      )}
 
       {/* Decorative corners — hairline */}
       <div className="fixed top-8 left-8 w-10 h-10 pointer-events-none z-30">
