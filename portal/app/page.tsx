@@ -4,17 +4,6 @@ import { useState } from 'react'
 
 const services = [
   {
-    id: 'hospital',
-    title: '개원컨설팅',
-    subtitle: 'OPENING',
-    tagline: 'Establishment',
-    description: '입지 분석부터 인테리어까지\n원스톱 개원 컨설팅',
-    features: ['입지 분석', '인테리어', '인허가'],
-    url: 'https://medi.brandplaton.com',
-    image: 'https://medi.brandplaton.com/images/listings/building-01.jpg',
-    number: '01',
-  },
-  {
     id: 'loan',
     title: '금융솔루션',
     subtitle: 'FINANCE',
@@ -23,7 +12,7 @@ const services = [
     features: ['자금 조달', '금융 컨설팅', 'B2B 연계'],
     url: 'https://loan.brandplaton.com',
     image: 'https://loan.brandplaton.com/images/strategy-i5.jpg',
-    number: '02',
+    number: '01',
   },
 ]
 
@@ -247,7 +236,7 @@ export default function PortalPage() {
             <div className="w-6 h-px" style={{ background: `${GOLD}60` }} />
           </div>
           <p className="text-stone-400 text-[10px] tracking-[0.35em] font-light">
-            의료인의 성공적인 개원 파트너
+            의료인을 위한 맞춤형 금융 파트너
           </p>
         </div>
       </div>
