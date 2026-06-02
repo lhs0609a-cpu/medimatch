@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 
 const REDIRECT_URL = 'https://loan.brandplaton.com'
-const COUNTDOWN_SECONDS = 3
+const COUNTDOWN_SECONDS = 1
 
 const services = [
   {
