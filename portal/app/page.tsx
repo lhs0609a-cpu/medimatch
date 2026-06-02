@@ -11,7 +11,7 @@ const services = [
     description: '의료기관부터 대기업까지\n맞춤형 금융 컨설팅',
     features: ['자금 조달', '금융 컨설팅', 'B2B 연계'],
     url: 'https://loan.brandplaton.com',
-    image: 'https://loan.brandplaton.com/images/strategy-i5.jpg',
+    image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=2400&q=90',
     number: '01',
   },
 ]
