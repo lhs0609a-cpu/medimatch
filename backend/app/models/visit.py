@@ -23,6 +23,9 @@ class Visit(Base):
 
     id = Column(UUID(as_uuid=True), primary_key=True, server_default=text("gen_random_uuid()"))
     user_id = Column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+    # 테넌트 스코프 — 042. 1단계는 nullable(기존 user_id 쿼리와 공존),
+    # 쿼리 전환이 끝나면 NOT NULL 로 조인다.
+    clinic_id = Column(UUID(as_uuid=True), ForeignKey("clinics.id", ondelete="CASCADE"), nullable=True)
     patient_id = Column(UUID(as_uuid=True), ForeignKey("patients.id", ondelete="SET NULL"))
 
     chart_no = Column(String(50))

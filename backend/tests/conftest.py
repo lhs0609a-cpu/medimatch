@@ -10,7 +10,6 @@ from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sess
 from sqlalchemy.pool import NullPool
 import uuid
 
-from app.main import app
 from app.core.database import Base, get_db
 from app.core.security import create_access_token, get_password_hash
 from app.models.user import User, UserRole
@@ -76,7 +75,13 @@ async def db_session() -> AsyncGenerator[AsyncSession, None]:
 async def client(db_session: AsyncSession) -> AsyncGenerator[AsyncClient, None]:
     """
     Create a test client with database session override.
+
+    app.main 임포트를 여기로 미뤘다 — 전체 ASGI 앱은 무거운 선택적 의존성
+    (weasyprint·pandas·openai 등)을 끌어오는데, DB나 앱이 필요 없는 순수
+    단위 테스트까지 그걸 요구하면 로컬에서 아무 테스트도 못 돌린다.
     """
+    from app.main import app
+
     async def override_get_db():
         yield db_session
 

@@ -145,6 +145,23 @@ from .visit import Visit, VisitDiagnosis, VisitProcedure, VisitStatus
 from .appointment import Appointment, AppointmentStatus
 from .prescription import Prescription, PrescriptionItem, PrescriptionStatus
 from .bill import Bill, BillItem, EmrPayment, BillStatus, PaymentMethod as BillPaymentMethod
+# 매퍼 레지스트리 누락분 — 042.
+# 이 모듈들은 여기서 임포트되지 않아 relationship() 문자열 해석이 실패했다.
+# (BrokerageDeal -> 'LandlordListing' 이 대표 사례. 라우터가 직접 임포트할 때만
+#  우연히 동작했고, 그렇지 않은 경로에서는 매퍼 초기화가 통째로 깨졌다.)
+from .landlord import LandlordListing, LandlordInquiry
+from .staff_seat import StaffSeat
+from .clinic_setup import ClinicSetup
+from .banner import BannerAd, BannerEvent, BannerDailyStats
+from .chronic_care import ChronicCareProgram, ChronicCareVisit
+from .external_appointment import ExternalAppointment
+from .listing_access import ListingAccessLevel, AccessPricing
+from .pharmacy_prospect import PharmacyProspectTarget, OutboundCampaign, CampaignMessage
+from .questionnaire import QuestionnaireResponse
+from .sales_match import SalesRepProfile, SalesMatchRequest, SalesMatchReview
+from .visit_attachment import VisitAttachment, VisitUploadToken
+# 의료기관(테넌트) — 042
+from .clinic import Clinic, ClinicMember, ClinicRole, ClinicStatus
 
 __all__ = [
     "User",
@@ -398,4 +415,29 @@ __all__ = [
     "EmrPayment",
     "BillStatus",
     "BillPaymentMethod",
+    "Clinic",
+    "ClinicMember",
+    "ClinicRole",
+    "ClinicStatus",
+    "LandlordListing",
+    "LandlordInquiry",
+    "StaffSeat",
+    "ClinicSetup",
+    "BannerAd",
+    "BannerEvent",
+    "BannerDailyStats",
+    "ChronicCareProgram",
+    "ChronicCareVisit",
+    "ExternalAppointment",
+    "ListingAccessLevel",
+    "AccessPricing",
+    "PharmacyProspectTarget",
+    "OutboundCampaign",
+    "CampaignMessage",
+    "QuestionnaireResponse",
+    "SalesRepProfile",
+    "SalesMatchRequest",
+    "SalesMatchReview",
+    "VisitAttachment",
+    "VisitUploadToken",
 ]
