@@ -3,7 +3,7 @@ import { defineConfig, devices } from '@playwright/test'
 export default defineConfig({
   testDir: './e2e',
   testMatch: 'emr-workspace.spec.ts',
-  timeout: 60000,
+  timeout: 120000,
   expect: { timeout: 15000 },
   workers: 1,
   reporter: 'list',

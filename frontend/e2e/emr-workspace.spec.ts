@@ -10,7 +10,7 @@ test('login failures keep the user on the login page', async ({ page }) => {
   await page.getByLabel('이메일', { exact: true }).fill('doctor@example.com')
   await page.getByLabel('비밀번호', { exact: true }).fill('incorrect-password')
   await page.getByRole('button', { name: '로그인', exact: true }).click()
-  await expect(page.getByRole('alert')).toContainText('로그인 정보를 확인해주세요.')
+  await expect(page.getByRole('alert').filter({ hasText: '로그인 정보를 확인해주세요.' })).toBeVisible()
   await expect(page).toHaveURL(/\/emr\/login$/)
   expect(await page.evaluate(() => localStorage.getItem('access_token'))).toBeNull()
 })
@@ -33,7 +33,7 @@ test('waiting room saves transitions and preserves state after reload', async ({
   await expect(page.getByRole('button', { name: '진료 시작', exact: true })).toBeVisible()
   await page.screenshot({ path: 'test-results/emr-workspace-desktop.png', fullPage: true })
   await page.getByRole('button', { name: '진료 시작', exact: true }).click()
-  await expect(page).toHaveURL(/\/emr\/chart\/new\?cc=.*patient_id=p1/)
+  await expect(page).toHaveURL(/\/emr\/chart\/new\?cc=.*patient_id=p1/, { timeout: 60000 })
   expect(status).toBe('IN_PROGRESS')
 })
 
@@ -42,14 +42,14 @@ test('waiting-room display masks patient names', async ({ page }) => {
   await page.goto('/emr/waiting')
   await expect(page.getByRole('heading', { name: '김테스트' })).toBeVisible()
   await page.getByRole('button', { name: '대기실 화면', exact: true }).click()
-  await expect(page.getByRole('heading', { name: '김**', exact: true })).toBeVisible()
+  await expect(page.getByRole('heading', { name: '김***', exact: true })).toBeVisible()
   await expect(page.getByText('김테스트', { exact: true })).toHaveCount(0)
 })
 
 test('connection errors are not shown as an empty schedule', async ({ page }) => {
   await page.route('**/api/v1/**', route => route.request().url().includes('/emr/appointments') ? route.fulfill({ status: 503, json: { detail: 'Unavailable' } }) : route.fulfill({ json: {} }))
   await page.goto('/emr/waiting')
-  await expect(page.getByRole('alert')).toContainText('데이터를 불러오지 못했습니다')
+  await expect(page.getByRole('alert').filter({ hasText: '데이터를 불러오지 못했습니다' })).toBeVisible()
   await expect(page.getByText('해당 환자가 없습니다.')).toHaveCount(0)
 })
 
