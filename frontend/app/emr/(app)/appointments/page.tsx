@@ -1,7 +1,9 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useSearchParams } from 'next/navigation'
+import { useSearchParams, useRouter } from 'next/navigation'
+import { localDate, dayRange, chartHref, errorMessage } from '@/lib/emr/workflow'
+import QueryState from '@/components/emr/QueryState'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { Calendar, Plus, X, Clock, Phone, User, Check, Loader2, Stethoscope } from 'lucide-react'
 import { toast } from 'sonner'
@@ -26,7 +28,8 @@ function StatusBadge({ status }: { status: string }) {
 
 export default function AppointmentsPage() {
   const qc = useQueryClient()
-  const today = new Date().toISOString().slice(0, 10)
+  const router = useRouter()
+  const today = localDate()
   const [selectedDate, setSelectedDate] = useState(today)
   const [showForm, setShowForm] = useState(false)
   const searchParams = useSearchParams()
@@ -38,12 +41,10 @@ export default function AppointmentsPage() {
     if (newPatientId && !showForm) setShowForm(true)
   }, [newPatientId])
 
-  const dateFrom = `${selectedDate}T00:00:00`
-  const dateTo = `${selectedDate}T23:59:59`
-
-  const { data: appts, isLoading } = useQuery({
+  const { data: appts, isLoading, isError, refetch } = useQuery({
     queryKey: ['appointments', selectedDate],
-    queryFn: () => appointmentService.list({ date_from: dateFrom, date_to: dateTo }),
+    queryFn: () => appointmentService.list(dayRange(selectedDate)),
+    refetchInterval: 15000,
   })
 
   const { data: stats } = useQuery({
@@ -52,6 +53,7 @@ export default function AppointmentsPage() {
   })
 
   const checkInMut = useMutation({
+    onError: (error) => toast.error(errorMessage(error)),
     mutationFn: (id: string) => appointmentService.checkIn(id),
     onSuccess: () => {
       toast.success('환자 도착 처리 완료')
@@ -61,6 +63,7 @@ export default function AppointmentsPage() {
   })
 
   const cancelMut = useMutation({
+    onError: (error) => toast.error(errorMessage(error)),
     mutationFn: ({ id, reason }: { id: string; reason?: string }) =>
       appointmentService.cancel(id, reason),
     onSuccess: () => {
@@ -70,11 +73,18 @@ export default function AppointmentsPage() {
   })
 
   const completeMut = useMutation({
+    onError: (error) => toast.error(errorMessage(error)),
     mutationFn: (id: string) => appointmentService.update(id, { status: 'COMPLETED' }),
     onSuccess: () => {
       toast.success('진료 완료')
       qc.invalidateQueries({ queryKey: ['appointments'] })
     },
+  })
+
+  const startMut = useMutation({
+    mutationFn: (a: Appointment) => a.status === 'IN_PROGRESS' ? Promise.resolve(a) : appointmentService.update(a.id, { status: 'IN_PROGRESS' }),
+    onSuccess: a => { qc.invalidateQueries({ queryKey: ['appointments'] }); router.push(chartHref(a)) },
+    onError: error => toast.error(errorMessage(error)),
   })
 
   return (
@@ -105,7 +115,8 @@ export default function AppointmentsPage() {
         </div>
 
         {isLoading && <div className="flex justify-center py-8"><Loader2 className="w-5 h-5 animate-spin" /></div>}
-        {!isLoading && (appts?.length ?? 0) === 0 && (
+        <QueryState error={isError} retry={() => refetch()} />
+        {!isLoading && !isError && (appts?.length ?? 0) === 0 && (
           <p className="text-center py-8 text-sm text-muted-foreground">선택한 날짜에 예약이 없습니다.</p>
         )}
         <div className="space-y-2">
@@ -139,27 +150,28 @@ export default function AppointmentsPage() {
                     compact
                   />
                 )}
-                {a.status === 'SCHEDULED' && (
-                  <button onClick={() => checkInMut.mutate(a.id)} className="btn-secondary text-xs">
+                {(a.status === 'SCHEDULED' || a.status === 'CONFIRMED') && (
+                  <button disabled={checkInMut.isPending} onClick={() => checkInMut.mutate(a.id)} className="btn-secondary text-xs">
                     <User className="w-3 h-3" /> 체크인
                   </button>
                 )}
                 {(a.status === 'ARRIVED' || a.status === 'IN_PROGRESS') && (
-                  <a
-                    href={`/emr/chart/new?${a.patient_id ? `patient_id=${a.patient_id}&` : ''}cc=${encodeURIComponent(a.chief_complaint || '')}`}
+                  <button
+                    disabled={startMut.isPending}
+                    onClick={() => startMut.mutate(a)}
                     className="btn-primary text-xs"
                     title="진료 시작 — 미리 채워진 차트 작성"
                   >
                     <Stethoscope className="w-3 h-3" /> 진료 시작
-                  </a>
+                  </button>
                 )}
                 {(a.status === 'ARRIVED' || a.status === 'IN_PROGRESS') && (
-                  <button onClick={() => completeMut.mutate(a.id)} className="btn-ghost text-xs">
+                  <button disabled={completeMut.isPending} onClick={() => completeMut.mutate(a.id)} className="btn-ghost text-xs">
                     <Check className="w-3 h-3" /> 완료
                   </button>
                 )}
-                {a.status !== 'COMPLETED' && a.status !== 'CANCELLED' && (
-                  <button onClick={() => cancelMut.mutate({ id: a.id, reason: '취소' })} className="btn-ghost text-xs text-rose-600">
+                {['SCHEDULED', 'CONFIRMED', 'ARRIVED', 'NO_SHOW'].includes(a.status) && (
+                  <button aria-label={`${a.patient_name} 예약 취소`} disabled={cancelMut.isPending} onClick={() => { if (window.confirm(`${a.patient_name}님의 예약을 취소하시겠습니까?`)) cancelMut.mutate({ id: a.id, reason: '취소' }) }} className="btn-ghost text-xs text-rose-600">
                     <X className="w-3 h-3" />
                   </button>
                 )}
@@ -221,7 +233,7 @@ function NewAppointmentModal({ onClose, onSuccess, prefillPatientId, prefillPati
   const onSubmit = () => {
     const finalName = patient?.name || name
     const finalPhone = patient?.phone || phone
-    if (!finalName || !start) {
+    if (!finalName.trim() || !start || !Number.isInteger(duration) || duration < 1 || duration > 480) {
       toast.error('환자·예약시간 필수')
       return
     }
@@ -229,7 +241,7 @@ function NewAppointmentModal({ onClose, onSuccess, prefillPatientId, prefillPati
       patient_id: patient?.id,
       patient_name: finalName,
       patient_phone: finalPhone || undefined,
-      start_time: new Date(start).toISOString(),
+      start_time: start + ':00',
       duration_min: duration,
       appointment_type: type,
       chief_complaint: complaint || undefined,

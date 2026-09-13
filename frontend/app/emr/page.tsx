@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import BrandLogo from '@/components/BrandLogo'
 import { useState, useEffect, useRef } from 'react'
 import {
   ArrowRight,
@@ -197,12 +198,7 @@ export default function EMRLandingPage() {
       <nav className="fixed top-0 left-0 right-0 z-50 glass">
         <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
-            <Link href="/" className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-xl bg-primary flex items-center justify-center">
-                <Stethoscope className="w-4 h-4 text-white" />
-              </div>
-              <span className="font-bold text-lg">MediMatch <span className="text-primary">EMR</span></span>
-            </Link>
+            <BrandLogo />
 
             <div className="hidden md:flex items-center gap-1">
               <a href="#features" className="nav-link">핵심 기능</a>

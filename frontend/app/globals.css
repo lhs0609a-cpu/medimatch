@@ -2,6 +2,16 @@
 @tailwind components;
 @tailwind utilities;
 
+.emr-workspace { --background: 216 33% 97%; --primary: 221 83% 53%; --border: 214 24% 91%; }
+.dark .emr-workspace { --background: 220 20% 7%; --border: 220 12% 18%; }
+.emr-workspace button:disabled { cursor: not-allowed; opacity: 0.5; }
+.emr-workspace :is(button, a, input, select, textarea):focus-visible { outline: 2px solid #2563eb; outline-offset: 3px; }
+@media print {
+  .emr-workspace > aside, .emr-workspace header { display: none !important; }
+  .emr-workspace > div { margin-left: 0 !important; }
+  .emr-workspace { background: white; }
+}
+
 /* Pretendard Font - 한글 최적화 */
 @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/variable/pretendardvariable.css');
 

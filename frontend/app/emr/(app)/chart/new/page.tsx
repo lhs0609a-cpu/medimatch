@@ -14,10 +14,11 @@ import QuestionnairePrefillBanner from '@/components/emr/QuestionnairePrefillBan
 import SoapVoiceCapture from '@/components/emr/SoapVoiceCapture'
 import ModuleHeader from '@/components/emr/ModuleHeader'
 import { apiClient } from '@/lib/api/client'
+import { localDate } from '@/lib/emr/workflow'
 
 export default function NewChartPage() {
   const router = useRouter()
-  const today = new Date().toISOString().slice(0, 10)
+  const today = localDate()
 
   const [patient, setPatient] = useState<{ id: string; chart_no?: string; name: string } | null>(null)
 
@@ -70,7 +71,7 @@ export default function NewChartPage() {
     mutationFn: visitService.create,
     onSuccess: (visit) => {
       toast.success(`진료기록 저장 완료 (${visit.visit_no})`)
-      router.push('/emr/chart')
+      router.push(`/emr/chart/${visit.id}`)
     },
     onError: (e: any) => {
       toast.error(e.response?.data?.detail || '저장 실패')

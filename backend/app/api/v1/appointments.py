@@ -2,7 +2,7 @@
 import logging
 from datetime import date, datetime, timedelta
 from typing import List, Optional
-from uuid import UUID
+from uuid import UUID, uuid4
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy import select, and_, or_, func
@@ -11,12 +11,27 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from ..deps import get_db, get_current_active_user
 from ...models.user import User
 from ...models.appointment import Appointment, AppointmentStatus
+from ...models.patient import Patient
+from ...appointment_workflow import validate_transition, clinic_datetime, clinic_today
 from ...schemas.emr_core import (
     AppointmentCreate, AppointmentUpdate, AppointmentOut,
 )
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
+
+
+def _set_status(appt, target):
+    current = appt.status.value if hasattr(appt.status, "value") else appt.status
+    try:
+        validate_transition(current, target)
+    except ValueError as exc:
+        raise HTTPException(status_code=409, detail=str(exc))
+    appt.status = AppointmentStatus(target)
+    if target == "ARRIVED" and not appt.arrived_at:
+        appt.arrived_at = datetime.utcnow()
+    if target == "COMPLETED" and not appt.completed_at:
+        appt.completed_at = datetime.utcnow()
 
 
 async def _check_conflict(
@@ -50,6 +65,16 @@ async def create_appointment(
     current_user: User = Depends(get_current_active_user),
 ):
     """예약 생성 (시간 충돌 자동 검증)."""
+    # Serialize booking writes per owner so two concurrent requests cannot both
+    # pass the same time-conflict check.
+    await db.execute(select(User.id).where(User.id == current_user.id).with_for_update())
+    patient = None
+    if payload.patient_id:
+        patient = (await db.execute(select(Patient).where(
+            Patient.id == payload.patient_id, Patient.user_id == current_user.id,
+        ))).scalar_one_or_none()
+        if not patient:
+            raise HTTPException(status_code=404, detail="환자를 찾을 수 없습니다.")
     end = payload.start_time + timedelta(minutes=payload.duration_min)
 
     if await _check_conflict(db, current_user.id, payload.start_time, end):
@@ -58,12 +83,25 @@ async def create_appointment(
             detail="해당 시간대에 이미 예약이 있습니다.",
         )
 
+    # Direct-entry booking creates its patient in the same transaction.
+    # Subsequent chart and prescription screens receive a real patient UUID.
+    if patient is None:
+        patient = Patient(
+            user_id=current_user.id,
+            name=payload.patient_name,
+            phone=payload.patient_phone,
+            birth_date=payload.patient_birth,
+            chart_no=f"P-{uuid4().hex[:12].upper()}",
+        )
+        db.add(patient)
+        await db.flush()
+
     appt = Appointment(
         user_id=current_user.id,
-        patient_id=payload.patient_id,
-        patient_name=payload.patient_name,
-        patient_phone=payload.patient_phone,
-        patient_birth=payload.patient_birth,
+        patient_id=patient.id,
+        patient_name=patient.name,
+        patient_phone=payload.patient_phone or patient.phone,
+        patient_birth=payload.patient_birth or patient.birth_date,
         doctor_id=current_user.id,
         doctor_name=payload.doctor_name or current_user.name,
         start_time=payload.start_time,
@@ -91,9 +129,10 @@ async def list_appointments(
 ):
     """예약 목록. 기본: 오늘 ~ 7일 후."""
     if date_from is None:
-        date_from = datetime.combine(date.today(), datetime.min.time())
+        date_from = datetime.combine(clinic_today(), datetime.min.time())
     if date_to is None:
         date_to = date_from + timedelta(days=7)
+    date_from, date_to = clinic_datetime(date_from), clinic_datetime(date_to)
 
     q = (
         select(Appointment)
@@ -137,6 +176,7 @@ async def update_appointment(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_active_user),
 ):
+    await db.execute(select(User.id).where(User.id == current_user.id).with_for_update())
     appt = (await db.execute(
         select(Appointment).where(and_(
             Appointment.id == appointment_id,
@@ -162,14 +202,11 @@ async def update_appointment(
         appt.end_time = new_end
         appt.duration_min = new_dur
 
-    for k in ("status", "chief_complaint", "memo", "cancelled_reason"):
+    if "status" in data:
+        _set_status(appt, data["status"])
+    for k in ("chief_complaint", "memo", "cancelled_reason"):
         if k in data:
             setattr(appt, k, data[k])
-
-    if data.get("status") == AppointmentStatus.ARRIVED.value:
-        appt.arrived_at = datetime.utcnow()
-    if data.get("status") == AppointmentStatus.COMPLETED.value:
-        appt.completed_at = datetime.utcnow()
 
     await db.commit()
     await db.refresh(appt)
@@ -191,8 +228,7 @@ async def check_in(
     )).scalar_one_or_none()
     if not appt:
         raise HTTPException(status_code=404, detail="Appointment not found")
-    appt.status = AppointmentStatus.ARRIVED
-    appt.arrived_at = datetime.utcnow()
+    _set_status(appt, "ARRIVED")
     await db.commit()
     await db.refresh(appt)
     return appt
@@ -214,7 +250,7 @@ async def cancel_appointment(
     )).scalar_one_or_none()
     if not appt:
         raise HTTPException(status_code=404, detail="Appointment not found")
-    appt.status = AppointmentStatus.CANCELLED
+    _set_status(appt, "CANCELLED")
     appt.cancelled_reason = reason
     await db.commit()
 
@@ -225,7 +261,7 @@ async def today_stats(
     current_user: User = Depends(get_current_active_user),
 ):
     """대시보드용 오늘 예약 통계."""
-    today_start = datetime.combine(date.today(), datetime.min.time())
+    today_start = datetime.combine(clinic_today(), datetime.min.time())
     today_end = today_start + timedelta(days=1)
 
     rows = (await db.execute(

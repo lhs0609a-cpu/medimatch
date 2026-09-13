@@ -18,13 +18,14 @@ import {
   ROLE_OPTIONS, roleIcon,
 } from '@/lib/api/staffSeats'
 import ModuleHeader from '@/components/emr/ModuleHeader'
+import QueryState from '@/components/emr/QueryState'
 
 export default function SeatsPage() {
   const qc = useQueryClient()
   const [showAdd, setShowAdd] = useState(false)
   const [previewAdd, setPreviewAdd] = useState(0)
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isError, refetch } = useQuery({
     queryKey: ['seats'],
     queryFn: staffSeatService.list,
   })
@@ -52,6 +53,7 @@ export default function SeatsPage() {
 
   return (
     <div>
+      <QueryState error={isError} retry={() => refetch()} />
       <ModuleHeader
         moduleKey="seats"
         maxWidthClass="max-w-6xl"

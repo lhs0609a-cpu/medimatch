@@ -76,6 +76,7 @@ export const useAuth = create<AuthState>()(
         } finally {
           localStorage.removeItem('access_token')
           localStorage.removeItem('refresh_token')
+          localStorage.removeItem('medi_token')
           set({
             user: null,
             isAuthenticated: false,

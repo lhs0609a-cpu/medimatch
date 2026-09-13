@@ -40,12 +40,7 @@ export default function ContactPage() {
     setIsSubmitting(true)
 
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL
-      if (!apiUrl) {
-        throw new Error('API URL이 설정되지 않았습니다.')
-      }
-
-      const res = await fetch(`${apiUrl}/contact`, {
+      const res = await fetch('/api/v1/contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),

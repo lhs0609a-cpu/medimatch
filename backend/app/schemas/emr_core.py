@@ -2,7 +2,8 @@
 from datetime import datetime, date
 from typing import List, Optional, Dict, Any
 from uuid import UUID
-from pydantic import BaseModel, Field, ConfigDict
+from pydantic import BaseModel, Field, ConfigDict, field_validator
+from ..appointment_workflow import clinic_datetime
 
 
 # ────────────────────────────────────────────
@@ -197,25 +198,44 @@ class PrescriptionOut(BaseModel):
 # ────────────────────────────────────────────
 class AppointmentCreate(BaseModel):
     patient_id: Optional[UUID] = None
-    patient_name: str
+    patient_name: str = Field(min_length=1, max_length=100)
     patient_phone: Optional[str] = None
     patient_birth: Optional[date] = None
     doctor_name: Optional[str] = None
     start_time: datetime
-    duration_min: int = 15
+    duration_min: int = Field(default=15, ge=1, le=480)
     appointment_type: str = "INITIAL"
     chief_complaint: Optional[str] = None
     memo: Optional[str] = None
     channel: str = "PHONE"
 
+    @field_validator("patient_name")
+    @classmethod
+    def validate_name(cls, value):
+        if not value.strip():
+            raise ValueError("환자명을 입력해주세요.")
+        return value.strip()
+
+    @field_validator("start_time")
+    @classmethod
+    def normalize_start(cls, value):
+        return clinic_datetime(value)
+
 
 class AppointmentUpdate(BaseModel):
     start_time: Optional[datetime] = None
-    duration_min: Optional[int] = None
+    duration_min: Optional[int] = Field(default=None, ge=1, le=480)
     status: Optional[str] = None
     chief_complaint: Optional[str] = None
     memo: Optional[str] = None
     cancelled_reason: Optional[str] = None
+
+    @field_validator("start_time", "duration_min", "status")
+    @classmethod
+    def reject_null(cls, value):
+        if value is None:
+            raise ValueError("예약 시간·길이·상태는 비워둘 수 없습니다.")
+        return clinic_datetime(value) if isinstance(value, datetime) else value
 
 
 class AppointmentOut(BaseModel):

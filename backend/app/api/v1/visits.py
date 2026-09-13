@@ -13,6 +13,8 @@ from ..deps import get_db, get_current_active_user
 from ...models.user import User
 from ...models.visit import Visit, VisitDiagnosis, VisitProcedure, VisitStatus
 from ...models.bill import Bill, BillItem, BillStatus
+from ...models.patient import Patient
+from ...appointment_workflow import clinic_today
 from ...schemas.emr_core import (
     VisitCreate, VisitUpdate, VisitOut, VisitListItem, BillOut,
 )
@@ -43,6 +45,12 @@ async def create_visit(
     current_user: User = Depends(get_current_active_user),
 ):
     """진료 차트 생성 (SOAP + 활력징후 + 진단/시술 일괄 저장)."""
+    if payload.patient_id:
+        patient = (await db.execute(select(Patient).where(
+            Patient.id == payload.patient_id, Patient.user_id == current_user.id,
+        ))).scalar_one_or_none()
+        if not patient:
+            raise HTTPException(status_code=404, detail="환자를 찾을 수 없습니다.")
     visit = Visit(
         user_id=current_user.id,
         patient_id=payload.patient_id,
@@ -386,7 +394,7 @@ async def visit_stats(
     current_user: User = Depends(get_current_active_user),
 ):
     """대시보드용 통계: 오늘/이번달 진료 건수."""
-    today = date.today()
+    today = clinic_today()
     month_start = today.replace(day=1)
 
     today_count = (await db.execute(
@@ -419,7 +427,7 @@ async def dashboard_stats(
     """월별 진료수·매출·환자수 + 진료과 분포 + 진단 TOP 10."""
     from datetime import timedelta
     from dateutil.relativedelta import relativedelta as _rd
-    today = date.today()
+    today = clinic_today()
     start = (today - _rd(months=months - 1)).replace(day=1)
 
     # 월별 진료 수
@@ -455,8 +463,14 @@ async def dashboard_stats(
         .order_by('month')
     )).all()
     rev_map = {r[0]: int(r[1]) for r in rev_rows}
-    for m in monthly:
-        m["revenue"] = rev_map.get(m["month"], 0)
+    visit_map = {m["month"]: m for m in monthly}
+    monthly = []
+    for offset in range(months):
+        key = (start + _rd(months=offset)).strftime("%Y-%m")
+        monthly.append({
+            **visit_map.get(key, {"month": key, "visits": 0, "patients": 0}),
+            "revenue": rev_map.get(key, 0),
+        })
 
     # 진료 구분 분포
     type_rows = (await db.execute(

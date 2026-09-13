@@ -2,7 +2,7 @@
 환자 관리 API (스프레드시트 기반 파이프라인)
 
 - CRUD + CSV 가져오기 + 퍼널 분석 + 동의 현황
-- DB에 데이터 없으면 데모 데이터 반환
+- 현재 계정의 저장된 데이터만 반환
 """
 from fastapi import APIRouter, Depends, HTTPException, Query, UploadFile, File, Form
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -11,7 +11,6 @@ from pydantic import BaseModel
 from typing import Optional
 from datetime import date, datetime
 import json
-import random
 import logging
 import uuid
 
@@ -79,64 +78,36 @@ class PatientUpdate(BaseModel):
 # Demo data
 # ============================================================
 
-DEMO_PATIENTS = [
-    {"seq": 1, "chart": "P-001", "name": "김민수", "phone": "010-1111-2222", "gender": "M", "region": "강남구", "inflow_date": "2025-01-05", "inflow_path": "네이버 블로그", "keywords": "허리통증 내과", "symptoms": "만성 요통", "diagnosis": "요추 추간판 탈출증", "summary": "MRI 필요 상담", "quality": "HIGH", "assessment": "적극적 치료 의향", "status": "VISITED", "manager": "이실장", "consent_exam": "CONSENTED", "consent_treat": "CONSENTED"},
-    {"seq": 2, "chart": "P-002", "name": "박지영", "phone": "010-2222-3333", "gender": "F", "region": "서초구", "inflow_date": "2025-01-08", "inflow_path": "네이버 광고", "keywords": "피부과 여드름", "symptoms": "여드름", "diagnosis": "심상성 여드름", "summary": "레이저 치료 상담", "quality": "MEDIUM", "assessment": "가격 비교 중", "status": "BOOKED", "manager": "김실장", "consent_exam": "CONSENTED", "consent_treat": "PARTIAL"},
-    {"seq": 3, "chart": "P-003", "name": "이준호", "phone": "010-3333-4444", "gender": "M", "region": "송파구", "inflow_date": "2025-01-10", "inflow_path": "소개", "keywords": "", "symptoms": "건강검진", "diagnosis": "", "summary": "직장 건강검진", "quality": "HIGH", "assessment": "정기 고객 가능", "status": "VISITED", "manager": "이실장", "consent_exam": "CONSENTED", "consent_treat": "CONSENTED"},
-    {"seq": 4, "chart": "P-004", "name": "최수정", "phone": "010-4444-5555", "gender": "F", "region": "강남구", "inflow_date": "2025-01-12", "inflow_path": "인스타그램", "keywords": "다이어트 한의원", "symptoms": "체중 관리", "diagnosis": "비만", "summary": "한약 치료 관심", "quality": "LOW", "assessment": "단순 문의", "status": "CANCELLED", "manager": "김실장", "consent_exam": "NOT_ASKED", "consent_treat": "NOT_ASKED"},
-    {"seq": 5, "chart": "P-005", "name": "정태영", "phone": "010-5555-6666", "gender": "M", "region": "마포구", "inflow_date": "2025-01-15", "inflow_path": "구글 광고", "keywords": "내과 건강검진", "symptoms": "피로감", "diagnosis": "갑상선 기능 저하 의심", "summary": "혈액검사 권유", "quality": "MEDIUM", "assessment": "추가 검사 설득 필요", "status": "VISITED", "manager": "이실장", "consent_exam": "CONSENTED", "consent_treat": "REFUSED"},
-    {"seq": 6, "chart": "P-006", "name": "한미래", "phone": "010-6666-7777", "gender": "F", "region": "강남구", "inflow_date": "2025-01-18", "inflow_path": "네이버 블로그", "keywords": "아토피 치료", "symptoms": "아토피 피부염", "diagnosis": "아토피 피부염", "summary": "면역 치료 상담", "quality": "HIGH", "assessment": "장기 치료 동의 가능", "status": "BOOKED", "manager": "김실장", "consent_exam": "CONSENTED", "consent_treat": "CONSENTED"},
-    {"seq": 7, "chart": "P-007", "name": "윤성민", "phone": "010-7777-8888", "gender": "M", "region": "용산구", "inflow_date": "2025-01-20", "inflow_path": "오프라인 전단", "keywords": "", "symptoms": "두통", "diagnosis": "편두통", "summary": "진통제 처방 원함", "quality": "LOW", "assessment": "1회성 방문 예상", "status": "VISITED", "manager": "이실장", "consent_exam": "PARTIAL", "consent_treat": "REFUSED"},
-    {"seq": 8, "chart": "P-008", "name": "서하늘", "phone": "010-8888-9999", "gender": "F", "region": "강동구", "inflow_date": "2025-01-22", "inflow_path": "카카오톡", "keywords": "감기 병원", "symptoms": "기침, 콧물", "diagnosis": "급성 상기도 감염", "summary": "일반 감기", "quality": "MEDIUM", "assessment": "재방문 가능성 낮음", "status": "VISITED", "manager": "김실장", "consent_exam": "CONSENTED", "consent_treat": "NOT_ASKED"},
-    {"seq": 9, "chart": "P-009", "name": "조현우", "phone": "010-9999-0000", "gender": "M", "region": "서초구", "inflow_date": "2025-01-25", "inflow_path": "네이버 광고", "keywords": "위내시경 비용", "symptoms": "소화불량", "diagnosis": "기능성 소화불량", "summary": "내시경 검사 필요", "quality": "HIGH", "assessment": "검사 동의 확보 중", "status": "HELD", "manager": "이실장", "consent_exam": "PARTIAL", "consent_treat": "NOT_ASKED"},
-    {"seq": 10, "chart": "P-010", "name": "임서연", "phone": "010-0000-1111", "gender": "F", "region": "강남구", "inflow_date": "2025-01-28", "inflow_path": "소개", "keywords": "", "symptoms": "고혈압", "diagnosis": "본태성 고혈압", "summary": "투약 시작 상담", "quality": "HIGH", "assessment": "장기 관리 환자", "status": "VISITED", "manager": "김실장", "consent_exam": "CONSENTED", "consent_treat": "CONSENTED"},
-    {"seq": 11, "chart": "P-011", "name": "배동건", "phone": "010-1234-0001", "gender": "M", "region": "강남구", "inflow_date": "2025-02-01", "inflow_path": "네이버 블로그", "keywords": "당뇨 내과", "symptoms": "다음다갈", "diagnosis": "제2형 당뇨", "summary": "혈당 관리 상담", "quality": "HIGH", "assessment": "장기 관리 의향", "status": "VISITED", "manager": "이실장", "consent_exam": "CONSENTED", "consent_treat": "CONSENTED"},
-    {"seq": 12, "chart": "P-012", "name": "노은비", "phone": "010-1234-0002", "gender": "F", "region": "마포구", "inflow_date": "2025-02-03", "inflow_path": "인스타그램", "keywords": "피부 레이저", "symptoms": "기미", "diagnosis": "기미", "summary": "레이저토닝 관심", "quality": "MEDIUM", "assessment": "가격 민감", "status": "PENDING", "manager": "김실장", "consent_exam": "NOT_ASKED", "consent_treat": "NOT_ASKED"},
-]
-
-INFLOW_PATH_COLORS = {
-    "네이버 블로그": "emerald",
-    "네이버 광고": "blue",
-    "구글 광고": "red",
-    "인스타그램": "purple",
-    "카카오톡": "amber",
-    "소개": "cyan",
-    "오프라인 전단": "orange",
-}
+def _serialize_patient(patient):
+    """One representation for list/detail, including intake and consent fields."""
+    result = {}
+    for column in Patient.__table__.columns:
+        if column.name in {"user_id", "clinic_id"}:
+            continue
+        value = getattr(patient, column.name)
+        if isinstance(value, (datetime, date)):
+            value = value.isoformat()
+        elif isinstance(value, uuid.UUID):
+            value = str(value)
+        elif hasattr(value, "value"):
+            value = value.value
+        result[column.name] = value
+    return {**result, "inflow_path_color": "blue", "is_demo": False}
 
 
-def _build_demo_patients() -> list[dict]:
-    results = []
-    for p in DEMO_PATIENTS:
-        results.append({
-            "id": f"demo-{p['seq']:03d}",
-            "seq_no": p["seq"],
-            "chart_no": p["chart"],
-            "name": p["name"],
-            "phone": p["phone"],
-            "gender": p["gender"],
-            "region": p["region"],
-            "inflow_date": p["inflow_date"],
-            "inflow_path": p["inflow_path"],
-            "inflow_path_color": INFLOW_PATH_COLORS.get(p["inflow_path"], "gray"),
-            "search_keywords": p["keywords"],
-            "symptoms": p["symptoms"],
-            "diagnosis_name": p["diagnosis"],
-            "consultation_summary": p["summary"],
-            "db_quality": p["quality"],
-            "staff_assessment": p["assessment"],
-            "inbound_status": p["status"],
-            "manager_name": p["manager"],
-            "consent_examination": p["consent_exam"],
-            "consent_treatment": p["consent_treat"],
-            "is_demo": True,
-        })
-    return results
-
-
-# ============================================================
-# Endpoints
-# ============================================================
+async def _patient_analytics(db, user_id):
+    rows = (await db.execute(select(Patient).where(Patient.user_id == user_id))).scalars().all()
+    def value(v):
+        return v.value if hasattr(v, "value") else v
+    return [{
+        "inbound_status": value(p.inbound_status),
+        "consent_examination": value(p.consent_examination),
+        "consent_treatment": value(p.consent_treatment),
+        "inflow_path": p.inflow_path or "-",
+        "inflow_path_color": "blue",
+        "manager_name": p.manager_name,
+        "non_consent_reason": p.non_consent_reason,
+    } for p in rows]
 
 @router.get("/")
 async def list_patients(
@@ -150,7 +121,7 @@ async def list_patients(
     current_user: User = Depends(get_current_active_user),
     sub: ServiceSubscription = Depends(require_active_service(ServiceType.EMR)),
 ):
-    """환자 목록 (pagination, search, filter). DB 우선, 비어있으면 데모 폴백."""
+    """환자 목록 (pagination, search, filter). 빈 검색 결과는 빈 목록."""
     # 실 DB 조회
     q_db = select(Patient).where(Patient.user_id == current_user.id)
     if search:
@@ -176,36 +147,11 @@ async def list_patients(
             q_db.order_by(Patient.created_at.desc())
                 .offset((page - 1) * size).limit(size)
         )).scalars().all()
-        items = [{
-            "id": str(p.id),
-            "chart_no": p.chart_no,
-            "name": p.name,
-            "phone": p.phone,
-            "gender": p.gender,
-            "birth_date": p.birth_date.isoformat() if p.birth_date else None,
-            "inflow_path": p.inflow_path,
-            "inbound_status": p.inbound_status.value if p.inbound_status else None,
-            "manager_name": p.manager_name,
-            "appointment_date": p.appointment_date.isoformat() if p.appointment_date else None,
-        } for p in rows]
+        items = [_serialize_patient(p) for p in rows]
         return {"items": items, "total": total_db, "page": page, "size": size, "is_demo": False}
 
-    # DB 비어있을 때만 데모 폴백
-    patients = _build_demo_patients()
-    if search:
-        ql = search.lower()
-        patients = [p for p in patients if ql in p["name"].lower() or ql in (p["phone"] or "") or ql in (p["chart_no"] or "").lower()]
-    if status:
-        patients = [p for p in patients if p["inbound_status"] == status]
-    if manager:
-        patients = [p for p in patients if p["manager_name"] == manager]
-    if inflow_path:
-        patients = [p for p in patients if p["inflow_path"] == inflow_path]
-
-    total = len(patients)
-    start = (page - 1) * size
-    items = patients[start:start + size]
-    return {"items": items, "total": total, "page": page, "size": size, "is_demo": True}
+    # 검색 결과에 가상 환자를 섞지 않는다.
+    return {"items": [], "total": 0, "page": page, "size": size, "is_demo": False}
 
 
 @router.get("/funnel/summary")
@@ -215,7 +161,7 @@ async def funnel_summary(
     sub: ServiceSubscription = Depends(require_active_service(ServiceType.EMR)),
 ):
     """파이프라인 KPI"""
-    patients = _build_demo_patients()
+    patients = await _patient_analytics(db, current_user.id)
     total = len(patients)
     booked = len([p for p in patients if p["inbound_status"] in ["BOOKED", "VISITED"]])
     visited = len([p for p in patients if p["inbound_status"] == "VISITED"])
@@ -228,7 +174,7 @@ async def funnel_summary(
         "visit_rate": round(visited / total * 100, 1) if total else 0,
         "cancellation_rate": round(cancelled / total * 100, 1) if total else 0,
         "consent_rate": round(consented / total * 100, 1) if total else 0,
-        "is_demo": True,
+        "is_demo": False,
     }
 
 
@@ -239,7 +185,7 @@ async def funnel_stage_counts(
     sub: ServiceSubscription = Depends(require_active_service(ServiceType.EMR)),
 ):
     """단계별 환자 수"""
-    patients = _build_demo_patients()
+    patients = await _patient_analytics(db, current_user.id)
     stages = {
         "PENDING": {"label": "유입(대기)", "count": 0, "color": "gray"},
         "BOOKED": {"label": "예약완료", "count": 0, "color": "blue"},
@@ -252,7 +198,7 @@ async def funnel_stage_counts(
         if st in stages:
             stages[st]["count"] += 1
 
-    return {"stages": list(stages.values()), "total": len(patients), "is_demo": True}
+    return {"stages": list(stages.values()), "total": len(patients), "is_demo": False}
 
 
 @router.get("/funnel/inflow-path")
@@ -262,7 +208,7 @@ async def funnel_inflow_path(
     sub: ServiceSubscription = Depends(require_active_service(ServiceType.EMR)),
 ):
     """유입경로별 전환율"""
-    patients = _build_demo_patients()
+    patients = await _patient_analytics(db, current_user.id)
     paths: dict[str, dict] = {}
     for p in patients:
         path = p["inflow_path"]
@@ -286,7 +232,7 @@ async def funnel_inflow_path(
             "consent_rate": round(path_data["consented"] / t * 100, 1) if t else 0,
         })
     result.sort(key=lambda x: x["total"], reverse=True)
-    return {"paths": result, "is_demo": True}
+    return {"paths": result, "is_demo": False}
 
 
 @router.get("/consent/dashboard")
@@ -296,7 +242,7 @@ async def consent_dashboard(
     sub: ServiceSubscription = Depends(require_active_service(ServiceType.EMR)),
 ):
     """동의 현황 대시보드"""
-    patients = _build_demo_patients()
+    patients = await _patient_analytics(db, current_user.id)
     visited = [p for p in patients if p["inbound_status"] == "VISITED"]
     total_visited = len(visited)
 
@@ -328,13 +274,9 @@ async def consent_dashboard(
         })
 
     # 미동의 사유 TOP5
-    non_consent_reasons = [
-        {"reason": "비용 부담", "count": 3},
-        {"reason": "다른 병원 비교 후 결정", "count": 2},
-        {"reason": "시간 부족", "count": 2},
-        {"reason": "치료 필요성 미인식", "count": 1},
-        {"reason": "가족 상의 필요", "count": 1},
-    ]
+    from collections import Counter
+    reason_counts = Counter(p["non_consent_reason"] for p in visited if p.get("non_consent_reason"))
+    non_consent_reasons = [{"reason": reason, "count": count} for reason, count in reason_counts.most_common(5)]
 
     return {
         "total_visited": total_visited,
@@ -352,7 +294,7 @@ async def consent_dashboard(
         },
         "by_manager": managers,
         "non_consent_reasons": non_consent_reasons,
-        "is_demo": True,
+        "is_demo": False,
     }
 
 
@@ -363,7 +305,7 @@ async def get_patient(
     current_user: User = Depends(get_current_active_user),
     sub: ServiceSubscription = Depends(require_active_service(ServiceType.EMR)),
 ):
-    """환자 상세 — DB 우선, 폴백으로 데모."""
+    """환자 상세 — 현재 계정 소유 환자만 조회."""
     # UUID 형식이면 DB 조회
     try:
         from uuid import UUID
@@ -374,44 +316,12 @@ async def get_patient(
             ))
         )).scalar_one_or_none()
         if row:
-            return {
-                "id": str(row.id),
-                "chart_no": row.chart_no,
-                "name": row.name,
-                "phone": row.phone,
-                "gender": row.gender,
-                "birth_date": row.birth_date.isoformat() if row.birth_date else None,
-                "region": row.region,
-                "inflow_date": row.inflow_date.isoformat() if row.inflow_date else None,
-                "inflow_path": row.inflow_path,
-                "search_keywords": row.search_keywords,
-                "symptoms": row.symptoms,
-                "diagnosis_name": row.diagnosis_name,
-                "consultation_summary": row.consultation_summary,
-                "db_quality": row.db_quality.value if row.db_quality else None,
-                "staff_assessment": row.staff_assessment,
-                "appointment_date": row.appointment_date.isoformat() if row.appointment_date else None,
-                "appointment_path": row.appointment_path,
-                "inbound_status": row.inbound_status.value if row.inbound_status else None,
-                "cancellation_reason": row.cancellation_reason,
-                "consultation_gap_analysis": row.consultation_gap_analysis,
-                "manager_name": row.manager_name,
-                "consent_examination": row.consent_examination.value if row.consent_examination else None,
-                "consent_treatment": row.consent_treatment.value if row.consent_treatment else None,
-                "is_demo": False,
-            }
+            return _serialize_patient(row)
     except (ValueError, TypeError):
         pass
 
-    # 폴백: 데모
-    patients = _build_demo_patients()
-    patient = next((p for p in patients if p["id"] == patient_id), None)
-    if not patient:
-        if patients:
-            patient = patients[0]
-        else:
-            raise HTTPException(status_code=404, detail="Not found")
-    return {**patient, "is_demo": True}
+    # 없는 ID를 다른 환자로 대체하지 않는다.
+    raise HTTPException(status_code=404, detail="Patient not found")
 
 
 @router.post("/")

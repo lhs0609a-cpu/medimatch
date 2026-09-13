@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import BrandLogo from '@/components/BrandLogo'
 
 const footerLinks = {
   서비스: [
@@ -37,13 +38,7 @@ export function HomeFooter() {
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
           {/* Brand */}
           <div>
-            <Link href="/" className="flex items-center gap-2 mb-4">
-              <img
-                src="/assets/logo/mediplaton-horizontal.png"
-                alt="MEDI-PLATON"
-                className="h-8 object-contain"
-              />
-            </Link>
+            <div className="mb-4"><BrandLogo /></div>
             <p className="text-muted-foreground mb-4 text-sm">
               의료 개원의 모든 것을 연결하는 데이터 기반 통합 플랫폼
             </p>

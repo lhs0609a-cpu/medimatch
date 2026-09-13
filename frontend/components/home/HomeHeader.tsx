@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import BrandLogo from '@/components/BrandLogo'
 import { useState, useEffect } from 'react'
 import {
   ArrowRight,
@@ -39,13 +40,7 @@ export function HomeHeader() {
     <header className="fixed top-0 left-0 right-0 z-50 glass" role="banner">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
-          <Link href="/" className="flex items-center gap-2">
-            <img
-              src="/assets/logo/mediplaton-horizontal.png"
-              alt="MEDI-PLATON"
-              className="h-8 object-contain"
-            />
-          </Link>
+          <BrandLogo />
 
           <nav className="hidden lg:flex items-center gap-1">
             <div className="relative">

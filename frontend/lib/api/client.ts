@@ -10,6 +10,7 @@ const API_BASE_URL =
 
 export const apiClient = axios.create({
   baseURL: API_BASE_URL,
+  timeout: 30000,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -39,7 +40,7 @@ apiClient.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config
 
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    if (typeof window !== 'undefined' && error.response?.status === 401 && originalRequest && !originalRequest._retry) {
       originalRequest._retry = true
 
       try {

@@ -1,363 +1,99 @@
 'use client'
-
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useState, useEffect } from 'react'
-import {
-  Stethoscope,
-  Users,
-  Pill,
-  Send,
-  BarChart3,
-  LayoutGrid,
-  ChevronLeft,
-  ChevronRight,
-  Bell,
-  Search,
-  Menu,
-  X,
-  Mic,
-  HelpCircle,
-  Compass,
-  type LucideIcon,
-} from 'lucide-react'
+import { useQuery } from '@tanstack/react-query'
+import { LayoutDashboard, Users, Stethoscope, CalendarDays, Pill, Receipt, CreditCard, BarChart3, MessageSquare, Settings, Bell, Search, Menu, X, ChevronLeft, ChevronRight, LayoutGrid, HelpCircle, ArrowUpRight } from 'lucide-react'
+import BrandLogo from '@/components/BrandLogo'
 import { CommandPalette } from '@/components/emr/CommandPalette'
+import { clinicSetupService } from '@/lib/api/clinicSetup'
+import { apiClient } from '@/lib/api/client'
 
-type PrimaryLink = {
-  href: string
-  label: string
-  icon: LucideIcon
-  // 활성 처리될 추가 경로 prefix들 (이 prefix로 시작하면 같은 그룹으로 간주)
-  matchPrefixes?: string[]
-  badge?: string
-}
-
-// 일상에서 자주 쓰는 6개만 사이드바에 노출. 나머지 23개는 ⌘K(더보기)로.
-const primaryLinks: PrimaryLink[] = [
-  {
-    href: '/emr/appointments',
-    label: '진료',
-    icon: Stethoscope,
-    matchPrefixes: ['/emr/appointments', '/emr/chart', '/emr/inbox', '/emr/waiting', '/emr/telemedicine', '/emr/chronic-care', '/emr/smart-booking'],
-  },
-  {
-    href: '/emr/patients',
-    label: '환자',
-    icon: Users,
-    matchPrefixes: ['/emr/patients'],
-  },
-  {
-    href: '/emr/prescriptions',
-    label: '처방·청구',
-    icon: Pill,
-    matchPrefixes: ['/emr/prescriptions', '/emr/claims', '/emr/tax-correction', '/emr/bridge', '/emr/billing'],
-  },
-  {
-    href: '/emr/crm',
-    label: 'CRM',
-    icon: Send,
-    matchPrefixes: ['/emr/crm', '/emr/reviews'],
-    badge: 'NEW',
-  },
-  {
-    href: '/emr/dashboard',
-    label: '리포트',
-    icon: BarChart3,
-    matchPrefixes: ['/emr/dashboard', '/emr-dashboard', '/emr/reports', '/emr/cost', '/emr/ai-consulting', '/emr/multi-branch'],
-  },
-  {
-    href: '/emr/discover',
-    label: '발견',
-    icon: Compass,
-    matchPrefixes: ['/emr/discover', '/buildings', '/opening-project', '/group-buying', '/pharmacy-match', '/pharmacist', '/landlord'],
-    badge: 'NEW',
-  },
+const groups = [
+  { label: '워크스페이스', links: [
+    { href: '/emr/dashboard', label: '대시보드', icon: LayoutDashboard },
+    { href: '/emr/appointments', label: '예약·접수', icon: CalendarDays },
+    { href: '/emr/waiting', label: '대기실', icon: Stethoscope },
+    { href: '/emr/patients', label: '환자 관리', icon: Users },
+    { href: '/emr/chart', label: '전자차트', icon: Stethoscope },
+  ] },
+  { label: '진료 이후', links: [
+    { href: '/emr/prescriptions', label: '처방전', icon: Pill },
+    { href: '/emr/billing', label: '수납·결제', icon: CreditCard },
+    { href: '/emr/claims', label: '보험청구', icon: Receipt },
+    { href: '/emr/crm', label: '환자 CRM', icon: MessageSquare },
+    { href: '/emr/reports', label: '리포트', icon: BarChart3 },
+  ] },
 ]
-
-export default function EMRAppLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+export default function EMRAppLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
   const [collapsed, setCollapsed] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
-  const [mobileSearchOpen, setMobileSearchOpen] = useState(false)
   const [paletteOpen, setPaletteOpen] = useState(false)
-  const [authReady, setAuthReady] = useState(false)
-
-  // ⌘K / Ctrl+K — 어디서든 명령 팔레트 열기
+  const [auth, setAuth] = useState<'loading' | 'ready' | 'error'>('loading')
+  const [attempt, setAttempt] = useState(0)
+  const clinic = useQuery({ queryKey: ['clinic-setup'], queryFn: clinicSetupService.get, enabled: auth === 'ready', retry: 1 })
   useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
-        e.preventDefault()
-        setPaletteOpen(true)
-      }
+    setMobileOpen(false)
+    setPaletteOpen(false)
+  }, [pathname])
+  useEffect(() => {
+    const onKey = (event: KeyboardEvent) => {
+      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') { event.preventDefault(); setPaletteOpen(v => !v) }
+      if (event.key === 'Escape') setMobileOpen(false)
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
   }, [])
-
-  // EMR 진입 가드 — 토큰 없으면 데모 의사 자동 발급
   useEffect(() => {
-    const ensureAuth = async () => {
-      const jwt = localStorage.getItem('access_token')
-      const magic = localStorage.getItem('medi_token')
-      if (jwt || magic) {
-        setAuthReady(true)
-        return
-      }
+    const controller = new AbortController()
+    const timeout = window.setTimeout(() => controller.abort(), 15000)
+    let active = true
+    async function ensureAuth() {
+      setAuth('loading')
       try {
-        // 상대 경로 — next.config.js rewrites가 백엔드로 프록시 (같은 origin, CORS 우회)
-        const r = await fetch('/api/v1/auth/demo-doctor', { method: 'POST' })
-        if (r.ok) {
-          const data = await r.json()
-          if (data.token) {
-            localStorage.setItem('medi_token', data.token)
-          }
+        const token = localStorage.getItem('access_token') || localStorage.getItem('medi_token')
+        if (token) {
+          await apiClient.get('/auth/me', { signal: controller.signal })
+          if (active) setAuth('ready')
+          return
         }
-      } catch (e) {
-        console.warn('demo-doctor 발급 실패 — EMR API 호출이 401될 수 있음', e)
-      } finally {
-        setAuthReady(true)
-      }
+        const response = await fetch('/api/v1/auth/demo-doctor', { method: 'POST', signal: controller.signal })
+        if (!response.ok) throw new Error('인증 실패')
+        const data = await response.json()
+        if (!data.token) throw new Error('토큰 누락')
+        localStorage.setItem('medi_token', data.token)
+        if (active) setAuth('ready')
+      } catch { if (active) setAuth('error') }
+      finally { window.clearTimeout(timeout) }
     }
     ensureAuth()
-  }, [])
-
-  return (
-    <div className="min-h-screen bg-background flex">
-      {/* 모바일 오버레이 */}
-      {mobileOpen && (
-        <div
-          className="fixed inset-0 bg-black/40 z-40 lg:hidden"
-          onClick={() => setMobileOpen(false)}
-        />
-      )}
-
-      {/* ───── 사이드바 ───── */}
-      <aside
-        className={`
-          fixed top-0 left-0 h-full z-50
-          bg-card border-r border-border
-          flex flex-col
-          transition-all duration-300 ease-in-out
-          ${collapsed ? 'w-[72px]' : 'w-[240px]'}
-          ${mobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
-        `}
-      >
-        {/* 로고 */}
-        <div className={`h-16 flex items-center border-b border-border px-4 ${collapsed ? 'justify-center' : 'gap-3'}`}>
-          <div className="w-8 h-8 rounded-xl bg-primary flex items-center justify-center flex-shrink-0">
-            <Stethoscope className="w-4 h-4 text-white" />
-          </div>
-          {!collapsed && (
-            <span className="font-bold text-sm whitespace-nowrap">
-              MediMatch <span className="text-primary">EMR</span>
-            </span>
-          )}
-        </div>
-
-        {/* 의원 정보 */}
-        {!collapsed && (
-          <div className="px-4 py-3 border-b border-border">
-            <div className="text-xs text-muted-foreground">현재 의원</div>
-            <div className="text-sm font-semibold truncate">메디매치 내과의원</div>
-          </div>
-        )}
-
-        {/* 네비게이션 — 일상 6개만 노출 */}
-        <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
-          {primaryLinks.map((link) => {
-            const matches = link.matchPrefixes ?? [link.href]
-            const isActive = matches.some(p => pathname === p || pathname.startsWith(p + '/'))
-            return (
-              <Link
-                key={link.href}
-                href={link.href}
-                onClick={() => setMobileOpen(false)}
-                className={`
-                  flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium
-                  transition-all duration-200
-                  ${isActive
-                    ? 'bg-primary/10 text-primary'
-                    : 'text-muted-foreground hover:text-foreground hover:bg-secondary'
-                  }
-                  ${collapsed ? 'justify-center px-0' : ''}
-                `}
-                title={collapsed ? link.label : undefined}
-              >
-                <link.icon className="w-5 h-5 flex-shrink-0" />
-                {!collapsed && <span>{link.label}</span>}
-                {link.badge && !collapsed && (
-                  <span className="ml-auto text-[10px] font-semibold bg-primary/10 text-primary px-1.5 py-0.5 rounded-md">
-                    {link.badge}
-                  </span>
-                )}
-              </Link>
-            )
-          })}
-
-          {/* 더보기 — 전체 메뉴 + 검색 (⌘K) */}
-          <button
-            onClick={() => { setPaletteOpen(true); setMobileOpen(false) }}
-            className={`
-              w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium
-              text-muted-foreground hover:text-foreground hover:bg-secondary
-              transition-all duration-200
-              ${collapsed ? 'justify-center px-0' : ''}
-            `}
-            title={collapsed ? '더보기 (⌘K)' : undefined}
-          >
-            <LayoutGrid className="w-5 h-5 flex-shrink-0" />
-            {!collapsed && (
-              <>
-                <span>더보기</span>
-                <kbd className="ml-auto text-2xs px-1.5 py-0.5 bg-secondary border border-border rounded">⌘K</kbd>
-              </>
-            )}
-          </button>
-        </nav>
-
-        {/* 하단 */}
-        <div className="p-3 border-t border-border space-y-1">
-          <Link
-            href="/emr/notifications"
-            className={`flex items-center gap-3 px-3 py-2 rounded-xl text-sm text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors ${collapsed ? 'justify-center px-0' : ''}`}
-          >
-            <Bell className="w-5 h-5 flex-shrink-0" />
-            {!collapsed && <span>알림</span>}
-          </Link>
-          <Link
-            href="/emr/support"
-            className={`flex items-center gap-3 px-3 py-2 rounded-xl text-sm text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors ${collapsed ? 'justify-center px-0' : ''}`}
-          >
-            <HelpCircle className="w-5 h-5 flex-shrink-0" />
-            {!collapsed && <span>도움말</span>}
-          </Link>
-
-          <button
-            onClick={() => setCollapsed(!collapsed)}
-            className="hidden lg:flex items-center gap-3 px-3 py-2 rounded-xl text-sm text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors w-full"
-          >
-            {collapsed ? (
-              <ChevronRight className="w-5 h-5 mx-auto" />
-            ) : (
-              <>
-                <ChevronLeft className="w-5 h-5" />
-                <span>접기</span>
-              </>
-            )}
-          </button>
-        </div>
-      </aside>
-
-      {/* ───── 메인 영역 ───── */}
-      <div className={`flex-1 flex flex-col transition-all duration-300 ${collapsed ? 'lg:ml-[72px]' : 'lg:ml-[240px]'}`}>
-        {/* 상단 헤더 */}
-        <header className="h-16 flex items-center justify-between px-4 sm:px-6 border-b border-border bg-card/80 backdrop-blur-xl sticky top-0 z-30">
-          <div className="flex items-center gap-3">
-            <button
-              className="lg:hidden btn-icon"
-              onClick={() => setMobileOpen(true)}
-            >
-              <Menu className="w-5 h-5" />
-            </button>
-
-            {/* 모바일 검색 버튼 */}
-            <button
-              className="sm:hidden btn-icon"
-              onClick={() => setMobileSearchOpen(true)}
-              aria-label="환자 검색"
-            >
-              <Search className="w-5 h-5" />
-            </button>
-
-            {/* 명령 팔레트 트리거 — 환자/메뉴 통합 검색 */}
-            <button
-              onClick={() => setPaletteOpen(true)}
-              className="hidden sm:flex items-center gap-2 bg-secondary/50 hover:bg-secondary rounded-xl px-4 py-2 w-72 transition-colors"
-            >
-              <Search className="w-4 h-4 text-muted-foreground" />
-              <span className="text-sm text-muted-foreground flex-1 text-left">메뉴·환자·기능 검색</span>
-              <kbd className="hidden md:inline text-2xs text-muted-foreground bg-secondary px-1.5 py-0.5 rounded">⌘K</kbd>
-            </button>
-          </div>
-
-          <div className="flex items-center gap-2">
-            {/* AI 차트 바로가기 */}
-            <Link
-              href="/emr/chart/new"
-              className="btn-primary btn-sm hidden sm:flex"
-            >
-              <Mic className="w-3.5 h-3.5" />
-              AI 차트
-            </Link>
-
-            {/* 알림 */}
-            <button className="btn-icon relative">
-              <Bell className="w-5 h-5" />
-              <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full" />
-            </button>
-
-            {/* 프로필 */}
-            <button className="flex items-center gap-2 px-2 py-1.5 rounded-xl hover:bg-secondary transition-colors">
-              <div className="avatar avatar-sm bg-primary text-primary-foreground">
-                <span className="text-xs font-bold">김</span>
-              </div>
-              <span className="hidden sm:inline text-sm font-medium">김원장</span>
-            </button>
-          </div>
-        </header>
-
-        {/* 콘텐츠 — 인증 준비 후 렌더 (신규 사용자만 200~500ms 대기) */}
-        <main className="flex-1 p-4 sm:p-6 overflow-y-auto">
-          {authReady ? children : (
-            <div className="flex items-center justify-center h-[60vh]">
-              <div className="text-center text-muted-foreground">
-                <div className="inline-block w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin mb-3" />
-                <p className="text-sm">EMR 준비 중...</p>
-              </div>
-            </div>
-          )}
-        </main>
-      </div>
-
-      {/* 모바일 풀스크린 검색 오버레이 */}
-      {mobileSearchOpen && (
-        <div className="fixed inset-0 z-[60] bg-background sm:hidden animate-fade-in">
-          <div className="flex items-center gap-3 px-4 h-16 border-b border-border">
-            <Search className="w-5 h-5 text-muted-foreground flex-shrink-0" />
-            <input
-              type="text"
-              placeholder="환자 검색 (이름, 차트번호, 연락처)"
-              className="bg-transparent text-base outline-none w-full placeholder:text-muted-foreground"
-              autoFocus
-            />
-            <button
-              onClick={() => setMobileSearchOpen(false)}
-              className="btn-icon flex-shrink-0"
-            >
-              <X className="w-5 h-5" />
-            </button>
-          </div>
-          <div className="p-4 text-center text-sm text-muted-foreground">
-            환자 이름, 차트번호, 연락처로 검색하세요
-          </div>
-        </div>
-      )}
-
-      {/* AI 차트 플로팅 액션 버튼 (모바일) */}
-      <Link
-        href="/emr/chart/new"
-        className="sm:hidden fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full bg-primary text-primary-foreground shadow-lg flex items-center justify-center active:scale-95 transition-transform"
-        aria-label="AI 차트"
-      >
-        <Mic className="w-6 h-6" />
-      </Link>
-
-      {/* ⌘K 명령 팔레트 — 23개 숨김 메뉴 즉시 접근 */}
-      <CommandPalette open={paletteOpen} onClose={() => setPaletteOpen(false)} />
+    return () => { active = false; controller.abort(); window.clearTimeout(timeout) }
+  }, [attempt])
+  return <div className="emr-workspace min-h-screen bg-background">
+    <a href="#emr-content" className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[100] focus:bg-card focus:p-3">본문으로 이동</a>
+    {mobileOpen && <button aria-label="메뉴 닫기" className="fixed inset-0 z-40 bg-slate-950/40 lg:hidden" onClick={() => setMobileOpen(false)} />}
+    <aside className={'fixed inset-y-0 left-0 z-50 flex flex-col border-r border-border bg-card transition-all ' + (collapsed ? 'w-[76px] ' : 'w-[248px] ') + (mobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0')}>
+      <div className="flex h-[76px] shrink-0 items-center justify-center border-b border-border px-4"><BrandLogo compact={collapsed} workspace /></div>
+      {!collapsed && <Link href="/emr/settings" className="mx-4 mt-5 rounded-xl border border-border bg-secondary/40 px-3 py-3"><span className="block text-[10px] font-semibold tracking-widest text-muted-foreground">MY WORKSPACE</span><span className="mt-1 flex items-center justify-between text-sm font-semibold">{clinic.data?.clinic_name || '의원 정보 설정'}<ChevronRight className="h-4 w-4" /></span></Link>}
+      <nav aria-label="EMR 주요 메뉴" className="flex-1 overflow-y-auto px-3 py-5">
+        {groups.map(group => <div key={group.label} className="mb-5">{!collapsed && <p className="mb-2 px-3 text-[10px] font-semibold tracking-wider text-muted-foreground">{group.label}</p>}<div className="space-y-1">{group.links.map(link => {
+          const active = pathname === link.href || pathname.startsWith(link.href + '/')
+          return <Link key={link.href} href={link.href} title={link.label} aria-current={active ? 'page' : undefined} className={'flex items-center gap-3 rounded-lg px-3 py-2.5 text-[13px] font-medium transition-colors ' + (collapsed ? 'justify-center ' : '') + (active ? 'bg-blue-50 text-blue-700 dark:bg-blue-950 dark:text-blue-200' : 'text-muted-foreground hover:bg-secondary hover:text-foreground')}><link.icon className="h-[18px] w-[18px] shrink-0" />{!collapsed && link.label}</Link>
+        })}</div></div>)}
+        <button onClick={() => setPaletteOpen(true)} aria-label="전체 메뉴 검색" className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-[13px] text-muted-foreground hover:bg-secondary"><LayoutGrid className="h-[18px] w-[18px] shrink-0" />{!collapsed && '전체 메뉴'}</button>
+      </nav>
+      <div className="space-y-1 border-t border-border p-3">{[{ href: '/emr/settings', label: '설정', icon: Settings }, { href: '/emr/support', label: '도움말', icon: HelpCircle }].map(link => <Link key={link.href} href={link.href} title={link.label} className="flex items-center gap-3 rounded-lg px-3 py-2 text-xs text-muted-foreground hover:bg-secondary"><link.icon className="h-4 w-4 shrink-0" />{!collapsed && link.label}</Link>)}<button aria-label={collapsed ? '메뉴 펼치기' : '메뉴 접기'} onClick={() => setCollapsed(!collapsed)} className="hidden w-full items-center gap-3 rounded-lg px-3 py-2 text-xs text-muted-foreground hover:bg-secondary lg:flex">{collapsed ? <ChevronRight className="h-4 w-4" /> : <><ChevronLeft className="h-4 w-4" />메뉴 접기</>}</button></div>
+    </aside>
+    <div className={'min-w-0 transition-all ' + (collapsed ? 'lg:ml-[76px]' : 'lg:ml-[248px]')}>
+      <header className="sticky top-0 z-30 flex h-[76px] items-center justify-between gap-3 border-b border-border bg-card/95 px-4 backdrop-blur-xl sm:px-7">
+        <div className="flex min-w-0 items-center gap-3"><button aria-label="메뉴 열기" className="btn-icon lg:hidden" onClick={() => setMobileOpen(true)}><Menu className="h-5 w-5" /></button><button onClick={() => setPaletteOpen(true)} aria-label="메뉴 및 환자 검색" className="flex items-center gap-3 rounded-xl bg-secondary/60 px-3 py-2.5 text-sm text-muted-foreground sm:min-w-[280px]"><Search className="h-4 w-4" /><span className="hidden sm:inline">메뉴·환자 검색</span><kbd className="ml-auto hidden rounded border border-border px-1.5 text-[10px] sm:inline">Ctrl K</kbd></button></div>
+        <div className="flex items-center gap-2"><Link href="/emr/chart/new" className="btn-primary hidden text-xs sm:inline-flex">새 진료 기록 <ArrowUpRight className="h-4 w-4" /></Link><Link href="/emr/notifications" aria-label="알림" className="btn-icon"><Bell className="h-5 w-5" /></Link><Link href="/emr/settings" aria-label="의원 설정" className="flex h-9 w-9 items-center justify-center rounded-full bg-blue-50 text-blue-600"><Settings className="h-4 w-4" /></Link></div>
+      </header>
+      <main id="emr-content" className="min-w-0 p-4 sm:p-7">
+        {auth === 'ready' ? children : <div className="flex min-h-[60vh] items-center justify-center"><div className="max-w-sm text-center">{auth === 'loading' ? <><div className="mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-2 border-blue-600 border-t-transparent" /><p role="status" className="text-sm text-muted-foreground">워크스페이스에 연결하고 있습니다.</p></> : <><h1 className="text-xl font-bold">워크스페이스에 연결하지 못했습니다.</h1><p className="mt-3 text-sm text-muted-foreground">서버 연결을 확인하고 다시 시도하거나 로그인해주세요.</p><div className="mt-5 flex justify-center gap-2"><button className="btn-primary" onClick={() => setAttempt(v => v + 1)}>다시 시도</button><Link href="/emr/login" className="btn-secondary">로그인</Link></div></>}</div></div>}
+      </main>
     </div>
-  )
+    <CommandPalette open={paletteOpen} onClose={() => setPaletteOpen(false)} />
+  </div>
 }

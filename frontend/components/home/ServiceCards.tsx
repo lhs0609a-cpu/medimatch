@@ -12,21 +12,21 @@ const features = [
     Mockup: ChartMockup,
     title: 'AI 음성 자동 차트',
     desc: '진료 대화만 하세요. CC·PI·PMH를 AI가 자동 분류하고 ICD-10 진단코드까지 추천합니다.',
-    metric: '평균 차트 시간 70%↓',
-    href: '/services/emr#ai-chart',
+    metric: '음성 입력부터 SOAP 기록까지',
+    href: '/emr/chart/new',
   },
   {
     Mockup: ClaimsMockup,
     title: '삭감 방어 AI',
-    desc: '과거 삭감 패턴을 학습해 위험 청구를 실시간 경고. 최적 코드 조합으로 삭감률 30% 감소.',
-    metric: '삭감률 평균 30%↓',
-    href: '/services/emr#claims',
+    desc: '청구 내역과 검토 결과를 한곳에서 확인하고, 보완할 항목을 정리하세요.',
+    metric: '청구 내역과 검토 흐름 연결',
+    href: '/emr/claims',
   },
   {
     Mockup: CRMMockup,
     title: 'CRM · 환자 리콜',
     desc: '3개월 미방문 환자 자동 감지·알림톡 발송. 야간 차단·동의 검증 등 안전 가드 18종.',
-    metric: '재방문율 25%↑',
+    metric: '환자별 후속 관리',
     href: '/emr/crm',
   },
 ]
@@ -46,13 +46,13 @@ export function ServiceCards() {
             variants={staggerItem}
             className="inline-block px-3 py-1 mb-4 text-xs font-semibold text-primary bg-primary/10 rounded-full"
           >
-            실제 화면 — EMR 핵심 3가치
+            진료를 연결하는 핵심 기능
           </motion.span>
           <motion.h2
             variants={staggerItem}
             className="text-3xl md:text-5xl font-bold tracking-tight mb-4"
           >
-            진료의 70%는 AI가 대신
+            매일의 업무가 자연스럽게 이어지도록
           </motion.h2>
           <motion.p
             variants={staggerItem}

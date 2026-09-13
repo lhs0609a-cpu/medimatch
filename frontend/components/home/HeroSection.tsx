@@ -1,176 +1,35 @@
 'use client'
-
 import Link from 'next/link'
-import dynamic from 'next/dynamic'
-import { useState, useEffect } from 'react'
-import { motion } from 'framer-motion'
-import { ArrowRight, Stethoscope, Target, MessageCircle, Monitor, Send } from 'lucide-react'
-import { hasGuestToken } from '@/lib/auth/guestToken'
-
-const KakaoMap = dynamic(() => import('@/components/map/KakaoMap'), {
-  ssr: false,
-  loading: () => null,
-})
-
-const stats = [
-  { value: '13', label: '전문 분야' },
-  { value: '470+', label: '매물·솔루션' },
-  { value: '150+', label: '개원 성공' },
+import { useState } from 'react'
+import { ArrowRight, Check, CalendarDays, FileText, CreditCard, Stethoscope, Users, Search } from 'lucide-react'
+const flows = [
+  { title: '예약·접수', icon: CalendarDays, headline: '환자의 하루를 한눈에.', desc: '예약 확인부터 도착, 진료 시작까지 하나의 흐름으로 관리하세요.', href: '/emr/appointments' },
+  { title: '진료·차트', icon: FileText, headline: '기록은 명확하게. 진료는 편안하게.', desc: '환자 이력과 SOAP, 진단·시술 기록을 연결합니다.', href: '/emr/chart' },
+  { title: '수납·리포트', icon: CreditCard, headline: '진료 이후까지 빈틈없이.', desc: '청구서와 수납 내역을 관리하고 의원의 운영 현황을 확인하세요.', href: '/emr/billing' },
 ]
-
-interface HeroSectionProps {
-  markers?: Array<{
-    id: string | number
-    lat: number
-    lng: number
-    title: string
-    type: 'hospital' | 'pharmacy' | 'prospect' | 'default' | 'closed_hospital' | 'listing'
-  }>
-}
-
-export function HeroSection({ markers = [] }: HeroSectionProps) {
-  const [hasToken, setHasToken] = useState(false)
-  useEffect(() => { setHasToken(hasGuestToken()) }, [])
-
-  return (
-    <section className="relative min-h-[100dvh] flex items-center justify-center overflow-hidden" aria-label="히어로 섹션">
-      {/* 배경 지도 + gradient 오버레이 */}
-      <div className="absolute inset-0 -z-10">
-        <div className="absolute inset-0">
-          <KakaoMap
-            center={{ lat: 37.5172, lng: 127.0473 }}
-            level={8}
-            markers={markers}
-            className="w-full h-full opacity-50"
-          />
+export function HeroSection(_props: { markers?: unknown[] }) {
+  const [active, setActive] = useState(0)
+  const flow = flows[active]
+  return <section className="relative overflow-hidden border-b border-border bg-background pt-32 pb-20 sm:pt-40 lg:pb-28" aria-label="메디플라톤 소개">
+    <div aria-hidden="true" className="absolute right-0 top-0 h-full w-2/3 bg-gradient-to-bl from-blue-50/80 via-blue-50/20 to-transparent dark:from-blue-950/20" />
+    <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div className="grid items-center gap-14 lg:grid-cols-[1fr_1.1fr]">
+        <div><span className="inline-flex items-center gap-2 rounded-full border border-blue-200 bg-blue-50 px-3 py-1.5 text-xs font-semibold text-blue-700"><span className="h-1.5 w-1.5 rounded-full bg-blue-500" />의원을 위한 하나의 워크스페이스</span>
+          <h1 className="mt-7 text-4xl font-bold leading-[1.2] tracking-[-0.05em] sm:text-5xl lg:text-[60px]">더 나은 진료를 위한<br /><span className="text-blue-600">새로운 연결.</span></h1>
+          <p className="mt-6 max-w-lg text-base leading-8 text-muted-foreground sm:text-lg">예약부터 차트, 처방과 수납까지.<br />흩어진 업무를 연결하고, 환자에게 집중하세요.</p>
+          <div className="mt-8 flex flex-wrap gap-3"><Link href="/emr/dashboard" className="btn-primary px-6 py-3.5">EMR 시작하기 <ArrowRight className="h-4 w-4" /></Link><Link href="/contact" className="btn-secondary px-6 py-3.5">도입 상담</Link></div>
+          <div className="mt-6 flex flex-wrap gap-4 text-xs text-muted-foreground">{['환자 데이터 이관', '의원별 워크스페이스', '통합 진료 흐름'].map(s => <span key={s} className="inline-flex items-center gap-1.5"><Check className="h-3.5 w-3.5 text-blue-600" />{s}</span>)}</div>
         </div>
-        <div className="absolute inset-0 bg-gradient-to-b from-background/70 via-background/55 to-background pointer-events-none" />
-        <div className="absolute top-1/4 left-1/4 w-[600px] h-[600px] bg-[#3182f6]/5 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] bg-[#3182f6]/8 rounded-full blur-3xl pointer-events-none" />
+        <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_24px_80px_-24px_rgba(37,99,235,0.22)] text-slate-900">
+          <div className="flex items-center justify-between border-b border-slate-100 px-5 py-4"><span className="flex items-center gap-2 text-xs font-bold"><Stethoscope className="h-4 w-4 text-blue-600" />MEDIPLATON <span className="font-normal text-slate-400">/ 워크스페이스</span></span><span className="rounded bg-slate-100 px-2 py-1 text-[10px] text-slate-500">화면 미리보기 · 예시 데이터</span></div>
+          <div className="flex"><div className="hidden w-14 shrink-0 space-y-6 border-r border-slate-100 bg-slate-50/60 py-6 sm:block">{[CalendarDays, Users, FileText, CreditCard].map((Icon, i) => <Icon key={i} className={'mx-auto h-4 w-4 ' + (i === active ? 'text-blue-600' : 'text-slate-400')} />)}</div>
+          <div className="min-w-0 flex-1 p-5 sm:p-6"><div className="flex items-center justify-between"><p className="text-[10px] font-semibold tracking-widest text-blue-600">A BETTER DAY AT YOUR CLINIC</p><Search className="h-4 w-4 text-slate-400" /></div><h2 className="mt-3 text-xl font-bold tracking-tight">{flow.headline}</h2><p className="mt-2 min-h-10 text-xs leading-5 text-slate-500">{flow.desc}</p>
+          <div className="my-5 grid grid-cols-3 gap-2">{(active === 0 ? ['예약', '대기', '진료 중'] : active === 1 ? ['진료 기록', '진단', '시술'] : ['청구서', '수납 완료', '미수금']).map((s, i) => <div key={s} className="rounded-xl border border-slate-100 bg-slate-50 p-3"><p className="text-[10px] text-slate-500">{s}</p><p className="mt-2 text-xl font-semibold">{[12, 3, 2][i]}<span className="ml-1 text-[10px] font-normal text-slate-400">건</span></p></div>)}</div>
+          <div className="space-y-2">{['김○○', '이○○', '박○○'].map((name, i) => <div key={name} className="flex items-center gap-3 rounded-lg border border-slate-100 px-3 py-3"><span className="text-[10px] font-semibold text-blue-600">{['09:00', '09:15', '09:30'][i]}</span><span className="flex-1 text-xs font-medium">{name}</span><span className="text-[10px] text-slate-400">{active === 0 ? '예약 확인' : active === 1 ? '진료 기록' : '수납 확인'}</span><span className="h-1.5 w-1.5 rounded-full bg-blue-400" /></div>)}</div>
+          <Link href={flow.href} className="mt-5 flex items-center justify-between rounded-lg bg-blue-600 px-4 py-3 text-xs font-semibold text-white">{flow.title} 열기 <ArrowRight className="h-3.5 w-3.5" /></Link></div></div>
+        </div>
       </div>
-
-      <div className="relative max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-16 text-center">
-        <motion.h1
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, ease: 'easeOut' }}
-          className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black tracking-tight leading-[1.1] mb-6"
-        >
-          <span className="text-foreground">EMR·CRM 평생 무료,</span>
-          <br />
-          <span className="text-[#3182f6]">개원까지 한 번에</span>
-        </motion.h1>
-
-        <motion.p
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.15, ease: 'easeOut' }}
-          className="text-lg md:text-xl text-muted-foreground mb-4 max-w-2xl mx-auto leading-relaxed"
-        >
-          환자 리콜·예약·문진·청구까지 — 가입 없이 지금 바로 사용하세요.<br className="hidden md:block" />
-          기존 EMR 환자도 CSV/엑셀 한 번에 이관됩니다.
-        </motion.p>
-        <motion.p
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.2, ease: 'easeOut' }}
-          className="text-sm text-muted-foreground/80 mb-10"
-        >
-          ✓ 회원가입 불필요 &nbsp;·&nbsp; ✓ 비밀번호 없음 &nbsp;·&nbsp; ✓ 의사 평생 무료
-        </motion.p>
-
-        {/* 메인 CTA — CRM·EMR 바로 시작 (2-col, 동등 강조) */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.3, ease: 'easeOut' }}
-          className="mb-4 flex flex-col sm:flex-row items-stretch justify-center gap-3 max-w-2xl mx-auto"
-        >
-          <Link
-            href="/emr/crm"
-            className="btn-primary btn-lg group text-base px-8 py-4 inline-flex flex-1 justify-center"
-          >
-            <Send className="w-5 h-5" />
-            CRM 바로 시작
-            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-          </Link>
-          <Link
-            href="/emr"
-            className="inline-flex flex-1 items-center justify-center gap-2 px-8 py-4 text-base font-semibold rounded-2xl bg-[#3182f6]/10 hover:bg-[#3182f6]/20 text-[#3182f6] border-2 border-[#3182f6]/30 transition-all"
-          >
-            <Monitor className="w-5 h-5" />
-            EMR 바로 시작
-            <ArrowRight className="w-4 h-4" />
-          </Link>
-        </motion.div>
-
-        {/* 보조 동선 — 환자 이관 / 진단 / 카톡 복원 / 미션맵 */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.4, ease: 'easeOut' }}
-          className="mb-12 flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-sm"
-        >
-          <Link
-            href="/emr/patients/import"
-            className="inline-flex items-center gap-1.5 text-muted-foreground hover:text-[#3182f6] transition-colors"
-          >
-            <ArrowRight className="w-3.5 h-3.5" />
-            기존 EMR에서 환자 옮기기
-          </Link>
-          <span className="text-muted-foreground/30">·</span>
-          {hasToken ? (
-            <Link
-              href="/my-roadmap"
-              className="inline-flex items-center gap-1.5 text-muted-foreground hover:text-[#3182f6] transition-colors"
-            >
-              <Target className="w-3.5 h-3.5" />
-              내 개원 미션맵
-            </Link>
-          ) : (
-            <Link
-              href="/diagnose"
-              className="inline-flex items-center gap-1.5 text-muted-foreground hover:text-[#3182f6] transition-colors"
-            >
-              <Stethoscope className="w-3.5 h-3.5" />
-              개원 준비 중 — 1분 진단
-            </Link>
-          )}
-          <span className="text-muted-foreground/30">·</span>
-          <Link
-            href="/recover"
-            className="inline-flex items-center gap-1.5 text-muted-foreground hover:text-[#3182f6] transition-colors"
-          >
-            <MessageCircle className="w-3.5 h-3.5" />
-            카톡으로 링크 받기
-          </Link>
-        </motion.div>
-
-        {/* Stat pills */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.45, ease: 'easeOut' }}
-          className="flex items-center justify-center gap-3 sm:gap-4"
-        >
-          {stats.map((s) => (
-            <div
-              key={s.label}
-              className="px-5 py-2.5 rounded-full bg-[#3182f6]/10 border border-[#3182f6]/20 backdrop-blur-sm"
-            >
-              <span className="text-lg sm:text-xl font-bold text-[#3182f6]">{s.value}</span>
-              <span className="text-sm text-muted-foreground ml-1.5">{s.label}</span>
-            </div>
-          ))}
-        </motion.div>
-      </div>
-
-      {/* Scroll indicator */}
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce">
-        <svg className="w-6 h-6 text-muted-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-        </svg>
-      </div>
-    </section>
-  )
+      <div className="mt-14 grid gap-3 sm:grid-cols-3" role="group" aria-label="업무 미리보기">{flows.map((f, i) => <button key={f.title} onClick={() => setActive(i)} aria-pressed={active === i} className={'flex items-center gap-4 rounded-xl border px-5 py-4 text-left transition ' + (active === i ? 'border-blue-200 bg-blue-50/70 dark:bg-blue-950/30' : 'border-border bg-card hover:border-blue-200')}><f.icon className={'h-5 w-5 shrink-0 ' + (active === i ? 'text-blue-600' : 'text-muted-foreground')} /><span><span className="block text-sm font-bold">{f.title}</span><span className="mt-1 block text-xs text-muted-foreground">{['첫 만남부터 진료 시작까지', '환자 중심의 진료 기록', '의원 운영을 더 명확하게'][i]}</span></span><ArrowRight className="ml-auto h-4 w-4 text-muted-foreground" /></button>)}</div>
+    </div>
+  </section>
 }

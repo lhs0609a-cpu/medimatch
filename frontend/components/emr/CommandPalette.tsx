@@ -2,6 +2,8 @@
 
 import { useEffect, useRef, useState, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
+import { useQuery } from '@tanstack/react-query'
+import { apiClient } from '@/lib/api/client'
 import {
   Search, X, ArrowRight,
   LayoutDashboard, Users, Stethoscope, CalendarCheck, Receipt, Settings,
@@ -17,7 +19,7 @@ type Cmd = {
   label: string
   href: string
   icon: LucideIcon
-  group: '진료/운영' | '분석/리포트' | '발견 (생태계)' | '설정/기타'
+  group: '환자 검색' | '진료/운영' | '분석/리포트' | '발견 (생태계)' | '설정/기타'
   keywords?: string
 }
 
@@ -91,15 +93,37 @@ export function CommandPalette({ open, onClose }: Props) {
   const [activeIdx, setActiveIdx] = useState(0)
   const inputRef = useRef<HTMLInputElement>(null)
   const listRef = useRef<HTMLDivElement>(null)
+  const [debounced, setDebounced] = useState('')
+  useEffect(() => {
+    const timer = setTimeout(() => setDebounced(query.trim()), 300)
+    return () => clearTimeout(timer)
+  }, [query])
+  const patients = useQuery({
+    queryKey: ['command-patients', debounced],
+    queryFn: async (): Promise<{ id: string; name: string; chart_no?: string }[]> => {
+      const response = await apiClient.get('/emr/patients/', { params: { search: debounced, size: 6 } })
+      return response.data.items || []
+    },
+    enabled: open && debounced.length >= 2,
+    retry: false,
+  })
 
   const filtered = useMemo(() => {
     if (!query.trim()) return COMMANDS
-    return COMMANDS
+    const menus = COMMANDS
       .map(c => ({ c, s: Math.max(fuzzyScore(c.label, query), fuzzyScore(c.keywords ?? '', query)) }))
       .filter(x => x.s > 0)
       .sort((a, b) => b.s - a.s)
       .map(x => x.c)
-  }, [query])
+    const matches: Cmd[] = debounced === query.trim() && debounced.length >= 2 ? (patients.data || []).map(p => ({
+      id: `patient-${p.id}`, label: `${p.name}${p.chart_no ? ` · ${p.chart_no}` : ''}`,
+      href: `/emr/patients/${p.id}`, icon: Users, group: '환자 검색',
+    })) : []
+    return [...matches, ...menus]
+  }, [query, debounced, patients.data])
+
+  // Keyboard order must match the grouped visual order, not relevance order.
+  const ordered = useMemo(() => (['환자 검색', '진료/운영', '분석/리포트', '발견 (생태계)', '설정/기타'] as const).flatMap(group => filtered.filter(c => c.group === group)), [filtered])
 
   const grouped = useMemo(() => {
     const g: Record<string, Cmd[]> = {}
@@ -129,13 +153,13 @@ export function CommandPalette({ open, onClose }: Props) {
       if (e.key === 'ArrowUp')   { e.preventDefault(); setActiveIdx(i => Math.max(i - 1, 0)) }
       if (e.key === 'Enter') {
         e.preventDefault()
-        const target = filtered[activeIdx]
+        const target = ordered[activeIdx]
         if (target) { router.push(target.href); onClose() }
       }
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [open, filtered, activeIdx, onClose, router])
+  }, [open, filtered, ordered, activeIdx, onClose, router])
 
   if (!open) return null
 
@@ -158,7 +182,8 @@ export function CommandPalette({ open, onClose }: Props) {
             ref={inputRef}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="메뉴, 기능 검색 (예: 청구, crm, 환자)"
+            placeholder="메뉴 또는 환자 이름·차트번호 검색"
+            aria-label="메뉴 또는 환자 검색"
             className="bg-transparent text-base outline-none w-full placeholder:text-muted-foreground"
           />
           <button
@@ -171,12 +196,14 @@ export function CommandPalette({ open, onClose }: Props) {
         </div>
 
         <div ref={listRef} className="max-h-[60vh] overflow-y-auto py-2">
+          {debounced.length >= 2 && patients.isFetching && <p role="status" className="px-4 py-2 text-xs text-muted-foreground">환자 검색 중...</p>}
+          {debounced.length >= 2 && patients.isError && <p role="alert" className="px-4 py-2 text-xs text-rose-600">환자 검색에 실패했습니다. 연결을 확인해주세요.</p>}
           {filtered.length === 0 ? (
             <div className="px-4 py-8 text-center text-sm text-muted-foreground">
               일치하는 항목이 없습니다
             </div>
           ) : (
-            (['진료/운영', '분석/리포트', '발견 (생태계)', '설정/기타'] as const).map(groupName => {
+            (['환자 검색', '진료/운영', '분석/리포트', '발견 (생태계)', '설정/기타'] as const).map(groupName => {
               const items = grouped[groupName]
               if (!items?.length) return null
               return (
