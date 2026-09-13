@@ -261,7 +261,7 @@ async def create_prescription(
         prescription_no=_generate_rx_no(current_user.id),
         prescribed_date=payload.prescribed_date,
         doctor_id=current_user.id,
-        doctor_name=payload.doctor_name or current_user.name,
+        doctor_name=payload.doctor_name or current_user.full_name,
         pharmacy_name=payload.pharmacy_name,
         duration_days=payload.duration_days,
         patient_note=payload.patient_note,

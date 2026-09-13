@@ -103,7 +103,7 @@ async def create_appointment(
         patient_phone=payload.patient_phone or patient.phone,
         patient_birth=payload.patient_birth or patient.birth_date,
         doctor_id=current_user.id,
-        doctor_name=payload.doctor_name or current_user.name,
+        doctor_name=payload.doctor_name or current_user.full_name,
         start_time=payload.start_time,
         end_time=end,
         duration_min=payload.duration_min,

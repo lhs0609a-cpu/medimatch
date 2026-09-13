@@ -181,7 +181,7 @@ async def add_payment(
         transaction_id=payment.transaction_id,
         card_last4=payment.card_last4,
         card_company=payment.card_company,
-        received_by=payment.received_by or (current_user.name or ""),
+        received_by=payment.received_by or (current_user.full_name or ""),
         note=payment.note,
     )
     db.add(pay)
@@ -225,7 +225,7 @@ async def refund_bill(
         method=PaymentMethod.OTHER,
         is_refund=True,
         refund_reason=reason,
-        received_by=current_user.name or "",
+        received_by=current_user.full_name or "",
     ))
     bill.paid_amount -= amount
     bill.balance = bill.final_amount - bill.paid_amount
